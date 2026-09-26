@@ -41,7 +41,7 @@ const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
-const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
+const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
@@ -524,8 +524,8 @@ func draw_actor(a: Dictionary) -> void:
 	if a.fused:
 		var col := 3 if a.slash > 0 or a.get("fire_flash", 0.0) > 0 else (1 + int(a.step) % 2 if a.move.length() > 0.1 else 0)
 		var tint := Color(1.5, 1.5, 1.5, 0.65) if a.hurt > 0 else Color.WHITE
-		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 150, tint)
-		text_at(draw_pos + Vector2(-36, -145), "MARTY • FUSÃO", CYAN, 11)
+		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 144, tint)
+		text_at(draw_pos + Vector2(-36, -115), "MARTY • FUSÃO", CYAN, 11)
 		return
 	# Roupa atual: COM armadura = Ômega; SEM armadura = Padrão / Londres / Mecânico.
 	# marty_anim.png: linha = roupa*5 + vista; colunas = parado, passo 1-4, tiro, salto.
