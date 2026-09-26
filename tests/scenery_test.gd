@@ -29,8 +29,8 @@ func _init() -> void:
 	check(ids(rooms) == ["entry"], "no início só o Desembarque está descoberto")
 	var floors: Array = sc.visible_floors(s, rooms)
 	check(floors.has(DOCKS.CORRIDORS[0]), "corredor que sai do Desembarque aparece")
-	check(not Scenery.inside(floors, Vector2(2700, 4650)), "Pátio dos Guindastes fica no escuro")
-	s.actors[0].p = Vector2(2700, 4650); s.step(0.016, [{}, {}])
+	check(not Scenery.inside(floors, Vector2(3450, 6450)), "Pátio dos Guindastes fica no escuro")
+	s.actors[0].p = Vector2(3450, 6450); s.step(0.016, [{}, {}])
 	check(ids(sc.discovered_rooms(s)).has("cranes"), "entrar no Pátio revela a sala")
 
 	# Sala 01 continua atravessável (raio de colisão do Marty, grade de 8px)
@@ -44,9 +44,9 @@ func _init() -> void:
 		for off in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
 			var n: Vector2i = c + off
 			var p := Vector2(n) * 8
-			if p.x < 380 or p.x > 1960 or p.y < 4280 or p.y > 5120: continue
+			if p.x < 560 or p.x > 2240 or p.y < 5960 or p.y > 7040: continue
 			if not seen.has(n) and s.clear_at(p, 11): seen[n] = true; queue.append(n)
-	for target in [["chave", DOCKS.POINTS.key], ["saída para o corredor", Vector2(1880, 4690)], ["cais de granito", Vector2(1000, 4990)]]:
+	for target in [["chave", DOCKS.POINTS.key], ["saída para o corredor", Vector2(2185, 6500)], ["cais de granito", Vector2(920, 6975)]]:
 		var ok := false
 		for c in seen:
 			if (Vector2(c) * 8).distance_to(target[1]) < 24: ok = true; break
@@ -55,10 +55,10 @@ func _init() -> void:
 	s.start_run(1941); s.step(0.016, [{}, {}])
 	var entry: Dictionary = s.room_by_id("entry")
 	check(entry.get("locked", false), "Desembarque com inimigos: portões fechados")
-	check(not s.clear_at(Vector2(1618, 4690), 11), "portão fechado bloqueia a passagem")
+	check(not s.clear_at(Vector2(2218, 6500), 11), "portão fechado bloqueia a passagem")
 	s.enemies = s.enemies.filter(func(e): return e.room != "entry")
 	s.step(0.016, [{}, {}])
-	check(not entry.locked and entry.cleared and s.clear_at(Vector2(1618, 4690), 11), "sala limpa: portões abrem")
+	check(not entry.locked and entry.cleared and s.clear_at(Vector2(2218, 6500), 11), "sala limpa: portões abrem")
 	# Tentáculo do Desembarque causa dano
 	var m: Dictionary = s.actors[0]
 	m.p = DOCKS.HAZARDS[0].p; m.hurt = 0; var before: float = m.hp

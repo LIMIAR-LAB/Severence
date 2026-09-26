@@ -26,12 +26,14 @@ func _init() -> void:
 	check(a.mech, "blocked disembark preserves occupant")
 	s.obstacles.clear(); s.interact(a)
 	check(not a.mech and s.mech.occupant == -1, "valid exit clears seat")
-	a.p = Vector2(780, 460); a.hurt = 0; a.hp = 100; a.armor = false
-	s.damage_actor(a, 20); check(a.hp == 80, "unarmored damage")
-	a.hurt = 0; a.hp = 100; a.armor = true
-	s.damage_actor(a, 20); check(is_equal_approx(a.hp, 92), "Armadura Ômega recebe 40% do dano")
+	a.p = Vector2(780, 460); a.hurt = 0; a.hp = 30; a.armor = false; a.shield = 0.0
+	s.damage_actor(a, 20); check(a.hp == 20, "golpe pesado tira 1 coração")
+	a.hurt = 0; s.damage_actor(a, 8); check(a.hp == 15, "golpe comum tira meio coração")
+	a.hurt = 0; a.shield = 30.0
+	s.damage_actor(a, 20); check(a.hp == 15 and a.shield == 20.0, "escudo Ômega absorve o golpe antes da vida")
 	a.hurt = 0; a.jump = 0.4; s.damage_actor(a, 50)
-	check(a.hp == 92, "airborne damage rule is consistent")
+	check(a.hp == 15, "airborne damage rule is consistent")
+	a.shield = 0.0
 	a.jump = 0
 	var old: Vector2 = a.p
 	s.step_actor(a, {"move": Vector2(1, -1).normalized(), "jump": true}, 0.1)
@@ -50,15 +52,15 @@ func _init() -> void:
 	a.p = DocksMap.POINTS.shop; s.money = 15; var k: int = s.keys
 	s.interact(a); s.interact(a)
 	check(s.money == 0 and s.keys == k + 1, "shop purchase is atomic and stock limited")
-	s.enemies.clear(); s.spawn_enemy(Vector2(730, 4750), "brute")
-	a.p = Vector2(700, 4750); a.aim = Vector2.RIGHT; a.slash = 0
+	s.enemies.clear(); s.spawn_enemy(Vector2(1130, 6450), "brute")
+	a.p = Vector2(1100, 6450); a.aim = Vector2.RIGHT; a.slash = 0
 	s.melee(a); var hp: float = s.enemies[0].hp
 	s.step_actor(a, {"melee": true}, 0.01)
 	check(s.enemies[0].hp == hp, "melee cooldown prevents repeated damage per frame")
-	s.bullets.clear(); s.enemies.clear(); s.spawn_enemy(Vector2(810, 4750), "brute")
-	s.add_bullet(Vector2(700, 4750), Vector2.RIGHT, 0, 10, 2000)
+	s.bullets.clear(); s.enemies.clear(); s.spawn_enemy(Vector2(1210, 6450), "brute")
+	s.add_bullet(Vector2(1100, 6450), Vector2.RIGHT, 0, 10, 2000)
 	s.step_bullets(0.1)
-	check(s.enemies[0].hp == 108.75 and s.bullets.is_empty(), "fast projectile sweep hits once without tunnelling")
+	check(s.enemies[0].hp == s.enemies[0].max - 10 and s.bullets.is_empty(), "fast projectile sweep hits once without tunnelling")
 	s.enemies.clear(); a.p = DocksMap.POINTS.side; s.interact(a)
 	check(s.side_active and s.enemies.size() == 7, "optional encounter spawns seven guards")
 	s.enemies.clear(); s.step(0.016, [{}, {}])
@@ -66,16 +68,16 @@ func _init() -> void:
 	var coins: int = s.money; s.step(0.016, [{}, {}])
 	check(s.money == coins, "optional reward cannot repeat")
 	s.open_secret()
-	check(s.clear_at(DocksMap.SECRET_CORRIDOR.get_center(), 10) and s.clear_at(Vector2(4275, 1200), 10), "secret opens a traversable corridor")
-	check(s.height_at(Vector2(2060, 2900)) < s.height_at(Vector2(2240, 2900)), "ramp interpolates elevation")
-	var blocked: Vector2 = s.move_body(Vector2(2600, 3200), Vector2(0, -150), 11)
-	check(blocked.y >= 3120, "raised balcony ledge cannot be walked through")
-	var climbed: Vector2 = s.move_body(Vector2(2060, 2950), Vector2(300, 0), 11)
+	check(s.clear_at(DocksMap.SECRET_CORRIDOR.get_center(), 10) and s.clear_at(Vector2(6350, 1250), 10), "secret opens a traversable corridor")
+	check(s.height_at(Vector2(2060, 4100)) < s.height_at(Vector2(2240, 4100)), "ramp interpolates elevation")
+	var blocked: Vector2 = s.move_body(Vector2(2650, 4400), Vector2(0, -150), 11)
+	check(blocked.y >= 4320, "raised balcony ledge cannot be walked through")
+	var climbed: Vector2 = s.move_body(Vector2(2060, 4150), Vector2(300, 0), 11)
 	check(climbed.x > 2260 and s.height_at(climbed) == 44, "ramp allows walking onto raised balcony")
 	var route: PackedVector2Array = s.nav.get_point_path(s.nav.get_closest_point(DocksMap.POINTS.spawn), s.nav.get_closest_point(DocksMap.POINTS.boss))
 	check(route.size() > 2, "AI navigation connects arrival to boss")
 	a.dead = true; a.hp = 0; b.p = a.p + Vector2(30, 0); s.interact(b)
-	check(not a.dead and a.hp == 45, "partner can revive downed player")
+	check(not a.dead and a.hp == s.HEART * 1.5, "partner can revive downed player")
 	a.p = DocksMap.POINTS.extraction; s.boss_dead = true; var before: int = s.materials
 	s.interact(a)
 	check(s.mode == "hub" and s.materials == before + 3 and s.armor_unlocked, "extraction awards permanent armor and returns to hub")

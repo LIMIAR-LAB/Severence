@@ -310,7 +310,7 @@ func _physics_process(dt: float) -> void:
 	if edge("map", Input.is_physical_key_pressed(KEY_TAB) or Input.is_physical_key_pressed(KEY_M) or (mouse_on_map and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))): map_open = not map_open
 	if edge("coop", Input.is_physical_key_pressed(KEY_F2)) and not online:
 		sim.coop = "local" if sim.coop == "ai" else "ai"; sim.say("Parceiro: " + sim.coop)
-		sim.actors[1].active = true; sim.actors[1].dead = false; sim.actors[1].hp = maxf(45, sim.actors[1].hp)
+		sim.actors[1].active = true; sim.actors[1].dead = false; sim.actors[1].hp = maxf(sim.HEART * 1.5, sim.actors[1].hp)
 	if playing and not paused:
 		if online and not hosting:
 			if menu.visible: submit_input.rpc_id(1, {})
@@ -344,6 +344,8 @@ func _physics_process(dt: float) -> void:
 	if sim.coop == "local": zoom = clampf(950.0 / maxf(700, sim.actors[0].p.distance_to(sim.actors[1].p) + 380), 0.45, zoom)
 	if not playing or sim.mode == "hub": target = Vector2(672, 459); zoom = 0.955
 	elif sim.mode == "arena": target = Vector2(640, 530); zoom = 0.80
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--zoom=") and sim.mode == "run": zoom = float(arg.trim_prefix("--zoom="))   # capturas de conferência
 	camera.position = camera.position.lerp(target - Vector2(0, 40), 0.12)
 	camera.zoom = camera.zoom.lerp(Vector2(zoom, zoom), 0.1)
 	# Tremor de câmera: onda de choque da Ômega, tiro de escopeta e explosões do baú.
@@ -353,6 +355,9 @@ func _physics_process(dt: float) -> void:
 		elif fx.kind == "transform" and fx.life / fx.max > 0.45: shake = maxf(shake, 2.0)
 		elif fx.kind == "chest_burst" and fx.life / fx.max > 0.75: shake = maxf(shake, 3.0)
 		elif fx.kind == "stomp" and fx.life / fx.max > 0.7: shake = maxf(shake, 3.5)
+		elif fx.kind == "explosion" and fx.p.distance_to(sim.actors[0].p) < 900: shake = maxf(shake, fx.life / fx.max * (9.0 if fx.get("r", 0.0) > 100 else 4.0))
+		elif fx.kind == "gate_slam" and fx.life / fx.max > 0.6: shake = maxf(shake, 3.0)
+		elif fx.kind == "recoil" and fx.life / fx.max > 0.6: shake = maxf(shake, 3.0)
 	for a in sim.actors:
 		if a.get("fire_flash", 0.0) > 0.06 and sim.weapon_of(a) in ["shotgun", "omega"]: shake = maxf(shake, 2.5)
 	camera.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * shake

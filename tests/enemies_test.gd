@@ -51,7 +51,7 @@ func _init() -> void:
 	# Mecânico bate mais forte
 	s = arena(); a = s.actors[0]; a.outfit = "mecanico"; a.aim = Vector2.RIGHT
 	s.spawn_enemy(a.p + Vector2(40, 0), "brute"); s.melee(a)
-	check(s.enemies[0].hp == 118.75 - 46, "Mecânico: golpe corpo a corpo mais forte")
+	check(s.enemies[0].hp == s.enemies[0].max - 46, "Mecânico: golpe corpo a corpo mais forte")
 	# O Almirante das Profundezas
 	s = arena(); s.actors[0].p = Vector2(600, 600)
 	s.spawn_enemy(Vector2(600, 300), "boss"); var boss: Dictionary = s.enemies[0]

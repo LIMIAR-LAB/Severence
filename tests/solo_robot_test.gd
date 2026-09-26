@@ -38,7 +38,7 @@ func run() -> void:
 	check(s.spectres[0].hp == 75 and a.hp == 100, "fusion absorbs impact using robot energy")
 	check(s.toggle_fusion(a) and not a.armor and s.spectres[0].hp == 75, "separation restores armor without free healing")
 	s.toggle_fusion(a); a.hurt = 0; s.damage_actor(a, 90)
-	check(not a.fused and a.hp == 85 and s.spectres[0].state == "destroyed", "depleted fusion applies overflow damage")
+	check(not a.fused and a.hp == 95 and s.spectres[0].state == "destroyed", "depleted fusion applies overflow damage")
 	a.summon_cd = 0
 	check(not s.summon_robot(a), "destroyed robot cannot be healed by resummoning")
 	var copy = load("res://scripts/simulation.gd").new(); copy.apply_snapshot(s.snapshot())

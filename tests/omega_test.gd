@@ -35,7 +35,7 @@ func _init() -> void:
 	s.spawn_enemy(a.p + Vector2(60, 0), "brute"); var e: Dictionary = s.enemies[0]
 	a.aim = Vector2.RIGHT; a.shot = 0
 	s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)
-	check(e.hp == 118.75 - 38 and s.effects.any(func(fx): return fx.kind == "sword"), "1º corte da espada: 38 e rastro")
+	check(e.hp == e.max - 38 and s.effects.any(func(fx): return fx.kind == "sword"), "1º corte da espada: 38 e rastro")
 	e.hp = 999; e.max = 999
 	for n in range(2):
 		a.shot = 0; s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)

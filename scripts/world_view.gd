@@ -2,6 +2,19 @@ class_name DockView
 extends Node2D
 const DocksMap = preload("res://scripts/docks_map.gd")
 const SummonFX = preload("res://scripts/summon_fx.gd")
+const Scenery = preload("res://scripts/dock_scenery.gd")
+
+# Camada de luz (modo aditivo) desenhada por cima do mundo: postes, janelas, braseiros, explosões.
+class LightLayer extends Node2D:
+	var host
+	func _draw() -> void:
+		if host and host.sim and host.sim.mode != "hub": host.scenery.draw_lights(self, host.sim.tick_time)
+
+var scenery
+var light_layer: LightLayer
+var vis_floors: Array = []     # pisos descobertos neste quadro (névoa)
+var vis_rooms: Array = []
+const NIGHT := Color(0.74, 0.78, 0.96)
 
 var sim: Expedition
 var marty_texture: Texture2D
@@ -64,12 +77,20 @@ func _ready() -> void:
 	refuge_bg = load("res://assets/environment/refuge/refuge_bg.png")
 	refuge_core = load("res://assets/environment/refuge/core_front.png")
 	font = ThemeDB.fallback_font
+	scenery = Scenery.new()
+	light_layer = LightLayer.new(); light_layer.host = self
+	var mat := CanvasItemMaterial.new(); mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	light_layer.material = mat; light_layer.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	add_child(light_layer)
 
 func text_at(p: Vector2, text: String, color: Color = GOLD, size: int = 14) -> void:
 	draw_string(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
 
 func _draw() -> void:
 	if sim == null: return
+	scenery.lights.clear()
+	modulate = Color.WHITE if sim.mode == "hub" else NIGHT
+	if light_layer: light_layer.queue_redraw()
 	if sim.mode == "hub": draw_refuge_back()
 	else: draw_expedition_ground()
 	draw_entities()
@@ -100,68 +121,71 @@ func tile_floor(rect: Rect2, view: Rect2, kind: String) -> void:
 			var cell := Rect2(x, y, minf(size, rect.end.x - x), minf(size, rect.end.y - y))
 			draw_texture_rect_region(tex, cell, Rect2(Vector2.ZERO, cell.size))
 
+func seen(p: Vector2, margin: float = 30.0) -> bool:
+	# névoa: só o que está em piso já descoberto aparece
+	return sim.mode != "run" or Scenery.inside(vis_floors, p, margin)
+
 func draw_expedition_ground() -> void:
 	var view := view_rect()
-	# Água: fundo escuro, textura na proporção nativa (128×60) e brilhos que se movem.
-	draw_rect(view, Color("071523"))
-	var wx0 := int(floorf(view.position.x / 128) * 128); var wy0 := int(floorf(view.position.y / 60) * 60)
-	for y in range(wy0, int(view.end.y), 60):
-		for x in range(wx0, int(view.end.x), 128):
-			draw_texture_rect(dock_art.water, Rect2(x + ((y / 60) % 2) * 64 - 64, y, 128, 60), false, Color(0.65, 0.75, 0.9))
-	for y in range(int(floorf(view.position.y / 57) * 57), int(view.end.y), 57):
-		for x in range(int(floorf(view.position.x / 117) * 117), int(view.end.x), 117):
-			var offset := sin(sim.tick_time * 0.55 + x * 0.013 + y * 0.02) * 8
-			draw_line(Vector2(x + offset, y), Vector2(x + 18 + offset, y), Color(0.25, 0.45, 0.68, 0.35), 2)
-	for rect in sim.floors:
-		if not rect.grow(60).intersects(view): continue
-		draw_rect(rect.grow(9), Color("090e17")); draw_rect(rect.grow(5), Color("45414a"))
-		tile_floor(rect, view, floor_kind(rect))
-	# balcão elevado, rampas e canais
+	var t: float = sim.tick_time
+	draw_rect(view, Scenery.VOID)
+	vis_rooms = scenery.discovered_rooms(sim)
+	vis_floors = scenery.visible_floors(sim, vis_rooms)
+	scenery.draw_water(self, sim, vis_rooms, view)
+	scenery.draw_floors(self, sim, vis_floors, vis_rooms, view)
+	# balcão elevado e rampas
 	for area in sim.raised:
-		draw_rect(area, Color(1, 1, 1, 0.06))
+		if not seen(area.get_center()): continue
+		draw_rect(area, Color(1, 0.95, 0.85, 0.07))
 		draw_rect(Rect2(area.position.x, area.end.y, area.size.x, 44), Color("2c2a33"))
-		for x in range(int(area.position.x), int(area.end.x), 32):
-			draw_texture_rect_region(dock_art.wall, Rect2(x, area.end.y, minf(32, area.end.x - x), 44), Rect2((x % 4) * 24, 30, minf(32, area.end.x - x), 44))
+		scenery.strip(self, ["wall_base_0", "wall_base_1", "wall_base_2", "wall_base_3", "wall_base_4"], area.position.x, area.end.x, area.end.y - 14, 58, int(area.end.y))
 		draw_line(Vector2(area.position.x, area.end.y), Vector2(area.end.x, area.end.y), Color("c9bfae"), 3)
 	for ramp in sim.ramps:
 		var r: Rect2 = ramp.r
+		if not seen(r.get_center()): continue
 		draw_rect(r, Color("6d665f"))
 		for n in range(int(r.size.x / 20)):
 			var x: float = r.position.x + n * 20
 			draw_rect(Rect2(x, r.position.y, 16, r.size.y), Color("857c73")); draw_line(Vector2(x, r.position.y), Vector2(x, r.end.y), Color("b2a498"), 2)
 	for gap in sim.gaps:
-		draw_rect(gap, Color("0a1d30"))
-		for y in range(int(gap.position.y), int(gap.end.y), 60):
-			draw_texture_rect(dock_art.water, Rect2(gap.position.x, y, gap.size.x, minf(60, gap.end.y - y)), false, Color(0.6, 0.75, 0.95))
-		for y in range(int(gap.position.y), int(gap.end.y), 32):
-			draw_line(Vector2(gap.position.x - 5, y), Vector2(gap.position.x - 1, y + 17), GOLD, 3)
-			draw_line(Vector2(gap.end.x, y), Vector2(gap.end.x + 5, y + 17), GOLD, 3)
-	for rect in sim.floors:
-		if rect.grow(80).intersects(view): draw_quay_edges(rect)
-	if sim.secret_open:
-		for room in sim.rooms:
-			if room.kind == "secret": tile_floor(room.r, view, "planks")
-	for room in sim.rooms:
-		if room.kind == "secret" and not sim.secret_open: continue
-		var rect: Rect2 = room.r
-		if not rect.grow(100).intersects(view): continue
-		text_at(rect.position + Vector2(90, -20), room.name, Color("e8d9b8"), 18)
-		var x := rect.position.x + 40
-		while x < rect.end.x - 20:
-			lamp(Vector2(x, rect.position.y + 45)); x += 420
+		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
+	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
+	# decoração do chão (sob as entidades)
+	for h in sim.hazards:
+		var alert := false
+		for a in sim.actors:
+			if a.active and not a.dead and a.p.distance_to(h.p) < h.r + 90: alert = true
+		h["alert"] = alert
 	for d in sim.decor:
-		if view.has_point(d.p): draw_decor(d)
+		if not view.has_point(d.p) or not seen(d.p, 120): continue
+		if scenery.is_flat(d.kind):
+			if d.kind == "tentacle_pool":
+				for h in sim.hazards:
+					if h.p.distance_to(d.p) < 5: d["alert"] = h.get("alert", false)
+			scenery.draw_decor(self, d, t)
+		elif not scenery.handles(d.kind): draw_decor(d)
+	for room in vis_rooms:
+		var rect: Rect2 = room.r
+		if not rect.grow(300).intersects(view) or not room.has("id"): continue
+		text_at(rect.position + Vector2(40, -228 if scenery.style_of(room).get("top", "facade") == "facade" else -20), room.name, Color("e8d9b8"), 18)
+	# portões
+	for d in sim.doors:
+		var room: Dictionary = sim.room_by_id(d.room)
+		if room.is_empty() or not d.r.grow(200).intersects(view) or not seen(d.r.get_center(), 60): continue
+		scenery.draw_gate(self, d, room.get("locked", false), t, room.r)
 	if sim.mode == "run": draw_docks()
 	else:
 		text_at(Vector2(135, 865), "ONDA %d  •  SHIFT = DASH  •  R = ARMADURA  •  E = PILOTAR" % sim.arena_wave, CYAN, 18)
 	for chest in sim.chests:
 		if chest.secret and not sim.secret_open: continue
 		var p: Vector2 = chest.p
-		if not view.has_point(p): continue
+		if not view.has_point(p) or not seen(p): continue
 		draw_chest(chest)
 		if not chest.open:
 			draw_rect(Rect2(p - Vector2(4, 9), Vector2(8, 10)), CYAN if chest.secret else GOLD)
 			text_at(p + Vector2(-30, 25), "E • 1 chave", Color("c9b99c"), 12)
+			scenery.lights.append({"p": p - Vector2(0, 20), "kind": "cyan" if chest.secret else "bulb"})
+	scenery.draw_reveal(self, sim, vis_rooms)
 
 func draw_decor(d: Dictionary) -> void:
 	var p: Vector2 = d.p
@@ -184,6 +208,8 @@ func draw_decor(d: Dictionary) -> void:
 		"rug": draw_rect(Rect2(p - Vector2(70, 160), Vector2(140, 330)), Color(0.45, 0.1, 0.14, 0.7)); draw_rect(Rect2(p - Vector2(62, 152), Vector2(124, 314)), Color(0.6, 0.45, 0.2, 0.5), false, 3)
 
 func draw_obstacle(box: Rect2, kind: String) -> void:
+	if scenery.has_prop(kind) or kind == "crate_row":
+		scenery.draw_obstacle(self, box, kind, sim.tick_time); return
 	draw_set_transform(Vector2(box.position.x + box.size.x * 0.5, box.end.y + 4), 0, Vector2(1, 0.3))
 	draw_circle(Vector2.ZERO, box.size.x * 0.55, Color(0, 0, 0, 0.3)); draw_set_transform(Vector2.ZERO)
 	match kind:
@@ -210,6 +236,7 @@ func draw_entities() -> void:
 	for fx in sim.effects:
 		if fx.kind == "corpse": draw_corpse(fx)
 	for pickup in sim.pickups:
+		if not seen(pickup.p): continue
 		var p: Vector2 = pickup.p + Vector2(0, sin(sim.tick_time * 4) * 3)
 		draw_set_transform(pickup.p + Vector2(0, 6), 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 10, Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
 		if pickup.kind == "key":
@@ -221,13 +248,17 @@ func draw_entities() -> void:
 		var view := view_rect()
 		for i in range(sim.obstacles.size()):
 			var box: Rect2 = sim.obstacles[i]
-			if box.intersects(view): drawable.append({"type": "obstacle", "data": {"r": box, "k": sim.obstacle_kinds[i] if i < sim.obstacle_kinds.size() else "crate"}, "y": box.end.y})
-		drawable.append({"type": "capsule", "data": {}, "y": DocksMap.POINTS.extraction.y + 20})
+			if box.intersects(view) and seen(box.get_center(), 60): drawable.append({"type": "obstacle", "data": {"r": box, "k": sim.obstacle_kinds[i] if i < sim.obstacle_kinds.size() else "crate"}, "y": box.end.y})
+		for d in sim.decor:   # props de decoração em pé entram na ordenação por Y
+			if scenery.handles(d.kind) and not scenery.is_flat(d.kind) and view.has_point(d.p) and seen(d.p, 60):
+				drawable.append({"type": "decor", "data": d, "y": d.p.y})
+		if seen(DocksMap.POINTS.extraction): drawable.append({"type": "capsule", "data": {}, "y": DocksMap.POINTS.extraction.y + 20})
 	else:
 		for box in sim.obstacles: drawable.append({"type": "obstacle", "data": {"r": box, "k": "crate"}, "y": box.end.y})
 	for a in sim.actors:
 		if a.active and not a.mech: drawable.append({"type": "actor", "data": a, "y": a.p.y})
-	for e in sim.enemies: drawable.append({"type": "enemy", "data": e, "y": e.p.y})
+	for e in sim.enemies:
+		if seen(e.p): drawable.append({"type": "enemy", "data": e, "y": e.p.y})
 	# Cápsula Temporal: o robô só aparece quando a cápsula termina de materializá-lo.
 	if sim.mech.deployed and not SummonFX.robot_hidden(sim.effects, "titan"): drawable.append({"type": "mech", "data": sim.mech, "y": sim.mech.p.y})
 	for s in sim.spectres:
@@ -240,12 +271,20 @@ func draw_entities() -> void:
 			"enemy": draw_enemy(thing.data)
 			"mech": draw_mech(thing.data)
 			"obstacle": draw_obstacle(thing.data.r, thing.data.k)
+			"decor": scenery.draw_prop(self, thing.data.kind, thing.data.p, sim.tick_time)
 			"capsule": draw_capsule()
 			"spectre": draw_spectre(thing.data)
 			"core": draw_texture(refuge_core, CORE_OFFSET, Color(1, 1, 1, core_alpha()))
 	for b in sim.bullets:
+		if not seen(b.p): continue
 		var bullet_pos: Vector2 = b.p - Vector2(0, 28)
 		var kind: String = b.get("kind", "")
+		if kind == "bomb":
+			draw_bomb(b); continue
+		if kind == "p_heavy":
+			draw_circle(bullet_pos, b.r + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
+			draw_line(bullet_pos, bullet_pos - b.v.normalized() * 34, Color(0.7, 0.7, 0.75, 0.35), b.r)
+			scenery.lights.append({"p": b.p, "kind": "bulb"}); continue
 		if projectile_art.has(kind):
 			var tex: Texture2D = projectile_art[kind]
 			draw_set_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
@@ -322,6 +361,7 @@ func draw_entities() -> void:
 			draw_set_transform(fx.p + Vector2(k * 40, -40 + k * k * 120), k * 5.0)
 			draw_texture(tex, -tex.get_size() * 0.5, Color(1, 1, 1, fx.life / fx.max))
 			draw_set_transform(Vector2.ZERO)
+		elif fx.kind in ["explosion", "tentacle_strike", "gate_open", "gate_slam", "shield_hit", "spawn_portal", "prop_break", "splinter", "splash", "flash", "recoil"]: draw_fx_013(fx)
 		else: draw_circle(fx.p, 8, GOLD)
 
 func lamp(p: Vector2) -> void:
@@ -383,7 +423,8 @@ func draw_docks() -> void:
 	if not sim.secret_open:
 		draw_texture(docks_art.crack, P.secret_wall - Vector2(40, 60))
 		text_at(P.secret_wall + Vector2(-60, 40), "Parede rachada...", Color("978989"), 12)
-	for gap in sim.gaps: text_at(Vector2(gap.position.x - 70, gap.end.y + 30), "CANAL • ESPAÇO PARA SALTAR", GOLD, 12)
+	for gap in sim.gaps:
+		if minf(gap.size.x, gap.size.y) <= 120 and seen(gap.get_center(), gap.size.length()): text_at(Vector2(gap.position.x - 70, gap.end.y + 30), "CANAL • ESPAÇO PARA SALTAR", GOLD, 12)
 	for ramp in sim.ramps: text_at(ramp.r.position + Vector2(10, ramp.r.size.y + 22), "RAMPA", Color("c9bfae"), 11)
 
 func draw_capsule() -> void:
@@ -479,6 +520,7 @@ func draw_actor(a: Dictionary) -> void:
 	draw_set_transform(Vector2.ZERO)
 	if not weapon_behind: draw_weapon(a, draw_pos + Vector2(0, bob))
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
+	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
 	text_at(draw_pos + Vector2(-25, -96 if a.armor else -86), "MARTY" if a.id == 0 else ("ECHO • IA" if sim.coop == "ai" else "ECHO • P2"), player_color, 11)
 
@@ -489,7 +531,7 @@ func draw_mech(m: Dictionary) -> void:
 		crate(Rect2(p - Vector2(40, 25), Vector2(80, 30))); text_at(p + Vector2(-40, -35), "INUTILIZADO", Color("b78c84"), 12); return
 	# Titan v2: 8 direções (5 vistas + espelho), viseira acesa quando pilotado, passada pesada.
 	var facing: Vector2 = m.get("facing", m.aim)
-	var pose := marty_pose(facing)
+	var pose := titan_pose(facing)
 	var piloted: bool = m.occupant >= 0
 	var column := 0; var bob := 0.0; var squash := 1.0
 	if piloted and m.get("moving", false):
@@ -942,3 +984,88 @@ func draw_screen_flash() -> void:
 				var a := 1.0 - absf(t - 0.47) / 0.19
 				var owner: Dictionary = sim.actors[fx.get("owner", 0)]
 				draw_rect(Rect2(owner.p - Vector2(3000, 3000), Vector2(6000, 6000)), Color(1, 1, 0.95, clampf(a, 0, 1) * 0.85))
+
+# ── 0.13: Titan só usa vistas reais (lado nas diagonais), bomba, explosões e efeitos do cenário ──
+func titan_pose(f: Vector2) -> Array:
+	if absf(f.x) >= absf(f.y) * 0.7: return [2, f.x < 0]
+	return [0, false] if f.y > 0 else [4, false]
+
+func draw_shield_hex(c: Vector2, k: float) -> void:
+	var pts := PackedVector2Array()
+	for n in range(7): pts.append(c + Vector2.RIGHT.rotated(n * TAU / 6 + PI / 6) * Vector2(46, 58))
+	var pulse := 0.5 + 0.5 * sin(sim.tick_time * 5)
+	draw_polyline(pts, Color(0.45, 0.95, 1, 0.35 + 0.35 * k + 0.1 * pulse), 3)
+	draw_colored_polygon(pts.slice(0, 6), Color(0.4, 0.9, 1, 0.06 + 0.06 * k))
+	scenery.lights.append({"p": c + Vector2(0, 40), "kind": "cyan"})
+
+func draw_bomb(b: Dictionary) -> void:
+	var k: float = clampf(b.t / sim.MECH_BOMB.flight, 0, 1)
+	var to: Vector2 = b.to
+	# marcador de alvo no chão
+	draw_set_transform(to, 0, Vector2(1, 0.5))
+	draw_arc(Vector2.ZERO, sim.MECH_BOMB.radius * (0.4 + 0.6 * k), 0, TAU, 40, Color(1, 0.35, 0.2, 0.5 + 0.4 * k), 3)
+	draw_circle(Vector2.ZERO, 10, Color(1, 0.3, 0.2, 0.6))
+	draw_set_transform(Vector2.ZERO)
+	var height := sin(k * PI) * 170.0
+	var p: Vector2 = b.p - Vector2(0, 30 + height)
+	draw_set_transform(b.p, 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 12 * (1.0 - height / 250.0), Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+	draw_circle(p, 11, Color("1d1e24")); draw_circle(p - Vector2(3, 3), 4, Color("7d808c"))
+	var spark := p + Vector2(6, -12) + Vector2(sin(sim.tick_time * 40) * 2, 0)
+	draw_circle(spark, 4, Color(1, 0.8, 0.3)); scenery.lights.append({"p": spark, "kind": "bulb"})
+
+func draw_fx_013(fx: Dictionary) -> void:
+	var t: float = 1.0 - fx.life / maxf(0.01, fx.get("max", fx.life))
+	var p: Vector2 = fx.p
+	match fx.kind:
+		"explosion":
+			var r: float = fx.get("r", 100.0)
+			draw_set_transform(p, 0, Vector2(1, 0.62))
+			draw_circle(Vector2.ZERO, r * (0.3 + 0.8 * t), Color(1, 0.55, 0.15, 0.45 * (1 - t)))
+			draw_circle(Vector2.ZERO, r * (0.2 + 0.5 * t), Color(1, 0.9, 0.5, 0.7 * (1 - t)))
+			draw_arc(Vector2.ZERO, r * (0.5 + 0.7 * t), 0, TAU, 40, Color(1, 0.8, 0.5, 1 - t), 4)
+			draw_set_transform(Vector2.ZERO)
+			for n in range(12):
+				var d := Vector2.RIGHT.rotated(n * TAU / 12 + p.x)
+				draw_circle(p + d * r * t * Vector2(1, 0.6) - Vector2(0, sin(t * PI) * 40), 7 * (1 - t) + 2, Color(0.35, 0.3, 0.3, 0.6 * (1 - t)))
+			scenery.lights.append({"p": p, "kind": "blast", "r": r * 1.6 * (1 - t * 0.6)})
+		"tentacle_strike":
+			var dir: Vector2 = fx.get("dir", Vector2.RIGHT)
+			var tip: Vector2 = p + dir * 80 * sin(t * PI) - Vector2(0, 30 + 40 * sin(t * PI))
+			draw_polyline(PackedVector2Array([p, p.lerp(tip, 0.5) + dir.orthogonal() * 16, tip]), Color("5a2a66"), 12)
+			draw_polyline(PackedVector2Array([p, p.lerp(tip, 0.5) + dir.orthogonal() * 16, tip]), Color("a05ab8"), 4)
+		"gate_open":
+			draw_arc(p, 40 + 120 * t, 0, TAU, 32, Color(1, 0.85, 0.4, 1 - t), 4)
+		"gate_slam":
+			for n in range(8):
+				var d := Vector2.RIGHT.rotated(n * TAU / 8)
+				draw_circle(p + d * (20 + 50 * t) * Vector2(1, 0.5), 8 * (1 - t) + 2, Color(0.6, 0.55, 0.5, 0.6 * (1 - t)))
+		"shield_hit":
+			draw_arc(p - Vector2(0, 40), 50 + 20 * t, 0, TAU, 6, Color(0.5, 1, 1, 1 - t), 5)
+		"spawn_portal":
+			# reforços surgindo: poça roxa que cresce e tentáculos de luz
+			draw_set_transform(p, 0, Vector2(1, 0.5))
+			draw_circle(Vector2.ZERO, 50 * minf(1.0, t * 2), Color(0.35, 0.05, 0.45, 0.6))
+			draw_arc(Vector2.ZERO, 55 * minf(1.0, t * 2), 0, TAU, 32, Color(0.8, 0.3, 1, 0.9), 3)
+			draw_set_transform(Vector2.ZERO)
+			draw_line(p, p - Vector2(0, 120 * t), Color(0.8, 0.4, 1, 0.5 * (1 - t)), 10)
+			scenery.lights.append({"p": p, "kind": "danger"})
+		"prop_break":
+			for n in range(10):
+				var d := Vector2.RIGHT.rotated(n * TAU / 10 + p.y)
+				var q: Vector2 = p + d * (10 + 60 * t) * Vector2(1, 0.6) - Vector2(0, 30 + sin(t * PI) * 40 - t * 30)
+				draw_set_transform(q, t * 8 + n)
+				draw_rect(Rect2(-5, -3, 10, 6), Color(0.55, 0.36, 0.2, 1 - t) if not fx.get("prop", "").begins_with("sandbags") else Color(0.75, 0.62, 0.4, 1 - t))
+				draw_set_transform(Vector2.ZERO)
+		"splinter":
+			for n in range(4):
+				var d := Vector2.RIGHT.rotated(n * 1.7 + p.x)
+				draw_rect(Rect2(p + d * 20 * t - Vector2(0, 20), Vector2(4, 3)), Color(0.7, 0.5, 0.3, 1 - t))
+		"splash":
+			draw_set_transform(p, 0, Vector2(1, 0.5))
+			draw_arc(Vector2.ZERO, 20 + 40 * t, 0, TAU, 24, Color(0.7, 0.9, 1, 1 - t), 3)
+			draw_set_transform(Vector2.ZERO)
+		"flash":
+			draw_circle(p - Vector2(0, 30), 18 * (1 - t) + 6, Color(1, 0.85, 0.5, 0.8 * (1 - t)))
+			scenery.lights.append({"p": p, "kind": "bulb"})
+		"recoil":
+			draw_circle(p - Vector2(0, 50) - fx.get("dir", Vector2.RIGHT) * 20 * t, 16 * t + 4, Color(0.7, 0.7, 0.72, 0.4 * (1 - t)))

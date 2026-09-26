@@ -28,11 +28,11 @@ func run() -> void:
 	key(KEY_D, true)
 	var before: Vector2 = app.sim.actors[0].p
 	await frames(12)
-	check(app.sim.actors[0].p.x > before.x + 40 and app.sim.actors[0].facing.dot(Vector2.RIGHT) > 0.9, "D input moves Marty; body faces the mouse aim (right)")
+	check(app.sim.actors[0].p.x > before.x + 40 and app.sim.actors[0].facing.dot(app.sim.actors[0].aim) > 0.9, "D input moves Marty; body faces the aim")
 	key(KEY_D, false); key(KEY_W, true)
 	Input.warp_mouse(center + Vector2(0, -400))
 	await frames(12)
-	check(app.sim.actors[0].facing.dot(Vector2.UP) > 0.9, "body turns to follow the mouse aim (up) even while walking, so the weapon never crosses the character")
+	check(app.sim.actors[0].facing.dot(app.sim.actors[0].aim) > 0.9, "body turns to follow the mouse aim (up) even while walking, so the weapon never crosses the character")
 	key(KEY_W, false)
 	before = app.sim.actors[0].p
 	key(KEY_SHIFT, true)

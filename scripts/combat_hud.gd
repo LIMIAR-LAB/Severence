@@ -43,11 +43,18 @@ func _draw() -> void:
 	var id: int = 1 if app.online and not app.hosting else 0
 	var a: Dictionary = s.actors[id]
 	draw_texture_rect(art.portrait, Rect2(14, 14, 82, 82), false)
-	var max_hp: float = 100 + s.upgrade * 10
-	for n in range(8):
-		var filled: float = clampf(a.hp / max_hp * 8 - n, 0, 1)
-		draw_texture_rect(art.heart, Rect2(111+n*22,18,20,20), false, Color(0.25,0.25,0.3))
-		if filled > 0: draw_texture_rect_region(art.heart, Rect2(111+n*22,18,20*filled,20), Rect2(0,0,21*filled,21))
+	# 0.12: vida em corações (1 coração = 10) + corações de escudo Ômega em ciano
+	var hearts: int = int(roundf(s.max_hp() / s.HEART))
+	var shield_hearts: int = int(ceilf(a.get("shield", 0.0) / s.HEART))
+	for n in range(hearts + shield_hearts):
+		var hx := 111 + n * 22
+		if n < hearts:
+			var filled: float = clampf(a.hp / s.HEART - n, 0, 1)
+			draw_texture_rect(art.heart, Rect2(hx,18,20,20), false, Color(0.25,0.25,0.3))
+			if filled > 0: draw_texture_rect_region(art.heart, Rect2(hx,18,20*filled,20), Rect2(0,0,21*filled,21))
+		else:
+			var sf: float = clampf(a.shield / s.HEART - (n - hearts), 0, 1)
+			draw_texture_rect_region(art.heart, Rect2(hx,18,20*sf,20), Rect2(0,0,21*sf,21), Color(0.4, 1.3, 1.6))
 	text(Vector2(111,57), "DASH", 12, CYAN)
 	for n in range(6):
 		draw_rect(Rect2(153+n*21,46,18,8), CYAN if (1-a.dodge_cd/s.uniform_of(a).dash_cd)*6 > n else Color("1a3548"))
@@ -59,7 +66,12 @@ func _draw() -> void:
 	var box := Rect2(660 + dx * 0.5, 14, 260, 54)
 	frame(box)
 	var ratio := 0.0; var label := ""; var col := GOLD
-	if a.armor:
+	if a.mech:
+		var bcd: float = a.get("bomb_cd", 0.0)
+		ratio = 1.0 - bcd / s.MECH_BOMB.cooldown
+		label = "R • BOMBA PRONTA" if bcd <= 0 else "BOMBA • %.1fs" % bcd
+		col = Color("ff9a4a") if bcd <= 0 else Color("8a7a58")
+	elif a.armor:
 		ratio = a.armor_time / armor_info.duration; label = "%s • %.0fs" % [armor_info.name, ceilf(a.armor_time)]; col = CYAN
 	elif a.armor_cd > 0:
 		ratio = 1.0 - a.armor_cd / armor_info.cooldown; label = "RECARGA • %.0fs" % ceilf(a.armor_cd); col = Color("8a7a58")
@@ -75,11 +87,11 @@ func _draw() -> void:
 	var wsize: Vector2 = wtex.get_size() * minf(2.0, 80.0 / wtex.get_size().x)
 	draw_texture_rect(wtex, Rect2(Vector2(345, 44) - wsize * 0.5, wsize), false)
 	text(Vector2(380,48), "∞", 26, GOLD)
-	text(Vector2(311,82), "CANHÃO DO TITAN" if a.mech else ("LÂMINA ÔMEGA" if a.armor else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
+	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
 	if s.coop != "solo":
 		var partner: Dictionary = s.actors[1-id]
 		frame(Rect2(466,14,181,54)); text(Vector2(478,36), "PARCEIRO IA" if s.coop == "ai" else "PARCEIRO P2", 13, CYAN)
-		text(Vector2(478,55), "CAÍDO • REANIMAR" if partner.dead else "%d HP" % partner.hp, 13)
+		text(Vector2(478,55), "CAÍDO • REANIMAR" if partner.dead else "♥ %.1f / %d" % [partner.hp / s.HEART, int(s.max_hp() / s.HEART)], 13)
 	draw_set_transform(Vector2(dx, 0))
 	draw_minimap(s, a)
 	draw_set_transform(Vector2(0, dy))
@@ -117,17 +129,24 @@ func room_visible(s, room: Dictionary) -> bool:
 	return s.mode != "run" or s.visited.has(room.get("id", ""))
 
 func draw_map_geometry(s, to_screen: Callable, scale_factor: float, clip: Rect2, a: Dictionary) -> void:
+	var known: Array = map_rooms(s).filter(func(rm): return room_visible(s, rm))
 	for r in s.floors:
+		# névoa no mapa: só corredores ligados a salas já visitadas
+		if s.mode == "run" and not known.any(func(rm): return r.grow(6).intersects(rm.r)): continue
 		var target: Rect2 = Rect2(to_screen.call(r.position), r.size * scale_factor).intersection(clip)
 		if target.size.x > 0 and target.size.y > 0: draw_rect(target, MAP_ROOM_DIM)
 	for room in map_rooms(s):
 		var target: Rect2 = Rect2(to_screen.call(room.r.position), room.r.size * scale_factor).intersection(clip)
 		if target.size.x <= 0 or target.size.y <= 0: continue
 		var seen: bool = room_visible(s, room)
-		draw_rect(target, MAP_ROOM if seen else MAP_ROOM_DIM)
+		if not seen: continue
+		draw_rect(target, Color("5a2030") if room.get("locked", false) else MAP_ROOM)
 		draw_rect(target, MAP_LINE if seen else Color("50557a"), false, 2.0 if scale_factor > 0.1 else 1.0)
 		if room.r.has_point(a.p): draw_rect(target, Color(0.3, 0.9, 1, 0.18))
 	for box in s.obstacles:
+		if s.mode == "run":
+			var br: Dictionary = s.room_at(box.get_center())
+			if br.is_empty() or not room_visible(s, br): continue
 		var target: Rect2 = Rect2(to_screen.call(box.position), box.size * scale_factor).intersection(clip)
 		if target.size.x > 1 and target.size.y > 1: draw_rect(target, Color("8f93b8"))
 

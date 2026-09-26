@@ -1,6 +1,6 @@
 # Marty — Fraturas do Tempo
 
-Versão de teste 0.12, construída em Godot 4.7.2 para Windows. É um protótipo funcional do núcleo do MVP, não uma campanha concluída ou a arte final dos cenários. Esta versão atualiza Marty, docas e HUD com base nas referências fornecidas; veja `docs/ART_0_4.md`. A 0.5 transforma o Refúgio • Fora do Tempo no cenário ilustrado do conceito v1; veja `docs/REFUGIO_0_5.md`. A 0.6 aplica os sprites do conceito v1: 4 visuais do Marty, os 4 inimigos das Docas e o chefe O Almirante das Profundezas; veja `docs/SPRITES_0_6.md`. A 0.9 separa **Uniformes** (Padrão, Mecânico, Espião — cada um com arma e atributos próprios) da **Armadura Ômega** (temporária, com espada); veja `docs/EQUIPAMENTO_0_9.md`.
+Versão de teste 0.13, construída em Godot 4.7.2 para Windows. É um protótipo funcional do núcleo do MVP, não uma campanha concluída ou a arte final dos cenários. Esta versão atualiza Marty, docas e HUD com base nas referências fornecidas; veja `docs/ART_0_4.md`. A 0.5 transforma o Refúgio • Fora do Tempo no cenário ilustrado do conceito v1; veja `docs/REFUGIO_0_5.md`. A 0.6 aplica os sprites do conceito v1: 4 visuais do Marty, os 4 inimigos das Docas e o chefe O Almirante das Profundezas; veja `docs/SPRITES_0_6.md`. A 0.9 separa **Uniformes** (Padrão, Mecânico, Espião — cada um com arma e atributos próprios) da **Armadura Ômega** (temporária, com espada); veja `docs/EQUIPAMENTO_0_9.md`. A 0.13 recria as Docas como um mapa fixo e grande (13 salas + secreta), com paredes, portões, névoa, props destrutíveis, barris explosivos em cadeia e reforços; veja `docs/CENARIO_0_13.md`.
 
 ## Jogar
 
@@ -36,15 +36,13 @@ O salto evita balas enquanto o personagem está no ar e permite cruzar o vão si
 
 ## Primeiro percurso
 
-1. Entre nas docas pelo portal do refúgio.
-2. Pegue a chave perto do desembarque. Abra baús com E: cada baú gasta uma chave uma única vez.
-3. Cruze o armazém, combatendo ou saltando o vão. Os atalhos e os encontros variam com a seed.
-4. Na oficina, o comerciante vende uma chave e cura por 15 moedas (estoque único).
-5. Pilote o **Titan-01**: canhão, golpe pesado e integridade própria. Há apenas um assento. O parceiro pode continuar a pé.
-6. O gerador da sala superior inicia o desafio opcional: derrote sete guardiões em 55 segundos. Recompensa: 2 chaves, 25 moedas, cura e um fragmento permanente.
-7. Atravesse o depósito e use as escadas para chegar à arena do Vigia.
-8. Há uma parede rachada no lado direito da arena, que pode ser aberta com ataque corpo a corpo. O baú secreto custa uma chave.
-9. Derrote o Vigia e use o portal de extração: desbloqueia a armadura permanente e concede 3 fragmentos.
+1. Entre nas docas pelo portal do refúgio. O mapa completo abre com Tab/M e mostra só o que já foi descoberto.
+2. No **01 Desembarque**, pegue a chave. Ao entrar numa sala com inimigos os portões fecham até ela ficar limpa; algumas salas mandam uma segunda leva de reforços.
+3. Siga pelo **02 Pátio dos Guindastes** e **03 Armazém 7** (salte o canal ou use a passarela). Caixas e barris quebram; os **barris vermelhos explodem** e encadeiam — use-os contra os inimigos, mas cuidado, eles também ferem o Marty.
+4. Na **05 Oficina**, o comerciante vende uma chave e cura por 15 moedas (estoque único). O **Titan-01** fica ali: canhão pesado, bomba (R) e soco.
+5. O **06 Último Gerador** inicia o desafio opcional: sete guardiões em 55 segundos.
+6. Há uma **parede rachada** no topo do **07 Depósito de Munição**: um golpe corpo a corpo abre a passagem para o Contrabando.
+7. Pelo **09 Balcão do Farol** (ou pelo **11 Doque Seco**) chega-se à arena do **Almirante das Profundezas**. Derrote-o e use a cápsula de extração.
 10. Na bancada do refúgio, 2 fragmentos compram +10 de vida para a próxima tentativa, até 3 vezes.
 
 Dinheiro e chaves reiniciam por tentativa. Fragmentos, vitórias, melhorias e armadura desbloqueada são salvos em `user://progress.json`, dentro da pasta de dados do Godot para este jogo. Em rede, esta primeira versão salva o progresso do anfitrião; progressão própria do convidado ainda não foi implementada.
@@ -104,6 +102,6 @@ Capturas do renderizador real (abrem uma janela temporária e encerram):
 
 ## Limites desta entrega
 
-O mapa usa sete áreas principais fixas e uma área secreta, com atalhos, inimigos e coberturas variados por seed. Ainda não é um gerador que reorganiza livremente salas completas. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Não há seleção de personagens definitiva, outras épocas, lobby Steam, balanceamento final, remapeamento de controles, exportação independente do Godot nem validação humana de uma campanha completa.
+O mapa é fixo (13 salas e uma secreta, editadas em `tools/build_docks_map.py`); a seed só varia os tipos de inimigo. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Não há seleção de personagens definitiva, outras épocas, lobby Steam, balanceamento final, remapeamento de controles, exportação independente do Godot nem validação humana de uma campanha completa.
 
 Próximos marcos: playtest de movimentação/combate e câmera; navegação mais refinada; arte do cenário e inimigos; Vincent; geração modular mais ampla; transporte online com lobby/relay e teste real entre dois computadores; empacotamento para Windows.

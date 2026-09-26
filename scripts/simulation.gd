@@ -1,6 +1,7 @@
 class_name Expedition
 extends RefCounted
 const DOCKS := preload("res://scripts/docks_map.gd")  # não depende do cache de class_name
+const SummonFX = preload("res://scripts/summon_fx.gd")
 
 # All gameplay state is serializable. Only the host advances simulation.
 var actors: Array = []
@@ -52,6 +53,10 @@ var ai_path_timer := 0.0
 var arena_wave := 0
 var arena_wait := 0.0
 var spectres: Array = []
+var obstacle_hp: Array = []      # 0.13: vida de cada obstáculo (-1 = indestrutível)
+var fuses: Array = []            # barris explosivos prestes a estourar (reação em cadeia)
+var ob_grid: Dictionary = {}     # grade espacial dos obstáculos (mapa grande = muitos props)
+var ob_grid_count := -1
 
 func _init() -> void:
 	make_hub()
@@ -166,7 +171,7 @@ func make_hub() -> void:
 	doors.clear(); gate_blocks.clear(); hazards.clear()
 	mode = "hub"
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
-	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear()
+	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [
 		Rect2(420, 300, 490, 188),   # piso central (xadrez)
 		Rect2(560, 180, 190, 125),   # escadaria do portal
@@ -204,7 +209,7 @@ func start_arena() -> void:
 	mode = "arena"; tick_time = 0; arena_wave = 0; arena_wait = 0
 	side_active = false; side_complete = false; side_failed = false; side_time = 0
 	actors = [actor(0, Vector2(400, 600)), actor(1, Vector2(470, 650))]
-	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear()
+	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [Rect2(80, 100, 1120, 820)]
 	rooms = [{"r": floors[0], "name": "ARENA DE TESTE • ONDAS / DASH / ROBÔ", "kind": "arena"}]
 	mech = new_mech(Vector2(250, 800)); money = 0; keys = 0
@@ -240,9 +245,15 @@ func start_run(new_seed: int) -> void:
 	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = DOCKS.GAPS.duplicate()
 	jump_gap = gaps[0]
 	build_doors(); hazards = DOCKS.HAZARDS.duplicate(true)
+	obstacle_hp.clear(); fuses.clear()
 	for o in DOCKS.OBSTACLES:
-		obstacles.append(Rect2(o[0], o[1], o[2], o[3])); obstacle_kinds.append(o[4])
-	for d in DOCKS.DECOR: decor.append({"p": Vector2(d[0], d[1]), "kind": d[2]})
+		obstacles.append(Rect2(o[0], o[1], o[2], o[3])); obstacle_kinds.append(o[4]); obstacle_hp.append(DESTRUCTIBLE.get(o[4], -1.0))
+	for d in DOCKS.DECOR:
+		var item := {"p": Vector2(d[0], d[1]), "kind": d[2]}
+		if d.size() > 3: item.merge(d[3])
+		decor.append(item)
+	for room in rooms:
+		room["waves"] = DOCKS.WAVES.get(room.get("id", ""), []).duplicate(true)
 	for c in DOCKS.CHESTS: chests.append({"p": Vector2(c[0], c[1]), "open": false, "secret": c[2]})
 	mech = new_mech(P.mech)
 	reset_spectres()
@@ -296,11 +307,20 @@ func refresh_gate_blocks() -> void:
 	for d in doors:
 		if room_by_id(d.room).get("locked", false): gate_blocks.append(d.r)
 
-func step_gates() -> void:
+func step_gates(step_dt: float = 0.016) -> void:
 	var changed := false
 	for room in rooms:
 		if not room.has("id") or room.kind == "secret": continue
 		if room.get("locked", false):
+			if room.get("wave_t", 0.0) > 0:
+				room.wave_t -= step_dt
+				if room.wave_t <= 0: spawn_wave(room)
+				continue
+			if room_threats(room.id) == 0 and not room.get("waves", []).is_empty():
+				room.wave_t = 1.1
+				say("REFORÇOS! Mais criaturas emergem das docas!")
+				for w in room.waves: effects.append({"p": Vector2(w[0], w[1]), "kind": "spawn_portal", "life": 1.2, "max": 1.2})
+				continue
 			if room_threats(room.id) == 0:
 				room.locked = false; room.cleared = true; changed = true
 				say("SALA LIMPA • os portões se abriram!")
@@ -323,6 +343,65 @@ func step_gates() -> void:
 					a.p = spot if clear_at(spot, 23 if a.mech else 11) else inside.p
 					if a.mech: mech.p = a.p
 	if changed: refresh_gate_blocks()
+
+func spawn_wave(room: Dictionary) -> void:
+	for w in room.waves:
+		var pool: Array = DOCKS.GROUPS[w[2]]
+		spawn_enemy(Vector2(w[0], w[1]), pool[rng.randi_range(0, pool.size() - 1)])
+		enemies[-1]["alerted"] = true; enemies[-1]["room"] = room.id
+	room.waves = []
+
+# ── Props destrutíveis e barris explosivos (0.13) ─────────────────────────────
+const DESTRUCTIBLE := {"crate": 34.0, "crate_2": 44.0, "crate_3": 44.0, "crate_net": 40.0, "crate_barnacles": 50.0, "crate_broken": 20.0,
+	"barrel": 40.0, "barrel_oil": 40.0, "barrel_toxic": 40.0, "barrel_explosive": 16.0, "barrel_tipped": 30.0,
+	"fish_basket": 16.0, "lobster_trap": 22.0, "sandbags": 110.0, "sandbags_corner": 110.0, "sandbags_damaged": 60.0, "jerrycans": 24.0}
+const BARREL_BLAST := {"radius": 150.0, "damage": 60.0, "fuse": 0.18}
+
+func rebuild_ob_grid() -> void:
+	ob_grid.clear(); ob_grid_count = obstacles.size()
+	for i in obstacles.size():
+		var b: Rect2 = obstacles[i].grow(32)
+		for gy in range(int(floorf(b.position.y / 200.0)), int(floorf(b.end.y / 200.0)) + 1):
+			for gx in range(int(floorf(b.position.x / 200.0)), int(floorf(b.end.x / 200.0)) + 1):
+				var key := Vector2i(gx, gy)
+				if not ob_grid.has(key): ob_grid[key] = []
+				ob_grid[key].append(i)
+
+func obstacles_near(pos: Vector2) -> Array:
+	if ob_grid_count != obstacles.size(): rebuild_ob_grid()
+	return ob_grid.get(Vector2i(int(floorf(pos.x / 200.0)), int(floorf(pos.y / 200.0))), [])
+
+func obstacle_at(pos: Vector2, margin: float = 2.0) -> int:
+	for i in obstacles_near(pos):
+		if obstacles[i].grow(margin).has_point(pos): return i
+	return -1
+
+func damage_obstacle(i: int, amount: float) -> void:
+	if i < 0 or i >= obstacles.size() or i >= obstacle_hp.size() or obstacle_hp[i] < 0: return
+	obstacle_hp[i] -= amount
+	if obstacle_hp[i] > 0:
+		effects.append({"p": obstacles[i].get_center(), "kind": "splinter", "life": 0.25, "max": 0.25})
+		return
+	var box: Rect2 = obstacles[i]
+	var kind: String = obstacle_kinds[i]
+	obstacles.remove_at(i); obstacle_kinds.remove_at(i); obstacle_hp.remove_at(i)
+	ob_grid_count = -1
+	var foot := Vector2(box.get_center().x, box.end.y)
+	var debris := "debris_barrel" if kind.begins_with("barrel") else ("debris_sandbags" if kind.begins_with("sandbags") else "debris_crate")
+	decor.append({"p": foot, "kind": debris, "small": true})
+	effects.append({"p": foot, "kind": "prop_break", "life": 0.5, "max": 0.5, "prop": kind})
+	if kind == "barrel_explosive":
+		fuses.append({"p": box.get_center(), "t": BARREL_BLAST.fuse})
+	elif kind.begins_with("crate") and rng.randf() < 0.3:
+		pickups.append({"p": foot + Vector2(0, 10), "kind": "coin"})
+
+func step_fuses(dt: float) -> void:
+	var ready: Array = []
+	for f in fuses:
+		f.t -= dt
+		if f.t <= 0: ready.append(f)
+	fuses = fuses.filter(func(f): return f.t > 0)
+	for f in ready: explode(f.p, BARREL_BLAST.radius, BARREL_BLAST.damage, true, true)
 
 # ── Perigos do cenário ───────────────────────────────────────────────────────
 func step_hazards(dt: float) -> void:
@@ -375,8 +454,12 @@ func clear_at(pos: Vector2, radius: float, airborne: bool = false) -> bool:
 	if mode == "run" and not airborne:
 		for gap in gaps:
 			if gap.has_point(pos): return false
-	for box in obstacles:
-		if box.grow(radius).has_point(pos): return false
+	if mode == "run":
+		for i in obstacles_near(pos):
+			if obstacles[i].grow(radius).has_point(pos): return false
+	else:
+		for box in obstacles:
+			if box.grow(radius).has_point(pos): return false
 	for gate in gate_blocks:
 		if gate.grow(radius).has_point(pos): return false
 	return true
@@ -484,8 +567,9 @@ func step(dt: float, commands: Array) -> void:
 			if a.active and not a.dead:
 				var room := room_at(a.p)
 				if not room.is_empty() and not visited.has(room.id): visited.append(room.id)
-		step_gates()
+		step_gates(dt)
 		step_hazards(dt)
+		step_fuses(dt)
 		if side_active:
 			side_time -= dt
 			if side_time <= 0:
@@ -521,7 +605,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	var aim: Vector2 = cmd.get("aim", a.aim)
 	if aim.length() > 0.1: a.aim = aim.normalized()
 	if cmd.get("jump", false) and a.jump <= 0 and a.jump_cd <= 0 and not a.mech:
-		a.jump = 0.65; a.jump_cd = 0.8
+		a.jump = 0.65; a.jump_cd = 0.8; a["jump_from"] = a.p
 	if cmd.get("dodge", false) and a.dodge_cd <= 0 and not a.mech:
 		a.dodge = 0.20; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
 		a.dash_dir = moving.normalized() if moving.length() > 0.1 else a.facing.normalized()
@@ -552,7 +636,9 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	if a.jump > 0:
 		a.jump = maxf(0, a.jump - dt)
 		if a.jump == 0 and not clear_at(a.p, 10):
-			a.p = Vector2(915 if a.p.x < 974 else 1030, a.p.y); damage_actor(a, 12)
+			# caiu na água: volta para onde saltou e perde meio coração
+			a.p = a.get("jump_from", a.p); damage_actor(a, 12)
+			effects.append({"p": a.p, "kind": "splash", "life": 0.5, "max": 0.5})
 	if a.mech: mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
 	if a.armor and not a.mech:
 		if (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
@@ -579,11 +665,23 @@ func throw_bomb(a: Dictionary) -> void:
 	a.bomb_cd = MECH_BOMB.cooldown
 	effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.1, "dir": a.aim})
 
-func explode(p: Vector2, radius: float, damage: float, big: bool) -> void:
+func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: bool = false) -> void:
 	for e in enemies:
 		var d: float = e.p.distance_to(p)
 		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
 			e.hp -= damage * (1.0 - 0.45 * clampf(d / radius, 0, 1)); e.hurt = 0.2; e["alerted"] = true
+	if hurts_all:   # barril: atinge todo mundo (1 coração) e empurra
+		for a in actors:
+			if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8:
+				damage_actor(a, 20.0)
+				var push: Vector2 = (a.p - p).normalized() if a.p.distance_to(p) > 1 else Vector2.DOWN
+				a.p = move_body(a.p, push * 60, 23 if a.mech else 11)
+	# props no raio quebram (e barris explosivos encadeiam)
+	var hit: Array = []
+	for i in obstacles.size():
+		if i < obstacle_hp.size() and obstacle_hp[i] >= 0 and obstacles[i].get_center().distance_to(p) < radius + 20: hit.append(i)
+	hit.reverse()
+	for i in hit: damage_obstacle(i, damage)
 	effects.append({"p": p, "kind": "explosion", "life": 0.55 if big else 0.4, "max": 0.55 if big else 0.4, "r": radius})
 
 func step_bomb(b: Dictionary, dt: float) -> void:
@@ -646,10 +744,20 @@ func sword_attack(a: Dictionary) -> void:
 	for b in bullets:
 		if b.team == 1 and a.p.distance_to(b.p) < reach:
 			b.team = 0; b.v = a.aim * 560; b.damage = 18; b.kind = "p_omega"
+	props_in_arc(a, reach, damage)
 	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125: open_secret()
 	if finisher:
 		add_bullet(a.p + a.aim * 40, a.aim, 0, 30, 540, 16, a.id, "p_wave", 0.65)
 		bullets[-1]["pierce"] = 5
+
+func props_in_arc(a: Dictionary, reach: float, damage: float) -> void:
+	if mode != "run": return
+	var hit: Array = []
+	for i in obstacles.size():
+		var off: Vector2 = obstacles[i].get_center() - a.p
+		if i < obstacle_hp.size() and obstacle_hp[i] >= 0 and off.length() < reach + 20 and off.normalized().dot(a.aim) > 0.1: hit.append(i)
+	hit.reverse()
+	for i in hit: damage_obstacle(i, damage)
 
 func melee(a: Dictionary) -> void:
 	a.slash = 0.65 if a.mech else 0.45
@@ -659,6 +767,7 @@ func melee(a: Dictionary) -> void:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach and offset.normalized().dot(a.aim) > 0.05:
 			e.hp -= 55.0 if a.mech else float(uniform_of(a).melee); e.hurt = 0.15
+	props_in_arc(a, reach, 40.0 if a.mech else float(uniform_of(a).melee))
 	# A clearly hinted crack opens with a close attack, never a consumable key.
 	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125:
 		open_secret()
@@ -733,7 +842,11 @@ func interact(a: Dictionary) -> void:
 			return
 		if a.p.distance_to(DOCKS.POINTS.side) < 110 and not side_active and not side_complete and not side_failed:
 			side_active = true; side_time = 55
-			for n in range(7): spawn_enemy(Vector2(5480 + (n % 4) * 280, 2960 + floorf(float(n) / 4.0) * 560), "cult" if n % 2 == 0 else "brute", true)
+			var guards := [Vector2(-450, -300), Vector2(450, -300), Vector2(-500, 150), Vector2(500, 150), Vector2(-250, 380), Vector2(250, 380), Vector2(0, -330)]
+			for n in range(7):
+				var gp: Vector2 = DOCKS.POINTS.side + guards[n]
+				if not clear_at(gp, 14): gp = DOCKS.POINTS.side + guards[n] * 0.7
+				spawn_enemy(gp, "cult" if n % 2 == 0 else "brute", true)
 			say("OPCIONAL • Elimine os 7 guardiões em 55s. Recompensa: chaves, cura e fragmento."); return
 		if boss_dead and a.p.distance_to(DOCKS.POINTS.extraction) < 120:
 			if not reward_claimed:
@@ -906,6 +1019,7 @@ func step_bullets(dt: float) -> void:
 			b.p += b.v * dt / count
 			if not clear_at(b.p, 0, true):
 				b.life = 0
+				if mode == "run" and b.get("kind", "") != "p_heavy": damage_obstacle(obstacle_at(b.p), b.damage * (0.5 if b.team == 1 else 1.0))
 				if b.get("kind", "") == "p_heavy": explode(b.p, MECH_SHELL.splash, MECH_SHELL.splash_damage, false)
 				if b.team == 0: effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
 				break
@@ -985,20 +1099,22 @@ func summon_robot(a: Dictionary) -> bool:
 		if mech.hp <= 0:
 			say("Titan destruído. Recuperação na próxima tentativa."); return false
 		if mech.deployed and mech.owner == a.id and a.p.distance_to(mech.p) < 240:
+			effects.append(SummonFX.recall_effect(a.id, a.p - Vector2(0, 30), mech.p, "titan"))
 			mech.deployed = false; a.summon_cd = 3; say("Titan recolhido. Integridade preservada."); return true
 		var titan_pos := free_summon_position(a, 28)
 		if not titan_pos.is_finite(): say("Sem espaço livre para invocar o Titan."); return false
 		mech.p = titan_pos; mech.deployed = true; mech.owner = a.id; mech.aim = a.aim; a.summon_cd = 6
-		effects.append({"p": titan_pos, "kind": "summon", "life": 0.6, "dir": Vector2.UP})
+		effects.append(SummonFX.summon_effect(a.id, a.p - Vector2(0, 30), titan_pos, "titan"))
 		say("TITAN INVOCADO • aproxime-se e pressione E para pilotar."); return true
 	var s: Dictionary = spectres[a.id]
 	if s.hp <= 0: say("Spectre destruído. Recuperação na próxima tentativa."); return false
 	if s.state == "following":
+		effects.append(SummonFX.recall_effect(a.id, a.p - Vector2(0, 30), s.p, "spectre"))
 		s.state = "stored"; a.summon_cd = 3; say("Spectre recolhido. Energia preservada."); return true
 	var pos := free_summon_position(a, 14)
 	if not pos.is_finite(): say("Sem espaço livre para invocar Spectre."); return false
 	s.p = pos; s.state = "following"; a.summon_cd = 6
-	effects.append({"p": pos, "kind": "summon", "life": 0.6, "dir": Vector2.UP})
+	effects.append(SummonFX.summon_effect(a.id, a.p - Vector2(0, 30), pos, "spectre"))
 	say("SPECTRE INVOCADO • acompanha e atira. G para fundir / separar."); return true
 
 func toggle_fusion(a: Dictionary) -> bool:
@@ -1045,7 +1161,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses"]:
 		data[name] = get(name)
 	return data
 
