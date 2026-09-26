@@ -308,6 +308,10 @@ func draw_entities() -> void:
 		var bullet_pos: Vector2 = b.p - Vector2(0, 28)
 		var kind: String = b.get("kind", "")
 		if kind == "bomb":
+			# 0.15: telegraph da zona de impacto — anel vermelho no ponto de queda
+			var landing: Vector2 = b.get("to", b.p)
+			draw_arc(landing + Vector2(0, 4), sim.MECH_BOMB.radius * 0.55, 0, TAU, 40, Color(1, 0.4, 0.3, 0.55), 2.5)
+			draw_circle(landing + Vector2(0, 4), sim.MECH_BOMB.radius * 0.55, Color(1, 0.3, 0.25, 0.08))
 			draw_bomb(b); continue
 		if kind == "p_heavy":
 			draw_circle(bullet_pos, b.r + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
@@ -350,6 +354,19 @@ func draw_entities() -> void:
 				draw_line(fx.p - Vector2(0, 28) + d * (3 + t * 12), fx.p - Vector2(0, 28) + d * (6 + t * (22 if fx.omega else 14)), c, 2)
 			if fx.omega: draw_circle(fx.p - Vector2(0, 28), 10 * (1 - t) + 3, Color(0.6, 1, 1, 0.4 * (1 - t)))
 		elif fx.kind == "chest_burst": draw_chest_burst(fx)
+		elif fx.kind == "dmg_num":
+			# 0.15: número de dano flutuante (sobe, espalha em x e some)
+			var t: float = 1.0 - fx.life / fx.max
+			var np: Vector2 = fx.p - Vector2(0, 44 + t * 30) + Vector2(fx.get("vx", 0.0) * t, 0)
+			var size := 15 if fx.get("heavy", false) else 12
+			var col := Color("ffe08a") if fx.get("heavy", false) else Color("ffffff")
+			col.a = clampf(fx.life / fx.max * 1.6, 0, 1)
+			var txt := str(fx.get("value", 0))
+			draw_string(ThemeDB.fallback_font, np + Vector2(1, 1), txt, HORIZONTAL_ALIGNMENT_CENTER, 40, size, Color(0, 0, 0, col.a))
+			draw_string(ThemeDB.fallback_font, np, txt, HORIZONTAL_ALIGNMENT_CENTER, 40, size, col)
+		elif fx.kind == "clutch":
+			var t: float = 1.0 - fx.life / fx.max
+			draw_arc(fx.p, 30 + t * 60, 0, TAU, 24, Color(1, 0.25, 0.2, 0.7 * (1 - t)), 3)
 		elif fx.kind == "stomp":
 			var t: float = 1.0 - fx.life / fx.max
 			for n in range(8):
@@ -586,6 +603,7 @@ func draw_mech(m: Dictionary) -> void:
 			var jet := base + Vector2(0, -60) + back * (40 + k * 10) + Vector2(sin(sim.tick_time * 50 + k) * 3, 0)
 			draw_circle(jet, 14 - k * 3, Color(0.4, 0.9, 1, 0.45 - k * 0.1))
 	draw_set_transform(base, 0, Vector2(-1.0 if pose[1] else 1.0, squash))
+	# O atlas limpo mantém uma margem transparente entre todas as poses.
 	draw_texture_rect_region(titan_v2, Rect2(-88, -170, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176))
 	draw_set_transform(Vector2.ZERO)
 	if not piloted: text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)

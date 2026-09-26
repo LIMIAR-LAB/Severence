@@ -56,6 +56,11 @@ var pending_spawns: Array = []   # 0.15: inimigos aguardando o portal da arena t
 var spectres: Array = []
 var obstacle_hp: Array = []      # 0.13: vida de cada obstáculo (-1 = indestrutível)
 var fuses: Array = []            # barris explosivos prestes a estourar (reação em cadeia)
+var hitstop := 0.0               # 0.15: micro-pausa em golpes fortes (main.gd aplica Engine.time_scale)
+var clutch_t := 0.0              # 0.15: slow-mo quando o jogador fica com meio coração
+var clutch_cd := 0.0
+var streak := 0                  # 0.15: abates em sequência — bônus de moedas
+var streak_t := 0.0
 var ob_grid: Dictionary = {}     # grade espacial dos obstáculos (mapa grande = muitos props)
 var ob_grid_count := -1
 
@@ -584,6 +589,9 @@ func ai_input() -> Dictionary:
 func step(dt: float, commands: Array) -> void:
 	tick_time += dt; message_time = maxf(0, message_time - dt)
 	ai_path_timer -= dt
+	clutch_t = maxf(0, clutch_t - dt); clutch_cd = maxf(0, clutch_cd - dt)
+	streak_t = maxf(0, streak_t - dt)
+	if streak_t <= 0: streak = 0
 	for a in actors:
 		if not a.active: continue
 		var cmd: Dictionary = commands[a.id] if commands.size() > a.id else {}
@@ -591,6 +599,12 @@ func step(dt: float, commands: Array) -> void:
 		step_actor(a, cmd, dt)
 	# Bullets must advance in every scene, including the refuge and training arena.
 	step_spectres(dt); step_enemies(dt); step_bullets(dt); collect_pickups()
+	# 0.15: slow-mo "clutch" — meio coração com inimigos por perto dispara uma vez
+	for a in actors:
+		if a.active and not a.dead and a.hp <= HEART * 0.5 + 0.01 and not enemies.is_empty() and clutch_cd <= 0:
+			clutch_t = 2.2; clutch_cd = 20.0
+			effects.append({"p": a.p, "kind": "clutch", "life": 0.6, "max": 0.6})
+			say("NO LIMITE • cuidado!")
 	if mode == "arena":
 		if enemies.is_empty():
 			arena_wait += dt
@@ -682,6 +696,11 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 			# caiu na água: volta para onde saltou e perde meio coração
 			a.p = a.get("jump_from", a.p); damage_actor(a, 12)
 			effects.append({"p": a.p, "kind": "splash", "life": 0.5, "max": 0.5})
+		elif a.jump == 0 and a.mech:
+			# 0.15: pouso do Titan — onda de choque fere e quebra quem está perto
+			explode(a.p, 80.0, 16.0, false)
+			effects.append({"p": a.p, "kind": "stomp", "life": 0.5, "max": 0.5})
+			hit_stop(0.04)
 	if a.mech:
 		mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
 		if a.move.length() > 0.1: mech["move_dir"] = a.move.normalized()
@@ -724,7 +743,9 @@ func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: boo
 	for e in enemies:
 		var d: float = e.p.distance_to(p)
 		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
-			e.hp -= damage * (1.0 - 0.45 * clampf(d / radius, 0, 1)); e.hurt = 0.2; e["alerted"] = true
+			var dealt: float = damage * (1.0 - 0.45 * clampf(d / radius, 0, 1))
+			e.hp -= dealt; e.hurt = 0.2; e["alerted"] = true
+			pop_dmg(e.p, dealt, big)
 	if hurts_all:   # barril: atinge todo mundo (1 coração) e empurra
 		for a in actors:
 			if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8:
@@ -748,6 +769,13 @@ func step_bomb(b: Dictionary, dt: float) -> void:
 
 func add_bullet(pos: Vector2, direction: Vector2, team: int, damage: float, speed: float, radius: float = 5.0, owner_id: int = -1, kind: String = "", life: float = 3.0) -> void:
 	bullets.append({"p": pos, "v": direction * speed, "team": team, "damage": damage, "r": radius, "life": life, "owner": owner_id, "kind": kind})
+
+# 0.15: número de dano flutuante — desenhado em world_view.gd
+func pop_dmg(p: Vector2, amount: float, heavy: bool = false) -> void:
+	effects.append({"p": p, "kind": "dmg_num", "life": 0.6, "max": 0.6, "value": int(amount), "heavy": heavy, "vx": rng.randf_range(-14, 14)})
+
+func hit_stop(d: float) -> void:
+	hitstop = maxf(hitstop, d)
 
 func weapon_of(a: Dictionary) -> String:
 	if a.mech: return "mech"
@@ -803,6 +831,7 @@ func sword_attack(a: Dictionary) -> void:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach + (30 if e.kind == "boss" else 0) and offset.normalized().dot(a.aim) > -arc:
 			e.hp -= damage; e.hurt = 0.18
+			pop_dmg(e.p, damage, finisher)
 			effects.append({"p": e.p, "kind": "impact", "life": 0.2, "max": 0.2, "omega": true})
 			if e.kind != "boss": e.p = move_body(e.p, offset.normalized() * (18 if finisher else 8), 14)
 	for b in bullets:
@@ -830,7 +859,9 @@ func melee(a: Dictionary) -> void:
 	for e in enemies:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach and offset.normalized().dot(a.aim) > 0.05:
-			e.hp -= MECH_PUNCH if a.mech else float(uniform_of(a).melee); e.hurt = 0.15
+			var mdmg: float = MECH_PUNCH if a.mech else float(uniform_of(a).melee)
+			e.hp -= mdmg; e.hurt = 0.15
+			pop_dmg(e.p, mdmg, a.mech)
 	props_in_arc(a, reach, 40.0 if a.mech else float(uniform_of(a).melee))
 	# A clearly hinted crack opens with a close attack, never a consumable key.
 	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125:
@@ -1049,7 +1080,11 @@ func step_enemies(dt: float) -> void:
 		if e.kind == "bomber" and not e.detonated:
 			e.detonated = true
 			explode(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, true, true)
-		money += 4
+		# 0.15: sequência de abates — bônus de moedas crescente + hitstop (maior em elites)
+		streak += 1; streak_t = 2.2
+		money += 4 + mini(streak - 1, 4)
+		if e.kind in ["boss", "warden"]: hit_stop(0.09); streak_t = 3.0
+		else: hit_stop(0.03)
 		pickups.append({"p": e.p, "kind": "coin"})
 		if rng.randf() < 0.2: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
 		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 1.2, "max": 2.6 if e.kind == "boss" else 1.2, "flip": e.face.x < 0})
@@ -1160,18 +1195,23 @@ func step_bullets(dt: float) -> void:
 			if b.team == 0:
 				for e in enemies:
 					if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
-						var hits: Array = b.get("hits", [])
-						if hits.has(e.id): continue
+						var previous_hits: Array = b.get("hits", [])
+						if previous_hits.has(e.id): continue
 						e.hp -= b.damage; e.hurt = 0.12; e["alerted"] = true
+						# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
+						pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
+						if e.kind not in ["boss", "warden"]:
+							e.p = move_body(e.p, b.v.normalized() * (14.0 if b.get("kind", "") == "p_heavy" else 4.0), 12 if e.kind == "crawler_small" else 14)
 						if b.get("kind", "") == "p_heavy":
-							hits = b.get("hits", []); hits.append(e.id)
+							var heavy_hits: Array = b.get("hits", []); heavy_hits.append(e.id)
 							for other in enemies:   # respingo não repete o dano no alvo direto
-								if not hits.has(other.id) and other.p.distance_to(b.p) < MECH_SHELL.splash + 19:
+								if not heavy_hits.has(other.id) and other.p.distance_to(b.p) < MECH_SHELL.splash + 19:
 									other.hp -= MECH_SHELL.splash_damage; other.hurt = 0.15; other["alerted"] = true
+									pop_dmg(other.p, MECH_SHELL.splash_damage)
 							effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
 						effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
 						if b.get("pierce", 0) > 0:
-							b.pierce -= 1; hits.append(e.id); b["hits"] = hits
+							b.pierce -= 1; previous_hits.append(e.id); b["hits"] = previous_hits
 						else: b.life = 0
 						break
 			else:
@@ -1304,7 +1344,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 

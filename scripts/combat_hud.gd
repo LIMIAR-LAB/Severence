@@ -92,7 +92,15 @@ func _draw() -> void:
 		var partner: Dictionary = s.actors[1-id]
 		frame(Rect2(466,14,181,54)); text(Vector2(478,36), "PARCEIRO IA" if s.coop == "ai" else "PARCEIRO P2", 13, CYAN)
 		text(Vector2(478,55), "CAÍDO • REANIMAR" if partner.dead else "♥ %.1f / %d" % [partner.hp / s.HEART, int(s.max_hp() / s.HEART)], 13)
-	draw_set_transform(Vector2(dx, 0))
+	if s.streak >= 2:
+		# 0.15: sequência de abates — selo com barra de tempo restante
+		var pulse := 1.0 + sin(s.tick_time * 12) * 0.06
+		draw_set_transform(Vector2(640, 96), 0, Vector2(pulse, pulse))
+		text(Vector2(-60, 8), "SEQUÊNCIA ×%d" % s.streak, 18, Color("e8be6e"))
+		draw_rect(Rect2(-60, 16, 120, 5), Color("26323a"))
+		draw_rect(Rect2(-60, 16, 120 * clampf(s.streak_t / 2.2, 0, 1), 5), Color("e8be6e"))
+		draw_set_transform(Vector2(dx, 0))
+	else: draw_set_transform(Vector2(dx, 0))
 	draw_minimap(s, a)
 	draw_set_transform(Vector2(0, dy))
 	frame(Rect2(16,676,218,105))
