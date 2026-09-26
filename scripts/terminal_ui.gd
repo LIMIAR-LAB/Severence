@@ -236,7 +236,6 @@ const UNIFORM_CARDS := [["padrao", "1. PADRÃO", "equilibrado", Color("65f0f5")]
 const SHORT_DESC := {"padrao": "Equilibrado em tudo. Blaster de energia com cadência média.",
 	"mecanico": "Mais força e resistência. Chave inglesa pesada; um pouco mais lento.",
 	"espiao": "Rápido e discreto: os inimigos só o notam de perto."}
-const SHOT_DAMAGE := {"padrao": 16, "mecanico": 54, "espiao": 7}   # por disparo (escopeta: 6 × 9)
 const LEGEND := Color("ffc94a")
 
 class StatPanel extends Control:
@@ -359,25 +358,32 @@ func cycle_outfit(step: int) -> void:
 	if slot_buttons.has("o_" + outfit_choice): slot_buttons["o_" + outfit_choice].grab_focus()
 
 func draw_stats(c: Control) -> void:
+	# 0.14: números vêm de Expedition.loadout_stats — as mesmas constantes que o jogo usa.
 	var sim = app.sim
-	var u: Dictionary = sim.UNIFORMS[outfit_choice]
+	var kind := "omega" if preview_kind == "armor_omega" else (preview_kind if preview_kind in ["titan", "spectre"] else "uniform")
+	var rows: Array = sim.loadout_stats(kind, outfit_choice)
 	var f := ThemeDB.fallback_font
-	var hearts := int(roundf(sim.max_hp() / sim.HEART))
-	for h in hearts:
-		var x := 146.0 + h * 24; var y := 50.0
-		c.draw_colored_polygon(PackedVector2Array([Vector2(x, y + 6), Vector2(x + 10, y + 19), Vector2(x + 20, y + 6), Vector2(x + 15, y), Vector2(x + 10, y + 4), Vector2(x + 5, y)]), Color("e8404e"))
-	c.draw_string(f, Vector2(304 - 20, 64), str(hearts), HORIZONTAL_ALIGNMENT_RIGHT, 20, 14, Color("e2e8dc"))
-	var rows := [[u.speed, 430.0, CYAN, str(int(u.speed))], [u.melee, 50.0, Color("f08a24"), str(int(u.melee))],
-		[SHOT_DAMAGE.get(outfit_choice, 16), 60.0, Color("e8be6e"), str(SHOT_DAMAGE.get(outfit_choice, 16))],
-		[2.0 - u.taken, 1.2, Color("8fdc6a"), "%+d%%" % int(roundf((1.0 - u.taken) * 100))],
-		[1.0 / u.dash_cd, 3.0, Color("b98cff"), "%.2fs" % u.dash_cd]]
+	var sub: String = {"omega": "armadura lendária", "titan": "robô", "spectre": "robô"}.get(kind, "uniforme " + sim.UNIFORMS[outfit_choice].name.to_lower())
+	c.draw_string(f, Vector2(120, 33), sub, HORIZONTAL_ALIGNMENT_RIGHT, 184, 11, Color("7f9a9a"))
+	var colors := {"cyan": CYAN, "orange": Color("f08a24"), "gold": Color("e8be6e"), "green": Color("8fdc6a"), "violet": Color("b98cff")}
+	var step := 30.0 if rows.size() > 6 else 34.0
 	for i in rows.size():
 		var r: Array = rows[i]
-		var y := 87.0 + i * 34
-		c.draw_rect(Rect2(124, y, 132, 10), Color("14202a")); c.draw_rect(Rect2(124, y, 132, 10), Color("28404a"), false, 1)
-		var fill := int(roundf(12 * clampf(float(r[0]) / r[1], 0, 1)))
-		for n in 12: c.draw_rect(Rect2(126 + n * 10.7, y + 2, 8.7, 6), r[2] if n < fill else Color("1a2c32"))
-		c.draw_string(f, Vector2(264, y + 10), r[3], HORIZONTAL_ALIGNMENT_RIGHT, 40, 13, r[2])
+		var y := 50.0 + i * step
+		c.draw_string(f, Vector2(16, y + 9), r[0], HORIZONTAL_ALIGNMENT_LEFT, 110, 13, Color("e2e8dc"))
+		if r[3] in ["hearts", "hearts_shield"]:
+			for h in sim.BASE_HEARTS + (sim.OMEGA_SHIELD_HEARTS if r[3] == "hearts_shield" else 0):
+				var x: float = 124.0 + float(h) * 22
+				var col := Color("e8404e") if h < sim.BASE_HEARTS else Color("54e0f0")
+				c.draw_colored_polygon(PackedVector2Array([Vector2(x, y + 3), Vector2(x + 9, y + 15), Vector2(x + 18, y + 3), Vector2(x + 13.5, y - 2), Vector2(x + 9, y + 1), Vector2(x + 4.5, y - 2)]), col)
+			if r[3] == "hearts": c.draw_string(f, Vector2(200, y + 9), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 104, 13, Color("e2e8dc"))
+			continue
+		var color: Color = colors.get(r[3], CYAN)
+		if r[2] >= 0:
+			c.draw_rect(Rect2(124, y, 90, 10), Color("14202a")); c.draw_rect(Rect2(124, y, 90, 10), Color("28404a"), false, 1)
+			var fill := int(roundf(9 * clampf(r[2], 0, 1)))
+			for n in 9: c.draw_rect(Rect2(126 + n * 9.7, y + 2, 7.7, 6), color if n < fill else Color("1a2c32"))
+		c.draw_string(f, Vector2(218, y + 10), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 88, 12, color)
 
 func add_icon(parent: Control, tex: Texture2D) -> void:
 	var icon := TextureRect.new(); icon.texture = tex

@@ -18,7 +18,7 @@ Base: conceito v1 (set/2026) e `art/source/refuge-reference.png`. O refúgio pas
 | Portal DOCAS / 1941 | topo, centro (topo da escadaria) | inicia a expedição |
 | Coordenada Perdida | topo, direita | bloqueado — anel rachado com correntes |
 | Núcleo Temporal | centro | mostra expedições concluídas e fragmentos |
-| Bancada | esquerda | 2 fragmentos → +10 de vida (até 3×) |
+| Bancada | esquerda | congelada na 0.14 (vida fixa em 3 corações) |
 | Armadura de treino | inferior esquerda | alterna COM / SEM armadura |
 | Hangar do Titan | direita | Titan estacionado; E perto dele para pilotar; C recolhe/invoca |
 | Mural da equipe | inferior centro | conta lembranças recuperadas (1 por expedição concluída, até 4) |

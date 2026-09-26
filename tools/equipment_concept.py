@@ -298,9 +298,7 @@ def build_background():
         d.rectangle(R(cx - 10, cy - 2, 20, 4), fill=CYAN); d.rectangle(R(cx - 2, cy - 10, 4, 20), fill=CYAN)
     rx = 1004
     frame(d, R(rx, 64, 324, 260))
-    text(d, (rx + 20, 92), "STATUS", 18, GOLD, anchor="lm"); text(d, (rx + 304, 92), "uniforme atual", 11, DIM, False, anchor="rm")
-    for i, lab in enumerate(["CORAÇÕES", "VELOCIDADE", "GOLPE", "DANO / TIRO", "DEFESA", "DASH"]):
-        text(d, (rx + 20, 122 + i * 34), lab, 13, TEXT, anchor="lm")
+    text(d, (rx + 20, 92), "STATUS", 18, GOLD, anchor="lm")   # linhas desenhadas no jogo (loadout_stats)
     frame(d, R(rx, 332, 324, 240))
     for i in range(3):
         y = 344 + i * 76
