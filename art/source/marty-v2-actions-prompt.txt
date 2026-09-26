@@ -1,0 +1,6 @@
+Use case: identity-preserve. Production pixel-art action sprite sheet.
+Reference is the approved Marty walking sheet: preserve EXACT same chibi proportions, brown messy hair, huge expressive face, cyan aviator goggles on forehead, brown cream-collar pilot jacket, red scarf and dark trousers; white cyan armor version. Head 40 percent of total height. Same crisp pixel style, palette and dark outline.
+Create 6 columns by 4 rows, exactly 24 isolated full body sprites on pure flat magenta #ff00ff, wide magenta gutters, no words or shadows.
+Each row faces one direction: row1 DOWN, row2 LEFT, row3 RIGHT, row4 UP/back with no face visible.
+Columns 1,2,3 UNARMORED Marty: 1 aiming stance with empty hands held forward (gun rendered separately), 2 jumping with knees bent and scarf flying, 3 punching/short-range melee with fist extended.
+Columns 4,5,6 WHITE CYAN ARMORED Marty: same aim, jump and punch poses. Visible face hair and goggles, white torso, boots, gauntlets. Consistent size and feet baseline across all cells, complete figures, no cropping, no weapons. Pure magenta between every sprite and across whole backdrop. Canvas1536x1024.
