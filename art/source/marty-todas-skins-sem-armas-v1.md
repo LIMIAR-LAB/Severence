@@ -1,0 +1,10 @@
+# Marty — poses sem armas, todas as skins
+
+Gerado via image_gen integrado. Arquivo: marty-todas-skins-sem-armas-v1.png.
+Estudo visual de 4 roupas × 5 direções. Não integrado ao atlas animado.
+Armas devem permanecer recursos separados. Na integração, separar a camada
+dos dedos que cobre a empunhadura e calibrar pontos de mão por pose.
+
+## Prompt
+
+Create a corrected modular character sprite pose sheet for Marty Fraturas do Tempo. Reference 1 is identity/costume source atlas, Reference 2 is polished pixel art quality and bent arm anatomy reference ONLY; REMOVE ALL WEAPONS. Transparent background. Exactly 4 ROWS x 5 COLUMNS, 20 complete separate full-body sprites, equal cells and consistent grounded foot anchors, generous transparent gutters. Row1 standard Marty brown shearling pilot jacket, cyan goggles on spiky brown hair, dark pants, cyan gauntlets/backpack. Row2 spy Marty dark cap, sunglasses, dark trenchcoat, red scarf. Row3 mechanic Marty white sleeveless undershirt, olive overalls, gloves, NO wrench on shoulder or tools held. Row4 Omega white gold cyan armored Marty with closed helmet and purple cape, NO swords. Columns left to right: front, front-right three-quarter, right profile, back-right three-quarter, full back. Every sprite has anatomically connected upper arms, bent elbows, forearms raised around waist/lower chest, TWO EMPTY hands in a relaxed gripping C shape, dominant hand near torso, support hand slightly forward. Hands must be visible when appropriate, no weapons or props anywhere, nothing between hands: guns will be separate interchangeable game layers. Rear views have backs only, no front face. Preserve reference character proportions and costume identity. Refined crisp pixel-art clusters, clear cuffs, dimensional shading matching clothing, no procedural sticks or blocky pasted rectangles for arms. Transparent alpha, no text, no background, no grid, no labels, no weapons, no swords, no guns, no tools, no detached limbs. Deliver a pose study for all four costumes, not the original 200 frame animation atlas.

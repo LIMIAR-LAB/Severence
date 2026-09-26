@@ -22,8 +22,8 @@ func alpha_bounds(image: Image, rect: Rect2i) -> Rect2i:
 	return Rect2i(left, top, right - left, bottom - top)
 
 func _init() -> void:
-	var image := Image.load_from_file(ProjectSettings.globalize_path("res://assets/marty/marty_anim_v2.png"))
-	check(not image.is_empty(), "atlas v2 existe")
+	var image := Image.load_from_file(ProjectSettings.globalize_path("res://assets/marty/marty_anim_v3.png"))
+	check(not image.is_empty(), "atlas v3 existe")
 	check(image.get_size() == Vector2i(CELL * COLUMNS, CELL * ROWS), "atlas usa grade 10x20 de células 96px")
 	var frames := 0
 	for row in range(ROWS):

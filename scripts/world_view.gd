@@ -37,7 +37,7 @@ var enemy_texture: Texture2D
 var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
-const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v2.png"
+const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v4.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
@@ -677,32 +677,22 @@ func draw_warden(e: Dictionary) -> void:
 func weapon_hand_anchor(a: Dictionary) -> Vector2:
 	# 0.17: acompanha a mão visível de cada vista, em vez de orbitar o centro do corpo.
 	var pose := marty_pose(a.facing)
-	var anchors := [Vector2(7, -35), Vector2(15, -36), Vector2(15, -38), Vector2(17, -40), Vector2(15, -39)]
+	var anchors := [Vector2(20, -27), Vector2(21, -28), Vector2(18, -26), Vector2(18, -26), Vector2(20, -25)]
 	var hand: Vector2 = anchors[pose[0]]
 	if pose[1]: hand.x = -hand.x
-	if a.armor: hand.y -= 7
+	if a.armor: hand.y -= 2
 	return hand
 
-func draw_weapon_hand(a: Dictionary, wrist: Vector2, grip: Vector2) -> void:
-	# Antebraço curto e luva ligam o sprite à arma durante mira e recuo.
-	var glove := Color("49b7c9") if a.outfit == "padrao" or a.armor else Color("655042")
-	draw_line(wrist, grip, Color("181b22"), 7)
-	draw_line(wrist, grip, glove.darkened(0.25), 4)
-	draw_rect(Rect2(grip - Vector2(3, 3), Vector2(6, 6)), Color("181b22"))
-	draw_rect(Rect2(grip - Vector2(2, 2), Vector2(4, 4)), glove)
-
-func draw_weapon_arm(a: Dictionary, base: Vector2, grip: Vector2) -> void:
-	# 0.17: corrente ombro → cotovelo → mão, com dobra legível em todas as vistas.
+func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
+	# 0.18: dedos da própria arte cobrem a empunhadura, sem braços geométricos.
 	var pose := marty_pose(a.facing)
-	var side := -1.0 if pose[1] else 1.0
-	var shoulder := base + Vector2(15 * side, -47 if not a.armor else -54)
-	var elbow := base + Vector2(19 * side, -29 if not a.armor else -36)
-	var sleeve: Color = {"padrao": Color("65452f"), "espiao": Color("30323d"), "mecanico": Color("c79770")}.get(a.outfit, Color("65452f"))
-	if a.armor: sleeve = Color("a9c9d2")
-	var points := PackedVector2Array([shoulder, elbow, grip])
-	draw_polyline(points, Color("191922"), 10, false)
-	draw_polyline(points, sleeve, 7, false)
-	draw_line(elbow + Vector2(-1, -2), grip + Vector2(-1, -2), sleeve.lightened(0.18), 2)
+	var row: int = OUTFIT_ROW[sim.outfit_of(a)] * 5 + int(pose[0])
+	var anchor := weapon_hand_anchor(a)
+	if pose[1]: anchor.x = -anchor.x
+	var patch := Rect2(anchor + Vector2(48, 92) - Vector2(4, 4), Vector2(8, 8))
+	draw_set_transform(wrist, 0, Vector2(-1 if pose[1] else 1, 1))
+	draw_texture_rect_region(marty_anim, Rect2(-4, -4, 8, 8), Rect2(patch.position + Vector2(0, row * 96), patch.size))
+	draw_set_transform(Vector2.ZERO)
 
 func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	# Arma na mão: gira com a mira (360°), espelha para a esquerda, dá tranco para trás e para cima,
@@ -721,12 +711,11 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	var lift: float = k * {"pistol": 0.25, "shotgun": 0.45, "smg": 0.12, "omega": 0.3}[weapon]
 	var angle: float = aim.angle() + (lift if mirrored else -lift)
 	var wrist := base + weapon_hand_anchor(a)
-	var grip: Vector2 = wrist + aim * (4.0 - kick_back * 0.4)
+	var grip: Vector2 = wrist
 	var size := tex.get_size()
 	if weapon == "omega":
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 9)
 		draw_circle(grip + aim * 18, 9 + pulse * 3, Color(0.35, 0.9, 1, 0.12 + pulse * 0.08))
-	draw_weapon_arm(a, base, grip)
 	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15)}.get(weapon, Vector2(8, size.y * 0.5))
 	draw_set_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, -handle)
@@ -768,13 +757,12 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 	if a.slash > 0: angle = swing_angle(a, duration)
 	else: angle = aim.angle() + (-1.0 if mirrored else 1.0) * 1.05  # em guarda, lâmina baixa à frente
 	var wrist := base + weapon_hand_anchor(a)
-	var grip: Vector2 = wrist + Vector2.RIGHT.rotated(angle) * 4
+	var grip: Vector2 = wrist
 	var size := tex.get_size()
 	if energy:
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 8)
 		var tip := grip + Vector2.RIGHT.rotated(angle) * size.x
 		draw_line(grip, tip, Color(0.4, 0.95, 1, 0.18 + 0.1 * pulse), 12)
-	draw_weapon_arm(a, base, grip)
 	draw_set_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, Vector2(-6, -size.y * 0.5))
 	draw_set_transform(Vector2.ZERO)
