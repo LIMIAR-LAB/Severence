@@ -38,7 +38,7 @@ var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
-const TITAN_ATLAS_PATH := "res://assets/mech/titan_v4.png"
+const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
@@ -582,12 +582,8 @@ func draw_mech(m: Dictionary) -> void:
 	var column := 0; var bob := 0.0; var squash := 1.0
 	var pilot: Dictionary = sim.actors[m.occupant] if piloted else {}
 	var attacking: bool = piloted and (pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0)
-	if attacking:
-		# 0.15: clarão lateral só combina com a vista lateral do canhão.
-		column = 8 if pose[0] == 2 and pilot.get("fire_flash", 0.0) > 0 else 5
-	elif m.get("boosting", false):
-		column = 6
-	elif piloted and m.get("moving", false):
+	# 0.18: disparar não interrompe o ciclo dos pés.
+	if piloted and m.get("moving", false):
 		var phase := int(m.step) % 4
 		column = 1 + phase
 		# peso: afunda e achata quando o pé bate (quadros 1 e 3)
@@ -596,7 +592,7 @@ func draw_mech(m: Dictionary) -> void:
 		else: bob = -2.0 * sin(sub * PI)
 	elif not piloted: bob = 0.0
 	else:
-		column = 5
+		column = 0
 		bob = sin(sim.tick_time * 2.0) * 1.0  # motor ligado
 	var base: Vector2 = p - Vector2(0, sim.height_at(p) - bob)
 	if m.get("boosting", false):
@@ -606,7 +602,7 @@ func draw_mech(m: Dictionary) -> void:
 			draw_circle(jet, 14 - k * 3, Color(0.4, 0.9, 1, 0.45 - k * 0.1))
 	draw_set_transform(base, 0, Vector2(-1.0 if pose[1] else 1.0, squash))
 	# O atlas limpo mantém uma margem transparente entre todas as poses.
-	draw_texture_rect_region(titan_v2, Rect2(-88, -170, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176))
+	draw_texture_rect_region(titan_v2, Rect2(-88, -164, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176))
 	draw_set_transform(Vector2.ZERO)
 	if not piloted: text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)
 	else:
@@ -1091,9 +1087,8 @@ func draw_screen_flash() -> void:
 
 # ── 0.13: Titan só usa vistas reais (lado nas diagonais), bomba, explosões e efeitos do cenário ──
 func titan_pose(f: Vector2) -> Array:
-	# A arte lateral aponta para a direita; apenas a esquerda recebe espelho.
-	if absf(f.x) >= absf(f.y) * 0.7: return [2, f.x < 0]
-	return [0, false] if f.y > 0 else [4, false]
+	# 0.18: utiliza também as duas vistas diagonais da nova folha.
+	return marty_pose(f)
 
 func draw_shield_hex(c: Vector2, k: float) -> void:
 	var pts := PackedVector2Array()
