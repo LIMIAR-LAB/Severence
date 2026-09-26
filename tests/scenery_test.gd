@@ -64,5 +64,18 @@ func _init() -> void:
 	m.p = DOCKS.HAZARDS[0].p; m.hurt = 0; var before: float = m.hp
 	s.step(0.016, [{}, {}])
 	check(m.hp < before, "poça com tentáculo causa dano")
+	# 0.15: sala não pode ficar apagada ao entrar numa segunda expedição (tick_time recomeça do zero)
+	var sc2 = Scenery.new()
+	var s2 = Expedition.new(); s2.coop = "solo"; s2.start_run(1941)
+	s2.tick_time = 300.0; s2.step(0.016, [{}, {}]); sc2.discovered_rooms(s2)
+	s2.start_run(1942); s2.step(0.016, [{}, {}])
+	sc2.discovered_rooms(s2)
+	check(float(sc2.reveal_at.get("entry", 999.0)) <= s2.tick_time, "nova expedição: sala acende de novo (sem registro no futuro)")
+	s2.tick_time += 0.6
+	var dark := false
+	for room in sc2.discovered_rooms(s2):
+		var age: float = s2.tick_time - float(sc2.reveal_at.get(room.get("id", ""), -9.0))
+		if room.has("id") and age >= 0.0 and age < 0.5: dark = true
+	check(not dark, "depois de 0,5s nenhuma sala descoberta continua escurecida")
 	print("SCENERY_TESTS_DONE failures=%d" % failures)
 	quit(1 if failures > 0 else 0)
