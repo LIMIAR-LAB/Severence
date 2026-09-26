@@ -66,7 +66,7 @@ func show_screen(next: String) -> void:
 		stage.remove_child(content); content.queue_free()
 	content = Control.new(); content.size = Vector2(1344, 752); stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null
-	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "equipment_v2" if next == "equipment" else "menu") + ".png")
+	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "equipment_v3" if next == "equipment" else "menu") + ".png")
 	if next == "play": bg.texture = load("res://assets/ui/adventure.png")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if bg.texture.resource_path.ends_with("menu.png"):
@@ -228,8 +228,8 @@ var companion_body: Label
 var weapon_icon: TextureRect
 var weapon_label: Label
 
-# Tela de equipamento 0.13 (conceito art/concept/equipamento-v2-conceito-*.png).
-# Fundo estático: assets/ui/equipment_v2.png (tools/equipment_concept.py bg). Tudo que muda é Control real.
+# Tela de equipamento 0.16 — layout v3 (art/concept/equipamento-v3-mockup.png).
+# Fundo estático: assets/ui/equipment_v3.png (tools/equipment_v3.py). Tudo que muda é Control real.
 # Cada clique já aplica a escolha. Controle: direcional navega, A seleciona, B volta, LB/RB trocam o uniforme.
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const UNIFORM_CARDS := [["padrao", "1. PADRÃO", "equilibrado", Color("65f0f5")], ["mecanico", "2. MECÂNICO", "+ força", Color("8fdc6a")], ["espiao", "3. ESPIÃO", "+ velocidade", Color("b98cff")]]
@@ -261,69 +261,71 @@ func icon_at(parent: Control, rect: Rect2, tex: Texture2D) -> TextureRect:
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(icon); return icon
 
 func build_equipment() -> void:
+	# 0.16: layout v3 (art/concept/equipamento-v3-mockup.png). As caixas batem com tools/equipment_v3.py.
 	info_icons.clear(); info_titles.clear(); info_bodies.clear(); actor_tabs.clear()
-	# abas de jogador (coop local: equipar Marty ou Echo)
+	# abas de jogador no topo (coop local: equipar Marty ou Echo)
 	for i in 2:
-		var tab := button(content, Rect2(1090 + i * 118, 18, 110, 30), "MARTY" if i == 0 else "ECHO (P2)", func(): select_actor(i))
+		var tab := button(content, Rect2(1094 + i * 116, 21, 110, 28), "MARTY" if i == 0 else "ECHO (P2)", func(): select_actor(i))
 		tab.add_theme_font_size_override("font_size", 14); tab.focus_mode = Control.FOCUS_NONE
 		tab.disabled = i == 1 and not (app.playing and app.sim.coop == "local")
 		actor_tabs.append(tab)
-	live_status = label(content, Rect2(640, 21, 440, 26), "", 13, Color("9fc3bb")); live_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	live_status = label(content, Rect2(640, 22, 444, 26), "", 13, Color("9fc3bb")); live_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	# UNIFORME: cartões com o sprite do jogo
 	for i in 3:
 		var data: Array = UNIFORM_CARDS[i]
 		var key: String = "o_" + data[0]
-		var y := 110 + i * 100
-		var b := button(content, Rect2(28, y, 316, 90), "", func(): choose(key), true)
+		var b := button(content, Rect2(29, 113 + i * 101, 277, 86), "", func(): choose(key), true)
 		b.name = "Slot_" + key; slot_buttons[key] = b
-		icon_at(b, Rect2(6, 2, 96, 86), sprite_of(data[0]))
-		label(b, Rect2(112, 12, 200, 26), data[1], 18, Color("e2e8dc")).name = "Name"
-		label(b, Rect2(112, 38, 200, 22), data[2], 14, data[3])
-		label(b, Rect2(112, 60, 200, 20), app.sim.UNIFORMS[data[0]].weapon_name, 11, Color("7f9a9a"))
-	# ARMADURA lendária (única disponível por enquanto — liberada para testes)
-	var ab := button(content, Rect2(28, 494, 96, 122), "", func(): choose("armor_omega"), true)
+		icon_at(b, Rect2(6, 2, 90, 82), sprite_of(data[0]))
+		label(b, Rect2(104, 10, 170, 26), data[1], 18, Color("e2e8dc")).name = "Name"
+		label(b, Rect2(104, 36, 170, 22), data[2], 14, data[3])
+		label(b, Rect2(104, 58, 170, 20), app.sim.UNIFORMS[data[0]].weapon_name, 11, Color("7f9a9a"))
+	# ARMADURA lendária (única disponível por enquanto — liberada para testes); as 2 bloqueadas estão no fundo
+	var ab := button(content, Rect2(28, 496, 86, 118), "", func(): choose("armor_omega"), true)
 	ab.name = "Slot_armor_omega"; slot_buttons["armor_omega"] = ab
-	icon_at(ab, Rect2(4, 4, 88, 82), sprite_of("omega"))
-	label(ab, Rect2(0, 86, 96, 18), "ÔMEGA", 13, LEGEND).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label(ab, Rect2(0, 102, 96, 16), "★ LENDÁRIA", 10, Color("ffe7a6")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	# PALCO: retrato em cena (assets/ui/portraits)
-	preview = TextureRect.new(); preview.position = Vector2(362, 70); preview.size = Vector2(620, 448)
+	icon_at(ab, Rect2(4, 4, 78, 78), sprite_of("omega"))
+	label(ab, Rect2(0, 82, 86, 18), "ÔMEGA", 13, LEGEND).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label(ab, Rect2(0, 99, 86, 16), "★ LENDÁRIA", 10, Color("ffe7a6")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# PALCO: arte do personagem em cena (assets/ui/portraits_v3, tools/make_portraits_v3.py)
+	preview = TextureRect.new(); preview.position = Vector2(330, 74); preview.size = Vector2(688, 440)
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	preview.clip_contents = true; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(preview)
 	var fade := TextureRect.new(); var grad := GradientTexture2D.new(); grad.fill_from = Vector2(0, 1); grad.fill_to = Vector2(0, 0)
 	grad.gradient = Gradient.new(); grad.gradient.set_color(0, Color(0.02, 0.05, 0.07, 0.92)); grad.gradient.set_color(1, Color(0.02, 0.05, 0.07, 0))
-	fade.texture = grad; fade.position = Vector2(362, 418); fade.size = Vector2(620, 100); fade.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(fade)
-	stage_title = label(content, Rect2(362, 446, 620, 34), "", 24, Color.WHITE); stage_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stage_line = label(content, Rect2(362, 480, 620, 24), "", 13, CYAN); stage_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	for side in [-1, 1]:
-		var arrow := button(content, Rect2(368 if side < 0 else 940, 276, 36, 36), "◀" if side < 0 else "▶", func(): cycle_outfit(side))
+	fade.texture = grad; fade.position = Vector2(330, 404); fade.size = Vector2(688, 110); fade.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(fade)
+	stage_title = label(content, Rect2(330, 444, 688, 36), "", 26, Color.WHITE); stage_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stage_line = label(content, Rect2(330, 480, 688, 24), "", 13, CYAN); stage_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	for s in [0, 1]:
+		var side: int = -1 if s == 0 else 1
+		var ax := 338 if side < 0 else 974
+		var arrow := button(content, Rect2(ax, 272, 36, 36), "◀" if side < 0 else "▶", func(): cycle_outfit(side))
 		arrow.add_theme_font_size_override("font_size", 16); arrow.focus_mode = Control.FOCUS_NONE
-		label(content, Rect2(368 if side < 0 else 940, 314, 36, 16), "LB" if side < 0 else "RB", 10, Color("7f9a9a")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label(content, Rect2(ax, 310, 36, 16), "LB" if side < 0 else "RB", 10, Color("9fb4b4")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	# STATUS (desenhado) + descrições com sprites
-	stat_panel = StatPanel.new(); stat_panel.host = self; stat_panel.position = Vector2(1004, 64); stat_panel.size = Vector2(324, 260); stat_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(stat_panel)
+	stat_panel = StatPanel.new(); stat_panel.host = self; stat_panel.position = Vector2(1042, 66); stat_panel.size = Vector2(286, 258); stat_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(stat_panel)
 	for i in 3:
-		var y := 344 + i * 76
-		info_icons.append(icon_at(content, Rect2(1022, y + 4, 56, 60), null))
-		info_titles.append(label(content, Rect2(1092, y + 2, 226, 20), "", 13, CYAN))
-		var body := label(content, Rect2(1092, y + 22, 226, 48), "", 12, Color("c8d0cc")); body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var y := 348 + i * 74
+		info_icons.append(icon_at(content, Rect2(1058, y + 2, 56, 62), null))
+		info_titles.append(label(content, Rect2(1126, y, 196, 20), "", 12, CYAN))
+		var body := label(content, Rect2(1126, y + 20, 196, 50), "", 11, Color("c8d0cc")); body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		info_bodies.append(body)
-	# ROBÔ
+	# ROBÔ: Titan e Spectre (a 3ª vaga, bloqueada, está no fundo)
 	var robots := [["titan", "TITAN", "PILOTAR (E)", Color("8fdc6a")], ["spectre", "SPECTRE", "FUNDIR (G)", Color("b98cff")]]
 	for i in 2:
 		var r: Array = robots[i]
 		var key: String = r[0]
-		var b := button(content, Rect2(372 + i * 204, 578, 192, 96), "", func(): choose(key), true)
+		var b := button(content, Rect2(338 + i * 264, 580, 250, 90), "", func(): choose(key), true)
 		slot_buttons["robot" + str(i)] = b
-		icon_at(b, Rect2(4, 4, 88, 88), sprite_of(key))
-		label(b, Rect2(96, 14, 94, 24), r[1], 16, Color("e2e8dc"))
-		panel(b, Rect2(96, 48, 88, 24), Color(r[3], 0.18), r[3])
-		label(b, Rect2(96, 50, 88, 22), r[2], 11, r[3]).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	telemetry = label(content, Rect2(700, 546, 272, 22), "", 11, Color("9fc3bb")); telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		icon_at(b, Rect2(6, 4, 90, 82), sprite_of(key))
+		label(b, Rect2(106, 12, 136, 26), r[1], 18, Color("e2e8dc"))
+		panel(b, Rect2(106, 48, 128, 26), Color(r[3], 0.18), r[3])
+		label(b, Rect2(106, 50, 128, 24), r[2], 12, r[3]).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	telemetry = label(content, Rect2(740, 546, 272, 22), "", 11, Color("9fc3bb")); telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	# BOTÕES
-	var refuge := button(content, Rect2(1004, 580, 324, 50), "IR AO REFÚGIO  ▶", launch_refuge); refuge.add_theme_font_size_override("font_size", 20)
-	var start := button(content, Rect2(1004, 636, 324, 48), "CONTINUAR" if app.playing and pending_mode == "current" else "⚔  INICIAR ARENA", launch)
+	var refuge := button(content, Rect2(1042, 582, 286, 48), "IR AO REFÚGIO  ▶", launch_refuge); refuge.add_theme_font_size_override("font_size", 20)
+	var start := button(content, Rect2(1042, 636, 286, 46), "CONTINUAR" if app.playing and pending_mode == "current" else "⚔  INICIAR ARENA", launch)
 	start.add_theme_color_override("font_color", Color("f08a24")); start.add_theme_color_override("font_hover_color", Color("ffb45a"))
-	var back := button(content, Rect2(16, 636, 340, 48), "◀  VOLTAR", func(): show_screen("main"))
+	var back := button(content, Rect2(16, 634, 302, 48), "◀  VOLTAR", func(): show_screen("main"))
 	back.add_theme_color_override("font_color", Color("e8be6e")); back.name = "Back"
 	refresh_gear()
 	var first: Button = slot_buttons.get("o_" + outfit_choice, slot_buttons["o_padrao"])
@@ -364,26 +366,26 @@ func draw_stats(c: Control) -> void:
 	var rows: Array = sim.loadout_stats(kind, outfit_choice)
 	var f := ThemeDB.fallback_font
 	var sub: String = {"omega": "armadura lendária", "titan": "robô", "spectre": "robô"}.get(kind, "uniforme " + sim.UNIFORMS[outfit_choice].name.to_lower())
-	c.draw_string(f, Vector2(120, 33), sub, HORIZONTAL_ALIGNMENT_RIGHT, 184, 11, Color("7f9a9a"))
+	c.draw_string(f, Vector2(84, 33), sub, HORIZONTAL_ALIGNMENT_RIGHT, 184, 11, Color("7f9a9a"))
 	var colors := {"cyan": CYAN, "orange": Color("f08a24"), "gold": Color("e8be6e"), "green": Color("8fdc6a"), "violet": Color("b98cff")}
 	var step := 30.0 if rows.size() > 6 else 34.0
 	for i in rows.size():
 		var r: Array = rows[i]
 		var y := 50.0 + i * step
-		c.draw_string(f, Vector2(16, y + 9), r[0], HORIZONTAL_ALIGNMENT_LEFT, 110, 13, Color("e2e8dc"))
+		c.draw_string(f, Vector2(18, y + 9), r[0], HORIZONTAL_ALIGNMENT_LEFT, 98, 12, Color("e2e8dc"))
 		if r[3] in ["hearts", "hearts_shield"]:
 			for h in sim.BASE_HEARTS + (sim.OMEGA_SHIELD_HEARTS if r[3] == "hearts_shield" else 0):
-				var x: float = 124.0 + float(h) * 22
+				var x: float = 118.0 + float(h) * 22
 				var col := Color("e8404e") if h < sim.BASE_HEARTS else Color("54e0f0")
 				c.draw_colored_polygon(PackedVector2Array([Vector2(x, y + 3), Vector2(x + 9, y + 15), Vector2(x + 18, y + 3), Vector2(x + 13.5, y - 2), Vector2(x + 9, y + 1), Vector2(x + 4.5, y - 2)]), col)
-			if r[3] == "hearts": c.draw_string(f, Vector2(200, y + 9), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 104, 13, Color("e2e8dc"))
+			if r[3] == "hearts": c.draw_string(f, Vector2(200, y + 9), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 70, 13, Color("e2e8dc"))
 			continue
 		var color: Color = colors.get(r[3], CYAN)
 		if r[2] >= 0:
-			c.draw_rect(Rect2(124, y, 90, 10), Color("14202a")); c.draw_rect(Rect2(124, y, 90, 10), Color("28404a"), false, 1)
+			c.draw_rect(Rect2(118, y, 90, 10), Color("14202a")); c.draw_rect(Rect2(118, y, 90, 10), Color("28404a"), false, 1)
 			var fill := int(roundf(9 * clampf(r[2], 0, 1)))
-			for n in 9: c.draw_rect(Rect2(126 + n * 9.7, y + 2, 7.7, 6), color if n < fill else Color("1a2c32"))
-		c.draw_string(f, Vector2(218, y + 10), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 88, 12, color)
+			for n in 9: c.draw_rect(Rect2(120 + n * 9.7, y + 2, 7.7, 6), color if n < fill else Color("1a2c32"))
+		c.draw_string(f, Vector2(212, y + 10), r[1], HORIZONTAL_ALIGNMENT_RIGHT, 58, 12, color)
 
 func add_icon(parent: Control, tex: Texture2D) -> void:
 	var icon := TextureRect.new(); icon.texture = tex
@@ -412,8 +414,8 @@ func refresh_gear() -> void:
 	if preview == null: return
 	var sim = app.sim
 	var uni: Dictionary = sim.UNIFORMS[outfit_choice]
-	# palco: retrato em cena (tools/make_portraits.py); sem retrato, o sprite do jogo
-	var portrait := "res://assets/ui/portraits/%s.png" % preview_kind
+	# palco: arte em cena (tools/make_portraits_v3.py); sem arte, o sprite do jogo
+	var portrait := "res://assets/ui/portraits_v3/%s.png" % preview_kind
 	if ResourceLoader.exists(portrait):
 		preview.texture = load(portrait); preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	else:

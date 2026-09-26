@@ -14,7 +14,7 @@ func _initialize() -> void:
 	await process_frame; await process_frame
 	check(ui.slot_buttons.has("o_padrao") and ui.slot_buttons.has("o_mecanico") and ui.slot_buttons.has("o_espiao"), "3 cartões de uniforme")
 	check(ui.slot_buttons.has("armor_omega") and ui.slot_buttons.has("robot0") and ui.slot_buttons.has("robot1"), "vaga da armadura e 2 robôs")
-	check(ui.preview.texture != null and ui.preview.texture.resource_path.ends_with("portraits/o_padrao.png"), "palco mostra o retrato do uniforme")
+	check(ui.preview.texture != null and ui.preview.texture.resource_path.ends_with("portraits_v3/o_padrao.png"), "palco mostra a arte v3 do uniforme")
 	var focus: Control = root.get_viewport().gui_get_focus_owner()
 	check(focus == ui.slot_buttons["o_padrao"], "uniforme atual recebe o foco (navegação pelo controle)")
 	ui.cycle_outfit(1)
