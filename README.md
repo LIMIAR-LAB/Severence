@@ -32,6 +32,8 @@ Para explorar, escolha **IR AO REFÚGIO** na tela de equipamento. No refúgio, s
 
 Com um controle no coop local, ele controla o P2 e o teclado/mouse controla Marty. Com dois controles, cada um controla um personagem. Mapeamento implementado, mas ainda precisa de teste físico com os controles do usuário. Teclado compartilhado está sujeito ao limite de teclas simultâneas do dispositivo.
 
+As teclas do Marty/P1 são remapeáveis em OPÇÕES → CONTROLES: clique na ação e pressione a nova tecla (Esc cancela; teclas em uso ou reservadas são recusadas). Os binds ficam salvos em `settings.json`. Teclas do P2, mouse e controle ainda são fixos.
+
 O salto evita balas enquanto o personagem está no ar e permite cruzar o vão sinalizado do armazém. O dash percorre até 180px em 0,2s, tem recarga de 0,6s e usa a direção do movimento; parado, usa a direção do corpo. O HUD mostra sua disponibilidade. Marty move-se a 320px/s sem armadura, 300px/s com armadura e 190px/s no Titan. O corpo vira para onde anda; ao atirar ou golpear, vira para a mira. Escadas são rampas de elevação com colisão de bordas. Armas de fogo têm mira em 360 graus, enquanto o corpo usa oito direções de arte. A movimentação aceita qualquer direção. O ataque próximo usa arco frontal; com armadura também reflete projéteis próximos.
 
 ## Primeiro percurso
@@ -104,6 +106,6 @@ Capturas do renderizador real (abrem uma janela temporária e encerram):
 
 ## Limites desta entrega
 
-O mapa é fixo (13 salas e uma secreta, editadas em `tools/build_docks_map.py`); a seed só varia os tipos de inimigo. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Não há seleção de personagens definitiva, outras épocas, lobby Steam, balanceamento final, remapeamento de controles, exportação independente do Godot nem validação humana de uma campanha completa.
+O mapa é fixo (13 salas e uma secreta, editadas em `tools/build_docks_map.py`); a seed só varia os tipos de inimigo. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Não há seleção de personagens definitiva, outras épocas, lobby Steam, balanceamento final, remapeamento do P2/joypad, exportação independente do Godot nem validação humana de uma campanha completa.
 
 Próximos marcos: playtest de movimentação/combate e câmera; navegação mais refinada; arte do cenário e inimigos; Vincent; geração modular mais ampla; transporte online com lobby/relay e teste real entre dois computadores; empacotamento para Windows.

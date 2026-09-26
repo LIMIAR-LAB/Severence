@@ -43,6 +43,15 @@ var pref_gun := 0
 var pref_robot := "titan"
 var volume_percent := 70.0
 var ui_input_block := 0.0
+# 0.18: remapeamento de controles do P1 (teclado/mouse). P2 local e joypad ainda são fixos.
+const KEY_BIND_DEFAULTS := {"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": KEY_D,
+	"melee": KEY_F, "jump": KEY_SPACE, "dash": KEY_SHIFT, "interact": KEY_E, "armor": KEY_R,
+	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G}
+const KEY_BIND_LABELS := {"up": "ANDAR PRA CIMA", "down": "ANDAR PRA BAIXO", "left": "ANDAR PRA ESQUERDA",
+	"right": "ANDAR PRA DIREITA", "melee": "GOLPE", "jump": "SALTO", "dash": "DASH", "interact": "INTERAGIR",
+	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE"}
+const KEY_BIND_RESERVED := [KEY_ESCAPE, KEY_TAB, KEY_M, KEY_B, KEY_F2]
+var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
 
 func _ready() -> void:
@@ -265,16 +274,16 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 	var a: Dictionary = sim.actors[index]
 	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false}
 	if use_primary:
-		cmd.move = Vector2(float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)), float(Input.is_physical_key_pressed(KEY_S)) - float(Input.is_physical_key_pressed(KEY_W))).normalized()
+		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
 		cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
 		cmd.fire = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not map_open and not minimap_rect().has_point(get_viewport().get_mouse_position())
-		cmd.melee = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(KEY_F)
-		cmd.jump = Input.is_physical_key_pressed(KEY_SPACE)
-		cmd.dodge = Input.is_physical_key_pressed(KEY_SHIFT); cmd.boost = cmd.dodge
-		cmd.interact = Input.is_physical_key_pressed(KEY_E)
-		cmd.armor = Input.is_physical_key_pressed(KEY_R)
-		cmd.weapon = Input.is_physical_key_pressed(KEY_Q)
-		cmd.summon = Input.is_physical_key_pressed(KEY_C); cmd.fusion = Input.is_physical_key_pressed(KEY_G)
+		cmd.melee = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(key_binds.melee)
+		cmd.jump = Input.is_physical_key_pressed(key_binds.jump)
+		cmd.dodge = Input.is_physical_key_pressed(key_binds.dash); cmd.boost = cmd.dodge
+		cmd.interact = Input.is_physical_key_pressed(key_binds.interact)
+		cmd.armor = Input.is_physical_key_pressed(key_binds.armor)
+		cmd.weapon = Input.is_physical_key_pressed(key_binds.weapon)
+		cmd.summon = Input.is_physical_key_pressed(key_binds.summon); cmd.fusion = Input.is_physical_key_pressed(key_binds.fusion)
 	else:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP))).normalized()
 		var dir := Vector2(float(Input.is_physical_key_pressed(KEY_L)) - float(Input.is_physical_key_pressed(KEY_J)), float(Input.is_physical_key_pressed(KEY_K)) - float(Input.is_physical_key_pressed(KEY_I)))
@@ -435,10 +444,19 @@ func set_volume(value: float) -> void:
 	for player in sound_players:
 		player.volume_db = -80.0 if volume_percent <= 0 else linear_to_db(volume_percent / 100.0) - 8
 
+# 0.18: aplica um novo bind se a tecla não estiver em uso por outra ação; devolve true se aplicou.
+func rebind_key(action: String, keycode: int) -> bool:
+	if not KEY_BIND_DEFAULTS.has(action) or keycode in KEY_BIND_RESERVED: return false
+	for other in key_binds:
+		if other != action and key_binds[other] == keycode: return false
+	key_binds[action] = keycode
+	save_settings()
+	return true
+
 func save_settings() -> void:
 	var file := FileAccess.open("user://settings.json", FileAccess.WRITE)
 	if file != null:
-		file.store_string(JSON.stringify({"armor": pref_armor, "outfit": pref_outfit, "gun": pref_gun, "robot": pref_robot, "volume": volume_percent, "display": display.to_dict()}))
+		file.store_string(JSON.stringify({"armor": pref_armor, "outfit": pref_outfit, "gun": pref_gun, "robot": pref_robot, "volume": volume_percent, "display": display.to_dict(), "key_binds": key_binds}))
 
 func load_settings() -> void:
 	if not FileAccess.file_exists("user://settings.json"): return
@@ -451,6 +469,18 @@ func load_settings() -> void:
 	pref_outfit = saved_outfit if saved_outfit in ["padrao", "mecanico", "espiao"] else "padrao"
 	pref_robot = data.get("robot", "titan") if data.get("robot", "titan") in ["", "titan", "spectre"] else "titan"
 	volume_percent = clampf(float(data.get("volume", 70)), 0, 100)
+	if data.get("key_binds") is Dictionary:
+		var loaded := {}
+		for action in KEY_BIND_DEFAULTS:
+			var bound = data.key_binds.get(action)
+			if bound is float or bound is int:
+				var kc := int(bound)
+				if kc > 0 and kc not in KEY_BIND_RESERVED and not loaded.values().has(kc): loaded[action] = kc
+		for action in loaded:
+			var clash := false
+			for other in key_binds:
+				if other != action and not loaded.has(other) and key_binds[other] == loaded[action]: clash = true
+			if not clash: key_binds[action] = loaded[action]
 
 func save_progress() -> void:
 	if online and not hosting: return

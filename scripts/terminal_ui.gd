@@ -215,6 +215,8 @@ func launch_seed(kind: String) -> void:
 	app.start_solo(); app.sim.coop = kind; app.sim.start_run(value.to_int()); app.apply_preferences(0)
 
 var options_tab := "video"
+var awaiting_bind := ""   # 0.18: nome da ação esperando a próxima tecla, ou "" se nenhuma
+var bind_buttons: Dictionary = {}
 
 func build_options() -> void:
 	var dim := ColorRect.new(); dim.color = Color(0.015, 0.025, 0.04, 0.82); dim.size = Vector2(1344, 752); content.add_child(dim)
@@ -230,10 +232,39 @@ func build_options() -> void:
 			label(p, Rect2(30, 100, 600, 35), "VOLUME DOS EFEITOS", 18)
 			var volume := HSlider.new(); volume.position = Vector2(30, 145); volume.size = Vector2(760, 40); volume.min_value = 0; volume.max_value = 100; volume.value = app.volume_percent
 			volume.value_changed.connect(func(value): app.set_volume(value)); p.add_child(volume)
-		"controls":
-			label(p, Rect2(30, 100, 760, 400), "WASD mover • Mouse mirar/atirar • F / botão direito golpe\nEspaço salto (também na diagonal) • Shift dash (no Titan: turbo)\nR vestir armadura • E interagir / pilotar Titan\nC invocar/recolher robô • G fundir Spectre\nTAB ou M mapa • B equipamento • Esc menu\n\nControle: analógicos mover/mirar • RT tiro • X golpe\nA salto • B dash • Y interagir • LB armadura", 18, Color("c6dccd"))
-			button(p, Rect2(30, 470, 400, 50), "UNIFORME / ARMADURA / ROBÔ", func(): pending_mode = "current"; read_equipment(); show_screen("equipment"))
+		"controls": build_controls_options(p)
 	button(p, Rect2(30, 585, 200, 48), "VOLTAR", func(): app.save_settings(); show_screen("main"))
+
+# 0.18: remapeamento do P1 (teclado/mouse). P2 local e joypad continuam fixos.
+func build_controls_options(p: Control) -> void:
+	awaiting_bind = ""; bind_buttons.clear()
+	label(p, Rect2(30, 90, 760, 26), "MARTY / P1 — clique numa tecla e pressione a nova", 16, Color("9fc3bb"))
+	var actions: Array = app.KEY_BIND_DEFAULTS.keys()
+	var col_h := 44
+	for i in actions.size():
+		var action: String = actions[i]
+		var col := i / 6; var row := i % 6
+		var rect := Rect2(30 + col * 390, 125 + row * col_h, 370, 38)
+		var b := button(p, rect, bind_caption(action), func(): start_rebind(action))
+		b.add_theme_font_size_override("font_size", 15)
+		bind_buttons[action] = b
+	label(p, Rect2(30, 400, 760, 26), "Mouse: mirar e atirar (clique esquerdo) • direito também golpeia", 14, GOLD)
+	button(p, Rect2(30, 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
+	button(p, Rect2(30, 495, 400, 50), "UNIFORME / ARMADURA / ROBÔ", func(): pending_mode = "current"; read_equipment(); show_screen("equipment"))
+
+func bind_caption(action: String) -> String:
+	var label_text: String = app.KEY_BIND_LABELS.get(action, action)
+	if awaiting_bind == action: return label_text + " — pressione uma tecla..."
+	return label_text + " — " + OS.get_keycode_string(app.key_binds[action])
+
+func start_rebind(action: String) -> void:
+	awaiting_bind = action
+	get_viewport().gui_release_focus() # sem isso o botão focado engole Espaço/Enter
+	for a in bind_buttons: bind_buttons[a].text = bind_caption(a)
+
+func reset_binds() -> void:
+	app.key_binds = app.KEY_BIND_DEFAULTS.duplicate(); app.save_settings()
+	for a in bind_buttons: bind_buttons[a].text = bind_caption(a)
 
 func option_row(p: Control, y: int, caption: String, items: Array, selected: int, on_pick: Callable) -> OptionButton:
 	label(p, Rect2(30, y + 6, 330, 32), caption, 17, Color("c6dccd"))
@@ -302,6 +333,14 @@ func choose(key: String) -> void:
 # Controle: LB/RB (e as setas da vitrine) passam pelos itens; A equipa; B volta.
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible: return
+	if awaiting_bind != "" and event is InputEventKey and event.pressed:
+		var action := awaiting_bind; awaiting_bind = ""
+		if event.physical_keycode != KEY_ESCAPE:
+			if not app.rebind_key(action, event.physical_keycode):
+				bind_buttons[action].text = bind_caption(action) + " (em uso!)"
+				accept_event(); return
+		for a in bind_buttons: bind_buttons[a].text = bind_caption(a)
+		accept_event(); return
 	if event is InputEventJoypadButton and event.pressed:
 		if screen == "equipment" and event.button_index == JOY_BUTTON_LEFT_SHOULDER: cycle_outfit(-1); accept_event()
 		elif screen == "equipment" and event.button_index == JOY_BUTTON_RIGHT_SHOULDER: cycle_outfit(1); accept_event()
