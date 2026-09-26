@@ -458,7 +458,7 @@ func save_progress() -> void:
 	if err == OK: last_save = serialized
 
 func load_progress() -> void:
-	# 0.17: jogo novo começa só com o Padrão (sem armadura e sem robô)
+	# 0.17: equipamento inicial definido no JSON; Titan e Spectre liberados durante os testes.
 	sim.set_unlocks(EquipmentData.starting_unlocks())
 	if not FileAccess.file_exists("user://progress.json"): sim.make_hub(); return
 	var data = JSON.parse_string(FileAccess.get_file_as_string("user://progress.json"))

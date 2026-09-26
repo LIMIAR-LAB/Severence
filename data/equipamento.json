@@ -61,7 +61,7 @@
 			"icone": "res://assets/ui/equipamento/icones/icon_robo_titan.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_titan_bloqueado.png",
 			"card": "res://assets/ui/equipamento/cards/card_titan.png",
-			"desbloqueado_no_inicio": false,
+			"desbloqueado_no_inicio": true,
 			"desbloqueio": {"tipo": "sala", "sala": "shop", "texto": "Encontre o Titan na Oficina das docas (sala 05)."},
 			"atributos": {"vida": "+6", "velocidade": "=190", "golpe": "=55", "dano": "=82"}
 		},
@@ -72,7 +72,7 @@
 			"icone": "res://assets/ui/equipamento/icones/icon_robo_spectre.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_spectre_bloqueado.png",
 			"card": "res://assets/ui/equipamento/cards/card_spectre.png",
-			"desbloqueado_no_inicio": false,
+			"desbloqueado_no_inicio": true,
 			"desbloqueio": {"tipo": "desafio", "texto": "Conclua o desafio do Último Gerador (sala 06)."},
 			"atributos": {"velocidade": "=360", "dano": "x1.69", "defesa": "+20"}
 		}

@@ -15,7 +15,13 @@ func _init() -> void:
 			if not it.has(key): check(false, "%s sem %s" % [it.get("id", "?"), key])
 		for path in [it.icone, it.card, it.get("icone_bloqueado", "")]:
 			if path != "" and not ResourceLoader.exists(path): check(false, "arquivo faltando: " + path)
-	check(EquipmentData.starting_unlocks() == ["padrao"], "jogo novo: só o Padrão")
+	check(EquipmentData.starting_unlocks() == ["padrao", "titan", "spectre"], "fase de teste: Padrão, Titan e Spectre liberados")
+	var testing = Expedition.new()
+	testing.set_unlocks(EquipmentData.starting_unlocks())
+	testing.make_hub()
+	check(testing.is_unlocked("titan") and testing.is_unlocked("spectre"), "robôs disponíveis no Refúgio")
+	check(testing.equip(0, "padrao", "titan"), "Titan pode ser equipado desde o início")
+	check(testing.equip(0, "padrao", "spectre"), "Spectre pode ser equipado desde o início")
 	var s = Expedition.new()
 	for id in s.OUTFITS:
 		var u: Dictionary = s.UNIFORMS[id]
@@ -27,7 +33,8 @@ func _init() -> void:
 	check(EquipmentData.combine("espiao", "", "titan").final.velocidade == 190.0, "Titan pilotado anda a 190")
 
 	# início do jogo
-	s.set_unlocks(EquipmentData.starting_unlocks())
+	# Mantém a cobertura da progressão normal, sem a liberação temporária de testes.
+	s.set_unlocks(["padrao"])
 	s.coop = "solo"; s.start_run(1941)
 	var a: Dictionary = s.actors[0]
 	check(a.selected_robot == "" and not s.mech.deployed, "começa sem robô e sem Titan no mapa")
