@@ -21,7 +21,7 @@ func run() -> void:
 	app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await frames(3)
 	app.start_solo()
-	await frames(15) # Let the menu click suppression window expire.
+	await frames(60) # Aguarda o portal de 0,8s e a supressão do clique do menu.
 	check(app.sim.mode == "arena" and app.sim.enemies.size() >= 5 and not app.menu.visible, "main play button enters live combat")
 	var center: Vector2 = root.get_visible_rect().size / 2
 	Input.warp_mouse(center + Vector2(400, 0))

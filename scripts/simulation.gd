@@ -52,6 +52,7 @@ var ai_path := PackedVector2Array()
 var ai_path_timer := 0.0
 var arena_wave := 0
 var arena_wait := 0.0
+var pending_spawns: Array = []   # 0.15: inimigos aguardando o portal da arena terminar
 var spectres: Array = []
 var obstacle_hp: Array = []      # 0.13: vida de cada obstáculo (-1 = indestrutível)
 var fuses: Array = []            # barris explosivos prestes a estourar (reação em cadeia)
@@ -88,6 +89,12 @@ const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "
 # Depois de BOSS_ENRAGE_TIME segundos de combate ativo, os cooldowns de ataque encolhem por BOSS_ENRAGE_SCALE.
 const BOSS_ENRAGE_TIME := 150.0
 const BOSS_ENRAGE_SCALE := 0.6
+
+# ── Inimigos especiais e ondas temáticas (0.15) ──────────────────────────────
+const BOMBER_BLAST := {"radius": 90.0, "damage": 22.0, "trigger": 40.0}
+const ARENA_SPAWN_DELAY := 0.8
+const ARENA_HP_PER_WAVE := 0.15
+const ARENA_DAMAGE_PER_WAVE := 0.04
 
 # ── Vida em corações (0.12) ─────────────────────────────────────────────────
 # 1 coração = 10 de vida. Marty começa com 3. Golpe comum tira meio coração; golpe pesado
@@ -221,8 +228,24 @@ func start_arena() -> void:
 
 func spawn_arena_wave() -> void:
 	arena_wave += 1
-	for n in range(4 + mini(arena_wave, 4)):
-		spawn_enemy(Vector2(800 + (n % 3) * 120, 290 + floorf(float(n) / 3) * 190), ["cult", "fish", "crawler", "brute"][n % 4])
+	if arena_wave == 1: pending_spawns.clear()
+	var kinds: Array = []
+	if arena_wave <= 2:
+		for n in range(4 + arena_wave): kinds.append(["cult", "fish", "crawler"][n % 3])
+	elif arena_wave == 3:
+		for n in range(10): kinds.append("crawler_small")
+	elif arena_wave == 4:
+		kinds = ["brute", "brute", "bomber", "cult", "fish"]
+	else:
+		var count := 6 + mini(arena_wave - 5, 5)
+		for n in range(count): kinds.append(["cult", "fish", "crawler", "brute", "bomber"][n % 5])
+		if (arena_wave - 5) % 4 == 0: kinds.append("warden")
+	var hp_scale := 1.0 + arena_wave * ARENA_HP_PER_WAVE
+	var damage_scale := 1.0 + arena_wave * ARENA_DAMAGE_PER_WAVE
+	for n in range(kinds.size()):
+		var pos := Vector2(800 + (n % 3) * 120, 260 + floorf(float(n) / 3) * 155)
+		pending_spawns.append({"p": pos, "kind": kinds[n], "timer": ARENA_SPAWN_DELAY, "hp_scale": hp_scale, "damage_scale": damage_scale})
+		effects.append({"p": pos, "kind": "spawn_portal", "life": ARENA_SPAWN_DELAY, "max": ARENA_SPAWN_DELAY})
 	for a in actors:
 		if not a.dead: heal(a, 1)
 
@@ -428,13 +451,14 @@ func room_at(pos: Vector2) -> Dictionary:
 func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
 	uid += 1
 	# 0.11: inimigos mais resistentes (≈ +50% de vida) e o Almirante com 600.
-	var hp: float = {"boss": 600.0, "brute": 95.0, "fish": 66.0, "crawler": 45.0, "crawler_small": 18.0}.get(kind, 52.0)
+	var hp: float = {"boss": 600.0, "brute": 95.0, "fish": 66.0, "crawler": 45.0, "crawler_small": 18.0,
+		"bomber": 24.0, "guard": 64.0}.get(kind, 52.0)
 	if kind == "warden": hp = 420.0
 	elif kind != "boss": hp *= 1.25
 	enemies.append({"id": uid, "p": pos, "kind": kind, "hp": hp, "max": hp, "cd": rng.randf_range(0.5, 1.5), "phase": 0, "hurt": 0.0, "side": optional,
 		"room": room_at(pos).get("id", "") if mode == "run" else "",
 		"face": Vector2.DOWN, "moving": false, "shot": 0.0, "stage": 1, "charge": 0.0, "spin": 0.0, "spin_angle": 0.0, "step": 0.0,
-		"fight_time": 0.0, "enraged": false})
+		"fight_time": 0.0, "enraged": false, "fuse": -1.0, "zigzag": rng.randf_range(0.0, TAU), "detonated": false, "damage_scale": 1.0})
 
 func say(text: String) -> void:
 	message = text; message_time = 5.0
@@ -919,9 +943,30 @@ func detection_range(a: Dictionary, base: float) -> float:
 	return base * 0.55 if outfit_of(a) == "espiao" and not a.mech else base
 
 func step_enemies(dt: float) -> void:
+	# 0.15: o portal aparece primeiro; só materializa o inimigo depois de 0,8s.
+	var ready_spawns: Array = []
+	for pending in pending_spawns:
+		pending.timer -= dt
+		if pending.timer <= 0: ready_spawns.append(pending)
+	if not pending_spawns.is_empty(): arena_wait = 0.0
+	pending_spawns = pending_spawns.filter(func(p): return p.timer > 0)
+	for pending in ready_spawns:
+		spawn_enemy(pending.p, pending.kind)
+		var spawned_enemy: Dictionary = enemies[-1]
+		spawned_enemy.hp *= pending.hp_scale; spawned_enemy.max = spawned_enemy.hp
+		spawned_enemy.damage_scale = pending.damage_scale
 	var spawned: Array = []
 	for e in enemies:
 		e.hurt = maxf(0, e.hurt - dt); e.shot = maxf(0, e.shot - dt); e.moving = false
+		# Guard bloqueia apenas tiros que chegam pelo lado para o qual está olhando.
+		if e.kind == "guard":
+			for b in bullets:
+				if b.team != 0 or b.life <= 0 or b.p.distance_to(e.p) > 32.0 + b.r: continue
+				var bullet_side: Vector2 = (b.p - e.p).normalized()
+				if bullet_side.dot(e.face) <= 0: continue
+				b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 8.0
+				e.hurt = 0.12
+				effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18})
 		var target: Dictionary = {}; var closest := 99999.0
 		# Linha de visão só é testada a cada 0,3s para quem ainda não foi alertado (mapa grande = muitos inimigos).
 		var look := true
@@ -942,12 +987,24 @@ func step_enemies(dt: float) -> void:
 		e.face = direction
 		if e.kind == "warden": step_warden(e, target, direction, closest, dt); continue
 		if e.kind == "boss": step_boss(e, target, direction, closest, dt); continue
-		var preferred: float = {"cult": 240.0, "fish": 210.0, "brute": 220.0, "crawler": 110.0, "crawler_small": 18.0}.get(e.kind, 120.0)
-		var speed: float = {"cult": 100.0, "fish": 85.0, "brute": 95.0, "crawler": 140.0, "crawler_small": 170.0}.get(e.kind, 100.0)
+		if e.kind == "bomber":
+			e.zigzag += dt * 8.0
+			if closest < 120.0:
+				e.fuse = 0.35 if e.fuse < 0 else maxf(0, e.fuse - dt)
+				if sin(e.zigzag * 2.0) > 0: e.hurt = 0.12
+			if closest < BOMBER_BLAST.trigger:
+				e.detonated = true; e.hp = 0
+				explode(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, true, true)
+				continue
+		var preferred: float = {"cult": 240.0, "fish": 210.0, "brute": 220.0, "crawler": 110.0, "crawler_small": 18.0,
+			"bomber": 0.0, "guard": 150.0}.get(e.kind, 120.0)
+		var speed: float = {"cult": 100.0, "fish": 85.0, "brute": 95.0, "crawler": 140.0, "crawler_small": 170.0,
+			"bomber": 220.0, "guard": 50.0}.get(e.kind, 100.0)
 		speed *= 1.2
 		if closest > preferred:
 			var before: Vector2 = e.p
-			e.p = move_body(e.p, direction * speed * dt, 14)
+			var move_direction := direction.rotated(sin(e.zigzag) * 0.65) if e.kind == "bomber" else direction
+			e.p = move_body(e.p, move_direction * speed * dt, 14)
 			e.moving = e.p.distance_to(before) > 0.1; e.step += dt * 8
 		e.cd -= dt
 		if e.cd > 0: continue
@@ -955,25 +1012,28 @@ func step_enemies(dt: float) -> void:
 			# 0.11: cadência ~40% maior, projéteis mais rápidos e mais fortes
 			"cult":
 				e.cd = 0.9; e.shot = 0.3
-				add_bullet(e.p, direction, 1, 12, 240, 6, -1, "magenta")
-				if rng.randf() < 0.35: add_bullet(e.p, direction.rotated(0.18), 1, 12, 240, 6, -1, "magenta")
+				add_bullet(e.p, direction, 1, 12 * e.damage_scale, 240, 6, -1, "magenta")
+				if rng.randf() < 0.35: add_bullet(e.p, direction.rotated(0.18), 1, 12 * e.damage_scale, 240, 6, -1, "magenta")
 			"fish":
 				e.cd = 1.4; e.shot = 0.35
-				add_bullet(e.p, direction, 1, 22, 320, 6, -1, "harpoon")
+				add_bullet(e.p, direction, 1, 22 * e.damage_scale, 320, 6, -1, "harpoon")
 			"brute":
 				e.cd = 1.2; e.shot = 0.35
-				for n in range(6): add_bullet(e.p, direction.rotated((n - 2.5) * 0.12), 1, 9, 290, 5, -1, "violet")
+				for n in range(6): add_bullet(e.p, direction.rotated((n - 2.5) * 0.12), 1, 9 * e.damage_scale, 290, 5, -1, "violet")
 			"crawler":
 				e.cd = 0.8
 				if closest < 220:
 					e.shot = 0.3
-					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.28), 1, 9, 250, 6, -1, "acid", 0.9)
+					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.28), 1, 9 * e.damage_scale, 250, 6, -1, "acid", 0.9)
 			"crawler_small":
 				e.cd = 0.55
-				if closest < 34: damage_actor(target, 8)
+				if closest < 34: damage_actor(target, 8 * e.damage_scale)
 		e.cd *= 0.85
 	for e in enemies:
 		if e.hp > 0: continue
+		if e.kind == "bomber" and not e.detonated:
+			e.detonated = true
+			explode(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, true, true)
 		money += 4
 		pickups.append({"p": e.p, "kind": "coin"})
 		if rng.randf() < 0.2: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
