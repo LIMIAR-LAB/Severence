@@ -70,7 +70,7 @@ func show_screen(next: String) -> void:
 	if next == "play": bg.texture = load("res://assets/ui/adventure.png")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if bg.texture.resource_path.ends_with("menu.png"):
-		bg.free(); content.add_child(MenuBackground.new())   # tela inicial animada
+		bg.free(); content.add_child(title_background())   # tela inicial: vídeo em loop (0.16)
 	else: content.add_child(bg)
 	match next:
 		"main": build_main()
@@ -92,21 +92,65 @@ func close() -> void:
 	# A UI click must not become a weapon shot in the same frame.
 	app.ui_input_block = 0.2
 
+# ── Tela inicial 0.16: vídeo em loop (assets/ui/title, tools/make_title_screen.py) com o menu desenhado nele.
+# Cada botão do vídeo tem duas placas estáticas por cima (normal / aceso); o Button real é invisível.
+const TITLE_DIR := "res://assets/ui/title/"
+const TITLE_BUTTONS := [Rect2(30, 261, 317, 55), Rect2(30, 311, 317, 55), Rect2(30, 361, 317, 55), Rect2(30, 410, 317, 55), Rect2(30, 460, 317, 55), Rect2(30, 510, 317, 55), Rect2(30, 560, 317, 55)]
+const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher single player ou parceiro IA", "Hospedar ou entrar por IP",
+	"Escolher uma seed para as docas", "Uniforme, armadura e robô", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
+var title_video: VideoStreamPlayer
+
+func title_background() -> Control:
+	if not ResourceLoader.exists(TITLE_DIR + "title_still.png"): return MenuBackground.new()
+	var root := Control.new(); root.size = Vector2(1344, 752); root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var still := TextureRect.new(); still.texture = load(TITLE_DIR + "title_still.png")   # quadro parado (sem vídeo / headless)
+	still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; still.size = root.size; still.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(still)
+	var stream = load(TITLE_DIR + "title_loop.ogv") if ResourceLoader.exists(TITLE_DIR + "title_loop.ogv") else null
+	if stream != null and DisplayServer.get_name() != "headless":
+		title_video = VideoStreamPlayer.new(); title_video.stream = stream; title_video.expand = true
+		title_video.size = root.size; title_video.mouse_filter = Control.MOUSE_FILTER_IGNORE; title_video.autoplay = true
+		if "loop" in title_video: title_video.set("loop", true)
+		title_video.finished.connect(title_video.play)   # garante o loop em qualquer versão
+		root.add_child(title_video)
+	return root
+
+func title_button(i: int, callback: Callable, sel_layer: Control) -> Button:
+	var r: Rect2 = TITLE_BUTTONS[i]
+	var sel := TextureRect.new(); sel.texture = load(TITLE_DIR + "btn_%d_sel.png" % i); sel.position = r.position; sel.size = r.size
+	sel.mouse_filter = Control.MOUSE_FILTER_IGNORE; sel.visible = false; sel_layer.add_child(sel)
+	var b := Button.new(); b.position = r.position + Vector2(10, 5); b.size = r.size - Vector2(20, 10)   # só a placa, sem a margem
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]: b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	b.tooltip_text = TITLE_TIPS[i]; b.name = "Title_%d" % i
+	var lit := func(on: bool): sel.visible = on and not b.disabled
+	b.mouse_entered.connect(lit.bind(true)); b.mouse_exited.connect(func(): lit.call(b.has_focus()))
+	b.focus_entered.connect(lit.bind(true)); b.focus_exited.connect(lit.bind(false))
+	b.pressed.connect(callback); content.add_child(b)
+	return b
+
 func build_main() -> void:
-	panel(content, Rect2(41, 207, 348, 23), Color("16291c"), Color("16291c"))
-	label(content, Rect2(64, 207, 330, 23), "PROTÓTIPO 0.4  •  DOCAS DE 1941", 15, Color("b7d2b7"))
-	panel(content, Rect2(123, 277, 255, 24), Color("153a35"), Color("153a35"))
-	label(content, Rect2(134, 276, 260, 26), "Solo, parceiro IA ou coop", 17, Color("bde3cf"))
-	var ys := [242, 314, 382, 450, 519, 589]
-	var callbacks: Array[Callable] = [func(): show_screen("play"), func(): pending_mode = "local"; start_target = "arena"; read_equipment(); show_screen("equipment"), func(): show_screen("online"), func(): show_screen("seed"), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
-	for i in range(6):
-		var b := button(content, Rect2(42, ys[i], 346, 64), "", callbacks[i], true)
-		b.tooltip_text = ["Escolher single player ou parceiro IA", "Dois jogadores no mesmo computador", "Hospedar ou entrar por IP", "Escolher uma seed para as docas", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"][i]
-	panel(content, Rect2(55, 668, 333, 37), Color("18291c"), Color("18291c"))
-	label(content, Rect2(62, 673, 320, 30), app.network_status, 17, Color("bad9bf"))
-	main_resume = button(content, Rect2(938, 676, 350, 50), "CONTINUAR  [ESC]", close)
-	main_resume.visible = app.playing
-	button(content, Rect2(938, 614, 350, 50), "EQUIPAMENTO  [B]", func(): pending_mode = "current"; open("equipment"))
+	if not ResourceLoader.exists(TITLE_DIR + "btn_0.png"): return
+	var normals := Control.new(); normals.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(normals)
+	for i in range(TITLE_BUTTONS.size() - 1, -1, -1):   # de baixo para cima: o CONTINUAR fica por cima da vizinha
+		var n := TextureRect.new(); n.texture = load(TITLE_DIR + "btn_%d.png" % i); n.position = TITLE_BUTTONS[i].position; n.size = TITLE_BUTTONS[i].size
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE; n.name = "Plate_%d" % i; normals.add_child(n)
+	var sel_layer := Control.new(); sel_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(sel_layer)
+	var callbacks: Array[Callable] = [close, func(): show_screen("play"), func(): show_screen("online"), func(): show_screen("seed"),
+		func(): pending_mode = "current"; open("equipment"), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
+	for i in TITLE_BUTTONS.size():
+		var b := title_button(i, callbacks[i], sel_layer)
+		if i == 0:
+			main_resume = b; b.disabled = not app.playing
+			if b.disabled:
+				b.tooltip_text = "Nenhuma expedição em andamento"
+				normals.get_node("Plate_0").modulate = Color(0.5, 0.5, 0.5)
+	# coop local (não está no desenho do menu): linha discreta entre SAIR e o status
+	var coop := button(content, Rect2(40, 617, 298, 30), "COOP LOCAL  •  2 JOGADORES", func(): pending_mode = "local"; start_target = "arena"; read_equipment(); show_screen("equipment"), true)
+	coop.add_theme_font_size_override("font_size", 14); coop.add_theme_color_override("font_color", Color("e8c98a")); coop.name = "CoopLocal"
+	coop.tooltip_text = "Dois jogadores no mesmo computador"
+	# status da rede: o vídeo já diz OFFLINE; qualquer outro estado é escrito por cima
+	if app.network_status != "OFFLINE":
+		panel(content, Rect2(78, 667, 222, 28), Color("2c3222"), Color("2c3222"))
+		label(content, Rect2(78, 669, 222, 26), app.network_status, 14, Color("f0d9a0")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func overlay(title: String) -> Panel:
 	var dim := ColorRect.new(); dim.color = Color(0.015, 0.025, 0.04, 0.78); dim.size = Vector2(1344, 752); content.add_child(dim)
