@@ -180,6 +180,8 @@ func draw_expedition_ground() -> void:
 					if h.p.distance_to(d.p) < 5: d["alert"] = h.get("alert", false)
 			scenery.draw_decor(self, d, t)
 		elif not scenery.handles(d.kind): draw_decor(d)
+	for g in sim.tentacle_gates:   # 0.16
+		if view.grow(200).has_point(g.p) and seen(g.p, 160): scenery.draw_tentacle_gate(self, g, t)
 	for room in vis_rooms:
 		var rect: Rect2 = room.r
 		if not rect.grow(300).intersects(view) or not room.has("id"): continue

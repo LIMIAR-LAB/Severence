@@ -66,7 +66,7 @@ POINTS = {
     "spawn": (820, 6480), "spawn2": (880, 6540), "key": (1450, 6560),
     "shop": (8950, 6170), "side": (8950, 4450), "secret_wall": (6540, 3740),
     "boss": (4200, 1200), "extraction": (4200, 720), "mech": (9250, 6700),
-    "ammo_center": (7050, 4350),
+    "ammo_center": (7050, 4350), "warden": (4850, 4350),
 }
 CHESTS = [(6150, 6080, False), (850, 3800, False), (8850, 1400, False), (6350, 1150, True)]
 
@@ -75,13 +75,13 @@ ROOM_STYLE = {
     "entry": {"top": "facade", "bottom": "quay", "left": "pier", "quay_band": 180},
     "cranes": {"top": "facade", "bottom": "quay", "quay_band": 150},
     "warehouse": {"top": "facade", "bottom": "wall"},
-    "market": {"top": "facade", "bottom": "quay", "quay_band": 140},
-    "shop": {"top": "facade", "bottom": "quay", "right": "pier", "quay_band": 130},
+    "market": {"top": "facade", "bottom": "quay", "quay_band": 140, "floor_set": "market"},
+    "shop": {"top": "facade", "bottom": "quay", "right": "pier", "quay_band": 130, "floor_set": "workshop"},
     "generator": {"top": "facade", "bottom": "wall"},
     "ammo": {"top": "facade", "bottom": "wall"},
     "rails": {"top": "facade", "bottom": "wall"},
     "stairs": {"top": "facade", "bottom": "wall"},
-    "chapel": {"top": "facade", "bottom": "wall", "left": "pier"},
+    "chapel": {"top": "facade", "bottom": "wall", "left": "pier", "floor_set": "chapel", "floor_patch": (640, 3700, 420, 1300)},
     "drydock": {"top": "facade", "bottom": "wall", "left": "pier"},
     "cellar": {"top": "facade", "bottom": "wall", "right": "pier"},
     "boss": {"top": "facade", "bottom": "wall"},
@@ -94,6 +94,21 @@ WATER = [
     ("shop", (8400, 6900, 1100, 700)), ("shop", (9500, 5800, 900, 1800)),
     ("chapel", (-500, 3400, 700, 1800)), ("drydock", (-500, 1000, 700, 1900)),
     ("cellar", (9100, 1000, 900, 1500)),
+]
+
+# 0.16: ATALHOS — corredor fechado por uma fachada rachada. Explosão (barril, bomba, canhão) perto da
+# parede troca o sprite pela versão _open e libera a passagem. Sem portões (não entram em CORRIDORS).
+# r = piso do corredor; wall = colisão da parede (na borda da sala); room = sala do lado da parede.
+SHORTCUTS = [
+    {"r": (2740, 5000, 128, 800), "wall": (2740, 5776, 128, 36), "room": "cranes"},      # 02 Guindastes ↑ 09 Farol
+    {"r": (5100, 5000, 128, 900), "wall": (5100, 5876, 128, 36), "room": "warehouse"},   # 03 Armazém ↑ 08 Ferroviário
+]
+# 0.16: PORTÕES DE TENTÁCULO — poça que bloqueia um corredor e fere quem encosta (active) até o evento
+# ligado a ela acontecer; aí vira grade selada (sealed), segura e atravessável.
+# event: warden (mini-chefe do Pátio Ferroviário morto) | side (desafio do Último Gerador concluído)
+TENTACLE_GATES = [
+    {"p": (6000, 4300), "block": (5860, 4200, 280, 200), "event": "warden", "damage": 12},   # 08 → 07
+    {"p": (8100, 4400), "block": (7960, 4300, 280, 200), "event": "side", "damage": 12},     # 07 → 06
 ]
 
 # ─────────────────────────────────────────────────────────────── conteúdo
@@ -113,6 +128,10 @@ FOOT = {  # caixa de colisão por prop (largura, altura) — pés do sprite
     "container_open": (150, 72), "container_open_red": (150, 72), "container_open_olive": (150, 72),
     "crane": (96, 60), "phone_booth": (70, 40), "radio": (70, 40), "jerrycans": (84, 34), "medkit": (72, 36),
     "pillar": (90, 90), "generator": (110, 90), "altar": (200, 90), "pew": (180, 44), "ammo": (70, 50),
+    # 0.16: microbiomas (Oficina, Mercado, Capela)
+    "workshop_bench": (88, 26), "workshop_tool_rack": (56, 20), "workshop_welder": (58, 22), "workshop_parts": (60, 22),
+    "market_stall": (120, 30), "market_net": (92, 14), "market_baskets": (60, 24), "market_ice_barrel": (44, 26),
+    "market_rowboat": (90, 20), "chapel_stained_glass": (50, 20), "chapel_offering_bowl": (44, 20),
 }
 
 def ob(kind, x, y):
@@ -190,6 +209,7 @@ ob("container", 3180, 6960); ob("container_open_olive", 3500, 6980)
 sandbag_wall(2700, 6480, 2); sandbag_wall(3830, 6480, 2)
 barrels(3330, 6400, True); barrels(3430, 6620, True)
 crate_pile(2620, 5900, 1); crate_pile(4180, 6900, 2)
+barrels(2960, 5930, True)   # 0.16: abrem o atalho da parede rachada (↑ Farol)
 ob("lamp_post", 3080, 6460); ob("lamp_post", 3760, 6700); ob("brazier", 2620, 6700)
 dec("rails", 3400, 6250); dec("rails", 3400, 6560)
 dec("grate", 3000, 6620); dec("manhole", 3800, 6300); dec("symbol_2", 3400, 6780)
@@ -203,7 +223,8 @@ for yy in (6060, 6260, 6460):
     crate_pile(4820, yy, (yy // 200) % 3)
 row("crate", 5100, 6200, 3, 60); row("crate_2", 5100, 6560, 3, 60)
 ob("jerrycans", 5320, 6760); ob("wheelbarrow", 5140, 6900)
-crate_pile(5700, 6060, 2); row("crate_barnacles", 5650, 6420, 2, 72); barrels(5900, 6520)
+crate_pile(5700, 6060, 2); barrels(5300, 5990, True)   # 0.16: atalho ↑ Ferroviário
+row("crate_barnacles", 5650, 6420, 2, 72); barrels(5900, 6520)
 ob("container_olive", 5950, 6960); ob("fish_basket", 6200, 6120); ob("lobster_trap", 6150, 6800)
 ob("lamp_post", 5620, 6300); ob("brazier", 6000, 6250)
 dec("tentacle_planks", 5300, 6380); dec("debris_barrel", 5850, 6800); dec("rope", 5000, 6800)
@@ -221,6 +242,11 @@ hazard(7420, 6700, 66)
 dec("grate", 7000, 6330); dec("symbol_1", 7550, 6330); dec("anchor", 6700, 6400)
 spawns("mix", [(6900, 6300), (7200, 6050), (7600, 6300), (7900, 6600), (7000, 6800), (7400, 6150), (7750, 6800)])
 WAVES["market"] = [[6750, 6600, "dock"], [8000, 6000, "mix"], [7400, 6000, "dock"]]
+# 0.16: microbioma do mercado (tools/prepare_market.py)
+ob("market_stall", 7150, 6160); ob("market_stall", 7580, 6460)
+ob("market_ice_barrel", 7580, 6170); ob("market_ice_barrel", 7150, 6470)
+ob("market_baskets", 7880, 6700); ob("market_net", 6900, 6760); ob("market_rowboat", 7200, 6930)
+dec("market_lanterns", 6850, 5850); dec("market_lanterns", 7280, 5850)
 
 # ── 05 Oficina (comerciante) ──
 facade_decor("shop", [("iron_door", 250), ("poster", 800)])
@@ -228,6 +254,11 @@ row("crate", 8790, 6240, 6, 60)          # balcão do comerciante
 ob("medkit", 8540, 6150); ob("radio", 9380, 6150); ob("jerrycans", 9360, 6400)
 ob("lamp_post", 8520, 6600); ob("lamp_post", 9400, 6600); crate_pile(8500, 6780, 1)
 dec("manhole", 8950, 6600); dec("rope", 9100, 6800)
+# 0.16: microbioma da oficina (tools/prepare_workshop.py)
+ob("workshop_bench", 9300, 6070); ob("workshop_tool_rack", 8480, 6060); ob("workshop_tool_rack", 9440, 6060)
+ob("workshop_welder", 9180, 6420); ob("workshop_parts", 8620, 6450); ob("workshop_parts", 9150, 6600)
+dec("workshop_hoist", 9250, 6560)
+for p in [(8850, 6480), (9060, 6720), (8600, 6300)]: dec("workshop_oil_puddle", *p)
 
 # ── 06 O Último Gerador (desafio opcional) ──
 facade_decor("generator", [("iron_door", 300), ("iron_door", 1000)])
@@ -278,7 +309,11 @@ facade_decor("chapel", [("iron_door", 650)], lamps=False)
 ob("altar", 850, 3950)
 for yy in (4250, 4450, 4650): ob("pew", 470, yy); ob("pew", 1230, yy)
 dec("ritual_circle", 850, 4150); dec("symbol_0", 450, 3850); dec("symbol_2", 1250, 3850)
-for p in [(450, 3750), (1250, 3750), (400, 4850), (1300, 4850)]: dec("candles", *p)
+for p in [(450, 3750), (1250, 3750), (400, 4850), (1300, 4850), (700, 3990), (1000, 3990)]: dec("chapel_candles", *p)
+# 0.16: microbioma da capela (tools/prepare_chapel.py); tapete e altar continuam
+ob("chapel_stained_glass", 400, 3700); ob("chapel_stained_glass", 1300, 3700)
+ob("chapel_offering_bowl", 650, 4010); ob("chapel_offering_bowl", 1050, 4010)
+dec("chapel_banner", 560, 3590); dec("chapel_banner", 1140, 3590)
 dec("rug", 850, 4500); dec("tentacle_planks", 500, 4880)
 ob("brazier", 650, 3780); ob("brazier", 1050, 3780)
 hazard(1200, 4900, 58)
@@ -377,7 +412,9 @@ def validate():
     if bad: raise SystemExit("\n".join(bad))
     # o balcão elevado é uma parede para quem vem de baixo
     raised_block = [(RAISED[0][0], RAISED[0][1] + RAISED[0][3] - 4, RAISED[0][2], 8)]
-    marty = flood(POINTS["spawn"], 11, floors, obstacles + list(GAPS) + raised_block)
+    gates = [g["block"] for g in TENTACLE_GATES]
+    for sc in SHORTCUTS: assert any(rect_has(R[sc["room"]], sc["wall"][0] + 5, sc["wall"][1] + sc["wall"][3] - 5) for _ in [0]), f"atalho fora da sala {sc}"
+    marty = flood(POINTS["spawn"], 11, floors, obstacles + list(GAPS) + raised_block + gates)
     for rid, name, kind, fl, rr in ROOMS:
         if kind == "secret": continue
         cx, cy = rr[0] + rr[2] / 2, rr[1] + rr[3] / 2
@@ -387,7 +424,7 @@ def validate():
         assert reach(marty, POINTS[k], tol=60), f"ponto {k} não alcançável"
     for x, y, secret in CHESTS:
         if not secret: assert reach(marty, (x, y), tol=70), f"baú em {(x, y)} não alcançável"
-    titan = flood(POINTS["mech"], 23, floors, obstacles + list(GAPS) + raised_block, step=12)
+    titan = flood(POINTS["mech"], 23, floors, obstacles + list(GAPS) + raised_block + gates, step=12)
     for k in ("spawn", "boss"):
         assert reach(titan, POINTS[k], step=12, tol=80), f"Titan não chega em {k}"
     def nudge(s):
@@ -415,6 +452,7 @@ def val(x):
     if isinstance(x, (int, float)): return str(x)
     if isinstance(x, str): return '"' + x + '"'
     if isinstance(x, tuple) and len(x) == 2: return v2(x)
+    if isinstance(x, tuple) and len(x) == 4: return r2(x)
     if isinstance(x, dict): return "{" + ", ".join(f'"{k}": {val(v)}' for k, v in x.items()) + "}"
     raise TypeError(x)
 
@@ -443,6 +481,9 @@ def emit():
     L.append("const WATER := [\n\t" + ",\n\t".join(f'{{"room": "{rid}", "r": {r2(r)}}}' for rid, r in WATER) + "]")
     L.append("# Perigos: poça com tentáculo (pisar = meio coração e empurrão; saltar escapa).")
     L.append("const HAZARDS := [\n\t" + ",\n\t".join(f'{{"p": {v2(h["p"])}, "r": {h["r"]}.0, "damage": {h["damage"]}.0}}' for h in HAZ) + "]")
+    L.append("# 0.16: atalhos (parede rachada que a explosão abre) e portões de tentáculo (selam num evento).")
+    L.append("const SHORTCUTS := [\n\t" + ",\n\t".join(f'{{"r": {r2(c["r"])}, "wall": {r2(c["wall"])}, "room": "{c["room"]}"}}' for c in SHORTCUTS) + "]")
+    L.append("const TENTACLE_GATES := [\n\t" + ",\n\t".join(f'{{"p": {v2(g["p"])}, "block": {r2(g["block"])}, "event": "{g["event"]}", "damage": {g["damage"]}.0}}' for g in TENTACLE_GATES) + "]")
     L.append("")
     L.append("const OBSTACLES := [")
     L.append(",\n".join("\t" + ", ".join(f'[{o[0]}, {o[1]}, {o[2]}, {o[3]}, "{o[4]}"]' for o in ch) for ch in chunks(OB, 4)) + "]")

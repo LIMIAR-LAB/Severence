@@ -107,6 +107,12 @@ func _ready() -> void:
 			camera.position = sim.actors[0].p
 		if arg == "--boss-dead": sim.boss_dead = true; sim.enemies = sim.enemies.filter(func(e): return e.kind != "boss")
 		if arg == "--map-open": map_open = true
+		# 0.16: capturas do cenário — atalhos abertos, portões selados, sem inimigos
+		if arg == "--open-shortcuts":
+			for i in range(sim.obstacles.size() - 1, -1, -1):
+				if sim.obstacle_kinds[i].begins_with("wall_crack_"): sim.open_shortcut(i)
+		if arg == "--seal-gates": sim.enemies = sim.enemies.filter(func(e): return e.kind != "warden"); sim.side_complete = true
+		if arg == "--no-enemies": sim.enemies = sim.enemies.filter(func(e): return e.kind == "warden")
 		# 0.17: capturas/testes da tela de Equipamento nos dois estados
 		if arg == "--new-game": sim.set_unlocks(EquipmentData.starting_unlocks())
 		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))

@@ -12,13 +12,25 @@ const TILE_NAMES := ["planks_base", "planks_knot", "planks_nails", "planks_crack
 	"wall_cap_0", "wall_cap_1", "wall_cap_2", "wall_cap_3", "wall_cap_4",
 	"brick_base", "brick_base2", "brick_damaged", "brick_hole", "brick_pipe", "brick_window",
 	"wall_base_0", "wall_base_1", "wall_base_2", "wall_base_3", "wall_base_4",
-	"wall_corner_0", "wall_corner_1", "side_cap", "grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "piling"]
+	"wall_corner_0", "wall_corner_1", "side_cap", "grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "piling",
+	"wall_crack_a", "wall_crack_b", "wall_crack_c", "wall_crack_a_open", "wall_crack_b_open", "wall_crack_c_open"]   # 0.16: tools/prepare_cracked_walls.py
 const PROP_NAMES := ["crate", "crate_2", "crate_3", "crate_broken", "crate_net", "crate_barnacles", "barrel", "barrel_oil", "barrel_toxic",
 	"barrel_explosive", "barrel_tipped", "sandbags", "sandbags_corner", "sandbags_damaged", "bollard", "bollard_rope", "rope",
 	"fish_basket", "lobster_trap", "wheelbarrow", "anchor", "bench", "lamp_post", "ship_lantern", "wall_lamp", "brazier",
 	"brazier_f1", "brazier_f2", "brazier_f3", "container", "container_open", "rowboat", "crane", "hook", "phone_booth", "poster",
 	"radio", "jerrycans", "medkit", "iron_door", "tentacle_pool_1", "tentacle_pool_2", "ritual_circle", "tentacle_planks",
-	"debris_crate", "debris_barrel", "debris_sandbags", "container_red", "container_olive", "container_open_red", "container_open_olive"]
+	"debris_crate", "debris_barrel", "debris_sandbags", "container_red", "container_olive", "container_open_red", "container_open_olive",
+	"tentacle_gate_active", "tentacle_gate_sealed"]   # 0.16: tools/prepare_tentacle_gate.py
+# 0.16: microbiomas — props e pisos por sala (tools/prepare_workshop.py, prepare_market.py, prepare_chapel.py)
+const SET_PROPS := {
+	"workshop": ["workshop_bench", "workshop_tool_rack", "workshop_hoist", "workshop_oil_puddle", "workshop_welder", "workshop_parts"],
+	"market": ["market_stall", "market_net", "market_baskets", "market_ice_barrel", "market_rowboat", "market_lanterns"],
+	"chapel": ["chapel_stained_glass", "chapel_candles", "chapel_banner", "chapel_offering_bowl"]}
+# piso de cada conjunto: [nome, peso] (64x64, 1 px da arte = 1 px de mundo)
+const FLOOR_SETS := {
+	"workshop": [["workshop_floor_riveted", 14], ["workshop_floor_worn", 5], ["workshop_floor_oil", 2], ["workshop_floor_grate", 1]],
+	"market": [["market_floor_scales", 6], ["market_floor_puddle", 2], ["market_floor_seaweed", 2]],
+	"chapel": [["chapel_floor_eye", 1], ["chapel_floor_spiral", 1]]}
 
 # Escala de mundo de cada prop (1.0 = tamanho nativo da folha). Marty tem ~72 px.
 const PROP_SCALE := {"crate": 0.8, "crate_2": 0.8, "crate_3": 0.8, "crate_broken": 0.8, "crate_net": 0.8, "crate_barnacles": 0.8,
@@ -45,6 +57,10 @@ var lights: Array = []  # poças de luz do quadro atual (desenhadas no LightLaye
 func _init() -> void:
 	for n in TILE_NAMES: tiles[n] = load(BASE + "tiles/" + n + ".png")
 	for n in PROP_NAMES: props[n] = load(BASE + "props/" + n + ".png")
+	for set_name in SET_PROPS:
+		for n in SET_PROPS[set_name]: props[n] = load(BASE + set_name + "/" + n + ".png")
+	for set_name in FLOOR_SETS:
+		for e in FLOOR_SETS[set_name]: tiles[e[0]] = load(BASE + set_name + "/" + e[0] + ".png")
 	for n in ["light_amber", "light_green", "soft_circle"]: fx[n] = load(BASE + "fx/" + n + ".png")
 
 static func hash01(ix: int, iy: int, salt: int = 0) -> float:
@@ -136,6 +152,30 @@ func tile_area(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, origin: V
 			else: name = pick_granite(ix, iy)
 			ci.draw_texture_rect_region(tiles[name], clip, Rect2(clip.position - cell.position, clip.size), tint)
 
+func style_of_rect(sim, rect: Rect2) -> Dictionary:
+	for room in sim.rooms:
+		if room.r == rect: return style_of(room)
+	return {}
+
+# 0.16: piso de um microbioma — azulejos 64x64 sorteados pelos pesos de FLOOR_SETS (fixo por célula).
+func set_area(ci: CanvasItem, rect: Rect2, view: Rect2, set_name: String) -> void:
+	var area := rect.intersection(view)
+	if area.size.x <= 0 or area.size.y <= 0: return
+	var entries: Array = FLOOR_SETS[set_name]
+	var total := 0.0
+	for e in entries: total += float(e[1])
+	for iy in range(int(floorf((area.position.y - rect.position.y) / 64.0)), int(floorf((area.end.y - rect.position.y - 0.01) / 64.0)) + 1):
+		for ix in range(int(floorf((area.position.x - rect.position.x) / 64.0)), int(floorf((area.end.x - rect.position.x - 0.01) / 64.0)) + 1):
+			var cell := Rect2(rect.position + Vector2(ix, iy) * 64.0, Vector2(64, 64))
+			var clip := cell.intersection(rect)
+			if clip.size.x <= 0 or clip.size.y <= 0: continue
+			var roll := hash01(int(cell.position.x / 64.0), int(cell.position.y / 64.0), 11) * total
+			var name: String = entries[0][0]
+			for e in entries:
+				roll -= float(e[1])
+				if roll <= 0: name = e[0]; break
+			ci.draw_texture_rect_region(tiles[name], clip, Rect2(clip.position - cell.position, clip.size))
+
 func floor_kind(sim, rect: Rect2) -> String:
 	for room in sim.rooms:
 		if room.r.encloses(rect) or room.r.has_point(rect.get_center()): return room.get("floor", "stone")
@@ -145,8 +185,12 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 	for rect in floors:
 		if not rect.intersects(view): continue
 		var kind := floor_kind(sim, rect)
+		var st := style_of_rect(sim, rect)
+		if st.has("floor_set") and not st.has("floor_patch"):
+			set_area(ci, rect, view, st.floor_set); continue
 		var tint := Color(1.0, 0.93, 0.86) if kind == "cobble" else Color.WHITE
 		tile_area(ci, rect, view, "planks" if kind == "planks" else "granite", Vector2.ZERO, tint)
+		if st.has("floor_patch"): set_area(ci, st.floor_patch, view, st.floor_set)
 	for room in rooms:
 		var band: float = style_of(room).get("quay_band", 0.0)
 		if band <= 0: continue
@@ -316,6 +360,10 @@ func draw_prop(ci: CanvasItem, kind: String, foot: Vector2, t: float = 0.0, tint
 	ci.draw_texture_rect(tex, Rect2(foot - Vector2(size.x * 0.5, size.y), size), false, tint)
 
 func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
+	if kind.begins_with("wall_crack_"):
+		# 0.16: segmento de fachada (128x216) com a base na borda da sala (box.end.y - 12)
+		ci.draw_texture(tiles[kind], Vector2(box.position.x, box.end.y - 12 - 216))
+		return
 	var size := prop_size("crate" if kind == "crate_row" else kind)
 	var foot := Vector2(box.get_center().x, box.end.y + 4)
 	ci.draw_set_transform(foot + Vector2(0, -2), 0, Vector2(1, 0.32))
@@ -335,14 +383,17 @@ func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
 		return
 	draw_prop(ci, kind, foot, t)
 	match kind:
+		"chapel_offering_bowl": lights.append({"p": foot - Vector2(0, 30), "kind": "violet"})
+		"workshop_welder":
+			if int(t * 14) % 3 != 0: lights.append({"p": foot + Vector2(18, -34), "kind": "cyan"})
 		"lamp_post": lights.append({"p": foot + Vector2(0, -6), "kind": "amber", "s": 1.2}); lights.append({"p": foot - Vector2(0, size.y - 22), "kind": "bulb"})
 		"brazier": lights.append({"p": foot - Vector2(0, 40), "kind": "fire"})
 
 # Decoração: plana (chão), na parede (fachada) ou em pé (ordenada por Y junto com as entidades).
-const FLAT_DECOR := ["grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "tentacle_pool", "ritual_circle", "tentacle_planks", "rails_diag", "rails", "rowboat", "debris_crate", "debris_barrel", "debris_sandbags", "rope", "anchor"]
-const WALL_DECOR := ["poster", "iron_door", "wall_lamp", "phone_booth_wall"]
+const FLAT_DECOR := ["workshop_oil_puddle", "grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "tentacle_pool", "ritual_circle", "tentacle_planks", "rails_diag", "rails", "rowboat", "debris_crate", "debris_barrel", "debris_sandbags", "rope", "anchor"]
+const WALL_DECOR := ["poster", "iron_door", "wall_lamp", "phone_booth_wall", "market_lanterns", "chapel_banner"]
 
-func is_flat(kind: String) -> bool: return kind in FLAT_DECOR or kind in WALL_DECOR
+func is_flat(kind: String) -> bool: return kind in FLAT_DECOR or kind in WALL_DECOR or kind.begins_with("wall_crack_")
 func handles(kind: String) -> bool: return is_flat(kind) or props.has(kind)
 
 func draw_decor(ci: CanvasItem, d: Dictionary, t: float) -> void:
@@ -384,6 +435,14 @@ func draw_decor(ci: CanvasItem, d: Dictionary, t: float) -> void:
 			var size := tex.get_size() * s
 			ci.draw_texture_rect(tex, Rect2(p - Vector2(size.x * 0.5, size.y), size), false)
 			if d.kind == "wall_lamp": lights.append({"p": p + Vector2(8, 40), "kind": "amber", "s": 0.8}); lights.append({"p": p - Vector2(-12, 22), "kind": "bulb"})
+		"wall_crack_a_open", "wall_crack_b_open", "wall_crack_c_open":
+			ci.draw_texture(tiles[d.kind], p - Vector2(0, 216 + 12))
+		"workshop_oil_puddle":
+			var tex: Texture2D = props[d.kind]
+			ci.draw_texture(tex, p - tex.get_size() * 0.5)
+		"market_lanterns":
+			draw_prop(ci, d.kind, p, t)
+			for k in 4: lights.append({"p": p + Vector2(-33 + k * 22, -8), "kind": "bulb"})
 		_:
 			if props.has(d.kind): draw_prop(ci, d.kind, p, t)
 
@@ -433,6 +492,8 @@ func draw_lights(ci: CanvasItem, t: float) -> void:
 				ci.draw_texture_rect(fx.soft_circle, Rect2(p - Vector2(r, r * 0.7), Vector2(r * 2, r * 1.4)), false, Color(1.0, 0.55, 0.2, 0.45))
 			"cyan":
 				ci.draw_texture_rect(fx.soft_circle, Rect2(p - Vector2(120, 120), Vector2(240, 240)), false, Color(0.4, 0.9, 1.0, 0.35))
+			"violet":
+				ci.draw_texture_rect(fx.soft_circle, Rect2(p - Vector2(90, 70), Vector2(180, 140)), false, Color(0.65, 0.3, 1.0, 0.4 + 0.1 * sin(t * 3 + p.x)))
 
 # ------------------------------------------------------------------ portões (0.12)
 # Portões grandes nas pontas dos corredores: torres de tijolo, luzes, seta dourada no chão quando abertos,
@@ -490,3 +551,12 @@ func draw_gate(ci: CanvasItem, d: Dictionary, locked: bool, t: float, room_rect:
 		var on := locked and int(t * 4) % 2 == 0
 		ci.draw_circle(lamp, 9, Color("1b1c22")); ci.draw_circle(lamp, 6, (red if on else Color(0.45, 0.1, 0.1)) if locked else gold)
 		lights.append({"p": lamp, "kind": "bulb_red" if locked else "bulb"})
+
+# ------------------------------------------------------------------ portão de tentáculo (0.16)
+# Ativo: poça viva em 2x (fecha os 200 px do corredor) com brilho vermelho; selado: grade acorrentada.
+func draw_tentacle_gate(ci: CanvasItem, g: Dictionary, t: float) -> void:
+	var tex: Texture2D = props.tentacle_gate_sealed if g.sealed else props.tentacle_gate_active
+	var size := tex.get_size() * 2.0
+	var sway := Vector2.ZERO if g.sealed else Vector2(0, sin(t * 3.0) * 2.0)
+	ci.draw_texture_rect(tex, Rect2(g.p - size * 0.5 + sway, size), false)
+	if not g.sealed: lights.append({"p": g.p, "kind": "danger"})

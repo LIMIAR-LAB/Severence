@@ -51,6 +51,7 @@ var visited: Array = []
 var doors: Array = []        # 0.12: portões entre salas e corredores {"r", "room", "side"}
 var gate_blocks: Array = []  # retângulos dos portões fechados agora (colisão)
 var hazards: Array = []      # 0.12: perigos do cenário (poça com tentáculo)
+var tentacle_gates: Array = []  # 0.16: poças que bloqueiam um corredor até um evento (DOCKS.TENTACLE_GATES)
 var nav := AStar2D.new()
 var nav_points: Dictionary = {}
 var ai_path := PackedVector2Array()
@@ -191,7 +192,7 @@ const HUB_POINTS := [
 const HUB_TITAN_BAY := Vector2(1140, 548)
 
 func make_hub() -> void:
-	doors.clear(); gate_blocks.clear(); hazards.clear()
+	doors.clear(); gate_blocks.clear(); hazards.clear(); tentacle_gates.clear()
 	mode = "hub"
 	pending_spawns.clear()   # 0.15: portais atrasados da arena não atravessam para o Refúgio
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
@@ -239,7 +240,7 @@ func start_arena() -> void:
 	rooms = [{"r": floors[0], "name": "ARENA DE TESTE • ONDAS / DASH / ROBÔ", "kind": "arena"}]
 	mech = new_mech(Vector2(250, 800)); money = 0; keys = 0; apply_unlock_state()
 	reset_spectres()
-	doors.clear(); gate_blocks.clear(); hazards.clear()
+	doors.clear(); gate_blocks.clear(); hazards.clear(); tentacle_gates.clear()
 	build_navigation(); spawn_arena_wave()
 	say("TESTE IMEDIATO • inimigos à direita • Shift: DASH • F: golpe • R: armadura • E: robô")
 
@@ -284,12 +285,18 @@ func start_run(new_seed: int) -> void:
 	for room in rooms:
 		if room.kind != "secret": floors.append(room.r)
 	floors.append_array(DOCKS.EXTRA_FLOORS); floors.append_array(DOCKS.CORRIDORS)
+	for sc in DOCKS.SHORTCUTS: floors.append(sc.r)   # 0.16: atalhos (fechados pela parede rachada)
 	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = DOCKS.GAPS.duplicate()
 	jump_gap = gaps[0]
 	build_doors(); hazards = DOCKS.HAZARDS.duplicate(true)
 	obstacle_hp.clear(); fuses.clear()
 	for o in DOCKS.OBSTACLES:
 		obstacles.append(Rect2(o[0], o[1], o[2], o[3])); obstacle_kinds.append(o[4]); obstacle_hp.append(DESTRUCTIBLE.get(o[4], -1.0))
+	# 0.16: parede rachada A, B ou C em cada atalho (sorteada pela seed, sem mexer no rng dos inimigos)
+	for i in DOCKS.SHORTCUTS.size():
+		obstacles.append(DOCKS.SHORTCUTS[i].wall); obstacle_kinds.append("wall_crack_" + ["a", "b", "c"][posmod(seed_value * 31 + i * 17, 3)]); obstacle_hp.append(-1.0)
+	tentacle_gates = DOCKS.TENTACLE_GATES.duplicate(true)
+	for g in tentacle_gates: g["sealed"] = false; g["cd"] = 0.0
 	for d in DOCKS.DECOR:
 		var item := {"p": Vector2(d[0], d[1]), "kind": d[2]}
 		if d.size() > 3: item.merge(d[3])
@@ -397,7 +404,8 @@ func spawn_wave(room: Dictionary) -> void:
 # ── Props destrutíveis e barris explosivos (0.13) ─────────────────────────────
 const DESTRUCTIBLE := {"crate": 34.0, "crate_2": 44.0, "crate_3": 44.0, "crate_net": 40.0, "crate_barnacles": 50.0, "crate_broken": 20.0,
 	"barrel": 40.0, "barrel_oil": 40.0, "barrel_toxic": 40.0, "barrel_explosive": 16.0, "barrel_tipped": 30.0,
-	"fish_basket": 16.0, "lobster_trap": 22.0, "sandbags": 110.0, "sandbags_corner": 110.0, "sandbags_damaged": 60.0, "jerrycans": 24.0}
+	"fish_basket": 16.0, "lobster_trap": 22.0, "sandbags": 110.0, "sandbags_corner": 110.0, "sandbags_damaged": 60.0, "jerrycans": 24.0,
+	"market_baskets": 16.0, "market_ice_barrel": 40.0, "workshop_parts": 30.0}   # 0.16
 const BARREL_BLAST := {"radius": 150.0, "damage": 60.0, "fuse": 0.18}
 
 func rebuild_ob_grid() -> void:
@@ -448,6 +456,7 @@ func step_fuses(dt: float) -> void:
 
 # ── Perigos do cenário ───────────────────────────────────────────────────────
 func step_hazards(dt: float) -> void:
+	step_tentacle_gates(dt)
 	for h in hazards:
 		h["cd"] = maxf(0, h.get("cd", 0.0) - dt)
 		for a in actors:
@@ -508,6 +517,8 @@ func clear_at(pos: Vector2, radius: float, airborne: bool = false) -> bool:
 			if box.grow(radius).has_point(pos): return false
 	for gate in gate_blocks:
 		if gate.grow(radius).has_point(pos): return false
+	for tg in tentacle_gates:
+		if not tg.sealed and tg.block.grow(radius).has_point(pos): return false
 	return true
 
 func move_body(pos: Vector2, movement: Vector2, radius: float, airborne: bool = false) -> Vector2:
@@ -759,6 +770,9 @@ func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: boo
 				damage_actor(a, 20.0)
 				var push: Vector2 = (a.p - p).normalized() if a.p.distance_to(p) > 1 else Vector2.DOWN
 				a.p = move_body(a.p, push * 60, 23 if a.mech else 11)
+	# 0.16: parede rachada perto da explosão desmorona e abre o atalho
+	for i in range(obstacles.size() - 1, -1, -1):
+		if i < obstacle_kinds.size() and obstacle_kinds[i].begins_with("wall_crack_") and obstacles[i].get_center().distance_to(p) < radius + 70: open_shortcut(i)
 	# props no raio quebram (e barris explosivos encadeiam)
 	var hit: Array = []
 	for i in obstacles.size():
@@ -1358,7 +1372,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 
@@ -1454,3 +1468,42 @@ func check_unlocks() -> void:
 func apply_unlock_state() -> void:
 	if mech.is_empty(): return
 	if not is_unlocked("titan") and mech.get("occupant", -1) == -1: mech.deployed = false
+
+
+# ── 0.16: atalhos de parede rachada ─────────────────────────────────────────
+func open_shortcut(i: int) -> void:
+	var box: Rect2 = obstacles[i]
+	var kind: String = obstacle_kinds[i]
+	obstacles.remove_at(i); obstacle_kinds.remove_at(i); obstacle_hp.remove_at(i)
+	ob_grid_count = -1
+	decor.append({"p": Vector2(box.position.x, box.end.y), "kind": kind + "_open"})
+	effects.append({"p": box.get_center(), "kind": "prop_break", "life": 0.6, "max": 0.6, "prop": "sandbags"})
+	build_navigation()
+	say("ATALHO ABERTO • a explosão derrubou a parede!")
+
+# ── 0.16: portões de tentáculo ──────────────────────────────────────────────
+func tentacle_event_done(g: Dictionary) -> bool:
+	match str(g.get("event", "")):
+		"warden": return not enemies.any(func(e): return e.kind == "warden")
+		"side": return side_complete
+	return false
+
+func step_tentacle_gates(dt: float) -> void:
+	for g in tentacle_gates:
+		if g.sealed: continue
+		if tentacle_event_done(g):
+			g.sealed = true
+			effects.append({"p": g.p, "kind": "gate_open", "life": 0.8, "max": 0.8})
+			build_navigation()
+			say("A poça de tentáculos foi selada • a passagem está livre.")
+			continue
+		g.cd = maxf(0, g.cd - dt)
+		var zone: Rect2 = g.block.grow(16)
+		for a in actors:
+			if not a.active or a.dead or a.jump > 0 or not zone.has_point(a.p): continue
+			if g.cd <= 0:
+				g.cd = 0.7
+				effects.append({"p": g.p, "kind": "tentacle_strike", "life": 0.35, "max": 0.35, "dir": (a.p - g.p).normalized()})
+			damage_actor(a, g.damage)
+			var away: Vector2 = Vector2(signf(a.p.x - g.block.get_center().x), 0) if g.block.size.x < g.block.size.y * 3 else Vector2(0, signf(a.p.y - g.block.get_center().y))
+			a.p = move_body(a.p, away * 300 * dt, 23 if a.mech else 11)

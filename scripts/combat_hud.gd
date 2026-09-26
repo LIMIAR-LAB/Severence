@@ -21,6 +21,8 @@ func _ready() -> void:
 	art["coin_clean"] = load("res://assets/environment/docks/coin.png")
 	art["titan"] = load("res://assets/mech/titan_v2.png")
 	art["boss"] = load("res://assets/boss/almirante_idle.png")
+	# 0.16: ícones do mapa (tools/prepare_map_icons.py) — 48x48, mostrados em 1/2 (24) no mapa e 1/3 (16) no minimapa
+	for key in ["boss", "shop", "challenge", "chest", "locked", "exit"]: art["map_" + key] = load("res://assets/ui/map_icons/map_icon_" + key + ".png")
 	for key in ["pistol", "shotgun", "smg", "omega_sword"]:
 		art["w_" + key] = load("res://assets/weapons/" + key + ".png")
 
@@ -165,14 +167,13 @@ func draw_map_geometry(s, to_screen: Callable, scale_factor: float, clip: Rect2,
 		if target.size.x > 1 and target.size.y > 1: draw_rect(target, Color("8f93b8"))
 
 func map_icon(s, pos: Vector2, kind: String, size: float, done: bool = false) -> void:
-	var c := Color.WHITE if not done else Color(0.5, 0.5, 0.55)
+	var c := Color.WHITE if not done else Color(0.45, 0.45, 0.5, 0.8)
+	var icon: String = {"boss": "map_boss", "shop": "map_shop", "side": "map_challenge", "chest": "map_chest", "locked": "map_locked", "capsule": "map_exit"}.get(kind, "")
+	if icon != "":
+		if kind == "capsule" and not s.boss_dead: c = Color(0.55, 0.6, 0.65)
+		draw_texture_rect(art[icon], Rect2((pos - Vector2(size, size) * 0.5).round(), Vector2(size, size)), false, c)
+		return
 	match kind:
-		"chest": draw_texture_rect(art.chest, Rect2(pos - Vector2(size, size) * 0.5, Vector2(size, size)), false, c)
-		"capsule": draw_texture_rect(art.capsule, Rect2(pos - Vector2(size * 0.32, size * 0.5), Vector2(size * 0.64, size)), false, c if s.boss_dead else Color(0.6, 0.6, 0.7))
-		"boss": draw_texture_rect(art.boss, Rect2(pos - Vector2(size, size) * 0.5, Vector2(size, size)), false, c)
-		"shop": draw_texture_rect(art.coin_clean, Rect2(pos - Vector2(size, size) * 0.4, Vector2(size, size) * 0.8), false, c)
-		"side":
-			draw_circle(pos, size * 0.45, Color("1c3a40")); draw_colored_polygon(PackedVector2Array([pos + Vector2(-2, -size * 0.35), pos + Vector2(size * 0.2, -2), pos + Vector2(0, 0), pos + Vector2(3, size * 0.35), pos + Vector2(-size * 0.2, 2), pos]), Color(0.4, 1, 1) if not done else Color(0.4, 0.5, 0.5))
 		"key": draw_texture_rect(art.key_clean, Rect2(pos - Vector2(size, size) * 0.5, Vector2(size, size)), false)
 		"titan": draw_texture_rect_region(art.titan, Rect2(pos - Vector2(size, size) * 0.5, Vector2(size, size)), Rect2(0, 0, 176, 176))
 
@@ -185,8 +186,10 @@ func draw_map_icons(s, to_screen: Callable, size: float, clip: Rect2) -> void:
 		icons.append([chest.p, "chest", chest.open])
 	icons.append([P.shop, "shop", s.shop_bought]); icons.append([P.side, "side", s.side_complete or s.side_failed])
 	icons.append([P.extraction + Vector2(0, -40), "capsule", false])
-	for e in s.enemies:
-		if e.kind == "boss": icons.append([e.p, "boss", false])
+	# 0.16: salas descobertas mostram o ícone do tipo (chefe na sala dele; portão trancado no centro)
+	for room in s.rooms:
+		if room.get("kind", "") == "boss" and not s.boss_dead: icons.append([room.r.get_center() + Vector2(0, 120), "boss", false])
+		if room.get("locked", false): icons.append([room.r.get_center(), "locked", false])
 	for pk in s.pickups:
 		if pk.kind == "key": icons.append([pk.p, "key", false])
 	if s.mech.deployed: icons.append([s.mech.p, "titan", false])
@@ -204,7 +207,7 @@ func draw_minimap(s, a: Dictionary) -> void:
 	var to_screen := func(w: Vector2) -> Vector2: return clip.get_center() + (w - center) * scale_factor
 	draw_rect(clip, Color("0b0d18"))
 	draw_map_geometry(s, to_screen, scale_factor, clip, a)
-	draw_map_icons(s, to_screen, 12.0, clip)
+	draw_map_icons(s, to_screen, 16.0, clip)
 	draw_circle(to_screen.call(a.p), 3, CYAN)
 	text(Vector2(1100, 118), "TAB / M • MAPA", 11)
 
@@ -223,11 +226,11 @@ func draw_full_map(s, a: Dictionary) -> void:
 		if room_visible(s, room):
 			var tl: Vector2 = to_screen.call(room.r.position)
 			text(tl + Vector2(6, 16), room.name, 11, Color("b9bddb"))
-	draw_map_icons(s, to_screen, 26.0, screen)
+	draw_map_icons(s, to_screen, 24.0, screen)
 	for other in s.actors:
 		if other.active and not other.dead and other.id != a.id: draw_circle(to_screen.call(other.p), 5, GOLD)
 	var me: Vector2 = to_screen.call(a.p)
 	draw_texture_rect(art.portrait, Rect2(me - Vector2(14, 14), Vector2(28, 28)), false)
 	draw_arc(me, 17, 0, TAU, 20, CYAN, 2)
 	text(Vector2(90, 50), "DOCAS DE 1941 • MAPA", 22, GOLD)
-	text(Vector2(90, screen.size.y - 40), "TAB / M / clique no minimapa para fechar     •  baú   moeda = oficina   raio = desafio   cápsula = extração", 14, Color("c6c9e0"))
+	text(Vector2(90, screen.size.y - 40), "TAB / M / clique no minimapa para fechar     •  caveira = chefe   saco = oficina   cronômetro = desafio   baú   cadeado = sala trancada   seta = extração", 14, Color("c6c9e0"))
