@@ -251,8 +251,8 @@ var info_bodies: Array = []
 var actor_tabs: Array = []
 
 func sprite_of(key: String) -> AtlasTexture:
-	if key == "titan": return atlas("res://assets/mech/titan_v2.png", Rect2(880, 0, 176, 176))
-	if key == "spectre": return atlas("res://assets/mech/spectre-feral.png", Rect2(0, 0, 128, 128))
+	if key == "titan": return atlas("res://assets/mech/titan_v3.png", Rect2(0, 0, 176, 176))
+	if key == "spectre": return atlas("res://assets/mech/spectre_octopus_v2.png", Rect2(0, 0, 128, 128))
 	return atlas("res://assets/marty/outfits.png", Rect2(0, 96 * OUTFIT_ROW.get(key, 0), 96, 96))
 
 func icon_at(parent: Control, rect: Rect2, tex: Texture2D) -> TextureRect:

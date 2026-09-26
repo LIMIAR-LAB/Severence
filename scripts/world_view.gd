@@ -38,6 +38,9 @@ var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v2.png"
+const TITAN_ATLAS_PATH := "res://assets/mech/titan_v3.png"
+const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
+const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
@@ -53,13 +56,15 @@ func _ready() -> void:
 	floor_texture = load("res://assets/environment/reference/floor.png")
 	for key in ["water", "wall", "crate", "lamp", "chest", "barrel", "sandbags", "rope", "coin", "key"]:
 		dock_art[key] = load("res://assets/environment/reference/" + key + ".png")
-	spectre_texture = load("res://assets/mech/spectre-feral.png")
-	fusion_texture = load("res://assets/marty/spectre-fusion.png")
+	# 0.15: Spectre é um pequeno polvo mecânico; a fusão preserva Marty visível.
+	spectre_texture = load(SPECTRE_ATLAS_PATH)
+	fusion_texture = load(FUSION_ATLAS_PATH)
 	warden_texture = load("res://assets/enemies/warden.png")
 	outfit_texture = load("res://assets/marty/outfits.png")
 	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
 	marty_anim = load(MARTY_ATLAS_PATH)
-	titan_v2 = load("res://assets/mech/titan_v2.png")
+	# 0.15: Titan fechado, sem piloto exposto, com olhos ciano no visor blindado.
+	titan_v2 = load(TITAN_ATLAS_PATH)
 	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin"]:
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
 	cobble_texture = load("res://assets/environment/cobble.png")

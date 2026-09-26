@@ -52,6 +52,7 @@ These pre-existing files were **not modified** by this scan; they remain the aut
 - [docs/EQUIPAMENTO_0_9.md](./EQUIPAMENTO_0_9.md) - Uniform/Armor/Robot system spec (source of truth for balance, cross-checked in `architecture.md`)
 - [docs/SPRITES_0_6.md](./SPRITES_0_6.md) - Marty/enemy/boss sprite sheets, animation notes (v0.6–v0.8)
 - [docs/SPRITES_MARTY_0_15.md](./SPRITES_MARTY_0_15.md) - current Marty sprite-grid contract, visual scale and regeneration process
+- [docs/ROBOS_SPECTRE_0_15.md](./ROBOS_SPECTRE_0_15.md) - current Titan, Spectre and symbiosis visual contracts
 - [docs/REFUGIO_0_5.md](./REFUGIO_0_5.md) - Hub scene construction and points of interest
 - [docs/ART_0_4.md](./ART_0_4.md) - v0.4 visual direction notes
 - [docs/CHANGES_0_3.md](./CHANGES_0_3.md) - v0.3 changelog (menus, solo mode, robots)
