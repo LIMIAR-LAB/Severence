@@ -9,13 +9,13 @@ func check(ok: bool, label: String) -> void:
 
 func _init() -> void:
 	var atlases := [
-		["res://assets/mech/titan_v3_clean.png", Vector2i(1760, 880), "Titan limpo: 10x5 em 176px"],
+		["res://assets/mech/titan_v4.png", Vector2i(1760, 880), "Titan limpo: 10x5 em 176px"],
 		["res://assets/mech/spectre_octopus_v2.png", Vector2i(512, 512), "Spectre: 4x4 em 128px"],
 		["res://assets/marty/spectre_fusion_v2.png", Vector2i(640, 640), "Fusão: 4x4 em 160px"]]
 	for spec in atlases:
 		var image := Image.load_from_file(ProjectSettings.globalize_path(spec[0]))
 		check(not image.is_empty() and image.get_size() == spec[1], spec[2])
-	var titan := Image.load_from_file(ProjectSettings.globalize_path("res://assets/mech/titan_v3_clean.png"))
+	var titan := Image.load_from_file(ProjectSettings.globalize_path("res://assets/mech/titan_v4.png"))
 	for row in range(5):
 		for column in range(10):
 			var used := titan.get_region(Rect2i(column * 176, row * 176, 176, 176)).get_used_rect()
