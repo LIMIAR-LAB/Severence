@@ -70,7 +70,7 @@ func _init() -> void:
 	s2.enemies.clear()
 	var a2: Dictionary = s2.actors[0]
 	a2.p = s2.mech.p - Vector2(30, 0)
-	s2.interact(a2)
+	s2.interact(a2); wait_cockpit(s2, a2)
 	check(a2.mech, "embarque no Titan")
 	s2.spawn_enemy(a2.p + Vector2(50, 0), "cult")
 	var hp0: float = s2.enemies[0].hp
@@ -81,3 +81,6 @@ func _init() -> void:
 
 	print("JUICE_TESTS_DONE failures=", failures)
 	quit(1 if failures > 0 else 0)
+
+func wait_cockpit(s, a: Dictionary) -> void:
+	if s.mech.get("cockpit_t", 0.0) > 0: s.step_actor(a, {}, 1.3)

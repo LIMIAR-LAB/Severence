@@ -56,12 +56,12 @@ func _init() -> void:
 	# Baú
 	s = Expedition.new(); s.coop = "solo"; s.start_run(1941)
 	a = s.actors[0]; a.p = s.chests[0].p; s.keys = 1
-	s.interact(a)
+	s.interact(a); wait_cockpit(s, a)
 	check(s.chests[0].open and s.chests[0].has("t") and s.effects.any(func(fx): return fx.kind == "chest_burst"), "baú abre com animação e explosão de itens")
 	check(a.armor_cd == 0 and not a.armor, "baú recarrega a armadura (sem vestir sozinho)")
 	# Titan: turbo segurando Shift e pisadas
 	s = Expedition.new(); s.coop = "solo"; s.start_arena(); s.enemies.clear()
-	a = s.actors[0]; a.p = s.mech.p - Vector2(40, 0); s.interact(a)
+	a = s.actors[0]; a.p = s.mech.p - Vector2(40, 0); s.interact(a); wait_cockpit(s, a)
 	var p0: Vector2 = a.p
 	s.step_actor(a, {"move": Vector2.RIGHT}, 0.1)
 	var normal: float = a.p.x - p0.x
@@ -72,3 +72,6 @@ func _init() -> void:
 	check(s.effects.any(func(fx): return fx.kind == "stomp"), "Titan: pisadas pesadas geram poeira/tremor")
 	print("OMEGA_TESTS_DONE failures=", failures)
 	quit(1 if failures > 0 else 0)
+
+func wait_cockpit(s, a: Dictionary) -> void:
+	if s.mech.get("cockpit_t", 0.0) > 0: s.step_actor(a, {}, 1.3)

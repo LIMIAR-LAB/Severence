@@ -10,6 +10,7 @@ func pilot(s) -> Dictionary:
 	var a: Dictionary = s.actors[0]
 	s.mech.deployed = true; s.mech.p = a.p + Vector2(40, 0)
 	a.p = s.mech.p - Vector2(30, 0); s.interact(a)
+	s.step_actor(a, {}, 1.3) # aguarda a escotilha
 	return a
 
 func _init() -> void:

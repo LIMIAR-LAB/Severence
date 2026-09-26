@@ -16,6 +16,7 @@ func _init() -> void:
 	# Embarque consome e bloqueia por combustível
 	a.p = s.mech.p - Vector2(30, 0)
 	s.interact(a)
+	s.step_actor(a, {}, 1.3) # aguarda a escotilha
 	check(a.mech, "Marty embarca no Titan com gasolina")
 	check(s.mech.fuel > 0 and s.mech.fuel <= s.FUEL_MAX, "tanque começa parcial (70%)")
 
@@ -46,16 +47,19 @@ func _init() -> void:
 	a.bomb_cd = 0; s.step_actor(a, {"armor": true}, 0.016)
 	check(s.bullets.is_empty(), "sem gasolina a bomba não sai")
 	s.interact(a)
+	s.step_actor(a, {}, 1.3) # aguarda a escotilha
 	check(not a.mech, "piloto desembarca mesmo sem gasolina")
 
 	# Reembarque bloqueado até abastecer
 	a.p = s.mech.p - Vector2(30, 0); a.interact_cd = 0
 	s.interact(a)
+	s.step_actor(a, {}, 1.3) # aguarda a escotilha
 	check(not a.mech, "não embarca com o tanque vazio")
 	s.pickups.append({"p": a.p, "kind": "fuel"})
 	s.collect_pickups()
 	check(s.mech.fuel == s.FUEL_PICKUP, "galão recarrega +40%% de gasolina")
 	s.interact(a)
+	s.step_actor(a, {}, 1.3) # aguarda a escotilha
 	check(a.mech, "com gasolina o Titan volta a funcionar")
 
 	# Bateria: recarrega e reanima o Spectre

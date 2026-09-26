@@ -651,6 +651,11 @@ func step(dt: float, commands: Array) -> void:
 	effects = effects.filter(func(fx): return fx.life > 0)
 
 func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
+	if mech.get("cockpit_t", 0.0) > 0 and mech.get("cockpit_actor", -1) == a.id:
+		mech.cockpit_t = maxf(0.0, mech.cockpit_t - dt)
+		if a.dead or mech.hp <= 0: mech.cockpit_t = 0.0
+		a.move = Vector2.ZERO
+		return
 	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "combo_t", "bomb_cd"]:
 		a[timer] = maxf(0, a.get(timer, 0.0) - dt)
 	if a.dead: return
@@ -901,18 +906,28 @@ func open_secret() -> void:
 	build_navigation()
 	say("Passagem secreta revelada! Há um baú de contrabando.")
 
+func begin_cockpit(a: Dictionary, entering: bool, outside: Vector2) -> void:
+	# 0.18: estado visual serializado junto do Titan; bloqueia comandos durante a escotilha.
+	mech["cockpit_t"] = 1.2
+	mech["cockpit_actor"] = a.id
+	mech["cockpit_entering"] = entering
+	mech["cockpit_outside"] = outside
+	mech["moving"] = false
+	mech["boosting"] = false
+
 func interact(a: Dictionary) -> void:
+	if mech.get("cockpit_t", 0.0) > 0: return
 	if a.mech:
 		for offset in [Vector2(60, 0), Vector2(-60, 0), Vector2(0, 65), Vector2(0, -65)]:
 			if clear_at(a.p + offset, 12):
-				mech.occupant = -1; a.mech = false; a.p += offset; say("Desembarque. A máquina mantém os danos."); return
+				begin_cockpit(a, false, a.p + offset); mech.occupant = -1; a.mech = false; a.p += offset; say("Desembarque. A máquina mantém os danos."); return
 		say("Saída bloqueada."); return
 	for other in actors:
 		if other.active and other.id != a.id and other.dead and a.p.distance_to(other.p) < 75:
 			other.dead = false; other.hp = HEART * 1.5; other.hurt = 2; say("Parceiro reanimado!"); return
 	if mech.deployed and is_unlocked("titan") and mech.hp > 0 and mech.occupant == -1 and not a.fused and a.p.distance_to(mech.p) < 90:
 		if mech.fuel <= 0: say("Titan sem gasolina • abra os baús para achar um galão."); return
-		mech.occupant = a.id; a.mech = true; a.p = mech.p; a["fuel_warned"] = false; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Shift: turbo / E: sair • GASOLINA %.0f%%" % (mech.fuel / FUEL_MAX * 100)); return
+		begin_cockpit(a, true, a.p); mech.occupant = a.id; a.mech = true; a.p = mech.p; a["fuel_warned"] = false; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Shift: turbo / E: sair • GASOLINA %.0f%%" % (mech.fuel / FUEL_MAX * 100)); return
 	if mode == "hub":
 		var point := hub_point_near(a.p)
 		match point.get("id", ""):
@@ -1294,6 +1309,7 @@ func free_summon_position(a: Dictionary, radius: float) -> Vector2:
 	return Vector2.INF
 
 func summon_robot(a: Dictionary) -> bool:
+	if mech.get("cockpit_t", 0.0) > 0 and a.selected_robot == "titan": return false
 	if not a.active or a.dead: return false
 	if a.selected_robot == "" or not is_unlocked(a.selected_robot):
 		say("Nenhum robô desbloqueado ainda."); return false

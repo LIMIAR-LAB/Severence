@@ -16,15 +16,15 @@ func _init() -> void:
 	var a: Dictionary = s.actors[0]
 	var b: Dictionary = s.actors[1]
 	a.p = s.mech.p - Vector2(40, 0); b.p = s.mech.p + Vector2(40, 0)
-	s.interact(a); s.interact(b)
+	s.interact(a); wait_cockpit(s, a); s.interact(b)
 	check(a.mech and not b.mech and s.mech.occupant == 0, "exclusive mech seat for simultaneous requests")
 	s.damage_actor(a, 50); var health: float = s.mech.hp
-	s.interact(a); s.interact(a)
+	s.interact(a); wait_cockpit(s, a); s.interact(a); wait_cockpit(s, a)
 	check(s.mech.hp == health and a.mech, "mech integrity persists across embark/disembark")
 	s.obstacles.append(Rect2(a.p - Vector2(100, 100), Vector2(200, 200)))
-	s.interact(a)
+	s.interact(a); wait_cockpit(s, a)
 	check(a.mech, "blocked disembark preserves occupant")
-	s.obstacles.clear(); s.interact(a)
+	s.obstacles.clear(); s.interact(a); wait_cockpit(s, a)
 	check(not a.mech and s.mech.occupant == -1, "valid exit clears seat")
 	a.p = Vector2(780, 460); a.hurt = 0; a.hp = 30; a.armor = false; a.shield = 0.0
 	s.damage_actor(a, 20); check(a.hp == 20, "golpe pesado tira 1 coração")
@@ -45,12 +45,12 @@ func _init() -> void:
 	s.start_run(1942)
 	check(s.enemies[0].p != first[0].p, "different seed changes encounters")
 	s.coop = "local"; a = s.actors[0]; b = s.actors[1]
-	a.p = s.chests[0].p; s.keys = 0; s.interact(a)
+	a.p = s.chests[0].p; s.keys = 0; s.interact(a); wait_cockpit(s, a)
 	check(not s.chests[0].open, "locked chest cannot open without key")
-	s.keys = 1; s.interact(a); s.interact(a)
+	s.keys = 1; s.interact(a); wait_cockpit(s, a); s.interact(a); wait_cockpit(s, a)
 	check(s.keys == 0 and s.chests[0].open, "chest consumes exactly one key")
 	a.p = DocksMap.POINTS.shop; s.money = 15; var k: int = s.keys
-	s.interact(a); s.interact(a)
+	s.interact(a); wait_cockpit(s, a); s.interact(a); wait_cockpit(s, a)
 	check(s.money == 0 and s.keys == k + 1, "shop purchase is atomic and stock limited")
 	s.enemies.clear(); s.spawn_enemy(Vector2(1130, 6450), "brute")
 	a.p = Vector2(1100, 6450); a.aim = Vector2.RIGHT; a.slash = 0
@@ -61,7 +61,7 @@ func _init() -> void:
 	s.add_bullet(Vector2(1100, 6450), Vector2.RIGHT, 0, 10, 2000)
 	s.step_bullets(0.1)
 	check(s.enemies[0].hp == s.enemies[0].max - 10 and s.bullets.is_empty(), "fast projectile sweep hits once without tunnelling")
-	s.enemies.clear(); a.p = DocksMap.POINTS.side; s.interact(a)
+	s.enemies.clear(); a.p = DocksMap.POINTS.side; s.interact(a); wait_cockpit(s, a)
 	check(s.side_active and s.enemies.size() == 7, "optional encounter spawns seven guards")
 	s.enemies.clear(); s.step(0.016, [{}, {}])
 	check(s.side_complete and not s.side_active, "optional reward granted on completion")
@@ -79,9 +79,12 @@ func _init() -> void:
 	a.dead = true; a.hp = 0; b.p = a.p + Vector2(30, 0); s.interact(b)
 	check(not a.dead and a.hp == s.HEART * 1.5, "partner can revive downed player")
 	a.p = DocksMap.POINTS.extraction; s.boss_dead = true; var before: int = s.materials
-	s.interact(a)
+	s.interact(a); wait_cockpit(s, a)
 	check(s.mode == "hub" and s.materials == before + 3 and s.armor_unlocked, "extraction awards permanent armor and returns to hub")
 	var copy = Sim.new(); copy.apply_snapshot(s.snapshot().duplicate(true))
 	check(copy.mode == s.mode and copy.actors[0].p == s.actors[0].p, "network state roundtrip")
 	print("SIMULATION_TESTS: ", checks, " checks, ", failures, " failures")
 	quit(1 if failures else 0)
+
+func wait_cockpit(s, a: Dictionary) -> void:
+	if s.mech.get("cockpit_t", 0.0) > 0: s.step_actor(a, {}, 1.3)

@@ -30,6 +30,7 @@ var outfit_texture: Texture2D
 var marty_anim: Texture2D
 var enemy_anim: Texture2D
 var weapon_art: Dictionary = {}
+var cockpit_texture: Texture2D
 var titan_v2: Texture2D
 var docks_art: Dictionary = {}
 var cobble_texture: Texture2D
@@ -65,6 +66,7 @@ func _ready() -> void:
 	marty_anim = load(MARTY_ATLAS_PATH)
 	# 0.15: Titan fechado, sem piloto exposto, com olhos ciano no visor blindado.
 	titan_v2 = load(TITAN_ATLAS_PATH)
+	cockpit_texture = load("res://assets/mech/titan_cockpit.png")
 	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin", "rug", "stairs"]:   # 0.15: props HD (tools/make_props_hd.py)
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
 	cobble_texture = load("res://assets/environment/cobble.png")
@@ -286,7 +288,7 @@ func draw_entities() -> void:
 	else:
 		for box in sim.obstacles: drawable.append({"type": "obstacle", "data": {"r": box, "k": "crate"}, "y": box.end.y})
 	for a in sim.actors:
-		if a.active and not a.mech: drawable.append({"type": "actor", "data": a, "y": a.p.y})
+		if a.active and not a.mech and not (sim.mech.get("cockpit_t", 0.0) > 0 and sim.mech.get("cockpit_actor", -1) == a.id): drawable.append({"type": "actor", "data": a, "y": a.p.y})
 	for e in sim.enemies:
 		if seen(e.p): drawable.append({"type": "enemy", "data": e, "y": e.p.y})
 	# Cápsula Temporal: o robô só aparece quando a cápsula termina de materializá-lo.
@@ -576,6 +578,8 @@ func draw_mech(m: Dictionary) -> void:
 	if m.hp <= 0:
 		crate(Rect2(p - Vector2(40, 25), Vector2(80, 30))); text_at(p + Vector2(-40, -35), "INUTILIZADO", Color("b78c84"), 12); return
 	# Titan v2: 8 direções (5 vistas + espelho), viseira acesa quando pilotado, passada pesada.
+	if m.get("cockpit_t", 0.0) > 0:
+		draw_cockpit(m); return
 	var facing: Vector2 = titan_visual_direction(m)
 	var pose := titan_pose(facing)
 	var piloted: bool = m.occupant >= 0
@@ -610,6 +614,24 @@ func draw_mech(m: Dictionary) -> void:
 		draw_rect(Rect2(p + Vector2(-35, 16), Vector2(70 * pilot.get("boost", 1.0), 3)), Color(1, 0.8, 0.35))
 	draw_rect(Rect2(p + Vector2(-35, 10), Vector2(70, 4)), Color("161824"))
 	draw_rect(Rect2(p + Vector2(-35, 10), Vector2(70 * m.hp / 240, 4)), CYAN)
+
+func draw_cockpit(m: Dictionary) -> void:
+	var progress: float = clampf(1.0 - m.cockpit_t / 1.2, 0, 1)
+	var frame := 0
+	if progress < 0.25: frame = mini(3, int(progress / 0.25 * 4))
+	elif progress < 0.75: frame = 3
+	else: frame = maxi(0, 3 - int((progress - 0.75) / 0.25 * 4))
+	var base: Vector2 = m.p - Vector2(0, sim.height_at(m.p))
+	draw_texture_rect_region(cockpit_texture, Rect2(base + Vector2(-88,-164),Vector2(176,176)),Rect2(frame*176,0,176,176))
+	var actor: Dictionary = sim.actors[m.cockpit_actor]
+	if actor.dead: return
+	var travel := smoothstep(0.25, 0.75, progress)
+	var inside := travel if m.cockpit_entering else 1.0 - travel
+	if inside >= 0.98: return
+	var position: Vector2 = (m.cockpit_outside - Vector2(0, sim.height_at(m.cockpit_outside))).lerp(base + Vector2(0,-48),inside)
+	var size := lerpf(96.0, 42.0, inside)
+	var row: int = OUTFIT_ROW[sim.outfit_of(actor)] * 5 + (4 if m.cockpit_entering else 0)
+	draw_texture_rect_region(marty_anim,Rect2(position-Vector2(size*0.5,size*92.0/96.0),Vector2.ONE*size),Rect2(0,row*96,96,96),Color(1,1,1,1.0-inside*0.8))
 
 func draw_spectre(s: Dictionary) -> void:
 	var p: Vector2 = s.p
