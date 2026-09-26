@@ -299,6 +299,14 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 func _physics_process(dt: float) -> void:
 	frames += 1
 	ui_input_block = maxf(0, ui_input_block - dt)
+	# 0.15: hitstop (micro-pausa em abates) e slow-mo "clutch" (meio coração)
+	if playing and not paused:
+		sim.hitstop = maxf(0, sim.hitstop - dt / maxf(Engine.time_scale, 0.001))
+		var ts := 1.0
+		if sim.clutch_t > 0: ts = 0.55
+		if sim.hitstop > 0: ts = 0.12
+		Engine.time_scale = ts
+	elif Engine.time_scale != 1.0: Engine.time_scale = 1.0
 	if edge("esc", Input.is_physical_key_pressed(KEY_ESCAPE)):
 		if menu.visible: menu.close()
 		else: menu.open("main")
