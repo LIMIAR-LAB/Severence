@@ -16,6 +16,8 @@ func run() -> void:
 	app.menu.content.find_child("SoloChoice", true, false).pressed.emit()
 	check(app.menu.pending_mode == "solo" and not app.playing, "solo card selects without prematurely starting")
 	check(app.menu.screen == "equipment" and app.menu.pending_mode == "solo", "solo card opens equipment directly")
+	# O teste precisa começar com Titan, sem depender da preferência persistida em user://.
+	app.menu.outfit_choice = "padrao"; app.menu.robot_choice = "titan"
 	app.menu.launch(); app.paused = true
 	var s = app.sim
 	check(s.coop == "solo" and not s.actors[1].active and s.actors[1].dead, "solo starts without active partner")

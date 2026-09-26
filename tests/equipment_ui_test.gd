@@ -10,7 +10,7 @@ func _initialize() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
 	var ui = app.menu
-	ui.read_equipment(); ui.outfit_choice = "padrao"; ui.show_screen("equipment")
+	ui.read_equipment(); ui.outfit_choice = "padrao"; ui.preview_kind = "o_padrao"; ui.show_screen("equipment")
 	await process_frame; await process_frame
 	check(ui.slot_buttons.has("o_padrao") and ui.slot_buttons.has("o_mecanico") and ui.slot_buttons.has("o_espiao"), "3 cartões de uniforme")
 	check(ui.slot_buttons.has("armor_omega") and ui.slot_buttons.has("robot0") and ui.slot_buttons.has("robot1"), "vaga da armadura e 2 robôs")

@@ -37,6 +37,7 @@ var enemy_texture: Texture2D
 var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
+const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v2.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
@@ -56,7 +57,8 @@ func _ready() -> void:
 	fusion_texture = load("res://assets/marty/spectre-fusion.png")
 	warden_texture = load("res://assets/enemies/warden.png")
 	outfit_texture = load("res://assets/marty/outfits.png")
-	marty_anim = load("res://assets/marty/marty_anim.png")
+	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
+	marty_anim = load(MARTY_ATLAS_PATH)
 	titan_v2 = load("res://assets/mech/titan_v2.png")
 	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin"]:
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
