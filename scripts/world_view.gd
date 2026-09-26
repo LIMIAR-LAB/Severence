@@ -65,7 +65,7 @@ func _ready() -> void:
 	marty_anim = load(MARTY_ATLAS_PATH)
 	# 0.15: Titan fechado, sem piloto exposto, com olhos ciano no visor blindado.
 	titan_v2 = load(TITAN_ATLAS_PATH)
-	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin"]:
+	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin", "rug", "stairs"]:   # 0.15: props HD (tools/make_props_hd.py)
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
 	cobble_texture = load("res://assets/environment/cobble.png")
 	enemy_anim = load("res://assets/enemies/docas_anim.png")
@@ -150,10 +150,19 @@ func draw_expedition_ground() -> void:
 	for ramp in sim.ramps:
 		var r: Rect2 = ramp.r
 		if not seen(r.get_center()): continue
-		draw_rect(r, Color("6d665f"))
-		for n in range(int(r.size.x / 20)):
-			var x: float = r.position.x + n * 20
-			draw_rect(Rect2(x, r.position.y, 16, r.size.y), Color("857c73")); draw_line(Vector2(x, r.position.y), Vector2(x, r.end.y), Color("b2a498"), 2)
+		# 0.15: degraus de pedra (azulejo 64×64); o lado alto fica mais claro
+		var y := r.position.y
+		while y < r.end.y:
+			var h := minf(64.0, r.end.y - y)
+			var x := r.position.x
+			while x < r.end.x:
+				var w := minf(64.0, r.end.x - x)
+				draw_texture_rect_region(docks_art.stairs, Rect2(x, y, w, h), Rect2(0, 0, w, h))
+				x += 64.0
+			y += 64.0
+		var high_left: bool = ramp.high < ramp.low
+		draw_rect(Rect2(r.position.x if high_left else r.end.x - 24, r.position.y, 24, r.size.y), Color(1, 0.95, 0.85, 0.08))
+		draw_rect(Rect2(r.end.x - 24 if high_left else r.position.x, r.position.y, 24, r.size.y), Color(0, 0, 0, 0.18))
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
@@ -212,7 +221,7 @@ func draw_decor(d: Dictionary) -> void:
 			for k in range(6):
 				draw_line(p + Vector2(k * 12 - 36, -20), p + Vector2(k * 12 - 26, 24), Color(0.55, 0.5, 0.4, 0.6), 1)
 				draw_line(p + Vector2(-40, k * 8 - 20), p + Vector2(36, k * 8 - 16), Color(0.55, 0.5, 0.4, 0.6), 1)
-		"rug": draw_rect(Rect2(p - Vector2(70, 160), Vector2(140, 330)), Color(0.45, 0.1, 0.14, 0.7)); draw_rect(Rect2(p - Vector2(62, 152), Vector2(124, 314)), Color(0.6, 0.45, 0.2, 0.5), false, 3)
+		"rug": draw_texture(docks_art.rug, p - Vector2(70, 160))
 
 func draw_obstacle(box: Rect2, kind: String) -> void:
 	if scenery.has_prop(kind) or kind == "crate_row":
@@ -457,7 +466,7 @@ func draw_capsule() -> void:
 		for k in range(4): draw_circle(P - Vector2(0, 70), 90 + k * 26 + sin(t * 2 + k) * 6, Color(0.35, 0.9, 1, 0.05))
 		draw_rect(Rect2(P.x - 30, P.y - 1400, 60, 1260), Color(0.5, 1, 1, 0.08 + 0.04 * sin(t * 3)))
 	draw_texture(tex, origin, Color.WHITE if active else Color(0.62, 0.62, 0.7))
-	var glass := Rect2(origin + Vector2(36, 54), Vector2(78, 130))
+	var glass := Rect2(origin + Vector2(32, 62), Vector2(86, 128))
 	if active:
 		var pulse := 0.5 + 0.5 * sin(t * 4)
 		draw_rect(glass, Color(0.45, 0.95, 1, 0.25 + 0.2 * pulse))
@@ -687,6 +696,9 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 	draw_set_transform(Vector2.ZERO)
 
 func draw_chest(chest: Dictionary) -> void:
+	# 0.15: baú da folha docks12 (fechado / aberto) com tremida e brilho ao abrir
+	if scenery and scenery.props.has("chest"):
+		draw_chest_hd(chest); return
 	var p: Vector2 = chest.p
 	var tex: Texture2D = dock_art.chest
 	var ts := tex.get_size()
@@ -1088,3 +1100,27 @@ func draw_fx_013(fx: Dictionary) -> void:
 			scenery.lights.append({"p": p, "kind": "bulb"})
 		"recoil":
 			draw_circle(p - Vector2(0, 50) - fx.get("dir", Vector2.RIGHT) * 20 * t, 16 * t + 4, Color(0.7, 0.7, 0.72, 0.4 * (1 - t)))
+
+func draw_chest_hd(chest: Dictionary) -> void:
+	var p: Vector2 = chest.p
+	var closed: Texture2D = scenery.props.chest
+	var opened: Texture2D = scenery.props.chest_open
+	draw_set_transform(p + Vector2(0, 6), 0, Vector2(1, 0.35)); draw_circle(Vector2.ZERO, 34, Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+	var s := 0.66
+	if not chest.open:
+		var bob := sin(sim.tick_time * 2.0 + p.x) * 1.0
+		var sz := closed.get_size() * s
+		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false)
+		var glint := fposmod(sim.tick_time * 0.7 + p.x * 0.01, 3.0)
+		if glint < 0.3: draw_circle(p + Vector2(-sz.x * 0.4 + glint * sz.x * 2.6, -sz.y + 18), 2.5, Color(1, 1, 0.85, 0.85))
+		return
+	var t: float = sim.tick_time - chest.get("t", -99.0)
+	var shake := Vector2(sin(t * 90) * 2.5, 0) if t < 0.22 else Vector2.ZERO
+	var tex: Texture2D = closed if t < 0.22 else opened
+	var pop := 1.0 + 0.12 * maxf(0, 1.0 - absf(t - 0.3) / 0.15) if t < 0.5 else 1.0
+	var sz2 := tex.get_size() * s * pop
+	draw_texture_rect(tex, Rect2(p + shake - Vector2(sz2.x * 0.5, sz2.y - 8), sz2), false, Color(1, 1, 1).darkened(0.25 if t > 3.0 else 0.0))
+	if t > 0.22 and t < 3.0:
+		var glow := 0.6 + 0.4 * sin(sim.tick_time * 5)
+		scenery.lights.append({"p": p - Vector2(0, 30), "kind": "bulb"})
+		draw_circle(p - Vector2(0, 34), 14 * glow, Color(1, 0.85, 0.4, 0.25 * glow))

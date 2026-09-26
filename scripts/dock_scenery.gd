@@ -106,7 +106,7 @@ func pick_plank(ix: int, iy: int) -> String:
 func pick_granite(ix: int, iy: int) -> String:
 	if hash01(ix, iy, 3) < 0.8: return "granite_base"
 	var r := hash01(ix, iy, 4)
-	return "granite_moss" if r < 0.5 else ("granite_cracked" if r < 0.96 else "granite_puddle")
+	return "granite_moss" if r < 0.5 else "granite_cracked"   # 0.15: sem a poça quadrada (destoava)
 
 func tile_area(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, origin: Vector2 = Vector2.ZERO, tint: Color = Color.WHITE, yellow_row: int = -99) -> void:
 	var area := rect.intersection(view)

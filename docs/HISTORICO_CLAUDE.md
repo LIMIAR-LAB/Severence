@@ -19,6 +19,7 @@ Os detalhes de cada versão ficam nos documentos por tema, indicados em cada ite
 | 0.13 | Tela inicial animada | `scripts/menu_background.gd`, `shaders/menu_bg.gdshader` |
 | 0.14 | Retratos estilo Toriyama, tela de Equipamento v2, Ômega lendária, navegação por controle | este documento |
 | 0.14 | Correção: vida inicial fixa em 3 corações; STATUS da tela calculado das constantes reais | este documento |
+| 0.15 | Props HD do cenário: pilar, gerador, altar, bancos, munição, velas, poça, rachadura, tapete, degraus, cápsula; baú da folha docks12 | este documento |
 
 A 0.14 também tem o Warden e o combustível do Titan, feitos pelo Codex. Veja o commit `75adfc3`.
 
@@ -107,6 +108,21 @@ Prévia: `tools/preview_menu_bg.gd` → `art/menu-animado-preview.gif`.
 - A bancada do Refúgio avisa "em breve" e não gasta fragmentos.
 - **Ainda em aberto:** como aumentar a vida (itens, bancada, chefe...). Quando decidirmos, basta mexer em `max_hp()` e na bancada (`interact`, caso `"bench"`).
 
+## Props HD do cenário (0.15)
+
+- `tools/make_props_hd.py` redesenha em pixel art os props que ainda eram blocos simples. Todos ficam em `assets/environment/docks/`, com o mesmo nome e tamanho, então o código não muda.
+- Novos no jogo:
+  - `rug.png`: tapete da Capela, antes um retângulo;
+  - `stairs.png`: degraus das rampas do Balcão do Farol;
+  - baú fechado/aberto da folha docks12 (`draw_chest_hd`), com tremida, "pop" e brilho.
+- Estilo:
+  - contorno de 1 px;
+  - luz de cima e da esquerda;
+  - rebites, musgo, desgaste;
+  - hexágono laranja da Cápsula Temporal na cápsula de extração.
+- O piso de granito não usa mais a "poça quadrada" (`granite_puddle`), que destoava.
+- Prévia: `art/props-hd-preview.png`. Teste: `tests/props_hd_test.gd`.
+
 ## Testes
 
 Rode cada um com `--headless --path . --script tests/<nome>.gd`. Todos devem terminar com 0 falhas.
@@ -126,6 +142,7 @@ Rode cada um com `--headless --path . --script tests/<nome>.gd`. Todos devem ter
 | `warden_test` | Mini-chefe Warden |
 | `summon_fx_test` | Cápsula Temporal |
 | `equipment_ui_test` | Tela de Equipamento v2, foco, LB/RB, Ômega lendária (guarda e devolve `user://settings.json`) |
+| `props_hd_test` | Props HD carregam no tamanho certo e têm detalhe |
 | `hearts_stats_test` | 3 corações fixos, bancada congelada, STATUS = números reais do tiro, do Titan, da Ômega e do Spectre |
 
 Os testes de interface mexem nas preferências salvas. Se um teste de robô falhar por causa de uma escolha salva, apague o `user://settings.json`.
