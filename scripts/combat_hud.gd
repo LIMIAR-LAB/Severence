@@ -100,6 +100,12 @@ func _draw() -> void:
 	var robot_max: float = 240 if a.selected_robot == "titan" else 100
 	text(Vector2(30,699), a.selected_robot.to_upper() + (" • FUSÃO" if a.fused else ""), 16, CYAN)
 	draw_rect(Rect2(30,711,188,12), Color("26323a")); draw_rect(Rect2(30,711,188*robot_hp/robot_max,12),Color("89d859"))
+	if a.selected_robot == "titan":
+		# 0.14: barra de gasolina do Titan
+		var fuel: float = s.mech.get("fuel", 0.0) / s.FUEL_MAX
+		draw_rect(Rect2(30,727,140,7), Color("26323a"))
+		draw_rect(Rect2(30,727,140*fuel,7), Color("e8a33d") if fuel > 0.2 else Color("d04430"))
+		text(Vector2(176,734), "GAS", 11, Color("e8a33d"))
 	text(Vector2(30,746), "C • INVOCAR / RECOLHER" if a.summon_cd <= 0 else "RECARGA • %.1fs" % a.summon_cd, 12)
 	text(Vector2(30,768), "G • SEPARAR" if a.fused else "E • PILOTAR   G • FUNDIR", 12, GOLD)
 	draw_set_transform(Vector2(dx, dy))

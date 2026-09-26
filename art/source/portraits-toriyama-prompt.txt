@@ -1,0 +1,62 @@
+RETRATOS DA TELA DE EQUIPAMENTO — homenagem ao traço de Akira Toriyama
+=======================================================================
+Onde salvar: assets/ui/portraits/<nome>.png, 738x610 px (o jogo troca a imagem sozinho).
+Referências para anexar: art/source/marty-outfits-v1.png (roupas), assets/ui/menu.png (clima do jogo),
+assets/mech/titan_v2.png (Titan com viseira). Gere todos na mesma sessão para manter o traço igual.
+
+Não peça personagens dele (Goku, Arale, Dragon Quest etc.): só o estilo. Nada de texto, logo ou marca-d'água.
+
+--- ESTILO (colar no início de todos) ---
+Style: hand-drawn anime/manga illustration in homage to Akira Toriyama's late-80s/90s color art
+(Dragon Ball / Dr. Slump / Dragon Quest era): clean confident black ink lines with varied weight,
+simple cel shading with one crisp shadow tone and a bright rim highlight, saturated flat colors,
+big expressive eyes and friendly cocky grin, chunky rounded mechanical designs full of rivets,
+vents, bolts and panel lines, playful dynamic pose, slight low-angle hero shot.
+Character stands on a small hexagonal orange-and-dark-steel platform, feet visible, centered, full body,
+filling about 80% of the height. Background: soft, painterly night harbor of 1941 London (brick
+warehouses, dock cranes, distant fires and searchlights), out of focus, dark blue with warm orange
+glows, with a large soft glow behind the character in the character's accent color.
+Aspect 738x610 (landscape, a bit wider than tall). No text, no UI, no frame, no watermark.
+
+--- 1) o_padrao.png ---
+Subject: MARTY, a cheerful cocky young adult pilot (not a child, not muscular). Messy spiky brown hair,
+cyan pilot goggles on forehead, brown shearling flight jacket with cream fur collar, white shirt with a
+small cyan glowing chest emblem, cyan tech gauntlets, dark blue trousers, chunky boots with cyan soles.
+Holds a compact silver-and-cyan retro-futuristic blaster pistol pointing up next to his face, winking.
+Accent color: cyan.
+
+--- 2) o_mecanico.png ---
+Subject: the same MARTY as the MECHANIC skin: goggles on forehead, white tank top with grease stains,
+bandaged forearms, olive-green work trousers with a tool belt full of screwdrivers and bolts, brown boots.
+Rests a huge wrench on his shoulder with one hand, rivet shotgun in the other, confident smirk, a smudge
+of grease on his cheek. Accent color: warm orange (sparks and welding glow around him).
+
+--- 3) o_espiao.png ---
+Subject: the same MARTY as the SPY skin: brown flat newsboy cap, round dark sunglasses, long charcoal
+trench coat, bright red scarf fluttering in the wind, black gloves, holds a 1940s drum-magazine submachine
+gun low; sly grin, one eyebrow raised, noir mood. Accent color: red with a cold blue backlight.
+
+--- 4) armor_omega.png ---
+Subject: MARTY wearing the OMEGA ARMOR: sleek white and gold sci-fi armor with rounded plates, glowing
+cyan T-shaped visor helmet, shoulder thrusters with cyan flames, a torn royal-blue cape, and a big
+glowing cyan energy blade held diagonally in front of him. Power-up moment: crackling cyan aura and
+golden sparks around him, hair of energy rising from the thrusters. Accent color: cyan and gold.
+
+--- 5) titan.png ---
+Subject: TITAN-01, a heavy olive-green retro war mech (rounded barrel-shaped torso, big round shoulder
+pads with stars, glowing cyan reactor core in the chest, dark visor band with two glowing cyan eyes,
+rotary minigun on the right arm, big fist on the left). No open cockpit, no visible pilot. Toriyama-style
+chunky cute-but-tough robot, slightly worn paint and rivets, standing proud on the platform, steam from vents.
+Accent color: cyan with warm orange rim light.
+
+--- 6) spectre.png ---
+Subject: SPECTRE, Marty's feral symbiote companion, REDESIGNED to match the same cute cartoon style as
+Marty (the current one looks too realistic and dark). A panther-sized shadow creature, dark indigo/violet
+body with glowing cyan crack lines, big glowing cyan eyes with a mischievous look, toothy grin (friendly-
+menacing, not gory), four stubby clawed paws, a few bouncy tentacles on its back that curl like cartoon
+flames, long curly tail. Crouching playfully, ready to pounce. Accent color: violet with cyan highlights.
+
+--- EXTRA (opcional): folha de sprites do novo Spectre para o jogo ---
+Use o prompt de "spectre-feral-source" com o design do item 6: 4 linhas (frente, esquerda, direita, costas)
+x 4 colunas (parado, passo 1, passo 2, ataque com boca aberta), fundo magenta #ff00ff puro, contorno escuro,
+pixel art no mesmo tamanho e traço do Marty em marty-outfits-v1.png. Salvar em art/source/spectre-v2-source.png.

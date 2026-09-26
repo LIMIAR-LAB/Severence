@@ -242,6 +242,18 @@ func draw_entities() -> void:
 		if pickup.kind == "key":
 			draw_circle(p - Vector2(0, 10), 16, Color(1, 0.85, 0.4, 0.15))
 			draw_texture_rect(docks_art.key, Rect2(p - Vector2(12, 26), Vector2(24, 27)), false)
+		elif pickup.kind == "fuel":
+			# Galão de gasolina (0.14): corpo vermelho com alça escura
+			draw_circle(p - Vector2(0, 10), 17, Color(1, 0.5, 0.25, 0.15))
+			draw_rect(Rect2(p - Vector2(7, 26), Vector2(14, 19)), Color(0.75, 0.16, 0.12))
+			draw_rect(Rect2(p - Vector2(7, 26), Vector2(14, 4)), Color(0.9, 0.3, 0.2))
+			draw_rect(Rect2(p - Vector2(4, 31), Vector2(8, 4)), Color(0.35, 0.2, 0.16))
+		elif pickup.kind == "battery":
+			# Bateria (0.14): célula ciano com polo positivo
+			draw_circle(p - Vector2(0, 10), 17, Color(0.4, 0.9, 1, 0.15))
+			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 18)), Color(0.15, 0.55, 0.65))
+			draw_rect(Rect2(p - Vector2(2, 28), Vector2(4, 4)), Color(0.7, 0.95, 1))
+			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 3)), Color(0.85, 0.75, 0.3))
 		else: draw_texture_rect(docks_art.coin, Rect2(p - Vector2(8, 18), Vector2(16, 18)), false)
 	var drawable: Array = []
 	if sim.mode == "run":

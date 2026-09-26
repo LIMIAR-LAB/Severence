@@ -36,7 +36,7 @@ const GAPS := [Rect2(5480, 5900, 80, 780), Rect2(7950, 1200, 80, 700), Rect2(650
 const POINTS := {
 	"spawn": Vector2(820, 6480), "spawn2": Vector2(880, 6540), "key": Vector2(1450, 6560), "shop": Vector2(8950, 6170),
 	"side": Vector2(8950, 4450), "secret_wall": Vector2(6540, 3740), "boss": Vector2(4200, 1200), "extraction": Vector2(4200, 720),
-	"mech": Vector2(9250, 6700), "ammo_center": Vector2(7050, 4350)}
+	"mech": Vector2(9250, 6700), "ammo_center": Vector2(7050, 4350), "warden": Vector2(4850, 4350)}
 const CHESTS := [[6150, 6080, false], [850, 3800, false], [8850, 1400, false], [6350, 1150, true]]
 
 # Bordas: top facade|wall|none • bottom wall|quay|none • left/right wall|pier • quay_band = faixa de granito

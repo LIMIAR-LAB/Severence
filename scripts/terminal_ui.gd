@@ -1,6 +1,7 @@
 class_name TemporalTerminal
 extends Control
 const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
+const MenuBackground = preload("res://scripts/menu_background.gd")
 
 # Supplied concept screens form the decorative layer. Every active region is a
 # real Control; editable text, selections, previews and statuses are live.
@@ -67,7 +68,10 @@ func show_screen(next: String) -> void:
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null
 	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "equipment" if next == "equipment" else "menu") + ".png")
 	if next == "play": bg.texture = load("res://assets/ui/adventure.png")
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(bg)
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if bg.texture.resource_path.ends_with("menu.png"):
+		bg.free(); content.add_child(MenuBackground.new())   # tela inicial animada
+	else: content.add_child(bg)
 	match next:
 		"main": build_main()
 		"online": build_online()
@@ -316,9 +320,16 @@ func refresh_gear() -> void:
 	var uni: Dictionary = sim.UNIFORMS[outfit_choice]
 	var armor: Dictionary = sim.ARMORS.omega
 	var rows_by_key := {"o_padrao": 0, "o_espiao": 1, "o_mecanico": 2, "armor_omega": 3}
-	if preview_kind == "titan": preview.texture = atlas("res://assets/mech/titan_v2.png", Rect2(880, 0, 176, 176))
+	# retrato de vitrine (tools/make_portraits.py); cai no sprite do jogo se não existir
+	var portrait := "res://assets/ui/portraits/%s.png" % preview_kind
+	if ResourceLoader.exists(portrait):
+		preview.texture = load(portrait); preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		preview.position = Vector2(478, 39); preview.size = Vector2(369, 305)
+	elif preview_kind == "titan": preview.texture = atlas("res://assets/mech/titan_v2.png", Rect2(880, 0, 176, 176))
 	elif preview_kind == "spectre": preview.texture = atlas("res://assets/mech/spectre-feral.png", Rect2(0, 0, 128, 128))
 	else: preview.texture = atlas("res://assets/marty/outfits.png", Rect2(0, 96 * rows_by_key.get(preview_kind, 0), 96, 96))
+	if not ResourceLoader.exists(portrait):
+		preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; preview.position = Vector2(525, 66); preview.size = Vector2(270, 265)
 	info_title.text = "UNIFORME " + uni.name
 	info_body.text = uni.desc + "\nArma: " + uni.weapon_name
 	armor_body.text = "ÔMEGA • R • 5s / recarga 60s\nLâmina: 38/38/64, final com onda.\nVelocidade 430 • resistência 60%.\nTiros: mínimo de 1 coração após resistência. Baús recarregam."

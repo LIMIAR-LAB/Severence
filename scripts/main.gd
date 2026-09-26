@@ -389,7 +389,7 @@ func update_hud() -> void:
 	var guns := ["PISTOLA", "ESCOPETA", "AUTOMÁTICA"]
 	var area := "REFÚGIO" if sim.mode == "hub" else ("ARENA • ONDA " + str(sim.arena_wave) if sim.mode == "arena" else "DOCAS • SEED " + str(sim.seed_value))
 	var dash_status := "DASH PRONTO" if a.dodge_cd <= 0 else "DASH %.1fs" % a.dodge_cd
-	hud.text = "MARTY  %03d HP   %s   %s     |     ECHO %03d HP • %s     |     TITAN %03d\n%s    CHAVES %d    MOEDAS %d    FRAGMENTOS %d    %s    %s" % [int(a.hp), "COM ARMADURA" if a.armor else "SEM ARMADURA", guns[a.gun], int(b.hp), sim.coop.to_upper(), int(sim.mech.hp), dash_status, sim.keys, sim.money, sim.materials, area, network_status]
+	hud.text = "MARTY  %03d HP   %s   %s     |     ECHO %03d HP • %s     |     TITAN %03d • GAS %d%%\n%s    CHAVES %d    MOEDAS %d    FRAGMENTOS %d    %s    %s" % [int(a.hp), "COM ARMADURA" if a.armor else "SEM ARMADURA", guns[a.gun], int(b.hp), sim.coop.to_upper(), int(sim.mech.hp), int(sim.mech.get("fuel", 0.0) / sim.FUEL_MAX * 100), dash_status, sim.keys, sim.money, sim.materials, area, network_status]
 	if sim.coop == "solo": hud.text = hud.text.replace("ECHO %03d HP • SOLO" % int(b.hp), "SINGLE PLAYER • SEM PARCEIRO")
 	var controlled: Dictionary = sim.actors[1] if online and not hosting else a
 	var robot_status := "C: %s %s" % [controlled.selected_robot.to_upper(), "PRONTO" if controlled.summon_cd <= 0 else "%.1fs" % controlled.summon_cd]

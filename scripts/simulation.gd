@@ -147,7 +147,8 @@ func outfit_of(a: Dictionary) -> String:
 	return "omega" if a.armor else a.get("outfit", "padrao")
 
 func new_mech(pos: Vector2) -> Dictionary:
-	return {"p": pos, "hp": 240.0, "occupant": -1, "aim": Vector2.RIGHT, "step": 0.0, "deployed": true, "owner": -1}
+	# 0.14: o Titan consome gasolina enquanto pilotado — começa com tanque parcial.
+	return {"p": pos, "hp": 240.0, "fuel": 70.0, "occupant": -1, "aim": Vector2.RIGHT, "step": 0.0, "deployed": true, "owner": -1}
 
 func reset_spectres() -> void:
 	spectres = []
@@ -263,6 +264,7 @@ func start_run(new_seed: int) -> void:
 		if not clear_at(pos, 16): pos = Vector2(sp[0], sp[1])
 		spawn_enemy(pos, pool[rng.randi_range(0, pool.size() - 1)])
 	spawn_enemy(P.boss, "boss")
+	spawn_enemy(P.warden, "warden")
 	pickups.append({"p": P.key, "kind": "key"})
 	build_navigation()
 	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. A armadura carrega em 60s.")
@@ -427,6 +429,8 @@ func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
 	uid += 1
 	# 0.11: inimigos mais resistentes (≈ +50% de vida) e o Almirante com 600.
 	var hp: float = {"boss": 600.0, "brute": 95.0, "fish": 66.0, "crawler": 45.0, "crawler_small": 18.0}.get(kind, 52.0)
+	if kind == "warden": hp = 420.0
+	elif kind != "boss": hp *= 1.25
 	enemies.append({"id": uid, "p": pos, "kind": kind, "hp": hp, "max": hp, "cd": rng.randf_range(0.5, 1.5), "phase": 0, "hurt": 0.0, "side": optional,
 		"room": room_at(pos).get("id", "") if mode == "run" else "",
 		"face": Vector2.DOWN, "moving": false, "shot": 0.0, "stage": 1, "charge": 0.0, "spin": 0.0, "spin_angle": 0.0, "step": 0.0,
@@ -619,6 +623,14 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 			boosting = true; speed = 420.0; a.boost = maxf(0, a.boost - dt / 2.4)
 			if int(tick_time * 30) % 2 == 0: effects.append({"p": a.p - moving.normalized() * 30, "kind": "thrust", "life": 0.3, "max": 0.3, "dir": -moving.normalized()})
 		else: a.boost = minf(1.0, a.boost + dt / 3.5)
+		# 0.14: combustível — tanque vazio para o Titan no lugar (motor morre).
+		var drain: float = (FUEL_MOVE if moving.length() > 0.1 else FUEL_IDLE) + (FUEL_BOOST if boosting else 0.0)
+		mech.fuel = maxf(0, mech.fuel - drain * dt)
+		if mech.fuel <= 0:
+			speed = 0.0
+			if not a.get("fuel_warned", false): a["fuel_warned"] = true; say("TITAN SEM GASOLINA • procure um galão nos baús.")
+		elif mech.fuel < 20.0 and not a.get("fuel_warned", false): a["fuel_warned"] = true; say("Gasolina no fim • procure um galão nos baús.")
+		elif mech.fuel >= 20.0: a["fuel_warned"] = false
 	mech["boosting"] = boosting and a.mech
 	if a.get("snare", 0.0) > 0 and not a.mech: speed *= 0.4  # preso pelo arpão
 	if a.dodge > 0:
@@ -643,7 +655,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	if a.armor and not a.mech:
 		if (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
 	else:
-		if cmd.get("fire", false) and a.shot <= 0: fire_actor(a)
+		if cmd.get("fire", false) and a.shot <= 0 and not (a.mech and mech.fuel <= 0): fire_actor(a)
 		if cmd.get("melee", false) and a.slash <= 0: melee(a)
 	if cmd.get("interact", false) and a.interact_cd <= 0:
 		a.interact_cd = 0.4; interact(a)
@@ -651,14 +663,24 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.mech: throw_bomb(a)   # no Titan, R / LB lança uma bomba
 		else: toggle_armor(a)
 
-# ── Titan: canhão pesado e bombas ────────────────────────────────────────────
+# ── Titan: canhão pesado, bombas e combustível (0.14) ─────────────────────────
 # Canhão: projétil grande e lento que explode no impacto (dano em área).
 const MECH_SHELL := {"damage": 70.0, "speed": 330.0, "radius": 14.0, "cooldown": 0.85, "splash": 80.0, "splash_damage": 34.0}
+# Gasolina: o Titan só funciona pilotado enquanto houver fuel. Baús dão galões.
+const FUEL_MAX := 100.0
+const FUEL_IDLE := 0.15     # por segundo, parado pilotando
+const FUEL_MOVE := 0.8      # por segundo, andando
+const FUEL_BOOST := 1.6     # por segundo extra com o turbo
+const FUEL_SHOT := 1.2      # por disparo do canhão pesado
+const FUEL_BOMB := 4.0      # por bomba arremessada
+const FUEL_PICKUP := 40.0   # galão de gasolina dos baús
+const BATTERY_PICKUP := 50.0  # bateria: recarrega a energia do Spectre
 # Bomba: arremessada em arco por cima de obstáculos, explode ao cair.
 const MECH_BOMB := {"range": 320.0, "flight": 0.8, "radius": 125.0, "damage": 95.0, "cooldown": 2.6}
 
 func throw_bomb(a: Dictionary) -> void:
-	if a.get("bomb_cd", 0.0) > 0: return
+	if a.get("bomb_cd", 0.0) > 0 or mech.fuel <= 0: return
+	mech.fuel = maxf(0, mech.fuel - FUEL_BOMB)
 	var target: Vector2 = a.p + a.aim * MECH_BOMB.range
 	bullets.append({"p": a.p, "v": Vector2.ZERO, "team": 0, "damage": MECH_BOMB.damage, "r": 10.0, "life": MECH_BOMB.flight + 1.0,
 		"owner": a.id, "kind": "bomb", "from": a.p, "to": target, "t": 0.0})
@@ -712,6 +734,7 @@ func fire_actor(a: Dictionary) -> void:
 			count = 2; damage = 24; cooldown = 0.2; speed = 860; radius = 7; spread = 0.05; kind = "p_omega"; pierce = 2
 		"mech":
 			damage = MECH_SHELL.damage; cooldown = MECH_SHELL.cooldown; radius = MECH_SHELL.radius; speed = MECH_SHELL.speed; kind = "p_heavy"
+			mech.fuel = maxf(0, mech.fuel - FUEL_SHOT)
 	if a.fused: damage *= 1.35; cooldown *= 0.8
 	for n in range(count):
 		var direction: Vector2 = a.aim.rotated((n - (count - 1) / 2.0) * spread)
@@ -795,7 +818,8 @@ func interact(a: Dictionary) -> void:
 		if other.active and other.id != a.id and other.dead and a.p.distance_to(other.p) < 75:
 			other.dead = false; other.hp = HEART * 1.5; other.hurt = 2; say("Parceiro reanimado!"); return
 	if mech.deployed and mech.hp > 0 and mech.occupant == -1 and not a.fused and a.p.distance_to(mech.p) < 90:
-		mech.occupant = a.id; a.mech = true; a.p = mech.p; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Soco: corpo a corpo / Shift: turbo / E: sair"); return
+		if mech.fuel <= 0: say("Titan sem gasolina • abra os baús para achar um galão."); return
+		mech.occupant = a.id; a.mech = true; a.p = mech.p; a["fuel_warned"] = false; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Shift: turbo / E: sair • GASOLINA %.0f%%" % (mech.fuel / FUEL_MAX * 100)); return
 	if mode == "hub":
 		var point := hub_point_near(a.p)
 		match point.get("id", ""):
@@ -831,8 +855,11 @@ func interact(a: Dictionary) -> void:
 				keys -= 1; chest.open = true; chest["t"] = tick_time; money += 10
 				heal(a, 1); a.armor_cd = 0.0
 				effects.append({"p": chest.p, "kind": "chest_burst", "life": 1.3, "max": 1.3, "secret": chest.secret})
+				# 0.14: os baús sempre soltam um galão de gasolina e uma bateria ao lado.
+				pickups.append({"p": chest.p + Vector2(46, 18), "kind": "fuel"})
+				pickups.append({"p": chest.p + Vector2(-46, 18), "kind": "battery"})
 				if chest.secret: materials += 1
-				say("+10 moedas, +25 de vida e ARMADURA RECARREGADA (R)" + (" + fragmento!" if chest.secret else ".")); return
+				say("+10 moedas, +1 coração, ARMADURA (R), galão e bateria" + (" + fragmento!" if chest.secret else ".")); return
 		if a.p.distance_to(DOCKS.POINTS.shop) < 110:
 			if shop_bought: say("Comerciante: estoque esgotado nesta expedição.")
 			elif money >= 15:
@@ -913,9 +940,11 @@ func step_enemies(dt: float) -> void:
 		e["alerted"] = true
 		var direction: Vector2 = (target.p - e.p).normalized()
 		e.face = direction
+		if e.kind == "warden": step_warden(e, target, direction, closest, dt); continue
 		if e.kind == "boss": step_boss(e, target, direction, closest, dt); continue
 		var preferred: float = {"cult": 240.0, "fish": 210.0, "brute": 220.0, "crawler": 110.0, "crawler_small": 18.0}.get(e.kind, 120.0)
 		var speed: float = {"cult": 100.0, "fish": 85.0, "brute": 95.0, "crawler": 140.0, "crawler_small": 170.0}.get(e.kind, 100.0)
+		speed *= 1.2
 		if closest > preferred:
 			var before: Vector2 = e.p
 			e.p = move_body(e.p, direction * speed * dt, 14)
@@ -942,6 +971,7 @@ func step_enemies(dt: float) -> void:
 			"crawler_small":
 				e.cd = 0.55
 				if closest < 34: damage_actor(target, 8)
+		e.cd *= 0.85
 	for e in enemies:
 		if e.hp > 0: continue
 		money += 4
@@ -954,6 +984,35 @@ func step_enemies(dt: float) -> void:
 		if e.kind == "boss": boss_dead = true; say("O Almirante afundou! Use o portal da arena para recuperar o núcleo e retornar.")
 	enemies = enemies.filter(func(e): return e.hp > 0)
 	for item in spawned: spawn_enemy(item[0], "crawler_small", item[1])
+
+func step_warden(e: Dictionary, target: Dictionary, direction: Vector2, closest: float, dt: float) -> void:
+	var state: String = e.get("attack_state", "hunt")
+	e["attack_time"] = maxf(0, e.get("attack_time", 0.0) - dt)
+	if state == "warning":
+		e.face = e.charge_dir
+		if e.attack_time <= 0: e.attack_state = "charge"; e.attack_time = 0.4
+		return
+	if state == "charge":
+		e.face = e.charge_dir
+		var before: Vector2 = e.p
+		e.p = move_body(e.p, e.charge_dir * 850.0 * dt, 48)
+		e.moving = true; e.step += dt * 18
+		# Sweep contact along the actual collision-constrained movement.
+		for a in actors:
+			if a.active and not a.dead and Geometry2D.get_closest_point_to_segment(a.p, before, e.p).distance_to(a.p) < 62 and line_of_fire(e.p, a.p): damage_actor(a, 32)
+		if e.attack_time <= 0 or e.p.distance_to(before) < 850.0 * dt * 0.8:
+			e.attack_state = "recover"; e.attack_time = 0.9
+		return
+	if state == "recover":
+		if e.attack_time <= 0: e.attack_state = "hunt"; e.cd = 0.45
+		return
+	e.cd -= dt
+	if closest < 560 and e.cd <= 0 and line_of_fire(e.p, target.p):
+		e["attack_state"] = "warning"; e.attack_time = 0.55; e["charge_dir"] = direction
+		return
+	var before: Vector2 = e.p
+	e.p = move_body(e.p, direction * 300.0 * dt, 48)
+	e.moving = e.p.distance_to(before) > 0.1; e.step += dt * 10
 
 func enrage_scale(e: Dictionary) -> float:
 	return BOSS_ENRAGE_SCALE if e.get("enraged", false) else 1.0
@@ -1025,7 +1084,7 @@ func step_bullets(dt: float) -> void:
 				break
 			if b.team == 0:
 				for e in enemies:
-					if b.p.distance_to(e.p) < (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19)) + b.r:
+					if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
 						var hits: Array = b.get("hits", [])
 						if hits.has(e.id): continue
 						e.hp -= b.damage; e.hurt = 0.12; e["alerted"] = true
@@ -1061,6 +1120,12 @@ func collect_pickups() -> void:
 		for a in actors:
 			if a.active and not a.dead and a.p.distance_to(pickup.p) < 32:
 				if pickup.kind == "key": keys += 1
+				elif pickup.kind == "fuel":
+					mech.fuel = minf(FUEL_MAX, mech.fuel + FUEL_PICKUP); say("GALÃO DE GASOLINA • Titan +%.0f%% de combustível" % (FUEL_PICKUP / FUEL_MAX * 100))
+				elif pickup.kind == "battery":
+					var bs: Dictionary = spectres[a.id]
+					if bs.hp <= 0: bs.state = "stored"   # bateria reanima um Spectre destruído
+					bs.hp = minf(100.0, bs.hp + BATTERY_PICKUP); say("BATERIA • Spectre recarregado")
 				else: money += 2
 				pickup["taken"] = true; break
 	pickups = pickups.filter(func(p): return not p.get("taken", false))
@@ -1125,6 +1190,7 @@ func toggle_fusion(a: Dictionary) -> bool:
 		end_fusion(a); spectres[a.id].p = pos; spectres[a.id].state = "following"
 		say("Fusão desfeita. Spectre voltou a acompanhar."); return true
 	if a.mech: say("Saia do Titan antes de se fundir."); return false
+	if a.armor or a.get("transform", 0.0) > 0: say("Espere a Ômega terminar antes de fundir Spectre."); return false
 	var s: Dictionary = spectres[a.id]
 	if s.state != "following" or s.hp <= 0:
 		say("Selecione Spectre no equipamento e invoque com C antes de fundir."); return false
@@ -1144,7 +1210,9 @@ func step_spectres(dt: float) -> void:
 		var owner_actor: Dictionary = actors[s.owner]
 		if not owner_actor.active or owner_actor.dead: s.state = "stored"; continue
 		var offset: Vector2 = owner_actor.p - s.p
-		if offset.length() > 85:
+		s["moving"] = offset.length() > 85
+		if s.moving:
+			s.aim = offset.normalized(); s["step"] = s.get("step", 0.0) + dt * 10
 			# Small hover unit; collision still prevents moving through walls.
 			s.p = move_body(s.p, offset.normalized() * minf(420, offset.length() * 3) * dt, 10, true)
 		if offset.length() > 600:
