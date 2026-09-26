@@ -15,5 +15,11 @@ func _init() -> void:
 	for spec in atlases:
 		var image := Image.load_from_file(ProjectSettings.globalize_path(spec[0]))
 		check(not image.is_empty() and image.get_size() == spec[1], spec[2])
+	var view := DockView.new()
+	var fused := {"move": Vector2.UP, "aim": Vector2.RIGHT, "facing": Vector2.RIGHT, "slash": 0.0, "fire_flash": 0.0}
+	check(view.fusion_visual_direction(fused) == Vector2.UP, "fusão andando para cima mostra as costas")
+	fused.fire_flash = 0.08
+	check(view.fusion_visual_direction(fused) == Vector2.RIGHT, "fusão atacando acompanha a mira")
+	view.free()
 	print("ROBOT_SPRITE_ATLAS failures=", failures)
 	quit(1 if failures else 0)

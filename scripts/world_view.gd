@@ -503,7 +503,7 @@ func draw_actor(a: Dictionary) -> void:
 	if a.fused:
 		var col := 3 if a.slash > 0 or a.get("fire_flash", 0.0) > 0 else (1 + int(a.step) % 2 if a.move.length() > 0.1 else 0)
 		var tint := Color(1.5, 1.5, 1.5, 0.65) if a.hurt > 0 else Color.WHITE
-		draw_feral(fusion_texture, draw_pos, a.facing, col, 160, 150, tint)
+		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 150, tint)
 		text_at(draw_pos + Vector2(-36, -145), "MARTY • FUSÃO", CYAN, 11)
 		return
 	# Roupa atual: COM armadura = Ômega; SEM armadura = Padrão / Londres / Mecânico.
@@ -579,7 +579,8 @@ func draw_mech(m: Dictionary) -> void:
 			var jet := base + Vector2(0, -60) + back * (40 + k * 10) + Vector2(sin(sim.tick_time * 50 + k) * 3, 0)
 			draw_circle(jet, 14 - k * 3, Color(0.4, 0.9, 1, 0.45 - k * 0.1))
 	draw_set_transform(base, 0, Vector2(-1.0 if pose[1] else 1.0, squash))
-	draw_texture_rect_region(titan_v2, Rect2(-88, -170, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176))
+	# clip_uv explícito impede que pixels do quadro vizinho vazem para o Titan atual.
+	draw_texture_rect_region(titan_v2, Rect2(-88, -170, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176), Color.WHITE, false, true)
 	draw_set_transform(Vector2.ZERO)
 	if not piloted: text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)
 	else:
@@ -602,8 +603,17 @@ func feral_row(direction: Vector2) -> int:
 	if absf(direction.x) > absf(direction.y): return 1 if direction.x < 0 else 2
 	return 3 if direction.y < 0 else 0
 
+func fusion_visual_direction(a: Dictionary) -> Vector2:
+	# A simbiose não carrega uma arma separada: andando, sua silhueta acompanha os pés.
+	# Durante um ataque, o corpo volta a apontar para a mira para manter o golpe legível.
+	if a.get("slash", 0.0) <= 0 and a.get("fire_flash", 0.0) <= 0:
+		var movement: Vector2 = a.get("move", Vector2.ZERO)
+		if movement.length() > 0.1: return movement.normalized()
+	return a.get("aim", a.get("facing", Vector2.DOWN)).normalized()
+
 func draw_feral(tex: Texture2D, foot: Vector2, direction: Vector2, col: int, cell: int, size: float, tint: Color = Color.WHITE) -> void:
-	draw_texture_rect_region(tex, Rect2(foot - Vector2(size * 0.5, size * (1.0 - 6.0 / cell)), Vector2.ONE * size), Rect2(col * cell, feral_row(direction) * cell, cell, cell), tint)
+	# Atlas gerado por IA: o recorte precisa ser rígido para não mostrar parte da célula ao lado.
+	draw_texture_rect_region(tex, Rect2(foot - Vector2(size * 0.5, size * (1.0 - 6.0 / cell)), Vector2.ONE * size), Rect2(col * cell, feral_row(direction) * cell, cell, cell), tint, false, true)
 
 func draw_warden(e: Dictionary) -> void:
 	var p: Vector2 = e.p
