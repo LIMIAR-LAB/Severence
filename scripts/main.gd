@@ -3,6 +3,7 @@ const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 
 const Sim = preload("res://scripts/simulation.gd")
 const View = preload("res://scripts/world_view.gd")
+const EquipmentData := preload("res://scripts/equipment_data.gd")
 const PORT := 24871
 var sim: Expedition
 var world: DockView
@@ -106,6 +107,9 @@ func _ready() -> void:
 			camera.position = sim.actors[0].p
 		if arg == "--boss-dead": sim.boss_dead = true; sim.enemies = sim.enemies.filter(func(e): return e.kind != "boss")
 		if arg == "--map-open": map_open = true
+		# 0.17: capturas/testes da tela de Equipamento nos dois estados
+		if arg == "--new-game": sim.set_unlocks(EquipmentData.starting_unlocks())
+		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))
 		if arg == "--visit-all":
 			for room in sim.rooms: sim.visited.append(room.id)
 	for page in ["main", "play", "online", "equipment", "options"]:
@@ -345,6 +349,7 @@ func _physics_process(dt: float) -> void:
 					receive_state.rpc(var_to_bytes(sim.snapshot()).compress(FileAccess.COMPRESSION_DEFLATE))
 			save_timer += dt
 			if save_timer > 2: save_timer = 0; save_progress()
+			if not sim.new_unlocks.is_empty(): sim.new_unlocks.clear(); save_progress()   # desbloqueio salva na hora
 	var target: Vector2 = sim.actors[0].p
 	if sim.coop == "local": target = (sim.actors[0].p + sim.actors[1].p) / 2
 	elif online and not hosting: target = sim.actors[1].p
@@ -408,7 +413,10 @@ func update_hud() -> void:
 	if not playing: hud.text = "MARTY — FRATURAS DO TEMPO     /     PRIMEIRA VERSÃO JOGÁVEL\n2 estados de armadura • IA / coop local / conexão online direta"
 
 func apply_preferences(id: int) -> void:
-	sim.equip(id, pref_outfit if pref_outfit in sim.OUTFITS else "padrao", pref_robot)
+	# 0.17: só o que estiver desbloqueado; sem robô liberado, o ator fica sem robô
+	var outfit := pref_outfit if pref_outfit in sim.OUTFITS and sim.is_unlocked(pref_outfit) else "padrao"
+	var robot := pref_robot if sim.is_unlocked(pref_robot) else sim.default_robot()
+	sim.equip(id, outfit, robot)
 
 func ui_size() -> Vector2:
 	return get_viewport().get_visible_rect().size
@@ -435,12 +443,12 @@ func load_settings() -> void:
 	pref_gun = clampi(int(data.get("gun", 0)), 0, 2)
 	var saved_outfit: String = str(data.get("outfit", "padrao")).replace("londres", "espiao")
 	pref_outfit = saved_outfit if saved_outfit in ["padrao", "mecanico", "espiao"] else "padrao"
-	pref_robot = data.get("robot", "titan") if data.get("robot", "titan") in ["titan", "spectre"] else "titan"
+	pref_robot = data.get("robot", "titan") if data.get("robot", "titan") in ["", "titan", "spectre"] else "titan"
 	volume_percent = clampf(float(data.get("volume", 70)), 0, 100)
 
 func save_progress() -> void:
 	if online and not hosting: return
-	var data := {"version": 1, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked}
+	var data := {"version": 1, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked, "unlocked": sim.unlocked.keys()}
 	var serialized := JSON.stringify(data)
 	if serialized == last_save: return
 	var file := FileAccess.open("user://progress.tmp", FileAccess.WRITE)
@@ -450,13 +458,21 @@ func save_progress() -> void:
 	if err == OK: last_save = serialized
 
 func load_progress() -> void:
-	if not FileAccess.file_exists("user://progress.json"): return
+	# 0.17: jogo novo começa só com o Padrão (sem armadura e sem robô)
+	sim.set_unlocks(EquipmentData.starting_unlocks())
+	if not FileAccess.file_exists("user://progress.json"): sim.make_hub(); return
 	var data = JSON.parse_string(FileAccess.get_file_as_string("user://progress.json"))
 	if not data is Dictionary or data.get("version", 0) != 1: return
 	sim.materials = clampi(int(data.get("materials", 0)), 0, 9999)
 	sim.upgrade = clampi(int(data.get("upgrade", 0)), 0, 3)
 	sim.clears = clampi(int(data.get("clears", 0)), 0, 9999)
 	sim.armor_unlocked = data.get("armor_unlocked", false) == true
+	var saved = data.get("unlocked", [])
+	if saved is Array:
+		for id in saved:
+			if not EquipmentData.item(str(id)).is_empty(): sim.unlocked[str(id)] = true
+	sim.check_unlocks()      # saves antigos: libera o que o progresso (chefe, expedições) já garantia
+	sim.new_unlocks.clear()
 	sim.make_hub()
 
 func capture() -> void:

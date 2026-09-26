@@ -1,33 +1,68 @@
 extends SceneTree
 
-# 0.14: tela de Equipamento v2 — cartões com sprites do jogo, palco com retrato, Ômega lendária, LB/RB e foco p/ controle.
+# 0.17: tela de Equipamento modular — moldura + camadas, dois estados: começo do jogo (só o Padrão)
+# e tudo desbloqueado. Cards, ícones, textos e números vêm de data/equipamento.json.
 var failures := 0
 func check(ok: bool, label: String) -> void:
 	if not ok: failures += 1; push_error("FAIL: " + label)
 	else: print("PASS: ", label)
 
+func tex_name(r: TextureRect) -> String:
+	return r.texture.resource_path.get_file() if r != null and r.texture != null else ""
+
 func _initialize() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
 	var ui = app.menu
-	ui.read_equipment(); ui.outfit_choice = "padrao"; ui.preview_kind = "o_padrao"; ui.show_screen("equipment")
+	var sim = app.sim
+
+	# ── estado 1: começo do jogo ──
+	sim.set_unlocks(["padrao"]); app.pref_outfit = "padrao"; app.pref_robot = "titan"
+	ui.read_equipment(); ui.show_screen("equipment")
 	await process_frame; await process_frame
-	check(ui.slot_buttons.has("o_padrao") and ui.slot_buttons.has("o_mecanico") and ui.slot_buttons.has("o_espiao"), "3 cartões de uniforme")
-	check(ui.slot_buttons.has("armor_omega") and ui.slot_buttons.has("robot0") and ui.slot_buttons.has("robot1"), "vaga da armadura e 2 robôs")
-	check(ui.preview.texture != null and ui.preview.texture.resource_path.ends_with("portraits_v3/o_padrao.png"), "palco mostra a arte v3 do uniforme")
-	var focus: Control = root.get_viewport().gui_get_focus_owner()
-	check(focus == ui.slot_buttons["o_padrao"], "uniforme atual recebe o foco (navegação pelo controle)")
-	ui.cycle_outfit(1)
-	check(ui.outfit_choice == "mecanico" and ui.preview.texture.resource_path.ends_with("o_mecanico.png"), "RB troca para o Mecânico")
-	ui.cycle_outfit(-1); ui.cycle_outfit(-1)
-	check(ui.outfit_choice == "espiao", "LB volta em círculo até o Espião")
-	ui.choose("armor_omega")
-	check(ui.stage_title.text.contains("LENDÁRIA") and ui.preview.texture.resource_path.ends_with("armor_omega.png"), "Ômega aparece como lendária no palco")
+	var eq = ui.equipment
+	check(eq != null and ui.content.get_parent() == ui, "tela montada fora do stage (escala inteira)")
+	check(tex_name(eq.get_child(0)) == "equip_moldura.png", "moldura é só o fundo")
+	for id in ["padrao", "mecanico", "espiao", "omega", "titan", "spectre"]:
+		check(eq.slots.has(id), "slot do item " + id)
+	check(tex_name(eq.slots.padrao.icon) == "icon_uniforme_padrao.png", "Padrão com o ícone dele")
+	check(tex_name(eq.slots.mecanico.icon) == "icon_uniforme_mecanico_bloqueado.png" and eq.slots.mecanico.sub.text == "BLOQUEADO", "Mecânico bloqueado no início")
+	check(tex_name(eq.slots.omega.icon) == "icon_armadura_omega_bloqueada.png", "Ômega bloqueada no início")
+	check(tex_name(eq.slots.titan.icon) == "icon_robo_titan_bloqueado.png" and tex_name(eq.slots.spectre.icon) == "icon_robo_spectre_bloqueado.png", "robôs bloqueados no início")
+	check(eq.find_child("EmptyArmor_1", true, false) != null and eq.find_child("EmptyRobot_2", true, false) != null, "vagas vazias com icon_slot_vazio")
+	check(ui.armor_choice == "" and ui.robot_choice == "", "sem armadura e sem robô equipados")
+	check(eq.robot_label.text == "SEM ROBÔ", "painel do robô vazio")
+	check(tex_name(eq.card) == "card_marty_padrao.png" and eq.card.modulate == Color.WHITE and not eq.card_lock.visible, "vitrine mostra o card do Padrão")
+	check(eq.slots.padrao.frame.visible, "Padrão equipado com frame de seleção")
+	eq.show_item("titan")
+	check(tex_name(eq.card) == "card_titan.png" and eq.card.modulate.v < 0.4 and eq.card_lock.visible, "item bloqueado: card escurecido + cadeado")
+	check(eq.desc_body.text.begins_with("Como desbloquear"), "descrição explica como desbloquear")
+	ui.choose("titan")
+	check(ui.robot_choice == "", "bloqueado não equipa")
+	check(eq.numbers[0].text == "3" and eq.numbers[1].text == "320", "STATUS do Padrão: 3 corações, velocidade 320")
+	check(ui.find_child("INICIAR*", true, false) == null, "sem botão INICIAR ARENA")
+	for b in ui.content.find_children("*", "Button", true, false):
+		check(not b.text.contains("ARENA"), "nenhum botão de arena")
+
+	# ── estado 2: tudo desbloqueado ──
+	sim.set_unlocks(["padrao", "mecanico", "espiao", "omega", "titan", "spectre"])
+	ui.read_equipment(); ui.show_screen("equipment")
+	await process_frame; await process_frame
+	eq = ui.equipment
+	check(tex_name(eq.slots.mecanico.icon) == "icon_uniforme_mecanico.png" and eq.slots.mecanico.sub.text == "+ força", "Mecânico liberado")
+	check(tex_name(eq.slots.omega.icon) == "icon_armadura_omega.png" and eq.slots.omega.frame.visible, "Ômega liberada com frame lendário")
+	check(eq.slots.omega.frame.texture.resource_path.ends_with("frame_lendario.png"), "Ômega usa frame_lendario")
+	check(ui.armor_choice == "omega" and ui.robot_choice == "titan", "Ômega e Titan equipados")
+	ui.choose("o_mecanico")
+	check(ui.outfit_choice == "mecanico" and tex_name(eq.card) == "card_marty_mecanico.png", "equipar o Mecânico troca o card")
 	ui.choose("spectre")
-	check(ui.robot_choice == "spectre" and ui.info_titles[2].text.contains("SPECTRE"), "escolher Spectre atualiza o companheiro")
-	var icon: TextureRect = ui.info_icons[0]
-	check(icon.texture is AtlasTexture and (icon.texture as AtlasTexture).atlas.resource_path.ends_with("outfits.png"), "descrições usam o sprite do jogo")
-	ui.show_screen("main"); await process_frame; await process_frame
-	check(root.get_viewport().gui_get_focus_owner() is Button, "menu principal já abre com um botão focado")
+	check(ui.robot_choice == "spectre" and eq.robot_label.text == "SPECTRE", "equipar o Spectre")
+	eq.show_item("omega")
+	check(eq.numbers[0].text == "6" and eq.numbers[1].text == "430", "STATUS com a Ômega: +3 corações, velocidade 430")
+	eq.show_item("mecanico")
+	check(eq.numbers[4].text == "+35%", "STATUS soma uniforme + robô (defesa: Mecânico +15, Spectre +20)")
+	var before: String = eq.focus_id
+	ui.cycle_outfit(1)
+	check(eq.focus_id != before, "LB/RB e setas passam pelos itens da vitrine")
 	print("EQUIPMENT_UI_TESTS_DONE failures=%d" % failures)
 	quit(1 if failures > 0 else 0)

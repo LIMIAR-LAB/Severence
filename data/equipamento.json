@@ -1,0 +1,80 @@
+{
+	"versao": 1,
+	"_leia": "Itens da tela de EQUIPAMENTO (0.17). 'atributos' dos uniformes são a base; os de armadura e robô são modificadores aplicados com o item em uso: '+N' soma, '=N' substitui, 'xN' multiplica. Ordem: uniforme -> robô -> armadura. 'desbloqueio.tipo': inicio | sala (id da sala em scripts/docks_map.gd) | desafio (missão do gerador concluída) | chefe (Almirante derrotado e núcleo extraído) | expedicoes (N expedições concluídas). tests/equipment_data_test.gd confere os uniformes contra scripts/simulation.gd.",
+	"stats": [
+		{"id": "vida", "nome": "CORAÇÕES", "cor": "e8404e"},
+		{"id": "velocidade", "nome": "VELOCIDADE", "cor": "54e0f0", "max": 430},
+		{"id": "golpe", "nome": "GOLPE", "cor": "f0a040", "max": 70},
+		{"id": "dano", "nome": "DANO / SEG", "cor": "f3c24a", "max": 100},
+		{"id": "defesa", "nome": "DEFESA", "cor": "7fd35a"},
+		{"id": "dash", "nome": "DASH", "cor": "a57cff"}
+	],
+	"itens": [
+		{
+			"id": "padrao", "categoria": "uniforme", "nome": "PADRÃO", "subtitulo": "equilibrado", "cor": "5fd6d8", "arma": "BLASTER", "raridade": "comum",
+			"descricao_curta": "Blaster de energia, cadência média.",
+			"descricao": "O uniforme de sempre: jaqueta de aviador com placas de reforço. Equilibrado em tudo. Blaster de energia com cadência média (16 de dano por tiro).",
+			"icone": "res://assets/ui/equipamento/icones/icon_uniforme_padrao.png",
+			"icone_bloqueado": "",
+			"card": "res://assets/ui/equipamento/cards/card_marty_padrao.png",
+			"desbloqueado_no_inicio": true,
+			"desbloqueio": {"tipo": "inicio", "texto": "Disponível desde o início."},
+			"atributos": {"vida": 3, "velocidade": 320, "golpe": 26, "dano": 73, "defesa": 0, "dash": 0.6}
+		},
+		{
+			"id": "mecanico", "categoria": "uniforme", "nome": "MECÂNICO", "subtitulo": "+ força", "cor": "8fdc6a", "arma": "ESCOPETA DE REBITE", "raridade": "comum",
+			"descricao_curta": "Escopeta de rebite e chave inglesa.",
+			"descricao": "Macacão da oficina do Refúgio. Mais força e resistência: escopeta de rebite (6 chumbos de 9) e chave inglesa pesada. Recebe 15% menos dano, mas anda mais devagar.",
+			"icone": "res://assets/ui/equipamento/icones/icon_uniforme_mecanico.png",
+			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_uniforme_mecanico_bloqueado.png",
+			"card": "res://assets/ui/equipamento/cards/card_marty_mecanico.png",
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "expedicoes", "valor": 1, "texto": "Conclua 1 expedição (derrote o Almirante e extraia o núcleo)."},
+			"atributos": {"vida": 3, "velocidade": 290, "golpe": 46, "dano": 83, "defesa": 15, "dash": 0.7}
+		},
+		{
+			"id": "espiao", "categoria": "uniforme", "nome": "ESPIÃO", "subtitulo": "+ velocidade", "cor": "b98cff", "arma": "SUBMETRALHADORA", "raridade": "comum",
+			"descricao_curta": "Submetralhadora, rápido e discreto.",
+			"descricao": "Sobretudo, boina e óculos escuros. Rápido e discreto: os inimigos só o notam de perto. Submetralhadora em rajada, dash recarrega quase 2x mais rápido. Recebe 10% mais dano.",
+			"icone": "res://assets/ui/equipamento/icones/icon_uniforme_espiao.png",
+			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_uniforme_espiao_bloqueado.png",
+			"card": "res://assets/ui/equipamento/cards/card_marty_espiao.png",
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "expedicoes", "valor": 2, "texto": "Conclua 2 expedições."},
+			"atributos": {"vida": 3, "velocidade": 385, "golpe": 20, "dano": 82, "defesa": -10, "dash": 0.35}
+		},
+		{
+			"id": "omega", "categoria": "armadura", "nome": "ARMADURA ÔMEGA", "subtitulo": "lendária", "arma": "LÂMINA ÔMEGA", "raridade": "lendario",
+			"descricao_curta": "R: 5s de poder, recarga 60s.",
+			"descricao": "LENDÁRIA. Vestida com R por 5 segundos (recarga de 60s; baús recarregam na hora). +3 corações de escudo, velocidade 430 e a Lâmina Ômega: combo de 3 cortes (38/38/64); o 3º solta uma onda que atravessa inimigos e o corte reflete tiros.",
+			"icone": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
+			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_armadura_omega_bloqueada.png",
+			"card": "res://assets/ui/equipamento/cards/card_armadura_omega.png",
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "chefe", "texto": "Derrote o Almirante das Profundezas e extraia o núcleo."},
+			"atributos": {"vida": "+3", "velocidade": "=430", "golpe": "=38", "dash": "=0.3"}
+		},
+		{
+			"id": "titan", "categoria": "robo", "nome": "TITAN", "subtitulo": "robô pilotável", "arma": "CANHÃO PESADO", "raridade": "raro",
+			"descricao_curta": "C invoca, E pilota. Canhão e bombas.",
+			"descricao": "Robô de combate pesado. C invoca perto de você, E entra e sai. Canhão pesado (70 + 34 em área), bomba em arco com R e turbo segurando Shift. Gasta gasolina: procure galões nos baús.",
+			"icone": "res://assets/ui/equipamento/icones/icon_robo_titan.png",
+			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_titan_bloqueado.png",
+			"card": "res://assets/ui/equipamento/cards/card_titan.png",
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "sala", "sala": "shop", "texto": "Encontre o Titan na Oficina das docas (sala 05)."},
+			"atributos": {"vida": "+6", "velocidade": "=190", "golpe": "=55", "dano": "=82"}
+		},
+		{
+			"id": "spectre", "categoria": "robo", "nome": "SPECTRE", "subtitulo": "companheiro", "arma": "RAIO DE ENERGIA", "raridade": "raro",
+			"descricao_curta": "C invoca: acompanha e atira. G funde.",
+			"descricao": "Predador simbionte de apoio. C invoca: ele acompanha e atira sozinho (9 de dano). G funde com Marty: mais velocidade e dano, e a energia do Spectre absorve os golpes.",
+			"icone": "res://assets/ui/equipamento/icones/icon_robo_spectre.png",
+			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_spectre_bloqueado.png",
+			"card": "res://assets/ui/equipamento/cards/card_spectre.png",
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "desafio", "texto": "Conclua o desafio do Último Gerador (sala 06)."},
+			"atributos": {"velocidade": "=360", "dano": "x1.69", "defesa": "+20"}
+		}
+	]
+}

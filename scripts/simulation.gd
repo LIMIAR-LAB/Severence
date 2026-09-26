@@ -2,6 +2,7 @@ class_name Expedition
 extends RefCounted
 const DOCKS := preload("res://scripts/docks_map.gd")  # não depende do cache de class_name
 const SummonFX = preload("res://scripts/summon_fx.gd")
+const EquipmentData := preload("res://scripts/equipment_data.gd")
 
 # All gameplay state is serializable. Only the host advances simulation.
 var actors: Array = []
@@ -25,6 +26,10 @@ var materials := 0
 var upgrade := 0
 var clears := 0
 var armor_unlocked := false
+# 0.17: itens de equipamento liberados (id -> true). Sozinha, a simulação é um "sandbox" com tudo
+# liberado (testes, arena); o jogo (main.gd) troca pelo estado do save — jogo novo = só o Padrão.
+var unlocked: Dictionary = {"padrao": true, "mecanico": true, "espiao": true, "omega": true, "titan": true, "spectre": true}
+var new_unlocks: Array = []   # desbloqueados nesta sessão ainda não salvos (main.gd salva e limpa)
 var side_active := false
 var side_complete := false
 var side_time := 0.0
@@ -71,8 +76,8 @@ func actor(id: int, pos: Vector2) -> Dictionary:
 	return {"id": id, "active": id == 0 or coop != "solo", "p": pos, "aim": Vector2.RIGHT, "facing": Vector2.DOWN, "dash_dir": Vector2.RIGHT, "move": Vector2.ZERO, "hp": BASE_HEARTS * HEART, "shield": 0.0, "armor": false,
 		"jump": 0.0, "jump_cd": 0.0, "shot": 0.0, "slash": 0.0, "dodge": 0.0, "dodge_cd": 0.0,
 		"hurt": 0.0, "step": 0.0, "mech": false, "dead": id == 1 and coop == "solo", "gun": 0, "interact_cd": 0.0, "revive": 0.0,
-		"selected_robot": "titan", "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
-		"outfit": "padrao" if id == 0 else "mecanico", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
+		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
+		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
 		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0}
 
 # UNIFORMES (skins, sempre vestidos) e ARMADURAS (poder temporário com recarga).
@@ -125,6 +130,7 @@ func uniform_of(a: Dictionary) -> Dictionary:
 
 # R: veste a armadura se estiver carregada; enquanto ativa, R a guarda antes do tempo.
 func toggle_armor(a: Dictionary) -> void:
+	if not is_unlocked(a.armor_type): say("Nenhuma armadura desbloqueada ainda."); return
 	if a.fused: say("Desfaça a fusão antes de vestir a armadura."); return
 	if a.mech: return
 	if a.armor:
@@ -210,7 +216,7 @@ func make_hub() -> void:
 		Rect2(880, 462, 62, 52),     # bloco de pedra do hangar
 		Rect2(1235, 450, 30, 130)]   # bancada vermelha do hangar
 	rooms = [{"r": Rect2(Vector2.ZERO, HUB_SIZE), "name": "REFÚGIO • FORA DO TEMPO", "kind": "hub"}]
-	mech = new_mech(HUB_TITAN_BAY); mech.aim = Vector2.DOWN
+	mech = new_mech(HUB_TITAN_BAY); mech.aim = Vector2.DOWN; apply_unlock_state()
 	reset_spectres()
 	for a in actors:
 		a.armor = false; a.armor_cd = 0.0
@@ -231,7 +237,7 @@ func start_arena() -> void:
 	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [Rect2(80, 100, 1120, 820)]
 	rooms = [{"r": floors[0], "name": "ARENA DE TESTE • ONDAS / DASH / ROBÔ", "kind": "arena"}]
-	mech = new_mech(Vector2(250, 800)); money = 0; keys = 0
+	mech = new_mech(Vector2(250, 800)); money = 0; keys = 0; apply_unlock_state()
 	reset_spectres()
 	doors.clear(); gate_blocks.clear(); hazards.clear()
 	build_navigation(); spawn_arena_wave()
@@ -291,7 +297,7 @@ func start_run(new_seed: int) -> void:
 	for room in rooms:
 		room["waves"] = DOCKS.WAVES.get(room.get("id", ""), []).duplicate(true)
 	for c in DOCKS.CHESTS: chests.append({"p": Vector2(c[0], c[1]), "open": false, "secret": c[2]})
-	mech = new_mech(P.mech)
+	mech = new_mech(P.mech); apply_unlock_state()
 	reset_spectres()
 	for sp in DOCKS.SPAWNS:
 		var pool: Array = DOCKS.GROUPS[sp[2]]
@@ -569,7 +575,7 @@ func ai_input() -> Dictionary:
 		elif delta_enemy.length() < 145: command.move = -delta_enemy.normalized()
 		else: command.move = delta_enemy.normalized().orthogonal() * 0.55
 		if delta_enemy.length() < 65: command.melee = true
-		if not a.armor and a.armor_cd <= 0 and delta_enemy.length() < 300 and not a.mech: command.armor = true
+		if not a.armor and a.armor_cd <= 0 and delta_enemy.length() < 300 and not a.mech and is_unlocked(a.armor_type): command.armor = true
 		if a.mech and a.get("bomb_cd", 0.0) <= 0 and delta_enemy.length() > 180 and delta_enemy.length() < 380: command.armor = true
 	for b in bullets:
 		if b.team == 1 and a.p.distance_to(b.p) < 65:
@@ -615,7 +621,7 @@ func step(dt: float, commands: Array) -> void:
 		for a in actors:
 			if a.active and not a.dead:
 				var room := room_at(a.p)
-				if not room.is_empty() and not visited.has(room.id): visited.append(room.id)
+				if not room.is_empty() and not visited.has(room.id): visited.append(room.id); check_unlocks()
 		step_gates(dt)
 		step_hazards(dt)
 		step_fuses(dt)
@@ -625,6 +631,7 @@ func step(dt: float, commands: Array) -> void:
 				side_active = false; side_failed = true; say("Gerador perdido. A missão principal continua.")
 			elif enemies.filter(func(e): return e.side).is_empty():
 				side_active = false; side_complete = true; money += 25; keys += 2; materials += 1
+				check_unlocks()
 				for a in actors: heal(a, 2)
 				say("DESAFIO CONCLUÍDO • 2 chaves, 25 moedas, cura e 1 fragmento permanente!")
 		if actors.all(func(a): return a.dead):
@@ -889,7 +896,7 @@ func interact(a: Dictionary) -> void:
 	for other in actors:
 		if other.active and other.id != a.id and other.dead and a.p.distance_to(other.p) < 75:
 			other.dead = false; other.hp = HEART * 1.5; other.hurt = 2; say("Parceiro reanimado!"); return
-	if mech.deployed and mech.hp > 0 and mech.occupant == -1 and not a.fused and a.p.distance_to(mech.p) < 90:
+	if mech.deployed and is_unlocked("titan") and mech.hp > 0 and mech.occupant == -1 and not a.fused and a.p.distance_to(mech.p) < 90:
 		if mech.fuel <= 0: say("Titan sem gasolina • abra os baús para achar um galão."); return
 		mech.occupant = a.id; a.mech = true; a.p = mech.p; a["fuel_warned"] = false; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Shift: turbo / E: sair • GASOLINA %.0f%%" % (mech.fuel / FUEL_MAX * 100)); return
 	if mode == "hub":
@@ -907,7 +914,9 @@ func interact(a: Dictionary) -> void:
 			"armor":
 				# Vitrine: troca o UNIFORME (Padrão → Mecânico → Espião). A armadura é o R.
 				if a.armor: say("Com a armadura ativa não dá para trocar de uniforme nem de arma."); return
-				a.outfit = OUTFITS[(OUTFITS.find(a.outfit) + 1) % OUTFITS.size()]
+				for _n in OUTFITS.size():
+					a.outfit = OUTFITS[(OUTFITS.find(a.outfit) + 1) % OUTFITS.size()]
+					if is_unlocked(a.outfit): break
 				say("Uniforme: " + UNIFORMS[a.outfit].name + " • " + UNIFORMS[a.outfit].desc.split("\n")[0] + "  (R veste a Armadura Ômega)"); return
 			"mural":
 				var photos := mini(clears, 4)
@@ -948,6 +957,7 @@ func interact(a: Dictionary) -> void:
 		if boss_dead and a.p.distance_to(DOCKS.POINTS.extraction) < 120:
 			if not reward_claimed:
 				reward_claimed = true; materials += 3; clears += 1; armor_unlocked = true
+				check_unlocks()
 			make_hub(); say("Núcleo recuperado! Armadura permanente e 3 fragmentos. A equipe retornou."); return
 	say("Aproxime-se de um portal, baú, parceiro caído, comerciante ou robô e pressione E.")
 
@@ -1247,7 +1257,9 @@ func collect_pickups() -> void:
 
 func equip(id: int, outfit: String, robot: String, armor_type: String = "omega") -> bool:
 	if id < 0 or id >= actors.size() or not actors[id].active: return false
-	if outfit not in OUTFITS or robot not in ["titan", "spectre"] or armor_type not in ARMORS: return false
+	if outfit not in OUTFITS or robot not in ["", "titan", "spectre"] or armor_type not in ARMORS: return false
+	if not is_unlocked(outfit) or (robot != "" and not is_unlocked(robot)):
+		say("Esse item ainda está bloqueado."); return false
 	var a: Dictionary = actors[id]
 	if a.dead: return false
 	if a.fused and robot != a.selected_robot:
@@ -1269,6 +1281,8 @@ func free_summon_position(a: Dictionary, radius: float) -> Vector2:
 
 func summon_robot(a: Dictionary) -> bool:
 	if not a.active or a.dead: return false
+	if a.selected_robot == "" or not is_unlocked(a.selected_robot):
+		say("Nenhum robô desbloqueado ainda."); return false
 	if a.summon_cd > 0:
 		say("Invocação recarregando: %.1fs" % a.summon_cd); return false
 	if a.mech or a.fused:
@@ -1344,7 +1358,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 
@@ -1392,3 +1406,51 @@ func loadout_stats(kind: String, outfit: String = "padrao") -> Array:
 				["DEFESA", "%+d%%" % int(roundf((1.0 - u.taken) * 100)), clampf(0.5 + (1.0 - u.taken) * 2.5, 0, 1), "green"],
 				["DASH", "%.2fs" % u.dash_cd, clampf(0.35 / u.dash_cd, 0, 1), "violet"]]
 	return rows
+
+
+# ── 0.17: desbloqueio de equipamento (regras em data/equipamento.json) ─────────
+func is_unlocked(id: String) -> bool:
+	return id != "" and unlocked.get(id, false) == true
+
+func default_robot() -> String:
+	for id in ["titan", "spectre"]:
+		if is_unlocked(id): return id
+	return ""
+
+func set_unlocks(ids: Array) -> void:
+	unlocked.clear()
+	for id in ids: unlocked[str(id)] = true
+	new_unlocks.clear()
+	for a in actors:
+		if not is_unlocked(a.outfit): a.outfit = "padrao"
+		if not is_unlocked(a.selected_robot): a.selected_robot = default_robot()
+	apply_unlock_state()
+
+func unlock(id: String) -> bool:
+	if is_unlocked(id) or EquipmentData.item(id).is_empty(): return false
+	unlocked[id] = true; new_unlocks.append(id)
+	for a in actors:
+		if a.selected_robot == "" and id in ["titan", "spectre"]: a.selected_robot = id
+	if id == "titan" and mode == "run" and mech.occupant == -1: mech.deployed = true   # o Titan estava guardado na Oficina
+	apply_unlock_state()
+	say("DESBLOQUEADO • %s • veja no Equipamento." % EquipmentData.item(id).get("nome", id.to_upper()))
+	return true
+
+# Avalia as regras de desbloqueio de cada item: inicio | sala | desafio | chefe | expedicoes.
+func check_unlocks() -> void:
+	for it in EquipmentData.items():
+		if is_unlocked(it.id): continue
+		var cond: Dictionary = it.get("desbloqueio", {})
+		var ok := false
+		match str(cond.get("tipo", "")):
+			"inicio": ok = true
+			"sala": ok = mode == "run" and visited.has(str(cond.get("sala", "")))
+			"desafio": ok = side_complete
+			"chefe": ok = armor_unlocked
+			"expedicoes": ok = clears >= int(cond.get("valor", 1))
+		if ok: unlock(it.id)
+
+# Titan bloqueado não fica no mapa (nem na baia do Refúgio, nem na Oficina das docas).
+func apply_unlock_state() -> void:
+	if mech.is_empty(): return
+	if not is_unlocked("titan") and mech.get("occupant", -1) == -1: mech.deployed = false

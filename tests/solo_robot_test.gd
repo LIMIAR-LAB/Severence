@@ -11,6 +11,8 @@ func _initialize() -> void:
 func run() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
+	# 0.17: jogo novo começa sem robôs; este teste cobre os robôs, então libera tudo
+	app.sim.set_unlocks(["padrao", "mecanico", "espiao", "omega", "titan", "spectre"])
 	app.menu.show_screen("play")
 	# Exercise the actual solo selection callback, then equipment launch.
 	app.menu.content.find_child("SoloChoice", true, false).pressed.emit()
