@@ -9,11 +9,10 @@ ignorada de propósito: a fileira de robôs é Titan, Spectre e uma vaga bloquea
 |---|---|
 | `assets/ui/equipment_v3.png` | Fundo estático 1344×752: molduras de metal escovado com friso de bronze e rebites, trilhas de circuito, palco com borda ciano, rodapé com atalhos. Gerado por `tools/equipment_v3.py`. |
 | `assets/ui/portraits_v3/*.png` | Arte do palco (1100×704, proporção do palco): `o_padrao`, `o_mecanico`, `o_espiao`, `armor_omega`, `titan`, `spectre`, `almirante`. Gerada por `tools/make_portraits_v3.py`. |
-| `art/source/portraits-anime-v1.png` | Folha 3×2 de retratos enviada pelo usuário (fonte dos retratos). |
+| `art/source/portraits-v4/*.png` | Cartas 1024×1024 em pixel art enviadas pelo usuário (fonte atual dos retratos). |
+| `art/source/portraits-anime-v1.png` | Folha anterior (estilo anime), guardada só como histórico. |
 
-- Os painéis quase quadrados da folha viram palco largo: a arte inteira na altura, com as laterais preenchidas pela própria arte desfocada.
-- O Padrão usa a arte larga do próprio mockup (sem título e setas).
-- **Spectre não está na folha**: por enquanto o palco usa o sprite do jogo (`spectre_octopus_v2`, nearest) sobre a tempestade roxa do painel do Almirante. Trocar quando houver arte própria no mesmo estilo.
+- Da carta sai a moldura de latão e a placa com o nome; a arte inteira fica na altura do palco e as laterais são preenchidas com a própria arte desfocada.
 - `almirante.png` fica pronto para uma futura tela de chefe; a tela de Equipamento não usa.
 
 ## Código
