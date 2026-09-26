@@ -582,7 +582,8 @@ func draw_mech(m: Dictionary) -> void:
 	var pilot: Dictionary = sim.actors[m.occupant] if piloted else {}
 	var attacking: bool = piloted and (pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0)
 	if attacking:
-		column = 8
+		# 0.15: clarão lateral só combina com a vista lateral do canhão.
+		column = 8 if pose[0] == 2 and pilot.get("fire_flash", 0.0) > 0 else 5
 	elif m.get("boosting", false):
 		column = 6
 	elif piloted and m.get("moving", false):
@@ -1064,6 +1065,7 @@ func draw_screen_flash() -> void:
 
 # ── 0.13: Titan só usa vistas reais (lado nas diagonais), bomba, explosões e efeitos do cenário ──
 func titan_pose(f: Vector2) -> Array:
+	# A arte lateral aponta para a direita; apenas a esquerda recebe espelho.
 	if absf(f.x) >= absf(f.y) * 0.7: return [2, f.x < 0]
 	return [0, false] if f.y > 0 else [4, false]
 

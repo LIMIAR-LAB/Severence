@@ -103,6 +103,9 @@ def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     output.save(OUTPUT, optimize=True)
     print(f"Atlas limpo salvo em {OUTPUT}")
+    # 0.15: linhas 3 e 4 viram costas de verdade (sem viseira/núcleo)
+    from titan_back_view import main as apply_back_view
+    apply_back_view()
 
 
 if __name__ == "__main__":
