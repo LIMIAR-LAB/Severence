@@ -62,6 +62,8 @@ func apply(tree: SceneTree) -> void:
 	win.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_INTEGER if pixel_perfect else Window.CONTENT_SCALE_STRETCH_FRACTIONAL
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = fps_limit
+	# A janela embutida pertence ao editor; ele controla tamanho, modo e posição.
+	if "--wid" in OS.get_cmdline_args(): return
 	if "--resolution" in OS.get_cmdline_args(): return   # testes/capturas definem a janela pela linha de comando
 	match mode:
 		0:
