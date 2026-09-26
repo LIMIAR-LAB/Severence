@@ -39,7 +39,8 @@ func _init() -> void:
 	s.step_actor(a, {"move": Vector2.RIGHT}, 0.5)
 	check(is_equal_approx(a.p.x, 610), "unarmored movement increased to 320px/s")
 	s.start_arena()
-	check(s.mode == "arena" and s.enemies.size() >= 5, "test arena starts with enemies immediately")
+	s.step_enemies(0.81)
+	check(s.mode == "arena" and s.enemies.size() >= 5, "test arena materializes enemies after portal")
 	s.coop = "ai"
 	var initial_enemy_count: int = s.enemies.size()
 	var ai_shot_seen := false
@@ -56,7 +57,7 @@ func _init() -> void:
 	check(enemy_damage_seen or s.enemies.size() < initial_enemy_count, "companion projectiles damage enemies in actual simulation")
 	check(enemy_shot_seen, "arena enemies retaliate with moving bullets")
 	s.coop = "local"; s.enemies.clear(); var wave: int = s.arena_wave
-	for i in range(130): s.step(1.0 / 60, [{}, {}])
+	for i in range(190): s.step(1.0 / 60, [{}, {}])
 	check(s.arena_wave == wave + 1 and not s.enemies.is_empty(), "arena replenishes enemies after wave clear")
 	print("COMBAT REGRESSION: ", count, " checks, ", failures, " failures")
 	quit(1 if failures else 0)

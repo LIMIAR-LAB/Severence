@@ -38,7 +38,7 @@ var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v2.png"
-const TITAN_ATLAS_PATH := "res://assets/mech/titan_v3.png"
+const TITAN_ATLAS_PATH := "res://assets/mech/titan_v3_clean.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
@@ -503,7 +503,7 @@ func draw_actor(a: Dictionary) -> void:
 	if a.fused:
 		var col := 3 if a.slash > 0 or a.get("fire_flash", 0.0) > 0 else (1 + int(a.step) % 2 if a.move.length() > 0.1 else 0)
 		var tint := Color(1.5, 1.5, 1.5, 0.65) if a.hurt > 0 else Color.WHITE
-		draw_feral(fusion_texture, draw_pos, a.facing, col, 160, 150, tint)
+		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 150, tint)
 		text_at(draw_pos + Vector2(-36, -145), "MARTY • FUSÃO", CYAN, 11)
 		return
 	# Roupa atual: COM armadura = Ômega; SEM armadura = Padrão / Londres / Mecânico.
@@ -558,11 +558,17 @@ func draw_mech(m: Dictionary) -> void:
 	if m.hp <= 0:
 		crate(Rect2(p - Vector2(40, 25), Vector2(80, 30))); text_at(p + Vector2(-40, -35), "INUTILIZADO", Color("b78c84"), 12); return
 	# Titan v2: 8 direções (5 vistas + espelho), viseira acesa quando pilotado, passada pesada.
-	var facing: Vector2 = m.get("facing", m.aim)
+	var facing: Vector2 = titan_visual_direction(m)
 	var pose := titan_pose(facing)
 	var piloted: bool = m.occupant >= 0
 	var column := 0; var bob := 0.0; var squash := 1.0
-	if piloted and m.get("moving", false):
+	var pilot: Dictionary = sim.actors[m.occupant] if piloted else {}
+	var attacking: bool = piloted and (pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0)
+	if attacking:
+		column = 8
+	elif m.get("boosting", false):
+		column = 6
+	elif piloted and m.get("moving", false):
 		var phase := int(m.step) % 4
 		column = 1 + phase
 		# peso: afunda e achata quando o pé bate (quadros 1 e 3)
@@ -570,8 +576,9 @@ func draw_mech(m: Dictionary) -> void:
 		if phase % 2 == 1: bob = 5.0 * (1.0 - sub); squash = 1.0 - 0.05 * (1.0 - sub)
 		else: bob = -2.0 * sin(sub * PI)
 	elif not piloted: bob = 0.0
-	else: bob = sin(sim.tick_time * 2.0) * 1.0  # motor ligado
-	if piloted: column += 5
+	else:
+		column = 5
+		bob = sin(sim.tick_time * 2.0) * 1.0  # motor ligado
 	var base: Vector2 = p - Vector2(0, sim.height_at(p) - bob)
 	if m.get("boosting", false):
 		var back := -facing.normalized()
@@ -583,9 +590,8 @@ func draw_mech(m: Dictionary) -> void:
 	draw_set_transform(Vector2.ZERO)
 	if not piloted: text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)
 	else:
-		var owner: Dictionary = sim.actors[m.occupant]
 		draw_rect(Rect2(p + Vector2(-35, 16), Vector2(70, 3)), Color("161824"))
-		draw_rect(Rect2(p + Vector2(-35, 16), Vector2(70 * owner.get("boost", 1.0), 3)), Color(1, 0.8, 0.35))
+		draw_rect(Rect2(p + Vector2(-35, 16), Vector2(70 * pilot.get("boost", 1.0), 3)), Color(1, 0.8, 0.35))
 	draw_rect(Rect2(p + Vector2(-35, 10), Vector2(70, 4)), Color("161824"))
 	draw_rect(Rect2(p + Vector2(-35, 10), Vector2(70 * m.hp / 240, 4)), CYAN)
 
@@ -593,7 +599,7 @@ func draw_spectre(s: Dictionary) -> void:
 	var p: Vector2 = s.p
 	draw_arc(p, 17, 0, TAU, 18, Color(0.3, 0.9, 1, 0.6), 2)
 	var col := 3 if s.shot > 0.38 else (1 + int(s.get("step", 0.0)) % 2 if s.get("moving", false) else 0)
-	draw_feral(spectre_texture, p - Vector2(0, sim.height_at(p)), s.aim, col, 128, 112)
+	draw_feral(spectre_texture, p - Vector2(0, sim.height_at(p)), spectre_visual_direction(s), col, 128, 112)
 	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40, 3)), Color("1a3541"))
 	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40 * s.hp / 100, 3)), CYAN)
 	text_at(p + Vector2(-30, -112), "SPECTRE", CYAN, 10)
@@ -601,6 +607,28 @@ func draw_spectre(s: Dictionary) -> void:
 func feral_row(direction: Vector2) -> int:
 	if absf(direction.x) > absf(direction.y): return 1 if direction.x < 0 else 2
 	return 3 if direction.y < 0 else 0
+
+func fusion_visual_direction(a: Dictionary) -> Vector2:
+	# Como no atlas básico do Marty: os pés comandam a vista durante a caminhada;
+	# ao atacar, a silhueta volta a acompanhar a mira.
+	if a.get("slash", 0.0) <= 0 and a.get("fire_flash", 0.0) <= 0:
+		var movement: Vector2 = a.get("move", Vector2.ZERO)
+		if movement.length() > 0.1: return movement.normalized()
+	return a.get("aim", a.get("facing", Vector2.DOWN)).normalized()
+
+func spectre_visual_direction(s: Dictionary) -> Vector2:
+	if s.get("moving", false) and s.get("shot", 0.0) <= 0:
+		return s.get("move_dir", s.get("aim", Vector2.DOWN)).normalized()
+	return s.get("aim", Vector2.DOWN).normalized()
+
+func titan_visual_direction(m: Dictionary) -> Vector2:
+	var piloted: bool = m.get("occupant", -1) >= 0
+	if piloted:
+		var pilot: Dictionary = sim.actors[m.occupant]
+		if pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0:
+			return m.get("aim", Vector2.DOWN).normalized()
+	if m.get("moving", false): return m.get("move_dir", m.get("facing", Vector2.DOWN)).normalized()
+	return m.get("aim", m.get("facing", Vector2.DOWN)).normalized()
 
 func draw_feral(tex: Texture2D, foot: Vector2, direction: Vector2, col: int, cell: int, size: float, tint: Color = Color.WHITE) -> void:
 	draw_texture_rect_region(tex, Rect2(foot - Vector2(size * 0.5, size * (1.0 - 6.0 / cell)), Vector2.ONE * size), Rect2(col * cell, feral_row(direction) * cell, cell, cell), tint)
