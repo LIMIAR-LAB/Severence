@@ -157,12 +157,14 @@ func outfit_of(a: Dictionary) -> String:
 
 func new_mech(pos: Vector2) -> Dictionary:
 	# 0.14: o Titan consome gasolina enquanto pilotado — começa com tanque parcial.
-	return {"p": pos, "hp": 240.0, "fuel": 70.0, "occupant": -1, "aim": Vector2.RIGHT, "step": 0.0, "deployed": true, "owner": -1}
+	return {"p": pos, "hp": 240.0, "fuel": 70.0, "occupant": -1, "aim": Vector2.RIGHT, "move_dir": Vector2.DOWN,
+		"step": 0.0, "deployed": true, "owner": -1}
 
 func reset_spectres() -> void:
 	spectres = []
 	for a in actors:
-		spectres.append({"owner": a.id, "state": "stored", "hp": SPECTRE_HP, "p": a.p, "aim": Vector2.RIGHT, "shot": 0.0})
+		spectres.append({"owner": a.id, "state": "stored", "hp": SPECTRE_HP, "p": a.p, "aim": Vector2.RIGHT,
+			"move_dir": Vector2.DOWN, "shot": 0.0})
 
 # Refúgio • Fora do Tempo — coordenadas iguais às de assets/environment/refuge/refuge_bg.png (1344x752).
 # Pisos e obstáculos são colisores invisíveis sobre a arte pintada.
@@ -680,7 +682,9 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 			# caiu na água: volta para onde saltou e perde meio coração
 			a.p = a.get("jump_from", a.p); damage_actor(a, 12)
 			effects.append({"p": a.p, "kind": "splash", "life": 0.5, "max": 0.5})
-	if a.mech: mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
+	if a.mech:
+		mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
+		if a.move.length() > 0.1: mech["move_dir"] = a.move.normalized()
 	if a.armor and not a.mech:
 		if (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
 	else:
@@ -1283,7 +1287,7 @@ func step_spectres(dt: float) -> void:
 		var offset: Vector2 = owner_actor.p - s.p
 		s["moving"] = offset.length() > 85
 		if s.moving:
-			s.aim = offset.normalized(); s["step"] = s.get("step", 0.0) + dt * 10
+			s["move_dir"] = offset.normalized(); s.aim = s.move_dir; s["step"] = s.get("step", 0.0) + dt * 10
 			# Small hover unit; collision still prevents moving through walls.
 			s.p = move_body(s.p, offset.normalized() * minf(420, offset.length() * 3) * dt, 10, true)
 		if offset.length() > 600:
