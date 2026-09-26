@@ -1,6 +1,6 @@
 # Marty — Fraturas do Tempo
 
-Versão de teste 0.13, construída em Godot 4.7.2 para Windows. É um protótipo funcional do núcleo do MVP, não uma campanha concluída ou a arte final dos cenários. Esta versão atualiza Marty, docas e HUD com base nas referências fornecidas; veja `docs/ART_0_4.md`. A 0.5 transforma o Refúgio • Fora do Tempo no cenário ilustrado do conceito v1; veja `docs/REFUGIO_0_5.md`. A 0.6 aplica os sprites do conceito v1: 4 visuais do Marty, os 4 inimigos das Docas e o chefe O Almirante das Profundezas; veja `docs/SPRITES_0_6.md`. A 0.9 separa **Uniformes** (Padrão, Mecânico, Espião — cada um com arma e atributos próprios) da **Armadura Ômega** (temporária, com espada); veja `docs/EQUIPAMENTO_0_9.md`. A 0.13 recria as Docas como um mapa fixo e grande (13 salas + secreta), com paredes, portões, névoa, props destrutíveis, barris explosivos em cadeia e reforços; veja `docs/CENARIO_0_13.md`.
+Versão de teste 0.14, construída em Godot 4.7.2 para Windows. É um protótipo funcional do núcleo do MVP, não uma campanha concluída ou a arte final dos cenários. Esta versão atualiza Marty, docas e HUD com base nas referências fornecidas; veja `docs/ART_0_4.md`. A 0.5 transforma o Refúgio • Fora do Tempo no cenário ilustrado do conceito v1; veja `docs/REFUGIO_0_5.md`. A 0.6 aplica os sprites do conceito v1: 4 visuais do Marty, os 4 inimigos das Docas e o chefe O Almirante das Profundezas; veja `docs/SPRITES_0_6.md`. A 0.9 separa **Uniformes** (Padrão, Mecânico, Espião — cada um com arma e atributos próprios) da **Armadura Ômega** (temporária, com espada); veja `docs/EQUIPAMENTO_0_9.md`. A 0.13 recria as Docas como um mapa fixo e grande (13 salas + secreta), com paredes, portões, névoa, props destrutíveis, barris explosivos em cadeia e reforços; veja `docs/CENARIO_0_13.md`. A 0.14 traz a nova tela de Equipamento (retratos, STATUS com os números reais, Ômega lendária), navegação por controle no menu e vida inicial fixa em 3 corações; o resumo de tudo está em `docs/HISTORICO_CLAUDE.md`.
 
 ## Jogar
 
@@ -10,7 +10,7 @@ Alternativa: importe `project.godot` no Godot e pressione **F5**. Não há depen
 
 No menu, escolha **JOGAR**, depois **SINGLE PLAYER — apenas Marty** ou **Marty + parceiro IA**. Escolha o equipamento e pressione **INICIAR ARENA**. A arena começa com inimigos à direita; novas ondas aparecem após dois segundos. O modo solo não tem parceiro ativo e reinicia quando Marty cai. Coop local e online possuem entradas próprias no menu.
 
-Para explorar, escolha **IR AO REFÚGIO** na tela de equipamento. No refúgio, suba a escadaria até o portal **DOCAS / 1941** e pressione **E**. A bancada (esquerda) usa fragmentos permanentes; a vitrine inferior esquerda alterna a armadura de treino; o Titan fica estacionado no hangar à direita. Núcleo, mural da equipe e o portal bloqueado também respondem ao **E**. A armadura de treinamento não é um desbloqueio permanente. **EXPEDIÇÃO DIRETA** também permite escolher solo ou parceiro IA.
+Para explorar, escolha **IR AO REFÚGIO** na tela de equipamento. No refúgio, suba a escadaria até o portal **DOCAS / 1941** e pressione **E**. A bancada (esquerda) ainda não compra melhorias; a vitrine inferior esquerda alterna a armadura de treino; o Titan fica estacionado no hangar à direita. Núcleo, mural da equipe e o portal bloqueado também respondem ao **E**. A armadura de treinamento não é um desbloqueio permanente. **EXPEDIÇÃO DIRETA** também permite escolher solo ou parceiro IA.
 
 **B** abre o equipamento; **C** invoca/recolhe o robô selecionado; **G** funde/separa o Spectre; **E** entra/sai do Titan. Invocações respeitam espaço, recarga e integridade: recolher não cura. Spectre acompanha e atira, ou se funde a Marty para absorver dano e aumentar velocidade e poder de fogo. A armadura continua binária. As três telas fornecidas pelo usuário são a base visual dos menus, com controles reais sobre a arte. Marty, inimigos e chefe usam os sprites do conceito v1; o Titan ainda usa a arte anterior.
 
@@ -43,7 +43,7 @@ O salto evita balas enquanto o personagem está no ar e permite cruzar o vão si
 5. O **06 Último Gerador** inicia o desafio opcional: sete guardiões em 55 segundos.
 6. Há uma **parede rachada** no topo do **07 Depósito de Munição**: um golpe corpo a corpo abre a passagem para o Contrabando.
 7. Pelo **09 Balcão do Farol** (ou pelo **11 Doque Seco**) chega-se à arena do **Almirante das Profundezas**. Derrote-o e use a cápsula de extração.
-10. Na bancada do refúgio, 2 fragmentos compram +10 de vida para a próxima tentativa, até 3 vezes.
+10. Todos começam com **3 corações**. A bancada do refúgio (melhoria de vida) está congelada até definirmos a progressão.
 
 Dinheiro e chaves reiniciam por tentativa. Fragmentos, vitórias, melhorias e armadura desbloqueada são salvos em `user://progress.json`, dentro da pasta de dados do Godot para este jogo. Em rede, esta primeira versão salva o progresso do anfitrião; progressão própria do convidado ainda não foi implementada.
 
@@ -90,6 +90,8 @@ Executar no PowerShell, na raiz do projeto:
 & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script tests/simulation_test.gd
 & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script tests/combat_regression_test.gd
 & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script tests/input_scene_test.gd
+# suíte completa (todos devem terminar com 0 falhas):
+Get-ChildItem tests\*_test.gd | ForEach-Object { & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script "tests/$($_.Name)" }
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/test_network.ps1
 ```
 

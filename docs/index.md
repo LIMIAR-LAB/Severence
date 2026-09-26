@@ -48,8 +48,11 @@ These pre-existing files were **not modified** by this scan; they remain the aut
 - [docs/TITAN_0_12.md](./TITAN_0_12.md) - Titan mech v0.12: heavy cannon, arced bomb, diagonal-pose fix (cross-checked in `architecture.md` §4 and `deep-dive-boss.md`)
 - [docs/CENARIO_0_12.md](./CENARIO_0_12.md) - Docks scenario v0.12: walls, fog of war, night lighting, Room 01 rebuild
 - [docs/DOCAS_0_11.md](./DOCAS_0_11.md) - Dungeon map v0.11: rooms, difficulty tuning, armor timing
+- [docs/HISTORICO_CLAUDE.md](./HISTORICO_CLAUDE.md) - Claude work history 0.5 → 0.14: timeline, where each feature lives, tests, tools, pending items
 - [docs/EQUIPAMENTO_0_9.md](./EQUIPAMENTO_0_9.md) - Uniform/Armor/Robot system spec (source of truth for balance, cross-checked in `architecture.md`)
 - [docs/SPRITES_0_6.md](./SPRITES_0_6.md) - Marty/enemy/boss sprite sheets, animation notes (v0.6–v0.8)
+- [docs/SPRITES_MARTY_0_15.md](./SPRITES_MARTY_0_15.md) - current Marty sprite-grid contract, visual scale and regeneration process
+- [docs/ROBOS_SPECTRE_0_15.md](./ROBOS_SPECTRE_0_15.md) - current Titan, Spectre and symbiosis visual contracts
 - [docs/REFUGIO_0_5.md](./REFUGIO_0_5.md) - Hub scene construction and points of interest
 - [docs/ART_0_4.md](./ART_0_4.md) - v0.4 visual direction notes
 - [docs/CHANGES_0_3.md](./CHANGES_0_3.md) - v0.3 changelog (menus, solo mode, robots)

@@ -1,7 +1,7 @@
 # Regras 0.12 — corações, escudo Ômega, portões e tentáculo
 
 ## Vida em corações
-- Marty começa com **3 corações**. 1 coração = 10 de vida; cada melhoria da bancada dá +1 coração.
+- Marty começa com **3 corações**. 1 coração = 10 de vida. (0.14: a vida inicial é sempre 3 corações; a bancada está congelada — ver `HISTORICO_CLAUDE.md`.)
 - Golpe comum tira **meio coração**. Golpe pesado tira **1 coração**: arpão, bala de canhão do Almirante, ou qualquer golpe com dano ≥ 20 depois do modificador do uniforme.
 - Depois de levar dano, 0,9s de invulnerabilidade.
 - Curas: baú, 1 coração; comerciante, 2 corações; desafio opcional, 2 corações; reanimar, 1,5 coração.

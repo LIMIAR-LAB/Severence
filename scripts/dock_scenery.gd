@@ -64,7 +64,13 @@ func discovered_rooms(sim) -> Array:
 		if room.kind == "secret" and not sim.secret_open: continue
 		if sim.mode != "run" or sim.visited.has(room.id):
 			out.append(room)
-			if not reveal_at.has(room.id): reveal_at[room.id] = sim.tick_time
+			# 0.15: tick_time recomeça em cada expedição; um registro antigo (de uma run anterior)
+			# ficava "no futuro" e a sala permanecia apagada até o relógio alcançá-lo.
+			if not reveal_at.has(room.id) or float(reveal_at[room.id]) > sim.tick_time: reveal_at[room.id] = sim.tick_time
+	# esquece salas que não estão mais descobertas (nova expedição, volta ao refúgio)
+	var ids := out.map(func(r): return r.get("id", ""))
+	for id in reveal_at.keys():
+		if not ids.has(id): reveal_at.erase(id)
 	return out
 
 func visible_floors(sim, rooms: Array) -> Array:
@@ -88,8 +94,8 @@ func draw_reveal(ci: CanvasItem, sim, rooms: Array) -> void:
 	# A sala recém-descoberta "acende" em 0,5s.
 	for room in rooms:
 		if not room.has("id"): continue
-		var age: float = sim.tick_time - reveal_at.get(room.id, -9.0)
-		if age < 0.5: ci.draw_rect(room.r.grow(40), Color(VOID, 1.0 - age / 0.5))
+		var age: float = sim.tick_time - float(reveal_at.get(room.id, -9.0))
+		if age >= 0.0 and age < 0.5: ci.draw_rect(room.r.grow(40), Color(VOID, 1.0 - age / 0.5))
 
 # ------------------------------------------------------------------ piso
 func style_of(room: Dictionary) -> Dictionary:
@@ -106,7 +112,7 @@ func pick_plank(ix: int, iy: int) -> String:
 func pick_granite(ix: int, iy: int) -> String:
 	if hash01(ix, iy, 3) < 0.8: return "granite_base"
 	var r := hash01(ix, iy, 4)
-	return "granite_moss" if r < 0.5 else ("granite_cracked" if r < 0.96 else "granite_puddle")
+	return "granite_moss" if r < 0.5 else "granite_cracked"   # 0.15: sem a poça quadrada (destoava)
 
 func tile_area(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, origin: Vector2 = Vector2.ZERO, tint: Color = Color.WHITE, yellow_row: int = -99) -> void:
 	var area := rect.intersection(view)

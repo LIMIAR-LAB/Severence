@@ -105,7 +105,9 @@ const HURT_IFRAMES := 0.9
 const OMEGA_SHIELD_HEARTS := 3
 
 func max_hp() -> float:
-	return (BASE_HEARTS + upgrade) * HEART
+	# 0.14: todos começam SEMPRE com 3 corações. As melhorias da bancada estão congeladas até
+	# definirmos a progressão de vida (o valor "upgrade" continua salvo para não perder o progresso).
+	return BASE_HEARTS * HEART
 
 func heart_damage(amount: float) -> float:
 	return HEART if amount >= 20.0 else HEART * 0.5
@@ -160,7 +162,7 @@ func new_mech(pos: Vector2) -> Dictionary:
 func reset_spectres() -> void:
 	spectres = []
 	for a in actors:
-		spectres.append({"owner": a.id, "state": "stored", "hp": 100.0, "p": a.p, "aim": Vector2.RIGHT, "shot": 0.0})
+		spectres.append({"owner": a.id, "state": "stored", "hp": SPECTRE_HP, "p": a.p, "aim": Vector2.RIGHT, "shot": 0.0})
 
 # Refúgio • Fora do Tempo — coordenadas iguais às de assets/environment/refuge/refuge_bg.png (1344x752).
 # Pisos e obstáculos são colisores invisíveis sobre a arte pintada.
@@ -169,7 +171,7 @@ const HUB_POINTS := [
 	{"id": "portal", "p": Vector2(655, 215), "r": 80, "label": "E • DOCAS / 1941"},
 	{"id": "lost", "p": Vector2(965, 275), "r": 85, "label": "COORDENADA PERDIDA • BLOQUEADO"},
 	{"id": "core", "p": Vector2(640, 455), "r": 70, "label": "E • NÚCLEO TEMPORAL"},
-	{"id": "bench", "p": Vector2(330, 335), "r": 85, "label": "E • BANCADA / 2 fragmentos"},
+	{"id": "bench", "p": Vector2(330, 335), "r": 85, "label": "E • BANCADA (em breve)"},
 	{"id": "armor", "p": Vector2(265, 580), "r": 85, "label": "E • TROCAR UNIFORME"},
 	{"id": "mural", "p": Vector2(672, 478), "r": 55, "label": "E • MURAL DA EQUIPE"},
 	{"id": "hangar", "p": Vector2(1000, 545), "r": 70, "label": "HANGAR DO TITAN"}]
@@ -638,7 +640,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		a.dodge = 0.20; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
 		a.dash_dir = moving.normalized() if moving.length() > 0.1 else a.facing.normalized()
 	var speed: float = 190.0 if a.mech else (ARMORS[a.armor_type].speed if a.armor else uniform_of(a).speed)
-	if a.fused: speed = 360.0
+	if a.fused: speed = FUSION.speed
 	if a.jump > 0: speed *= 1.12
 	# Titan: pesado (190), mas Shift segura o TURBO dos propulsores enquanto houver energia.
 	var boosting := false
@@ -745,21 +747,29 @@ func weapon_of(a: Dictionary) -> String:
 	if a.armor: return "omega_sword"
 	return uniform_of(a).weapon
 
+# 0.14: tabela única das armas — o jogo e a tela de Equipamento (loadout_stats) leem daqui.
+const WEAPONS := {
+	"pistol": {"count": 1, "damage": 16.0, "cooldown": 0.22, "speed": 660.0, "radius": 4.0, "spread": 0.12, "kind": "p_pistol", "pierce": 0},
+	"shotgun": {"count": 6, "damage": 9.0, "cooldown": 0.65, "speed": 620.0, "radius": 4.0, "spread": 0.11, "kind": "p_pellet", "pierce": 0},
+	"smg": {"count": 1, "damage": 7.0, "cooldown": 0.085, "speed": 740.0, "radius": 4.0, "spread": 0.12, "kind": "p_smg", "pierce": 0},
+	# Canhão de Plasma Ômega: disparo duplo, perfurante.
+	"omega": {"count": 2, "damage": 24.0, "cooldown": 0.2, "speed": 860.0, "radius": 7.0, "spread": 0.05, "kind": "p_omega", "pierce": 2}}
+const SWORD := {"hit": 38.0, "finisher": 64.0, "wave": 30.0}   # Lâmina Ômega (3º corte + onda)
+const MECH_PUNCH := 55.0
+const SPECTRE_SHOT := {"damage": 9.0, "cooldown": 0.55}
+const SPECTRE_HP := 100.0
+const FUSION := {"damage": 1.35, "cadence": 0.8, "speed": 360.0}
+
 func fire_actor(a: Dictionary) -> void:
 	var weapon := weapon_of(a)
-	var count := 1; var damage := 14.0; var cooldown := 0.25; var speed := 660.0; var radius := 4.0; var spread := 0.12
-	var kind := "p_pistol"; var pierce := 0
-	match weapon:
-		"pistol": damage = 16; cooldown = 0.22
-		"shotgun": count = 6; damage = 9; cooldown = 0.65; kind = "p_pellet"; speed = 620; spread = 0.11
-		"smg": damage = 7; cooldown = 0.085; kind = "p_smg"; speed = 740
-		"omega":
-			# Canhão de Plasma Ômega: exclusivo da armadura. Disparo duplo, perfurante e muito mais forte.
-			count = 2; damage = 24; cooldown = 0.2; speed = 860; radius = 7; spread = 0.05; kind = "p_omega"; pierce = 2
-		"mech":
-			damage = MECH_SHELL.damage; cooldown = MECH_SHELL.cooldown; radius = MECH_SHELL.radius; speed = MECH_SHELL.speed; kind = "p_heavy"
-			mech.fuel = maxf(0, mech.fuel - FUEL_SHOT)
-	if a.fused: damage *= 1.35; cooldown *= 0.8
+	var w: Dictionary = WEAPONS.get(weapon, WEAPONS.pistol)
+	var count: int = w.count; var damage: float = w.damage; var cooldown: float = w.cooldown; var speed: float = w.speed
+	var radius: float = w.radius; var spread: float = w.spread; var kind: String = w.kind; var pierce: int = w.pierce
+	if weapon == "mech":
+		count = 1; spread = 0.0; pierce = 0
+		damage = MECH_SHELL.damage; cooldown = MECH_SHELL.cooldown; radius = MECH_SHELL.radius; speed = MECH_SHELL.speed; kind = "p_heavy"
+		mech.fuel = maxf(0, mech.fuel - FUEL_SHOT)
+	if a.fused: damage *= FUSION.damage; cooldown *= FUSION.cadence
 	for n in range(count):
 		var direction: Vector2 = a.aim.rotated((n - (count - 1) / 2.0) * spread)
 		add_bullet(a.p + direction * (40 if a.mech else 34), direction, 0, damage, speed, radius, a.id, kind)
@@ -778,7 +788,7 @@ func sword_attack(a: Dictionary) -> void:
 	var finisher := hit == 2
 	var reach := 120.0 if finisher else 100.0
 	var arc := 0.25 if finisher else 0.1   # produto escalar mínimo (≈ 150° / 170°)
-	var damage := 64.0 if finisher else 38.0
+	var damage: float = SWORD.finisher if finisher else SWORD.hit
 	a.slash = 0.32; a.shot = 0.42 if finisher else 0.24; a.facing = a.aim
 	a["swing"] = hit
 	effects.append({"p": a.p, "kind": "sword", "life": 0.26, "max": 0.26, "dir": a.aim, "combo": hit, "owner": a.id})
@@ -794,7 +804,7 @@ func sword_attack(a: Dictionary) -> void:
 	props_in_arc(a, reach, damage)
 	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125: open_secret()
 	if finisher:
-		add_bullet(a.p + a.aim * 40, a.aim, 0, 30, 540, 16, a.id, "p_wave", 0.65)
+		add_bullet(a.p + a.aim * 40, a.aim, 0, SWORD.wave, 540, 16, a.id, "p_wave", 0.65)
 		bullets[-1]["pierce"] = 5
 
 func props_in_arc(a: Dictionary, reach: float, damage: float) -> void:
@@ -813,7 +823,7 @@ func melee(a: Dictionary) -> void:
 	for e in enemies:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach and offset.normalized().dot(a.aim) > 0.05:
-			e.hp -= 55.0 if a.mech else float(uniform_of(a).melee); e.hurt = 0.15
+			e.hp -= MECH_PUNCH if a.mech else float(uniform_of(a).melee); e.hurt = 0.15
 	props_in_arc(a, reach, 40.0 if a.mech else float(uniform_of(a).melee))
 	# A clearly hinted crack opens with a close attack, never a consumable key.
 	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125:
@@ -854,9 +864,7 @@ func interact(a: Dictionary) -> void:
 			"core":
 				say("Núcleo Temporal estável • expedições concluídas: %d • fragmentos: %d" % [clears, materials]); return
 			"bench":
-				if materials >= 2 and upgrade < 3:
-					materials -= 2; upgrade += 1; say("Vitalidade ampliada: +10 de vida na próxima expedição.")
-				else: say("Bancada: 2 fragmentos por +10 de vida. Máximo de 3 melhorias (%d/3)." % upgrade)
+				say("Bancada: melhorias de vida em breve. Por enquanto todos começam com 3 corações.")
 				return
 			"armor":
 				# Vitrine: troca o UNIFORME (Padrão → Mecânico → Espião). A armadura é o R.
@@ -1283,8 +1291,8 @@ func step_spectres(dt: float) -> void:
 		if not target.is_empty() and line_of_fire(s.p, target.p):
 			s.aim = (target.p - s.p).normalized()
 			if s.shot <= 0:
-				add_bullet(s.p + s.aim * 20, s.aim, 0, 9, 600, 4, s.owner)
-				s.shot = 0.55
+				add_bullet(s.p + s.aim * 20, s.aim, 0, SPECTRE_SHOT.damage, 600, 4, s.owner)
+				s.shot = SPECTRE_SHOT.cooldown
 
 func snapshot() -> Dictionary:
 	var data := {}
@@ -1295,3 +1303,45 @@ func snapshot() -> Dictionary:
 
 func apply_snapshot(data: Dictionary) -> void:
 	for name in data: set(name, data[name])
+
+
+# ── 0.14: números da tela de Equipamento, sempre calculados das mesmas constantes do jogo ──
+# Cada linha: {label, valor exibido, fração 0..1 para a barra (-1 = sem barra), cor}
+func loadout_stats(kind: String, outfit: String = "padrao") -> Array:
+	var u: Dictionary = UNIFORMS.get(outfit, UNIFORMS.padrao)
+	var rows: Array = []
+	match kind:
+		"omega":
+			var ar: Dictionary = ARMORS.omega
+			rows = [["CORAÇÕES", "%d + %d escudo" % [BASE_HEARTS, OMEGA_SHIELD_HEARTS], -1.0, "hearts_shield"],
+				["VELOCIDADE", str(int(ar.speed)), ar.speed / 430.0, "cyan"],
+				["LÂMINA", "%d / %d / %d" % [SWORD.hit, SWORD.hit, SWORD.finisher], SWORD.finisher / 70.0, "orange"],
+				["ONDA", "%d (atravessa)" % SWORD.wave, SWORD.wave / 70.0, "gold"],
+				["DURAÇÃO", "%ds" % int(ar.duration), ar.duration / 10.0, "green"],
+				["RECARGA", "%ds" % int(ar.cooldown), 1.0 - ar.cooldown / 120.0, "violet"]]
+		"titan":
+			rows = [["INTEGRIDADE", str(int(new_mech(Vector2.ZERO).hp)), 1.0, "green"],
+				["VELOCIDADE", "190 • turbo 420", 190.0 / 430.0, "cyan"],
+				["CANHÃO", "%d + %d área" % [MECH_SHELL.damage, MECH_SHELL.splash_damage], MECH_SHELL.damage / 100.0, "orange"],
+				["BOMBA (R)", "%d • raio %d" % [MECH_BOMB.damage, MECH_BOMB.radius], MECH_BOMB.damage / 100.0, "gold"],
+				["SOCO", str(int(MECH_PUNCH)), MECH_PUNCH / 70.0, "orange"],
+				["GASOLINA", "começa %d%%" % int(new_mech(Vector2.ZERO).fuel), new_mech(Vector2.ZERO).fuel / FUEL_MAX, "violet"]]
+		"spectre":
+			rows = [["ENERGIA", str(int(SPECTRE_HP)), 1.0, "green"],
+				["TIRO", "%d a cada %.2fs" % [SPECTRE_SHOT.damage, SPECTRE_SHOT.cooldown], SPECTRE_SHOT.damage / 20.0, "gold"],
+				["FUSÃO DANO", "+%d%%" % int(roundf((FUSION.damage - 1.0) * 100)), FUSION.damage - 1.0, "orange"],
+				["FUSÃO RITMO", "+%d%%" % int(roundf((1.0 / FUSION.cadence - 1.0) * 100)), 1.0 / FUSION.cadence - 1.0, "violet"],
+				["FUSÃO VELOC.", str(int(FUSION.speed)), FUSION.speed / 430.0, "cyan"],
+				["ABSORVE", "golpes", -1.0, "cyan"]]
+		_:
+			var w: Dictionary = WEAPONS[u.weapon]
+			var per_shot: float = w.damage * w.count
+			var dps: float = per_shot / w.cooldown
+			rows = [["CORAÇÕES", str(BASE_HEARTS), -1.0, "hearts"],
+				["VELOCIDADE", str(int(u.speed)), u.speed / 430.0, "cyan"],
+				["GOLPE", str(int(u.melee)), u.melee / 50.0, "orange"],
+				["DANO / TIRO", ("%d×%d" % [w.count, w.damage]) if w.count > 1 else str(int(w.damage)), per_shot / 60.0, "gold"],
+				["DANO / SEG", str(int(roundf(dps))), dps / 90.0, "gold"],
+				["DEFESA", "%+d%%" % int(roundf((1.0 - u.taken) * 100)), clampf(0.5 + (1.0 - u.taken) * 2.5, 0, 1), "green"],
+				["DASH", "%.2fs" % u.dash_cd, clampf(0.35 / u.dash_cd, 0, 1), "violet"]]
+	return rows
