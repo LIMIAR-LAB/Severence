@@ -49,5 +49,11 @@ func _init() -> void:
 	check(s.enemies.any(func(e): return e.kind == "warden"), "onda 5 inclui Warden elite")
 	check(s.enemies.all(func(e): return e.max > 0 and e.damage_scale > 1.0), "onda aplica escala de vida e dano")
 
+	# Trocar de modo cancela qualquer materialização ainda pendente.
+	s = arena(); s.arena_wave = 3; s.spawn_arena_wave()
+	check(not s.pending_spawns.is_empty(), "arena possui spawns aguardando portal")
+	s.make_hub(); s.step_enemies(1.0)
+	check(s.pending_spawns.is_empty() and s.enemies.is_empty(), "spawns da arena não vazam para o Refúgio")
+
 	print("NEW_ENEMIES_TESTS failures=", failures)
 	quit(1 if failures else 0)

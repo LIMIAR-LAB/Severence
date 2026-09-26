@@ -180,6 +180,7 @@ const HUB_TITAN_BAY := Vector2(1140, 548)
 func make_hub() -> void:
 	doors.clear(); gate_blocks.clear(); hazards.clear()
 	mode = "hub"
+	pending_spawns.clear()   # 0.15: portais atrasados da arena não atravessam para o Refúgio
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
 	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [
@@ -217,6 +218,7 @@ func hub_point_near(pos: Vector2) -> Dictionary:
 
 func start_arena() -> void:
 	mode = "arena"; tick_time = 0; arena_wave = 0; arena_wait = 0
+	pending_spawns.clear()
 	side_active = false; side_complete = false; side_failed = false; side_time = 0
 	actors = [actor(0, Vector2(400, 600)), actor(1, Vector2(470, 650))]
 	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
@@ -253,6 +255,7 @@ func spawn_arena_wave() -> void:
 
 func start_run(new_seed: int) -> void:
 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
+	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
 	seed_value = new_seed; rng.seed = seed_value
 	mode = "run"; tick_time = 0; money = 12; keys = 1
 	side_active = false; side_complete = false; side_failed = false; shop_bought = false
