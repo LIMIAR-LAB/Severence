@@ -66,7 +66,7 @@ func show_screen(next: String) -> void:
 		stage.remove_child(content); content.queue_free()
 	content = Control.new(); content.size = Vector2(1344, 752); stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null
-	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "equipment" if next == "equipment" else "menu") + ".png")
+	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "equipment_v2" if next == "equipment" else "menu") + ".png")
 	if next == "play": bg.texture = load("res://assets/ui/adventure.png")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if bg.texture.resource_path.ends_with("menu.png"):
@@ -79,6 +79,7 @@ func show_screen(next: String) -> void:
 		"play": build_play()
 		"seed": build_seed()
 		"options": build_options()
+	if next != "equipment": focus_first.call_deferred()   # navegação pelo controle
 
 func open(page: String = "main") -> void:
 	show(); app.paused = app.playing and not app.online
@@ -227,69 +228,156 @@ var companion_body: Label
 var weapon_icon: TextureRect
 var weapon_label: Label
 
-# Tela de equipamento: UNIFORME (skin + arma), ARMADURA levada (ativada com R) e ROBÔ.
-# Cada clique já aplica a escolha — não há botão de aplicar.
+# Tela de equipamento 0.13 (conceito art/concept/equipamento-v2-conceito-*.png).
+# Fundo estático: assets/ui/equipment_v2.png (tools/equipment_concept.py bg). Tudo que muda é Control real.
+# Cada clique já aplica a escolha. Controle: direcional navega, A seleciona, B volta, LB/RB trocam o uniforme.
+const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
+const UNIFORM_CARDS := [["padrao", "1. PADRÃO", "equilibrado", Color("65f0f5")], ["mecanico", "2. MECÂNICO", "+ força", Color("8fdc6a")], ["espiao", "3. ESPIÃO", "+ velocidade", Color("b98cff")]]
+const SHORT_DESC := {"padrao": "Equilibrado em tudo. Blaster de energia com cadência média.",
+	"mecanico": "Mais força e resistência. Chave inglesa pesada; um pouco mais lento.",
+	"espiao": "Rápido e discreto: os inimigos só o notam de perto."}
+const SHOT_DAMAGE := {"padrao": 16, "mecanico": 54, "espiao": 7}   # por disparo (escopeta: 6 × 9)
+const LEGEND := Color("ffc94a")
+
+class StatPanel extends Control:
+	var host
+	func _draw() -> void: host.draw_stats(self)
+
+var stage_title: Label
+var stage_line: Label
+var stat_panel: StatPanel
+var info_icons: Array = []
+var info_titles: Array = []
+var info_bodies: Array = []
+var actor_tabs: Array = []
+
+func sprite_of(key: String) -> AtlasTexture:
+	if key == "titan": return atlas("res://assets/mech/titan_v2.png", Rect2(880, 0, 176, 176))
+	if key == "spectre": return atlas("res://assets/mech/spectre-feral.png", Rect2(0, 0, 128, 128))
+	return atlas("res://assets/marty/outfits.png", Rect2(0, 96 * OUTFIT_ROW.get(key, 0), 96, 96))
+
+func icon_at(parent: Control, rect: Rect2, tex: Texture2D) -> TextureRect:
+	var icon := TextureRect.new(); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture = tex; icon.position = rect.position; icon.size = rect.size
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(icon); return icon
+
 func build_equipment() -> void:
-	panel(content, Rect2(166, 20, 222, 42), Color("0b1a22"), Color("0b1a22"))
-	label(content, Rect2(172, 22, 206, 38), "UNIFORME", 22, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	panel(content, Rect2(147, 65, 287, 455), Color("0b2430"), Color("365566"))
-	var slots := [["o_padrao", "PADRÃO", "equilibrado", 0], ["o_mecanico", "MECÂNICO", "+ força", 2], ["o_espiao", "ESPIÃO", "+ velocidade", 1]]
-	for i in range(3):
-		var data: Array = slots[i]
-		var key: String = data[0]
-		var b := button(content, Rect2(155, 75 + i * 98, 270, 90), "", func(): choose(key))
+	info_icons.clear(); info_titles.clear(); info_bodies.clear(); actor_tabs.clear()
+	# abas de jogador (coop local: equipar Marty ou Echo)
+	for i in 2:
+		var tab := button(content, Rect2(1090 + i * 118, 18, 110, 30), "MARTY" if i == 0 else "ECHO (P2)", func(): select_actor(i))
+		tab.add_theme_font_size_override("font_size", 14); tab.focus_mode = Control.FOCUS_NONE
+		tab.disabled = i == 1 and not (app.playing and app.sim.coop == "local")
+		actor_tabs.append(tab)
+	live_status = label(content, Rect2(640, 21, 440, 26), "", 13, Color("9fc3bb")); live_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	# UNIFORME: cartões com o sprite do jogo
+	for i in 3:
+		var data: Array = UNIFORM_CARDS[i]
+		var key: String = "o_" + data[0]
+		var y := 110 + i * 100
+		var b := button(content, Rect2(28, y, 316, 90), "", func(): choose(key), true)
 		b.name = "Slot_" + key; slot_buttons[key] = b
-		label(b, Rect2(95, 14, 175, 30), data[1], 17, GOLD)
-		label(b, Rect2(95, 44, 175, 30), data[2], 14, Color("b6dfdc"))
-		add_icon(b, atlas("res://assets/marty/outfits.png", Rect2(0, data[3] * 96, 96, 96)))
-	# Armaduras: escolha UMA para levar (ativada com R). Outras virão depois.
-	label(content, Rect2(160, 370, 270, 26), "ARMADURA — escolha 1 (R)", 14, CYAN)
-	for i in range(3):
-		var key := "armor_omega" if i == 0 else "armor_locked" + str(i)
-		var ab := button(content, Rect2(155 + i * 92, 398, 86, 112), "", func(): choose(key))
-		ab.name = "Slot_" + key; slot_buttons[key] = ab
-		if i == 0:
-			var icon := TextureRect.new(); icon.texture = atlas("res://assets/marty/outfits.png", Rect2(0, 288, 96, 96))
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.position = Vector2(4, 2); icon.size = Vector2(78, 80); icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; ab.add_child(icon)
-			label(ab, Rect2(4, 84, 78, 24), "ÔMEGA", 14, CYAN).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		else:
-			ab.disabled = true
-			label(ab, Rect2(4, 30, 78, 40), "?", 30, Color("48606a")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			label(ab, Rect2(4, 84, 78, 24), "BLOQUEADA", 11, Color("48606a")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	panel(content, Rect2(474, 35, 377, 313), Color("07303e"), CYAN)
-	preview = TextureRect.new(); preview.position = Vector2(525, 66); preview.size = Vector2(270, 265); preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(preview)
-	panel(content, Rect2(480, 365, 364, 93), Color("0b242c"), Color("477f82"))
-	current_choice = label(content, Rect2(493, 371, 340, 80), "", 15, GOLD)
-	# Three permanent information regions; selection only changes the preview.
-	panel(content, Rect2(895, 20, 310, 505), Color("081e29"), Color("497381"))
-	info_title = label(content, Rect2(910, 30, 280, 27), "", 18, GOLD)
-	info_body = label(content, Rect2(910, 62, 280, 125), "", 14, Color("b6dfdc"))
-	info_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label(content, Rect2(910, 198, 280, 27), "ARMADURA TEMPORÁRIA", 18, CYAN)
-	armor_body = label(content, Rect2(910, 230, 280, 145), "", 14, Color("b6dfdc"))
-	armor_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label(content, Rect2(910, 383, 280, 27), "COMPANHEIRO", 18, CYAN)
-	companion_body = label(content, Rect2(910, 413, 280, 104), "", 14, Color("b6dfdc"))
-	companion_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	for i in range(3):
-		var key: String = ["titan", "spectre", "locked_robot"][i]
-		var b := button(content, Rect2(344 + i * 237, 574, 201, 140), "", func(): choose(key), true)
-		b.disabled = i == 2; slot_buttons["robot" + str(i)] = b
-		if i == 1:
-			panel(b, Rect2(3, 3, 195, 114), Color("082331"), Color("082331"))
-			var icon := TextureRect.new(); icon.texture = atlas("res://assets/mech/spectre-feral.png", Rect2(0, 0, 128, 128))
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.position = Vector2(40, 0); icon.size = Vector2(120, 112); icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; b.add_child(icon)
-		panel(content, Rect2(347 + i * 237, 692, 193, 22), Color("082331"), Color("082331"))
-		label(content, Rect2(353 + i * 237, 692, 185, 22), ["TITAN • PILOTAR", "SPECTRE • FUNDIR", "BLOQUEADO"][i], 15)
-	button(content, Rect2(22, 622, 224, 45), "VOLTAR", func(): show_screen("main"))
-	button(content, Rect2(22, 681, 224, 45), "CONTINUAR" if app.playing and pending_mode == "current" else "INICIAR ARENA", launch)
-	detail = label(content, Rect2(24, 540, 240, 80), "R vestir armadura\nC invocar/recolher robô\nE pilotar Titan • G fundir Spectre", 14, GOLD)
-	live_status = label(content, Rect2(1000, 560, 270, 60), "", 14, CYAN)
-	telemetry = label(content, Rect2(1000, 620, 270, 40), "", 12, GOLD)
-	button(content, Rect2(480, 479, 365, 42), "IR AO REFÚGIO", launch_refuge)
-	if app.playing and app.sim.coop == "local":
-		button(content, Rect2(1000, 680, 270, 36), "EDITAR OUTRO JOGADOR", swap_actor).add_theme_font_size_override("font_size", 14)
+		icon_at(b, Rect2(6, 2, 96, 86), sprite_of(data[0]))
+		label(b, Rect2(112, 12, 200, 26), data[1], 18, Color("e2e8dc")).name = "Name"
+		label(b, Rect2(112, 38, 200, 22), data[2], 14, data[3])
+		label(b, Rect2(112, 60, 200, 20), app.sim.UNIFORMS[data[0]].weapon_name, 11, Color("7f9a9a"))
+	# ARMADURA lendária (única disponível por enquanto — liberada para testes)
+	var ab := button(content, Rect2(28, 494, 96, 122), "", func(): choose("armor_omega"), true)
+	ab.name = "Slot_armor_omega"; slot_buttons["armor_omega"] = ab
+	icon_at(ab, Rect2(4, 4, 88, 82), sprite_of("omega"))
+	label(ab, Rect2(0, 86, 96, 18), "ÔMEGA", 13, LEGEND).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label(ab, Rect2(0, 102, 96, 16), "★ LENDÁRIA", 10, Color("ffe7a6")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# PALCO: retrato em cena (assets/ui/portraits)
+	preview = TextureRect.new(); preview.position = Vector2(362, 70); preview.size = Vector2(620, 448)
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	preview.clip_contents = true; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(preview)
+	var fade := TextureRect.new(); var grad := GradientTexture2D.new(); grad.fill_from = Vector2(0, 1); grad.fill_to = Vector2(0, 0)
+	grad.gradient = Gradient.new(); grad.gradient.set_color(0, Color(0.02, 0.05, 0.07, 0.92)); grad.gradient.set_color(1, Color(0.02, 0.05, 0.07, 0))
+	fade.texture = grad; fade.position = Vector2(362, 418); fade.size = Vector2(620, 100); fade.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(fade)
+	stage_title = label(content, Rect2(362, 446, 620, 34), "", 24, Color.WHITE); stage_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stage_line = label(content, Rect2(362, 480, 620, 24), "", 13, CYAN); stage_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	for side in [-1, 1]:
+		var arrow := button(content, Rect2(368 if side < 0 else 940, 276, 36, 36), "◀" if side < 0 else "▶", func(): cycle_outfit(side))
+		arrow.add_theme_font_size_override("font_size", 16); arrow.focus_mode = Control.FOCUS_NONE
+		label(content, Rect2(368 if side < 0 else 940, 314, 36, 16), "LB" if side < 0 else "RB", 10, Color("7f9a9a")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# STATUS (desenhado) + descrições com sprites
+	stat_panel = StatPanel.new(); stat_panel.host = self; stat_panel.position = Vector2(1004, 64); stat_panel.size = Vector2(324, 260); stat_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(stat_panel)
+	for i in 3:
+		var y := 344 + i * 76
+		info_icons.append(icon_at(content, Rect2(1022, y + 4, 56, 60), null))
+		info_titles.append(label(content, Rect2(1092, y + 2, 226, 20), "", 13, CYAN))
+		var body := label(content, Rect2(1092, y + 22, 226, 48), "", 12, Color("c8d0cc")); body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		info_bodies.append(body)
+	# ROBÔ
+	var robots := [["titan", "TITAN", "PILOTAR (E)", Color("8fdc6a")], ["spectre", "SPECTRE", "FUNDIR (G)", Color("b98cff")]]
+	for i in 2:
+		var r: Array = robots[i]
+		var key: String = r[0]
+		var b := button(content, Rect2(372 + i * 204, 578, 192, 96), "", func(): choose(key), true)
+		slot_buttons["robot" + str(i)] = b
+		icon_at(b, Rect2(4, 4, 88, 88), sprite_of(key))
+		label(b, Rect2(96, 14, 94, 24), r[1], 16, Color("e2e8dc"))
+		panel(b, Rect2(96, 48, 88, 24), Color(r[3], 0.18), r[3])
+		label(b, Rect2(96, 50, 88, 22), r[2], 11, r[3]).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	telemetry = label(content, Rect2(700, 546, 272, 22), "", 11, Color("9fc3bb")); telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	# BOTÕES
+	var refuge := button(content, Rect2(1004, 580, 324, 50), "IR AO REFÚGIO  ▶", launch_refuge); refuge.add_theme_font_size_override("font_size", 20)
+	var start := button(content, Rect2(1004, 636, 324, 48), "CONTINUAR" if app.playing and pending_mode == "current" else "⚔  INICIAR ARENA", launch)
+	start.add_theme_color_override("font_color", Color("f08a24")); start.add_theme_color_override("font_hover_color", Color("ffb45a"))
+	var back := button(content, Rect2(16, 636, 340, 48), "◀  VOLTAR", func(): show_screen("main"))
+	back.add_theme_color_override("font_color", Color("e8be6e")); back.name = "Back"
 	refresh_gear()
+	var first: Button = slot_buttons.get("o_" + outfit_choice, slot_buttons["o_padrao"])
+	first.grab_focus.call_deferred()
+
+func select_actor(i: int) -> void:
+	if gear_actor != i: swap_actor()
+
+# Controle: LB/RB trocam o uniforme, B volta (os botões usam o foco do Godot: direcional + A).
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible: return
+	if event is InputEventJoypadButton and event.pressed:
+		if screen == "equipment" and event.button_index == JOY_BUTTON_LEFT_SHOULDER: cycle_outfit(-1); accept_event()
+		elif screen == "equipment" and event.button_index == JOY_BUTTON_RIGHT_SHOULDER: cycle_outfit(1); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus == null and (event.is_action_pressed("ui_down") or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_accept")):
+		focus_first(); accept_event()
+
+func focus_first() -> void:
+	# primeiro botão visível da tela recebe o foco (para jogar só com o controle)
+	var stack: Array = [content]
+	while not stack.is_empty():
+		var n: Node = stack.pop_front()
+		if n is Button and n.visible and not n.disabled and n.focus_mode != Control.FOCUS_NONE: n.grab_focus(); return
+		stack.append_array(n.get_children())
+
+func cycle_outfit(step: int) -> void:
+	var order := ["padrao", "mecanico", "espiao"]
+	var i := (order.find(outfit_choice) + step + order.size()) % order.size()
+	choose("o_" + order[i])
+	if slot_buttons.has("o_" + outfit_choice): slot_buttons["o_" + outfit_choice].grab_focus()
+
+func draw_stats(c: Control) -> void:
+	var sim = app.sim
+	var u: Dictionary = sim.UNIFORMS[outfit_choice]
+	var f := ThemeDB.fallback_font
+	var hearts := int(roundf(sim.max_hp() / sim.HEART))
+	for h in hearts:
+		var x := 146.0 + h * 24; var y := 50.0
+		c.draw_colored_polygon(PackedVector2Array([Vector2(x, y + 6), Vector2(x + 10, y + 19), Vector2(x + 20, y + 6), Vector2(x + 15, y), Vector2(x + 10, y + 4), Vector2(x + 5, y)]), Color("e8404e"))
+	c.draw_string(f, Vector2(304 - 20, 64), str(hearts), HORIZONTAL_ALIGNMENT_RIGHT, 20, 14, Color("e2e8dc"))
+	var rows := [[u.speed, 430.0, CYAN, str(int(u.speed))], [u.melee, 50.0, Color("f08a24"), str(int(u.melee))],
+		[SHOT_DAMAGE.get(outfit_choice, 16), 60.0, Color("e8be6e"), str(SHOT_DAMAGE.get(outfit_choice, 16))],
+		[2.0 - u.taken, 1.2, Color("8fdc6a"), "%+d%%" % int(roundf((1.0 - u.taken) * 100))],
+		[1.0 / u.dash_cd, 3.0, Color("b98cff"), "%.2fs" % u.dash_cd]]
+	for i in rows.size():
+		var r: Array = rows[i]
+		var y := 87.0 + i * 34
+		c.draw_rect(Rect2(124, y, 132, 10), Color("14202a")); c.draw_rect(Rect2(124, y, 132, 10), Color("28404a"), false, 1)
+		var fill := int(roundf(12 * clampf(float(r[0]) / r[1], 0, 1)))
+		for n in 12: c.draw_rect(Rect2(126 + n * 10.7, y + 2, 8.7, 6), r[2] if n < fill else Color("1a2c32"))
+		c.draw_string(f, Vector2(264, y + 10), r[3], HORIZONTAL_ALIGNMENT_RIGHT, 40, 13, r[2])
 
 func add_icon(parent: Control, tex: Texture2D) -> void:
 	var icon := TextureRect.new(); icon.texture = tex
@@ -318,29 +406,43 @@ func refresh_gear() -> void:
 	if preview == null: return
 	var sim = app.sim
 	var uni: Dictionary = sim.UNIFORMS[outfit_choice]
-	var armor: Dictionary = sim.ARMORS.omega
-	var rows_by_key := {"o_padrao": 0, "o_espiao": 1, "o_mecanico": 2, "armor_omega": 3}
-	# retrato de vitrine (tools/make_portraits.py); cai no sprite do jogo se não existir
+	# palco: retrato em cena (tools/make_portraits.py); sem retrato, o sprite do jogo
 	var portrait := "res://assets/ui/portraits/%s.png" % preview_kind
 	if ResourceLoader.exists(portrait):
-		preview.texture = load(portrait); preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-		preview.position = Vector2(478, 39); preview.size = Vector2(369, 305)
-	elif preview_kind == "titan": preview.texture = atlas("res://assets/mech/titan_v2.png", Rect2(880, 0, 176, 176))
-	elif preview_kind == "spectre": preview.texture = atlas("res://assets/mech/spectre-feral.png", Rect2(0, 0, 128, 128))
-	else: preview.texture = atlas("res://assets/marty/outfits.png", Rect2(0, 96 * rows_by_key.get(preview_kind, 0), 96, 96))
-	if not ResourceLoader.exists(portrait):
-		preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; preview.position = Vector2(525, 66); preview.size = Vector2(270, 265)
-	info_title.text = "UNIFORME " + uni.name
-	info_body.text = uni.desc + "\nArma: " + uni.weapon_name
-	armor_body.text = "ÔMEGA • R • 5s / recarga 60s\nLâmina: 38/38/64, final com onda.\nVelocidade 430 • resistência 60%.\nTiros: mínimo de 1 coração após resistência. Baús recarregam."
-	companion_body.text = ("TITAN • C invoca, E pilota.\nCanhão, bomba e turbo (Shift).\nIntegridade absorve impactos." if robot_choice == "titan" else "SPECTRE FERAL • C invoca.\nPredador de apoio; G funde/separa.\nFusão: +velocidade/dano. Energia absorve impactos; incompatível com Ômega.")
-	current_choice.text = "%s • UNIFORME %s\nARMA: %s\nARMADURA: ÔMEGA (R)  •  ROBÔ: %s" % ["ECHO" if gear_actor == 1 else "MARTY", uni.name, uni.weapon_name, robot_choice.to_upper()]
+		preview.texture = load(portrait); preview.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	else:
+		preview.texture = sprite_of(preview_kind.trim_prefix("o_").replace("armor_", "")); preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var who := "ECHO" if gear_actor == 1 else "MARTY"
+	match preview_kind:
+		"titan": stage_title.text = "TITAN-01 • ROBÔ PILOTÁVEL"
+		"spectre": stage_title.text = "SPECTRE • COMPANHEIRO FERAL"
+		"armor_omega": stage_title.text = "%s • ARMADURA ÔMEGA ★ LENDÁRIA" % who
+		_: stage_title.text = "%s • UNIFORME %s" % [who, uni.name]
+	stage_title.add_theme_color_override("font_color", LEGEND if preview_kind == "armor_omega" else Color.WHITE)
+	stage_line.text = "ARMA: %s   |   ARMADURA: ÔMEGA (R)   |   ROBÔ: %s" % [uni.weapon_name, robot_choice.to_upper()]
+	# descrições com os sprites do jogo
+	var infos := [[outfit_choice, "UNIFORME " + uni.name, CYAN, SHORT_DESC.get(outfit_choice, "")],
+		["omega", "ARMADURA ÔMEGA • LENDÁRIA", LEGEND, "Lâmina de energia, 3 corações de escudo e +velocidade por 5s."],
+		[robot_choice, "COMPANHEIRO • " + robot_choice.to_upper(), Color("8fdc6a") if robot_choice == "titan" else Color("b98cff"),
+			"C invoca, E pilota. Canhão, bomba (R) e turbo (Shift)." if robot_choice == "titan" else "C invoca: acompanha e atira. G funde: +velocidade e dano."]]
+	for i in infos.size():
+		info_icons[i].texture = sprite_of(infos[i][0])
+		info_titles[i].text = infos[i][1]; info_titles[i].add_theme_color_override("font_color", infos[i][2])
+		info_bodies[i].text = infos[i][3]
+	if stat_panel: stat_panel.queue_redraw()
+	for i in actor_tabs.size():
+		var tab: Button = actor_tabs[i]
+		tab.add_theme_color_override("font_color", CYAN if i == gear_actor else Color("5f7a7e"))
 	for key in slot_buttons:
-		var selected: bool = key == "o_" + outfit_choice or key == "armor_" + armor_choice or (key == "robot0" and robot_choice == "titan") or (key == "robot1" and robot_choice == "spectre")
+		var selected: bool = key == "o_" + outfit_choice or (key == "armor_omega" and armor_choice == "omega") or (key == "robot0" and robot_choice == "titan") or (key == "robot1" and robot_choice == "spectre")
 		var b: Button = slot_buttons[key]
-		var style: StyleBoxFlat = b.get_theme_stylebox("normal").duplicate()
-		style.border_color = CYAN if selected else Color("365566"); style.border_width_left = 3 if selected else 1; style.border_width_right = style.border_width_left; style.border_width_top = style.border_width_left; style.border_width_bottom = style.border_width_left
+		var edge: Color = LEGEND if key == "armor_omega" else CYAN
+		var style := StyleBoxFlat.new(); style.bg_color = Color(edge, 0.1) if selected else Color(0, 0, 0, 0)
+		style.border_color = edge if selected else Color(0, 0, 0, 0); style.set_border_width_all(3 if selected else 0); style.set_corner_radius_all(4)
 		b.add_theme_stylebox_override("normal", style)
+		var hover := StyleBoxFlat.new(); hover.bg_color = Color(edge, 0.16); hover.border_color = edge.lightened(0.3); hover.set_border_width_all(3); hover.set_corner_radius_all(4)
+		b.add_theme_stylebox_override("hover", hover); b.add_theme_stylebox_override("focus", hover)
+		if b.has_node("Name"): (b.get_node("Name") as Label).add_theme_color_override("font_color", CYAN if selected else Color("e2e8dc"))
 
 func apply_gear() -> bool:
 	app.pref_outfit = outfit_choice; app.pref_robot = robot_choice; app.save_settings()
@@ -376,4 +478,4 @@ func _process(_dt: float) -> void:
 	if telemetry != null and app.playing:
 		var a: Dictionary = app.sim.actors[gear_actor]
 		var s: Dictionary = app.sim.spectres[gear_actor]
-		telemetry.text = "T: %d HP • S: %d HP • %.1fs" % [app.sim.mech.hp, s.hp, a.summon_cd]
+		telemetry.text = "Integridade: Titan %d • Spectre %d%s" % [app.sim.mech.hp, s.hp, "" if a.summon_cd <= 0 else "  •  recarga %.1fs" % a.summon_cd]

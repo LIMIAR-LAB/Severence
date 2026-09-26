@@ -4,11 +4,11 @@ Fonte: art/source/portraits-toriyama-v1.png — folha 3x2 gerada a partir de art
 (homenagem ao traço de Akira Toriyama), fundo branco. Este script recorta cada figura, remove o branco com
 bordas suaves e monta um cenário próprio para cada uma usando as ilustrações do jogo:
 
-  Padrão    → cais noturno com holofotes (menu)          Ômega   → céu partido por raios e o monstro (menu)
+  Padrão    → cais noturno com holofotes (menu)          Ômega   → céu partido por raios, banhado em ouro (armadura lendária)
   Mecânico  → oficina do Refúgio (refuge-reference)       Titan   → porto em guerra, navios e relâmpagos (adventure)
   Espião    → rua de Londres com garoa e névoa (online)   Spectre → céu cósmico dos tentáculos, tons violeta (menu)
 
-Saída: assets/ui/portraits/<chave>.png (738x610). Uso: python tools/make_portraits.py
+Saída: assets/ui/portraits/<chave>.png (930x672). Uso: python tools/make_portraits.py
 """
 from pathlib import Path
 import math, random
@@ -18,7 +18,7 @@ from PIL import Image, ImageFilter, ImageDraw, ImageEnhance
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "art/source/portraits-toriyama-v1.png"
 OUT = ROOT / "assets/ui/portraits"
-W, H = 738, 610
+W, H = 930, 672   # 1,5× o palco da tela de equipamento (620×448)
 
 # recortes na folha (x0, y0, x1, y1)
 CELLS = {"o_padrao": (0, 0, 372, 388), "o_mecanico": (372, 0, 750, 390), "o_espiao": (750, 0, 1168, 392),
@@ -29,7 +29,7 @@ SCENES = {
     "o_padrao": ("assets/ui/menu.png", (1070, 200, 1344, 520), 2.5, 0.75, (90, 220, 255), (0.85, 0.95, 1.1), "embers"),
     "o_mecanico": ("art/source/refuge-reference.png", (40, 60, 560, 390), 2.5, 0.72, (255, 160, 60), (1.12, 0.95, 0.8), "sparks"),
     "o_espiao": ("assets/ui/online.png", (0, 150, 360, 560), 2.5, 0.6, (230, 60, 70), (0.8, 0.85, 1.15), "rain"),
-    "armor_omega": ("assets/ui/menu.png", (620, 0, 1190, 400), 1.8, 0.8, (110, 225, 255), (0.95, 1.0, 1.15), "energy"),
+    "armor_omega": ("assets/ui/menu.png", (620, 0, 1190, 400), 2.2, 0.75, (255, 196, 70), (1.25, 1.02, 0.62), "energy"),   # lendária: fundo dourado
     "titan": ("assets/ui/adventure.png", (960, 160, 1344, 560), 2.5, 0.7, (255, 150, 60), (1.05, 1.0, 0.9), "embers"),
     "spectre": ("assets/ui/menu.png", (730, 0, 1160, 330), 2.0, 0.7, (170, 90, 255), (1.0, 0.8, 1.25), "spores"),
 }
@@ -75,13 +75,19 @@ def scene(key, rng):
     bg = bg.filter(ImageFilter.GaussianBlur(blur))
     bg = ImageEnhance.Brightness(bg).enhance(bright)
     a = np.asarray(bg).astype(np.float32) / 255 * np.array(tone)
+    if key == "armor_omega":
+        # armadura lendária: céu em duotom dourado (sombra marrom → ouro → creme)
+        lum = np.asarray(bg.convert("L")).astype(np.float32)[..., None] / 255
+        lum = np.clip(lum * 1.6, 0, 1)
+        dark, mid, hi = np.array([0.10, 0.06, 0.02]), np.array([0.85, 0.58, 0.16]), np.array([1.0, 0.93, 0.7])
+        a = np.where(lum < 0.5, dark + (mid - dark) * (lum / 0.5), mid + (hi - mid) * ((lum - 0.5) / 0.5)) * 0.8
     yy, xx = np.mgrid[0:H, 0:W]
     cx, cy = W / 2, H * 0.48
     r = np.sqrt(((xx - cx) / W) ** 2 + ((yy - cy) / H) ** 2)
     g = np.array(glowc) / 255
     a += (np.clip(1 - r / 0.45, 0, 1) ** 2)[..., None] * g * 0.5            # contraluz
     ang = np.arctan2(yy - H * 0.42, xx - cx)
-    a += ((0.5 + 0.5 * np.cos(ang * 7 + 0.4)) ** 8 * np.clip(1 - r / 0.75, 0, 1))[..., None] * g * 0.16   # raios
+    a += ((0.5 + 0.5 * np.cos(ang * 7 + 0.4)) ** 8 * np.clip(1 - r / 0.75, 0, 1))[..., None] * g * (0.4 if key == "armor_omega" else 0.16)   # raios
     a *= np.clip(1.3 - r * 1.35, 0, 1)[..., None]                               # vinheta
     # névoa no chão
     fog = np.clip((yy - H * 0.7) / (H * 0.3), 0, 1) ** 1.5
@@ -110,7 +116,7 @@ def particles(img, kind, glowc, rng, front):
 def make(key):
     rng = random.Random(sum(map(ord, key)))
     fig = cutout(CELLS[key])
-    target_h = 545
+    target_h = 590
     f = min(target_h / fig.height, (W - 40) / fig.width)
     fig = fig.resize((int(fig.width * f), int(fig.height * f)), Image.LANCZOS)
     img = scene(key, rng)
