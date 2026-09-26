@@ -155,6 +155,9 @@ func tile_area(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, origin: V
 func style_of_rect(sim, rect: Rect2) -> Dictionary:
 	for room in sim.rooms:
 		if room.r == rect: return style_of(room)
+	for room in sim.rooms:   # 0.18: alas (ROOM_EXTRA) usam o estilo da sala dona
+		for ex: Rect2 in DOCKS.ROOM_EXTRA.get(room.get("id", ""), []):
+			if ex == rect: return style_of(room)
 	return {}
 
 # 0.16: piso de um microbioma — azulejos 64x64 sorteados pelos pesos de FLOOR_SETS (fixo por célula).
@@ -179,6 +182,9 @@ func set_area(ci: CanvasItem, rect: Rect2, view: Rect2, set_name: String) -> voi
 func floor_kind(sim, rect: Rect2) -> String:
 	for room in sim.rooms:
 		if room.r.encloses(rect) or room.r.has_point(rect.get_center()): return room.get("floor", "stone")
+	for room in sim.rooms:   # 0.18: alas (ROOM_EXTRA) têm o piso da sala dona
+		for ex: Rect2 in DOCKS.ROOM_EXTRA.get(room.get("id", ""), []):
+			if ex == rect: return room.get("floor", "stone")
 	return "planks"   # corredores: passarelas de madeira
 
 func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
@@ -201,6 +207,47 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 		tile_area(ci, quay, view, "granite", Vector2(r.position.x, r.end.y - rows * th), Color.WHITE, rows - 1)
 		ci.draw_rect(Rect2(quay.position.x, quay.position.y - 3, quay.size.x, 6), Color("2a1b12"))
 		ci.draw_rect(Rect2(quay.position.x, quay.position.y + 3, quay.size.x, 2), Color(0, 0, 0, 0.35))
+
+# ------------------------------------------------------------------ sujeira do piso (0.18)
+# Decals procedurais por célula de 64px (mancha, rachadura, cascalho) por cima do piso já desenhado.
+# Mesmo hash de sempre (determinístico pela posição) — funciona em qualquer sala ou mapa novo, sem
+# precisar de arte nova. Pula salas com floor_set (market/workshop/chapel) porque a folha delas já
+# tem bastante variedade e virou "poluída" quando testamos (ver docs/CENARIO_0_16.md).
+func draw_floor_grunge(ci: CanvasItem, sim, floors: Array, view: Rect2) -> void:
+	var cell_sz := 64.0
+	for rect: Rect2 in floors:
+		var st := style_of_rect(sim, rect)
+		if st.has("floor_set"): continue
+		var area: Rect2 = rect.intersection(view)
+		if area.size.x <= 0 or area.size.y <= 0: continue
+		var kind := floor_kind(sim, rect)
+		var dark := Color(0.08, 0.06, 0.03) if kind == "planks" else Color(0.03, 0.04, 0.06)
+		var iy0 := int(floorf(area.position.y / cell_sz)); var iy1 := int(floorf((area.end.y - 0.01) / cell_sz))
+		var ix0 := int(floorf(area.position.x / cell_sz)); var ix1 := int(floorf((area.end.x - 0.01) / cell_sz))
+		for iy in range(iy0, iy1 + 1):
+			for ix in range(ix0, ix1 + 1):
+				var roll := hash01(ix, iy, 61)
+				if roll >= 0.16: continue
+				var cx: float = ix * cell_sz + cell_sz * (0.3 + hash01(ix, iy, 62) * 0.4)
+				var cy: float = iy * cell_sz + cell_sz * (0.3 + hash01(ix, iy, 63) * 0.4)
+				var c := Vector2(cx, cy)
+				if not rect.has_point(c): continue
+				if roll < 0.05:   # mancha de umidade/óleo
+					var rad: float = cell_sz * (0.28 + hash01(ix, iy, 64) * 0.24)
+					ci.draw_circle(c, rad, Color(dark.r, dark.g, dark.b, 0.14))
+					ci.draw_circle(c, rad * 0.55, Color(dark.r, dark.g, dark.b, 0.1))
+				elif roll < 0.1:   # rachadura fina em Y
+					var ang: float = hash01(ix, iy, 65) * TAU
+					var ln: float = cell_sz * (0.32 + hash01(ix, iy, 66) * 0.3)
+					var dir := Vector2(cos(ang), sin(ang))
+					ci.draw_line(c - dir * ln * 0.5, c + dir * ln * 0.5, Color(0, 0, 0, 0.32), 1.3)
+					var ang2: float = ang + 0.8 + hash01(ix, iy, 67) * 0.7
+					ci.draw_line(c, c + Vector2(cos(ang2), sin(ang2)) * ln * 0.3, Color(0, 0, 0, 0.24), 1.0)
+				else:   # cascalho/lascas miúdas
+					var n := 2 + int(hash01(ix, iy, 68) * 3)
+					for i in range(n):
+						var p: Vector2 = c + Vector2(hash01(ix, iy, 70 + i) - 0.5, hash01(ix, iy, 80 + i) - 0.5) * cell_sz * 0.55
+						if rect.has_point(p): ci.draw_rect(Rect2(p, Vector2(2, 2)), Color(0, 0, 0, 0.28))
 
 # ------------------------------------------------------------------ água
 func draw_water(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
@@ -276,9 +323,7 @@ func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -
 	var all_floors: Array = sim.floors
 	for rect in floors:
 		if not rect.grow(WALL_H + 60).intersects(view): continue
-		var style: Dictionary = {}
-		for room in rooms:
-			if room.r == rect: style = style_of(room)
+		var style: Dictionary = style_of_rect(sim, rect)   # 0.18: também cobre as alas (ROOM_EXTRA)
 		var tl: Vector2 = rect.position; var br: Vector2 = rect.end
 		# sombra de contato por dentro das paredes
 		ci.draw_rect(Rect2(tl.x, tl.y, rect.size.x, 18), Color(0, 0, 0, 0.28))

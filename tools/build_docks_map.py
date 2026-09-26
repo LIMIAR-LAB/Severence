@@ -34,6 +34,12 @@ ROOMS = [
 ]
 R = {r[0]: r[4] for r in ROOMS}
 
+# 0.18: ALAS — recortes extras ligados a uma sala (a sala vira composta de vários retângulos,
+# em vez de só um Rect2; o desenho de piso/parede já trata cada retângulo do jeito certo por
+# encostar num vizinho igual a um corredor). Preencha com content() como o resto da sala.
+ROOM_EXTRA: dict = {}
+def extra(room_id, x, y, w, h): ROOM_EXTRA.setdefault(room_id, []).append((x, y, w, h))
+
 # Corredores sempre abertos (cada ponta que encosta numa sala vira um portão).
 CORRIDORS = [
     (2200, 6400, 300, 200),   # 01 → 02 (o primeiro é o que sai do Desembarque)
@@ -103,6 +109,12 @@ SHORTCUTS = [
     {"r": (2740, 5000, 128, 800), "wall": (2740, 5776, 128, 36), "room": "cranes"},      # 02 Guindastes ↑ 09 Farol
     {"r": (5100, 5000, 128, 900), "wall": (5100, 5876, 128, 36), "room": "warehouse"},   # 03 Armazém ↑ 08 Ferroviário
 ]
+# 0.18: alas — pequenas reentrâncias que tiram as salas do quadrado, encostadas numa borda livre.
+extra("cranes", 4400, 5800, 300, 300)      # 02 Guindastes: baia à direita
+extra("rails", 5800, 3700, 300, 320)       # 08 Ferroviário: baia à direita
+extra("market", 6320, 5900, 280, 260)      # 04 Mercado: reentrância à esquerda
+extra("warehouse", 4700, 7000, 320, 300)   # 03 Armazém: baia embaixo
+
 # 0.16: PORTÕES DE TENTÁCULO — poça que bloqueia um corredor e fere quem encosta (active) até o evento
 # ligado a ela acontecer; aí vira grade selada (sealed), segura e atravessável.
 # event: warden (mini-chefe do Pátio Ferroviário morto) | side (desafio do Último Gerador concluído)
@@ -217,6 +229,8 @@ row("bollard", 2700, 7040, 6, 330)
 spawns("mix", [(2750, 6300), (3100, 6200), (3650, 6250), (4150, 6300), (2750, 6900), (3300, 6850), (3750, 6600), (4150, 6700)])
 WAVES["cranes"] = [[2650, 6000, "dock"], [4250, 6000, "mix"], [3400, 6950, "mix"], [2650, 6950, "dock"]]
 
+ob("lamp_post", 4520, 5950); crate_pile(4550, 6000, 2)   # 0.18: baía extra (ROOM_EXTRA)
+dec("rope", 4600, 6150)
 # ── 03 Armazém 7 (canal com passarela embaixo) ──
 facade_decor("warehouse", [("iron_door", 300), ("poster", 900), ("iron_door", 1350)])
 for yy in (6060, 6260, 6460):
@@ -230,6 +244,8 @@ ob("lamp_post", 5620, 6300); ob("brazier", 6000, 6250)
 dec("tentacle_planks", 5300, 6380); dec("debris_barrel", 5850, 6800); dec("rope", 5000, 6800)
 spawns("mix", [(5000, 6400), (5300, 6100), (5700, 6300), (6000, 6700), (5300, 6850), (6200, 6200)])
 
+crate_pile(4750, 7080, 1); ob("jerrycans", 4900, 7220)   # 0.18: baía extra (ROOM_EXTRA)
+ob("lamp_post", 4780, 7250)
 # ── 04 Mercado de Peixe ──
 facade_decor("market", [("poster", 350), ("phone_booth_wall", 800), ("iron_door", 1200)])
 for i, yy in enumerate((6150, 6450)):
@@ -248,6 +264,8 @@ ob("market_ice_barrel", 7580, 6170); ob("market_ice_barrel", 7150, 6470)
 ob("market_baskets", 7880, 6700); ob("market_net", 6900, 6760); ob("market_rowboat", 7200, 6930)
 dec("market_lanterns", 6850, 5850); dec("market_lanterns", 7280, 5850)
 
+ob("fish_basket", 6420, 5980); ob("barrel", 6480, 6100)   # 0.18: reentrância extra (ROOM_EXTRA)
+dec("grate", 6400, 6120)
 # ── 05 Oficina (comerciante) ──
 facade_decor("shop", [("iron_door", 250), ("poster", 800)])
 row("crate", 8790, 6240, 6, 60)          # balcão do comerciante
@@ -293,6 +311,7 @@ dec("grate", 4700, 4400); dec("symbol_2", 5300, 4700); dec("debris_crate", 4350,
 spawns("mix", [(4100, 4100), (4500, 3900), (5000, 4250), (5600, 4150), (4400, 4550), (4900, 4850), (5500, 4650), (5250, 3900)])
 WAVES["rails"] = [[4000, 4950, "mix"], [5700, 3850, "heavy"], [4850, 4400, "cult"]]
 
+crate_pile(5900, 3780, 0); ob("lamp_post", 6000, 3950)   # 0.18: baía extra (ROOM_EXTRA)
 # ── 09 Balcão do Farol (rampas) ──
 facade_decor("stairs", [("iron_door", 350), ("poster", 850), ("iron_door", 1350)])
 for cx in (1950, 3350): ob("pillar", cx, 4700)
@@ -399,7 +418,7 @@ def reach(seen, p, step=10, tol=30):
 
 def validate():
     check_corridors()
-    floors = [r[4] for r in ROOMS if r[2] != "secret"] + CORRIDORS + EXTRA_FLOORS + [RAMPS[0][0], RAMPS[1][0]]
+    floors = [r[4] for r in ROOMS if r[2] != "secret"] + CORRIDORS + EXTRA_FLOORS + [RAMPS[0][0], RAMPS[1][0]] + [e for exs in ROOM_EXTRA.values() for e in exs]
     obstacles = [tuple(o[:4]) for o in OB]
     # portas livres: nenhum obstáculo encosta na boca de um corredor
     bad = []
@@ -467,6 +486,7 @@ def emit():
     L.append("const ROOMS := [")
     L.append(",\n".join(f'\t{{"id": "{i}", "name": "{n}", "kind": "{k}", "floor": "{f}", "r": {r2(r)}}}' for i, n, k, f, r in ROOMS) + "]")
     L.append(""); L.append("const EXTRA_FLOORS := [" + ", ".join(r2(r) for r in EXTRA_FLOORS) + "]")
+    L.append("const ROOM_EXTRA := {" + ", ".join(f'"{k}": [' + ", ".join(r2(e) for e in v) + "]" for k, v in ROOM_EXTRA.items()) + "}")
     L.append("const CORRIDORS := [\n\t" + ",\n\t".join(", ".join(r2(c) for c in ch) for ch in chunks(CORRIDORS, 4)) + "]")
     L.append(f"const SECRET_CORRIDOR := {r2(SECRET_CORRIDOR)}")
     L.append("const RAISED := [" + ", ".join(r2(r) for r in RAISED) + "]")

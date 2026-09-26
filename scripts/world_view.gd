@@ -142,6 +142,7 @@ func draw_expedition_ground() -> void:
 	vis_floors = scenery.visible_floors(sim, vis_rooms)
 	scenery.draw_water(self, sim, vis_rooms, view)
 	scenery.draw_floors(self, sim, vis_floors, vis_rooms, view)
+	scenery.draw_floor_grunge(self, sim, vis_floors, view)
 	# balcão elevado e rampas
 	for area in sim.raised:
 		if not seen(area.get_center()): continue

@@ -283,7 +283,9 @@ func start_run(new_seed: int) -> void:
 	for room in DOCKS.ROOMS: rooms.append(room.duplicate())
 	floors = []
 	for room in rooms:
-		if room.kind != "secret": floors.append(room.r)
+		if room.kind != "secret":
+			floors.append(room.r)
+			floors.append_array(DOCKS.ROOM_EXTRA.get(room.get("id", ""), []))   # 0.18: alas (salas não-retangulares)
 	floors.append_array(DOCKS.EXTRA_FLOORS); floors.append_array(DOCKS.CORRIDORS)
 	for sc in DOCKS.SHORTCUTS: floors.append(sc.r)   # 0.16: atalhos (fechados pela parede rachada)
 	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = DOCKS.GAPS.duplicate()
@@ -344,6 +346,13 @@ func build_doors() -> void:
 				"right": d = Rect2(r.end.x, f.position.y, DOOR_DEPTH, f.size.y)
 			doors.append({"r": d, "room": room.id, "side": side})
 
+func room_contains(room: Dictionary, p: Vector2, margin: float = 0.0) -> bool:
+	# 0.18: sala composta de room.r + suas alas (ROOM_EXTRA) — não é só o retângulo principal.
+	if room.r.grow(margin).has_point(p): return true
+	for ex: Rect2 in DOCKS.ROOM_EXTRA.get(room.get("id", ""), []):
+		if ex.grow(margin).has_point(p): return true
+	return false
+
 func room_by_id(id: String) -> Dictionary:
 	for room in rooms:
 		if room.get("id", "") == id: return room
@@ -379,7 +388,7 @@ func step_gates(step_dt: float = 0.016) -> void:
 		elif not room.get("cleared", false):
 			var inside: Dictionary = {}
 			for a in actors:
-				if a.active and not a.dead and room.r.grow(-50).has_point(a.p): inside = a; break
+				if a.active and not a.dead and room_contains(room, a.p, -50): inside = a; break
 			if inside.is_empty(): continue
 			if room_threats(room.id) == 0: room.cleared = true; continue
 			room.locked = true; changed = true
@@ -388,7 +397,7 @@ func step_gates(step_dt: float = 0.016) -> void:
 				if d.room == room.id: effects.append({"p": d.r.get_center(), "kind": "gate_slam", "life": 0.5, "max": 0.5})
 			# quem ficou do lado de fora é puxado para dentro (ninguém fica preso no corredor)
 			for a in actors:
-				if a.active and not a.dead and not room.r.has_point(a.p):
+				if a.active and not a.dead and not room_contains(room, a.p):
 					var spot: Vector2 = inside.p + Vector2(-50, 30)
 					a.p = spot if clear_at(spot, 23 if a.mech else 11) else inside.p
 					if a.mech: mech.p = a.p
@@ -472,7 +481,7 @@ func step_hazards(dt: float) -> void:
 
 func room_at(pos: Vector2) -> Dictionary:
 	for room in rooms:
-		if room.r.has_point(pos) and (room.kind != "secret" or secret_open): return room
+		if room_contains(room, pos) and (room.kind != "secret" or secret_open): return room
 	return {}
 
 func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
