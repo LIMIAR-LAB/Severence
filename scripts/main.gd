@@ -484,7 +484,7 @@ func load_settings() -> void:
 
 func save_progress() -> void:
 	if online and not hosting: return
-	var data := {"version": 1, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked, "unlocked": sim.unlocked.keys()}
+	var data := {"version": 1, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked, "unlocked": sim.unlocked.keys(), "story_quest": sim.story_quest}
 	var serialized := JSON.stringify(data)
 	if serialized == last_save: return
 	var file := FileAccess.open("user://progress.tmp", FileAccess.WRITE)
@@ -502,6 +502,7 @@ func load_progress() -> void:
 	sim.materials = clampi(int(data.get("materials", 0)), 0, 9999)
 	sim.upgrade = clampi(int(data.get("upgrade", 0)), 0, 3)
 	sim.clears = clampi(int(data.get("clears", 0)), 0, 9999)
+	sim.story_quest = clampi(int(data.get("story_quest", 0)),0,2)
 	sim.armor_unlocked = data.get("armor_unlocked", false) == true
 	var saved = data.get("unlocked", [])
 	if saved is Array:

@@ -14,6 +14,10 @@ var rooms: Array = []
 var floors: Array = []
 var obstacles: Array = []
 var chests: Array = []
+# 0.17: missão compartilhada pela equipe; salva e sincronizada.
+var story_quest := 0
+var dialogue_queue: Array = []
+const STORY_NPC := Vector2(850, 4400)
 var mech: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var seed_value := 1
@@ -283,7 +287,9 @@ func start_run(new_seed: int) -> void:
 	for room in DOCKS.ROOMS: rooms.append(room.duplicate())
 	floors = []
 	for room in rooms:
-		if room.kind != "secret": floors.append(room.r)
+		if room.kind != "secret":
+			floors.append(room.r)
+			floors.append_array(room.get("extra", []))   # 0.17: alas/alcovas da sala
 	floors.append_array(DOCKS.EXTRA_FLOORS); floors.append_array(DOCKS.CORRIDORS)
 	for sc in DOCKS.SHORTCUTS: floors.append(sc.r)   # 0.16: atalhos (fechados pela parede rachada)
 	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = DOCKS.GAPS.duplicate()
@@ -458,13 +464,20 @@ func step_fuses(dt: float) -> void:
 func step_hazards(dt: float) -> void:
 	step_tentacle_gates(dt)
 	for h in hazards:
+		if h.has("trap") and trap_phase(h) != "active": continue
 		h["cd"] = maxf(0, h.get("cd", 0.0) - dt)
 		for a in actors:
 			if not a.active or a.dead: continue
 			var d: Vector2 = a.p - h.p
+			if h.get("trap", "") == "darts":
+				var hit_dart := false
+				for off in [-h.r*0.7, 0.0, h.r*0.7]:
+					var dart_x: float = h.r-fposmod(tick_time*3.0+off,1.0)*h.r*2.0
+					if absf(d.y-off)<14 and absf(d.x-dart_x)<22: hit_dart=true
+				if not hit_dart: continue
 			if Vector2(d.x, d.y * 1.5).length() < h.r:
 				if a.jump > 0: continue   # saltar por cima escapa do tentáculo
-				if h.cd <= 0:
+				if h.cd <= 0 and not h.has("trap"):
 					h.cd = 0.7
 					effects.append({"p": h.p, "kind": "tentacle_strike", "life": 0.35, "max": 0.35, "dir": d.normalized() if d.length() > 1 else Vector2.RIGHT})
 				damage_actor(a, h.get("damage", 12.0))
@@ -472,7 +485,10 @@ func step_hazards(dt: float) -> void:
 
 func room_at(pos: Vector2) -> Dictionary:
 	for room in rooms:
-		if room.r.has_point(pos) and (room.kind != "secret" or secret_open): return room
+		if room.kind == "secret" and not secret_open: continue
+		if room.r.has_point(pos): return room
+		for ex in room.get("extra", []):
+			if ex.has_point(pos): return room
 	return {}
 
 func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
@@ -794,7 +810,7 @@ func step_bomb(b: Dictionary, dt: float) -> void:
 		explode(b.p, MECH_BOMB.radius, b.damage, true); b.life = 0
 
 func add_bullet(pos: Vector2, direction: Vector2, team: int, damage: float, speed: float, radius: float = 5.0, owner_id: int = -1, kind: String = "", life: float = 3.0) -> void:
-	bullets.append({"p": pos, "v": direction * speed, "team": team, "damage": damage, "r": radius, "life": life, "owner": owner_id, "kind": kind})
+	bullets.append({"p": pos, "v": direction * speed, "team": team, "damage": damage, "r": maxf(radius, 6.0) if team == 0 else radius * 1.12, "visual_r": maxf(radius, 6.0) / 0.8 if team == 0 else radius * 1.4, "life": life, "owner": owner_id, "kind": kind})
 
 # 0.15: número de dano flutuante — desenhado em world_view.gd
 func pop_dmg(p: Vector2, amount: float, heavy: bool = false) -> void:
@@ -806,7 +822,7 @@ func hit_stop(d: float) -> void:
 func weapon_of(a: Dictionary) -> String:
 	if a.mech: return "mech"
 	if a.armor: return "omega_sword"
-	return uniform_of(a).weapon
+	return a.get("weapon_override", uniform_of(a).weapon)
 
 # 0.14: tabela única das armas — o jogo e a tela de Equipamento (loadout_stats) leem daqui.
 const WEAPONS := {
@@ -916,6 +932,11 @@ func begin_cockpit(a: Dictionary, entering: bool, outside: Vector2) -> void:
 	mech["boosting"] = false
 
 func interact(a: Dictionary) -> void:
+	if mode == "run" and a.p.distance_to(STORY_NPC) < 95:
+		story_interact(a); return
+	for chest in chests:
+		if chest.get("reward", false) and not chest.open and a.p.distance_to(chest.p) < 85:
+			open_reward(chest, a); return
 	if mech.get("cockpit_t", 0.0) > 0: return
 	if a.mech:
 		for offset in [Vector2(60, 0), Vector2(-60, 0), Vector2(0, 65), Vector2(0, -65)]:
@@ -1130,6 +1151,9 @@ func step_enemies(dt: float) -> void:
 		if e.kind == "crawler":
 			for off in [Vector2(-18, 6), Vector2(18, -6)]:
 				if clear_at(e.p + off, 10): spawned.append([e.p + off, e.side])
+		if e.kind == "warden" or e.get("miniboss", false):
+			chests.append({"p": e.p, "open": false, "secret": false, "reward": true})
+			say("MINIBOSS DERROTADO • baú dourado sem chave! [E]")
 		if e.kind == "boss": boss_dead = true; say("O Almirante afundou! Use o portal da arena para recuperar o núcleo e retornar.")
 	enemies = enemies.filter(func(e): return e.hp > 0)
 	for item in spawned: spawn_enemy(item[0], "crawler_small", item[1])
@@ -1167,6 +1191,7 @@ func enrage_scale(e: Dictionary) -> float:
 	return BOSS_ENRAGE_SCALE if e.get("enraged", false) else 1.0
 
 func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: float, dt: float) -> void:
+	if boss_motion(e, target, dt): return
 	# Três estágios: a cada um o Almirante perde armas e o padrão de tiro muda.
 	var ratio: float = e.hp / e.max
 	var stage := 1 if ratio > 0.66 else (2 if ratio > 0.33 else 3)
@@ -1388,7 +1413,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "story_quest", "dialogue_queue", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 
@@ -1523,3 +1548,63 @@ func step_tentacle_gates(dt: float) -> void:
 			damage_actor(a, g.damage)
 			var away: Vector2 = Vector2(signf(a.p.x - g.block.get_center().x), 0) if g.block.size.x < g.block.size.y * 3 else Vector2(0, signf(a.p.y - g.block.get_center().y))
 			a.p = move_body(a.p, away * 300 * dt, 23 if a.mech else 11)
+
+# 0.17: recompensas e narrativa sem consumir as chaves da expedição.
+func open_reward(chest: Dictionary, a: Dictionary) -> void:
+	if chest.open: return
+	chest.open = true; chest["t"] = tick_time
+	var tiers := ["pistol", "smg", "shotgun", "omega"]
+	var current: String = a.get("weapon_override", uniform_of(a).weapon)
+	var tier := tiers.find(current)
+	if tier < tiers.size()-1:
+		a["weapon_override"] = tiers[maxi(0,tier+1)]
+		say("ARMA RECUPERADA • " + str(a.weapon_override).to_upper() + " • equipada nesta expedição")
+	else:
+		materials += 3; keys += 2; heal(a,2)
+		say("ARSENAL COMPLETO • +3 materiais, +2 chaves e cura")
+	effects.append({"p":chest.p,"kind":"chest_burst","life":1.3,"max":1.3,"secret":true})
+
+func trap_phase(h: Dictionary) -> String:
+	var t := fposmod(tick_time + float(h.get("offset",0)),4.0)
+	return "safe" if t < 2.2 else ("warning" if t < 3.0 else "active")
+
+func story_interact(a: Dictionary) -> void:
+	if not dialogue_queue.is_empty():
+		say(str(dialogue_queue.pop_front())); return
+	if story_quest == 0:
+		story_quest = 1
+		dialogue_queue = ["A Adega Inundada abriga criaturas. Elimine todas e volte.","Eu guardo materiais e chaves para quem nos ajudar. [E para continuar]"]
+		say("Pescador: o culto tomou nosso porto... [E]")
+	elif story_quest == 1:
+		var cellar := room_by_id("cellar")
+		if visited.has("cellar") and not enemies.any(func(e): return e.hp > 0 and cellar.r.has_point(e.p)):
+			story_quest = 2; materials += 4; keys += 2; heal(a,2)
+			say("Pescador: você nos salvou! +4 materiais, +2 chaves e cura.")
+		else: say("Pescador: limpe a Adega Inundada e volte aqui.")
+	else: say("Pescador: o porto se lembrará de você, Marty.")
+
+func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
+	var state: String = e.get("motion", "idle")
+	if state == "idle":
+		e["motion_cd"] = float(e.get("motion_cd", 2.5))-dt
+		if e.motion_cd > 0: return false
+		var arena: Rect2 = room_by_id("boss").get("r", Rect2(e.p-Vector2(800,600),Vector2(1600,1200)))
+		var destination: Vector2 = e.p + Vector2(260*cos(e.phase*1.9),220*sin(e.phase*1.9))
+		if not arena.grow(-80).has_point(destination): destination = arena.get_center()
+		var reached: Vector2 = e.p
+		for i in range(24): reached = move_body(reached, (destination-e.p)/24.0,45)
+		destination = reached
+		if not clear_at(destination,45): e.motion_cd=1.0; return false
+		e["motion_to"]=destination; e["motion"]="warning"; e["motion_t"]=0.7
+		e["motion_kind"]="dive" if e.hp/e.max <= 0.33 else ("charge" if e.hp/e.max <= 0.66 else "walk")
+		return true
+	e.motion_t -= dt
+	if state == "warning":
+		if e.motion_t <= 0: e.motion="moving"; e.motion_t=1.4
+		return true
+	var delta: Vector2 = e.motion_to-e.p
+	e.p=move_body(e.p,delta.normalized()*minf(delta.length(),(440.0 if e.motion_kind == "charge" else 260.0)*dt),45)
+	if e.motion_kind == "charge" and e.p.distance_to(target.p)<70: damage_actor(target,20)
+	if e.motion_t <= 0 or delta.length()<12:
+		e.motion="idle";e.motion_cd=3.0;e.cd=maxf(e.cd,0.5)
+	return true

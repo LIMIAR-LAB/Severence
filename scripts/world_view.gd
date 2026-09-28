@@ -114,6 +114,8 @@ func view_rect() -> Rect2:
 func floor_kind(rect: Rect2) -> String:
 	for room in sim.rooms:
 		if room.r.encloses(rect) or room.r.has_point(rect.get_center()): return room.get("floor", "stone")
+		for ex in room.get("extra", []):
+			if ex.encloses(rect) or ex.has_point(rect.get_center()): return room.get("floor", "stone")
 	return "stone"
 
 func tile_floor(rect: Rect2, view: Rect2, kind: String) -> void:
@@ -170,6 +172,7 @@ func draw_expedition_ground() -> void:
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
+		if h.has("trap") and seen(h.p): scenery.draw_trap(self,sim,h,t)
 		var alert := false
 		for a in sim.actors:
 			if a.active and not a.dead and a.p.distance_to(h.p) < h.r + 90: alert = true
@@ -203,7 +206,7 @@ func draw_expedition_ground() -> void:
 		draw_chest(chest)
 		if not chest.open:
 			draw_rect(Rect2(p - Vector2(4, 9), Vector2(8, 10)), CYAN if chest.secret else GOLD)
-			text_at(p + Vector2(-30, 25), "E • 1 chave", Color("c9b99c"), 12)
+			text_at(p + Vector2(-30, 25), "E • grátis" if chest.get("reward",false) else "E • 1 chave", Color("c9b99c"), 12)
 			scenery.lights.append({"p": p - Vector2(0, 20), "kind": "cyan" if chest.secret else "bulb"})
 	scenery.draw_reveal(self, sim, vis_rooms)
 
@@ -275,6 +278,10 @@ func draw_entities() -> void:
 			draw_rect(Rect2(p - Vector2(2, 28), Vector2(4, 4)), Color(0.7, 0.95, 1))
 			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 3)), Color(0.85, 0.75, 0.3))
 		else: draw_texture_rect(docks_art.coin, Rect2(p - Vector2(8, 18), Vector2(16, 18)), false)
+	if sim.mode == "run" and seen(sim.STORY_NPC):
+		var npc: Vector2 = sim.STORY_NPC
+		draw_texture_rect_region(marty_anim,Rect2(npc-Vector2(48,92),Vector2(96,96)),Rect2(0,5*96,96,96),Color(0.65,0.85,1))
+		text_at(npc+Vector2(-65,-105),"PESCADOR • E",GOLD,14)
 	var drawable: Array = []
 	if sim.mode == "run":
 		var view := view_rect()
@@ -321,10 +328,16 @@ func draw_entities() -> void:
 			draw_circle(bullet_pos, b.r + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
 			draw_line(bullet_pos, bullet_pos - b.v.normalized() * 34, Color(0.7, 0.7, 0.75, 0.35), b.r)
 			scenery.lights.append({"p": b.p, "kind": "bulb"}); continue
+		var visual_radius: float = b.get("visual_r",b.r)
+		if b.team == 1:
+			draw_circle(bullet_pos,visual_radius+2,Color("11101c"))
+			draw_circle(bullet_pos,visual_radius,Color("f965ae"))
+			draw_circle(bullet_pos,visual_radius*0.45,Color("fff4db"))
+			continue
 		if projectile_art.has(kind):
 			var tex: Texture2D = projectile_art[kind]
 			draw_set_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
-			draw_texture(tex, -tex.get_size() * 0.5)
+			draw_texture_rect(tex, Rect2(-tex.get_size()*0.75,tex.get_size()*1.5),false)
 			draw_set_transform(Vector2.ZERO)
 			continue
 		var c := CYAN if b.team == 0 else Color("fa6dbc")
@@ -787,6 +800,10 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 	draw_weapon_hand(a, wrist, grip)
 
 func draw_chest(chest: Dictionary) -> void:
+	if chest.get("reward",false):
+		draw_circle(chest.p,44,Color(1,0.75,0.15,0.18))
+		draw_arc(chest.p,34,0,TAU,32,GOLD,3)
+		text_at(chest.p+Vector2(-65,-70),"ARSENAL • SEM CHAVE" if not chest.open else "RECUPERADO",GOLD,12)
 	# 0.15: baú da folha docks12 (fechado / aberto) com tremida e brilho ao abrir
 	if scenery and scenery.props.has("chest"):
 		draw_chest_hd(chest); return
@@ -864,6 +881,12 @@ func boss_pose(e: Dictionary) -> String:
 	return "idle"
 
 func draw_boss(e: Dictionary) -> void:
+	if e.get("motion", "idle") == "warning":
+		draw_arc(e.motion_to,75,0,TAU,48,Color("ffb451"),5)
+		draw_line(e.p,e.motion_to,Color(1,0.4,0.2,0.6),4)
+		text_at(e.motion_to-Vector2(50,85),"! MERGULHO" if e.motion_kind == "dive" else "! AVANÇO",GOLD,16)
+	if e.get("motion", "idle") == "moving" and e.get("motion_kind", "") == "dive":
+		draw_arc(e.p,60,0,TAU,32,CYAN,3); return
 	var p: Vector2 = e.p
 	var pose := boss_pose(e)
 	var tex: Texture2D = boss_art[pose]
@@ -1201,7 +1224,7 @@ func draw_chest_hd(chest: Dictionary) -> void:
 	if not chest.open:
 		var bob := sin(sim.tick_time * 2.0 + p.x) * 1.0
 		var sz := closed.get_size() * s
-		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false)
+		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false, Color(1.25,1.1,0.5) if chest.get("reward",false) else Color.WHITE)
 		var glint := fposmod(sim.tick_time * 0.7 + p.x * 0.01, 3.0)
 		if glint < 0.3: draw_circle(p + Vector2(-sz.x * 0.4 + glint * sz.x * 2.6, -sz.y + 18), 2.5, Color(1, 1, 0.85, 0.85))
 		return

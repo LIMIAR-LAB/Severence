@@ -69,7 +69,8 @@ func _init() -> void:
 	check(saw_spin and saw_cannon, "fase 2: espiral e bala de canhão carregada")
 	boss.hp = 100; boss.cd = 0; s.bullets.clear(); s.actors[0].p = Vector2(600, 520)
 	var seen := {}
-	for n in range(400):
+	for n in range(900):
+		s.actors[0].p = boss.p + Vector2(0, 200) # acompanha reposicionamento para testar chamas de curto alcance
 		s.step_enemies(0.016)
 		for k in fired_kinds(s): seen[k] = true
 		s.actors[0].hp = 100; s.actors[0].dead = false

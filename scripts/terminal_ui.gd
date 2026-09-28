@@ -39,18 +39,19 @@ func _ready() -> void:
 func center_stage() -> void:
 	if stage == null: return
 	var vp := get_viewport_rect().size
-	stage.position = ((vp - Vector2(1280, 800)) * 0.5).floor()
+	var fit := minf(vp.x/1280.0,vp.y/800.0)
+	stage.scale = Vector2(1280.0/1344,800.0/752)*fit
+	stage.position = ((vp - Vector2(1280, 800)*fit) * 0.5).floor()
 	place_equipment()
 
-# 0.17: a tela de Equipamento (pixel art) fica fora do "stage" esticado: escala INTEIRA em pixels reais
-# (1x, 2x, 3x…) e centrada. Só quando a janela é menor que 1344x752 ela reduz para caber.
+# 0.17: equipamento centralizado com escala proporcional contínua para ocupar a janela.
 func place_equipment() -> void:
 	if content == null or screen != "equipment" or content.get_parent() != self: return
 	var k := get_viewport().get_final_transform().get_scale().x   # lógico -> pixels da janela
 	if k <= 0: k = 1.0
 	var phys := get_viewport_rect().size * k
 	var fit := minf(phys.x / 1344.0, phys.y / 752.0)
-	var s := floorf(fit) if fit >= 1.0 else fit
+	var s := fit # 0.17: ocupa a janela também entre escalas inteiras
 	content.scale = Vector2.ONE * (s / k)
 	content.position = ((phys - Vector2(1344, 752) * s) * 0.5).floor() / k
 
