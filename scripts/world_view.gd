@@ -981,6 +981,7 @@ func draw_enemy(e: Dictionary) -> void:
 		visual_transform(p + Vector2(0, bob), 0, Vector2(1, 1))
 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
 			tint = Color(1.5, 0.8, 0.55)
+		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
 		draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
 	elif special_enemy_art.has(e.kind):
 		var special: Texture2D = special_enemy_art[e.kind]
@@ -991,6 +992,9 @@ func draw_enemy(e: Dictionary) -> void:
 	else:
 		draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(column * 144, ENEMY_ROW[e.kind] * 96, 144, 96), tint)
 	visual_transform(Vector2.ZERO)
+	if e.kind == "guard" and e.combat == "attack":
+		draw_arc(p, 34, 0, TAU, 24, Color("ffad61"), 2)
+		text_at(p + Vector2(-28, -94), "ABERTO", Color("ffcb81"), 11)
 	if e.hp < e.max:
 		var w := 30.0 * scale
 		draw_rect(Rect2(p + Vector2(-w * 0.5, 6), Vector2(w, 3)), Color("1c1522"))
