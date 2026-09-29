@@ -15,6 +15,10 @@ var combat_zones: Array = []
 var harpoons: Array = []
 const ATTACK_LIMIT := 3
 const ATTACK_WARNING := 0.55
+const GUARD_WARNING := 1.1  # 0.20: preparação lenta, com escudo ainda erguido.
+const GUARD_ATTACK_TIME := 2.4
+const GUARD_SHOT_INTERVAL := 0.48
+const GUARD_SHOTS := 5
 const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
 var effects: Array = []
@@ -1251,7 +1255,7 @@ func step_bullets(dt: float) -> void:
 						var previous_hits: Array = b.get("hits", [])
 						if previous_hits.has(e.id): continue
 						if e.hp <= 0: continue
-						if (e.kind == "guard" or e.get("elite", "") == "shield") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") != "p_omega":
+						if (e.kind == "guard" or e.get("elite", "") == "shield") and not (e.kind == "guard" and e.combat == "attack") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") != "p_omega":
 							b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
 							effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
 						e.hp -= b.damage; e.hurt = 0.12; e["alerted"] = true
@@ -1681,12 +1685,19 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 		if e.kind != "fish": e["locked"] = target.p
 		e.face = (e.locked - e.p).normalized()
 		if e.combat_t <= 0:
-			e.combat = "attack"; e.combat_t = 0.7; e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
+			e.combat = "attack"; e.combat_t = GUARD_ATTACK_TIME if e.kind == "guard" else 0.7
+			e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
 		return
 	if e.combat == "attack":
-		var direction: Vector2 = (e.locked - e.p).normalized()
+		var direction: Vector2 = ((target.p if e.kind == "guard" else e.locked) - e.p).normalized()
 		e.face = direction; e.shot = 0.15
 		match e.kind:
+			"guard":
+				# 0.20: rajada cadenciada; durante toda a ofensiva a guarda fica aberta.
+				e.burst_t -= dt
+				if e.burst_t <= 0 and e.burst < GUARD_SHOTS:
+					add_bullet(e.p, direction, 1, 10 * e.damage_scale, 280, 7, -1, "magenta")
+					e.burst += 1; e.burst_t = GUARD_SHOT_INTERVAL
 			"brute":
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < 6:
@@ -1730,7 +1741,7 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 	if e.cd > 0 or attack_slots(target.id) >= ATTACK_LIMIT or not line_of_fire(e.p, target.p): return
 	if e.kind == "bomber" and e.p.distance_to(target.p) > 100: return
 	if e.kind in ["crawler", "crawler_small"] and e.p.distance_to(target.p) > 300: return
-	e.combat = "warning"; e.combat_t = ATTACK_WARNING; e.target_id = target.id
+	e.combat = "warning"; e.combat_t = GUARD_WARNING if e.kind == "guard" else ATTACK_WARNING; e.target_id = target.id
 	e["locked"] = target.p; e["launch"] = e.p
 
 func add_combat_zone(p: Vector2, radius: float, damage: float, kind: String, warning: float, duration: float) -> void:

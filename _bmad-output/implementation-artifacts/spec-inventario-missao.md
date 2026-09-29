@@ -2,7 +2,7 @@
 title: 'Inventário da missão separado da preparação'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 baseline_commit: '28437a20363da65af0b014dbe5981757501ebed9'
 context: []
 ---
@@ -62,6 +62,7 @@ context: []
 ## Spec Change Log
 
 - 2026-09-29: implementado o inventário contextual da missão, integrado à pausa e validado em 1920×1080.
+- 2026-09-29: revisão independente corrigiu projeção por tentativa, recursos do robô levado, atualização ao vivo, foco restaurado e sinalização de ícones provisórios.
 
 ## Design Notes
 
@@ -74,6 +75,43 @@ The shared shell prevents two interfaces from drifting visually, while `mission_
 - Godot 1920×1080 preview -- expected: mission inventory capture has no clipping and visually matches the reference hierarchy.
 
 **Results:**
-- 36/36 arquivos `tests/*_test.gd` aprovados (25 até `save_game_flow_test.gd` + 11 restantes).
+- 36/36 arquivos `tests/*_test.gd` aprovados em dois lotes, sem falhas.
 - `test-output/menu-inventario-missao-final.png` gerado em 1920×1080 e inspecionado sem recortes.
+
+## Suggested Review Order
+
+**Entrada e separação de contextos**
+
+- A pausa abre o inventário da missão sem substituir a preparação pré-jogo.
+  [`terminal_ui.gd:234`](../../scripts/terminal_ui.gd#L234)
+
+- O mesmo shell adota título, retorno e seletor cooperativo contextuais.
+  [`equipment_screen.gd:107`](../../scripts/equipment_screen.gd#L107)
+
+**Dados autoritativos da tentativa**
+
+- Quantidades projetam somente recursos atuais e o robô realmente levado.
+  [`equipment_screen.gd:158`](../../scripts/equipment_screen.gd#L158)
+
+- O marco inicial separa fragmentos anteriores dos ganhos nesta missão.
+  [`simulation.gd:284`](../../scripts/simulation.gd#L284)
+
+- Alterações autoritativas atualizam a grade preservando o foco lógico.
+  [`equipment_screen.gd:375`](../../scripts/equipment_screen.gd#L375)
+
+**Apresentação e segurança**
+
+- Cards sinalizam ícones provisórios e mantêm recursos transitórios somente leitura.
+  [`equipment_screen.gd:211`](../../scripts/equipment_screen.gd#L211)
+
+- Trocas em missão respeitam propriedade, autoridade e confirmação do anfitrião.
+  [`equipment_screen.gd:424`](../../scripts/equipment_screen.gd#L424)
+
+**Verificação e documentação**
+
+- O teste integra pausa, valores ao vivo, escopo da tentativa e retorno.
+  [`mission_inventory_ui_test.gd:8`](../../tests/mission_inventory_ui_test.gd#L8)
+
+- A documentação fixa a distinção entre inventário persistente e tentativa.
+  [`INVENTARIO.md:3`](../../docs/INVENTARIO.md#L3)
 

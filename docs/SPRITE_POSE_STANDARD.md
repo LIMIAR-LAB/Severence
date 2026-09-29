@@ -193,3 +193,29 @@ Os atlas atuais foram criados antes deste contrato e permanecem como legado:
 A migração deve ser gradual. Nenhum atlas funcional precisa ser removido apenas por
 estar no formato antigo; ele é substituído quando sua nova versão estiver aprovada,
 integrada e testada.
+
+## Marty Padrão — conjunto PixelLab
+
+O Marty Padrão é a primeira migração completa para este contrato. A referência é o
+personagem PixelLab `812c6637-c0c0-461a-bce5-22da22348ad7`, criado a partir do
+modelo aprovado em `art/source/characters/marty/padrao/reference/rotations/`.
+
+As fontes exportadas ficam em
+`art/source/characters/marty/padrao/pixellab/`. O arquivo de produção usado pelo
+jogo é convertido por `tools/import_marty_pixellab.py` em oito folhas separadas:
+
+| Ação | Quadros | Arquivo de jogo |
+| --- | ---: | --- |
+| Parado/respiração | 4 | `assets/characters/marty/padrao/pixellab/idle.png` |
+| Corrida | 8 | `assets/characters/marty/padrao/pixellab/run.png` |
+| Pulo | 9 | `assets/characters/marty/padrao/pixellab/jump.png` |
+| Esquiva com giro frontal | 6 | `assets/characters/marty/padrao/pixellab/evade.png` |
+| Corpo para disparo/recuo | 3 | `assets/characters/marty/padrao/pixellab/shoot.png` |
+| Ataque corpo a corpo | 6 | `assets/characters/marty/padrao/pixellab/melee.png` |
+| Dano | 6 | `assets/characters/marty/padrao/pixellab/hurt.png` |
+| Derrota | 7 | `assets/characters/marty/padrao/pixellab/defeat.png` |
+
+Cada folha usa células 96×96 e oito linhas nesta ordem: sul, sudeste, leste,
+nordeste, norte, noroeste, oeste e sudoeste. Todas as oito vistas são próprias;
+não espelhar horizontalmente, pois a ombreira, a manopla e a mochila são
+assimétricas. Armas, projéteis e clarões continuam em camadas separadas no jogo.

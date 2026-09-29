@@ -2,7 +2,8 @@
 title: 'Remake the first-stage boss with PixelLab'
 type: 'feature'
 created: '2026-09-29'
-status: 'draft'
+status: 'in-progress'
+baseline_commit: '1b938c74108d518d569049316856852211df8201'
 context:
   - '{project-root}/docs/SPRITES_0_6.md'
   - '{project-root}/docs/deep-dive-boss.md'

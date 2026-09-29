@@ -10,7 +10,7 @@ Existem dois contextos intencionalmente separados. Antes de iniciar, **Equipamen
 - Uma pilha ocupa uma vaga, respeita `max_pilha` e nunca é alterada parcialmente quando a operação falha.
 - Itens equipáveis apontam para um `loadout_id` existente. Uniformes/armas, Titan, Spectre e Ômega continuam autoritativos em `equipamento.json` e na simulação.
 - Itens marcados como `prototipo` aparecem no catálogo, mas não podem ser usados nem equipados. A UI explica o motivo.
-- Chaves, moedas, combustível do Titan e baterias do Spectre pertencem à tentativa atual e não ocupam o inventário persistente.
+- Chaves, moedas e fragmentos ganhos desde o início da tentativa, além do combustível ou energia do robô realmente levado, são projeções ao vivo e não ocupam o inventário persistente.
 
 ## Persistência e rede
 
@@ -18,5 +18,5 @@ Progresso e saves de expedição novos usam versão 2. Versão 1 continua aceita
 
 ## Limitações atuais
 
-Kit de reparo, sucata temporal, fragmento cronal e chave do Marty são protótipos de conteúdo. Eles demonstram pilhas, filtros e item especial, mas não criam cura, economia ou efeitos de combate. Os ícones desses itens e dos recursos temporários ainda são provisórios: usam deliberadamente assets internos rastreáveis até a produção do pacote final, sem material externo não licenciado.
+Kit de reparo, sucata temporal, fragmento cronal e chave do Marty são protótipos de conteúdo. Eles demonstram pilhas, filtros e item especial, mas não criam cura, economia ou efeitos de combate. Os ícones desses itens e dos recursos temporários ainda são provisórios: usam deliberadamente assets internos rastreáveis até a produção do pacote final, sem material externo não licenciado. Na tela da missão, esses casos recebem a marca visível `PROV.` e a explicação “Ícone provisório” no painel de detalhes.
 

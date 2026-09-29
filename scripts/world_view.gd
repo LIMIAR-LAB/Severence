@@ -30,6 +30,7 @@ var dock_art: Dictionary = {}
 var font: Font
 var outfit_texture: Texture2D
 var marty_anim: Texture2D
+var marty_padrao_actions: Dictionary = {}
 var marty_roll: Dictionary = {}
 var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
@@ -45,6 +46,11 @@ var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
+const MARTY_PADRAO_ROOT := "res://assets/characters/marty/padrao/pixellab/"
+const MARTY_PADRAO_FRAMES := {
+	"idle": 4, "run": 8, "jump": 9, "evade": 6,
+	"shoot": 3, "melee": 6, "hurt": 6, "defeat": 7,
+}
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
@@ -73,6 +79,9 @@ func _ready() -> void:
 	outfit_texture = load("res://assets/marty/outfits.png")
 	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
 	marty_anim = load(MARTY_ATLAS_PATH)
+	# Marty Padrao usa arte propria em oito direcoes, sem espelhar detalhes assimetricos.
+	for action in MARTY_PADRAO_FRAMES:
+		marty_padrao_actions[action] = load(MARTY_PADRAO_ROOT + action + ".png")
 	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
 	for direction in ["side", "front_diag", "back_diag"]:
 		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
@@ -575,8 +584,11 @@ func draw_actor(a: Dictionary) -> void:
 	visual_transform(foot, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 17, Color(0, 0, 0, 0.4)); visual_transform(Vector2.ZERO)
 	draw_arc(foot, 16, 0, TAU, 20, player_color, 2)
 	if a.dead:
-		draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
-		draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
+		if sim.outfit_of(a) == "padrao":
+			draw_marty_padrao_frame("defeat", a.facing, MARTY_PADRAO_FRAMES.defeat - 1, foot, Color.WHITE)
+		else:
+			draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
+			draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
 		text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12); return
 	var jump_height := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
 	var elevation := sim.height_at(foot)
@@ -622,7 +634,13 @@ func draw_actor(a: Dictionary) -> void:
 		draw_power_aura(draw_pos, clampf(1.0 - absf(charge_t - 0.6) / 0.8, 0.25, 1.0), true)
 	elif a.armor and not a.mech:
 		draw_power_aura(draw_pos, 0.28, false)
-	if a.dodge > 0 and not a.mech:
+	if outfit_key == "padrao":
+		var padrao_action := marty_padrao_action(a, walking, firing)
+		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else (a.move if padrao_action == "run" else a.facing)
+		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
+		draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
+		if padrao_action != "evade": draw_weapon(a, draw_pos + Vector2(0, bob))
+	elif a.dodge > 0 and not a.mech:
 		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
 	else:
 		visual_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
@@ -766,6 +784,8 @@ func weapon_hand_anchor(a: Dictionary) -> Vector2:
 
 func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	# 0.18: dedos da própria arte cobrem a empunhadura, sem braços geométricos.
+	# O novo Padrao ja possui maos completas; nao cola nele um recorte do atlas antigo.
+	if sim.outfit_of(a) == "padrao": return
 	var pose := marty_pose(a.facing)
 	var row: int = OUTFIT_ROW[sim.outfit_of(a)] * 5 + int(pose[0])
 	var anchor := weapon_hand_anchor(a)
@@ -897,6 +917,38 @@ func marty_pose(f: Vector2) -> Array:
 		5: return [3, true]    # cima-esquerda
 		6: return [4, false]   # cima
 		_: return [3, false]   # cima-direita
+
+func marty_direction_row(direction: Vector2) -> int:
+	# Ordem do export PixelLab: sul, sudeste, leste, nordeste, norte,
+	# noroeste, oeste, sudoeste.
+	var f := direction.normalized() if direction.length() > 0.01 else Vector2.DOWN
+	var octant := int(round(fposmod(f.angle(), TAU) / (TAU / 8))) % 8
+	return [2, 1, 0, 7, 6, 5, 4, 3][octant]
+
+func marty_padrao_action(a: Dictionary, walking: bool, firing: bool) -> String:
+	if a.dodge > 0: return "evade"
+	if a.slash > 0 and not a.mech: return "melee"
+	if a.jump > 0: return "jump"
+	if a.hurt > 0: return "hurt"
+	if firing: return "shoot"
+	if walking: return "run"
+	return "idle"
+
+func marty_padrao_frame(a: Dictionary, action: String, slash_dur: float) -> int:
+	var count: int = MARTY_PADRAO_FRAMES[action]
+	match action:
+		"evade": return clampi(int((1.0 - a.dodge / 0.20) * count), 0, count - 1)
+		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
+		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
+		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
+		"run": return int(a.step) % count
+		"hurt": return int(sim.tick_time * 14.0) % count
+		_: return int(sim.tick_time * 4.0 + a.id) % count
+
+func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foot: Vector2, tint: Color) -> void:
+	var texture: Texture2D = marty_padrao_actions[action]
+	var row := marty_direction_row(direction)
+	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
 
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p

@@ -8,6 +8,7 @@ func check(ok: bool, description: String) -> void:
 func _initialize() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app); await process_frame
 	app.sim.set_unlocks(["padrao", "titan", "spectre", "omega"])
+	app.sim.materials = 5
 	app.start_single(); app.sim.start_run(1941)
 	app.sim.keys = 3; app.sim.money = 47; app.sim.materials = 8
 	app.sim.mech.fuel = app.sim.FUEL_MAX * 0.62; app.sim.spectres[0].hp = 71
@@ -21,6 +22,7 @@ func _initialize() -> void:
 	check(eq.find_child("InventorySlot_missao_chaves", true, false) is Button, "chaves coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_missao_moedas", true, false) is Button, "moedas coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_prototipo_reparo", true, false) == null, "item persistente não levado fica fora da missão")
+	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_fragmentos")) == 3, "fragmentos contam somente o ganho desta missão")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_combustivel")) == 62, "combustível usa valor vivo quando Titan foi levado")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_energia")) == 0, "energia só aparece quando Spectre foi levado")
 	check(app.sim.inventory_state == persistent_before, "recursos da tentativa não entram no inventário persistente")
