@@ -3,6 +3,8 @@ extends RefCounted
 const DOCKS := preload("res://scripts/docks_map.gd")  # não depende do cache de class_name
 const SummonFX = preload("res://scripts/summon_fx.gd")
 const EquipmentData := preload("res://scripts/equipment_data.gd")
+const InventoryState := preload("res://scripts/inventory_state.gd")
+const InventoryData := preload("res://scripts/inventory_data.gd")
 
 # All gameplay state is serializable. Only the host advances simulation.
 var actors: Array = []
@@ -33,6 +35,7 @@ var message_time := 0.0
 var money := 0
 var keys := 0
 var materials := 0
+var run_materials_start := 0
 var upgrade := 0
 var clears := 0
 var armor_unlocked := false
@@ -40,6 +43,7 @@ var armor_unlocked := false
 # liberado (testes, arena); o jogo (main.gd) troca pelo estado do save — jogo novo = só o Padrão.
 var unlocked: Dictionary = {"padrao": true, "mecanico": true, "espiao": true, "omega": true, "titan": true, "spectre": true}
 var new_unlocks: Array = []   # desbloqueados nesta sessão ainda não salvos (main.gd salva e limpa)
+var inventory_state: Dictionary = InventoryState.defaults()
 var side_active := false
 var side_complete := false
 var side_time := 0.0
@@ -196,7 +200,7 @@ const HUB_POINTS := [
 	{"id": "lost", "p": Vector2(965, 275), "r": 85, "label": "COORDENADA PERDIDA • BLOQUEADO"},
 	{"id": "core", "p": Vector2(640, 455), "r": 70, "label": "E • NÚCLEO TEMPORAL"},
 	{"id": "bench", "p": Vector2(330, 335), "r": 85, "label": "E • BANCADA (em breve)"},
-	{"id": "armor", "p": Vector2(265, 580), "r": 85, "label": "E • TROCAR UNIFORME"},
+	{"id": "armor", "p": Vector2(265, 580), "r": 85, "label": "E • CONSULTAR EQUIPAMENTO"},
 	{"id": "mural", "p": Vector2(672, 478), "r": 55, "label": "E • MURAL DA EQUIPE"},
 	{"id": "hangar", "p": Vector2(1000, 545), "r": 70, "label": "HANGAR DO TITAN"}]
 const HUB_TITAN_BAY := Vector2(1140, 548)
@@ -281,7 +285,7 @@ func start_run(new_seed: int) -> void:
 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
 	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
 	seed_value = new_seed; rng.seed = seed_value
-	mode = "run"; tick_time = 0; money = 12; keys = 1
+	mode = "run"; tick_time = 0; money = 12; keys = 1; run_materials_start = materials
 	side_active = false; side_complete = false; side_failed = false; shop_bought = false
 	boss_dead = false; secret_open = false; reward_claimed = false
 	var P: Dictionary = DOCKS.POINTS
@@ -982,12 +986,7 @@ func interact(a: Dictionary) -> void:
 				say("Bancada: melhorias de vida em breve. Por enquanto todos começam com 3 corações.")
 				return
 			"armor":
-				# Vitrine: troca o UNIFORME (Padrão → Mecânico → Espião). A armadura é o R.
-				if a.armor: say("Com a armadura ativa não dá para trocar de uniforme nem de arma."); return
-				for _n in OUTFITS.size():
-					a.outfit = OUTFITS[(OUTFITS.find(a.outfit) + 1) % OUTFITS.size()]
-					if is_unlocked(a.outfit): break
-				say("Uniforme: " + UNIFORMS[a.outfit].name + " • " + UNIFORMS[a.outfit].desc.split("\n")[0] + "  (R veste a Armadura Ômega)"); return
+				say("Uniforme: " + UNIFORMS[a.outfit].name + ". Configure o próximo visual antes da expedição."); return
 			"mural":
 				var photos := mini(clears, 4)
 				if photos == 0: say("O mural da equipe perdida. Marty ainda não conseguiu trazer ninguém de volta.")
@@ -1322,6 +1321,18 @@ func equip(id: int, outfit: String, robot: String, armor_type: String = "omega")
 		say("Desfaça a fusão antes de trocar de robô."); return false
 	if a.armor and outfit != a.outfit:
 		say("Com a armadura ativa não dá para trocar de uniforme nem de arma."); return false
+	# O inventário persistente pertence ao jogador principal; P2/guest não sobrescreve seu loadout meta.
+	if id == 0:
+		var inventory := InventoryState.new(inventory_state)
+		for entry in InventoryData.valid_items():
+			var loadout_id := str(entry.get("loadout_id", "")); var slot := str(entry.get("slot", ""))
+			var required := (loadout_id == outfit and slot == "uniforme") or (loadout_id == robot and slot == "robo")
+			var optional_armor := loadout_id == armor_type and slot == "armadura" and InventoryData.unlocked(entry, unlocked)
+			if required or optional_armor:
+				if inventory.quantity(entry.id) == 0 and not inventory.add(entry.id): return false
+				if not inventory.equip(entry.id, unlocked): return false
+		if robot == "" and not inventory.unequip("robo"): return false
+		inventory_state = inventory.to_dict()
 	a.outfit = outfit; a.selected_robot = robot
 	if not a.armor: a.armor_type = armor_type
 	return true
@@ -1415,12 +1426,16 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 
 func apply_snapshot(data: Dictionary) -> void:
-	for name in data: set(name, data[name])
+	var allowed := snapshot().keys()
+	for name in data:
+		if name in allowed and name != "inventory_state": set(name, data[name])
+	if data.get("inventory_state") is Dictionary: inventory_state = InventoryState.new(data.inventory_state).to_dict()
+	else: inventory_state = InventoryState.new(inventory_state).to_dict()
 
 
 # ── 0.14: números da tela de Equipamento, sempre calculados das mesmas constantes do jogo ──

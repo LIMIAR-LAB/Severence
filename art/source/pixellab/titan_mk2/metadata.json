@@ -1,0 +1,36 @@
+{
+  "group_id": "d4beb218-256b-4c1a-846a-ff4e8d331b80",
+  "states": [
+    {
+      "character": {
+        "id": "639605ef-43f4-4540-9a72-b5029135eeac",
+        "name": "Idle",
+        "prompt": "A new production-ready version of Titan-01, a compact heavy bipedal time-travel combat mech for a top-down three-quarter-view pixel art game. Preserve the reference robot's identity: squat broad olive-drab weathered military armor, fully closed rounded helmet with a dark horizontal visor and two cyan eyes, one bright circular cyan chest reactor visible only from front angles, a compact integrated forearm cannon on its right arm, articulated armored left hand, twin brass fuel tanks and dark mechanical backpack visible from behind, broad planted feet. Make the redesign slightly cleaner and more distinctive with readable armor plates, rivets, and subtle battle wear. Same proportions and details in all eight rotations. Transparent background, complete uncropped body, no human pilot, no muzzle flash, no environment, no text.",
+        "size": {
+          "width": 176,
+          "height": 176
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-09-29T21:36:11.583370+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-09-29T21:40:11.372250"
+}

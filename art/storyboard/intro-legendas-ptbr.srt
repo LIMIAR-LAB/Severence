@@ -1,0 +1,77 @@
+1
+00:00:01,000 --> 00:00:05,700
+Elias: Travessia em trinta segundos.
+Todo mundo pronto?
+
+2
+00:00:07,600 --> 00:00:10,600
+Marty: Pronto. Obra de um gênio.
+
+3
+00:00:11,400 --> 00:00:13,600
+Letícia: Marty. Faltou a trava.
+
+4
+00:00:13,700 --> 00:00:15,800
+Marty: Teste de reflexo. Passou!
+
+5
+00:00:17,000 --> 00:00:20,500
+Vincent: Leva outra. Só por garantia.
+
+6
+00:00:24,000 --> 00:00:26,000
+Elias: Estranho…
+
+7
+00:00:28,000 --> 00:00:31,300
+Íris: Você também está na lista de pacientes.
+
+8
+00:00:33,000 --> 00:00:36,800
+Letícia: Na volta, você me deve
+um dia sem consertar nada.
+
+9
+00:00:37,000 --> 00:00:39,800
+Marty: Encontro marcado. Sem ferramentas.
+
+10
+00:00:42,000 --> 00:00:44,700
+Elias: Isso não é turbulência!
+
+11
+00:00:46,000 --> 00:00:49,300
+Marty: Todo mundo para a sala do núcleo!
+
+12
+00:00:52,000 --> 00:00:54,000
+Letícia: Marty!
+
+13
+00:01:06,000 --> 00:01:11,000
+Marty: Letícia? Vincent? …Alguém?
+
+14
+00:01:15,000 --> 00:01:21,000
+Marty: Aqui é o Marty. Estou na sala do núcleo.
+Respondam.
+
+15
+00:01:35,000 --> 00:01:39,400
+Sistema: Quatro assinaturas da tripulação detectadas.
+Coordenadas temporais instáveis.
+
+16
+00:01:39,700 --> 00:01:41,300
+Marty: Vocês estão aí…
+
+17
+00:01:41,500 --> 00:01:45,800
+Sistema: Primeiro destino acessível:
+Londres. Mil novecentos e quarenta e um.
+
+18
+00:01:49,000 --> 00:01:53,000
+Marty: Eu vou encontrar vocês. Um por um.
+

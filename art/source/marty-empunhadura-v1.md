@@ -1,0 +1,9 @@
+# Marty — estudo de empunhadura
+
+Gerado com image_gen integrado. Arte: marty-empunhadura-v1.png.
+Estudo de poses Padrão e Mecânico; ainda não é um atlas animado integrado.
+Revisar orientação da arma na vista traseira do Mecânico antes da integração.
+
+## Prompt
+
+Create a corrected pixel-art sprite reference sheet for the game Marty Fraturas do Tempo. Use the recent attached gameplay screenshots as character identity references and the prior annotated holding-weapon correction sheet as anatomical guidance. Transparent background. EXACTLY 2 rows x 5 columns, ten separate full-body sprites with ample transparent gutters, equal scale and aligned feet. Top row: Marty standard pilot, spiky brown hair, cyan goggles on forehead, brown shearling flight jacket, dark trousers, boots, cyan technological gauntlets and compact cyan blaster. Bottom row: same Marty mechanic skin, white sleeveless undershirt, olive overalls/trousers, tool belt, gloves, carrying a compact shotgun. Columns in each row: front, front-right three-quarter, right profile, rear-right three-quarter, full back. Each character naturally holds his weapon with TWO HANDS: dominant fingers visibly wrap around actual pistol grip, support palm contacts fore-end, bent elbows and continuous anatomically plausible upper arms/forearms connect shoulders to wrists. Guns at lower chest height, clear of face and neck. In rear views show backpack, rear hair and jacket, properly foreshortened raised forearms; no front face on rear sprites. Crisp hand-crafted detailed pixel art, chibi game proportions like the references, restrained highlights, no smooth vector limbs, no straight brown tubes pasted on arms. No floating weapons, detached hands, extra arms, duplicate weapons, shoulder-held tools, scenery, text, labels, shadows or grid lines. This is a production art study for replacement sprites, not a UI screenshot. Preserve recognisable identity and costume palettes.

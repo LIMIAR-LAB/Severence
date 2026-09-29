@@ -1,188 +1,419 @@
 extends Control
-# 0.17: tela de EQUIPAMENTO modular. A moldura (assets/ui/equipamento/equip_moldura.png) é só o fundo:
-# ícones, cards, textos, números, barras e seleção são nós separados por cima, controlados pelos dados
-# (data/equipamento.json via equipment_data.gd) e pelo estado de desbloqueio da simulação (sim.unlocked).
-# Todas as caixas abaixo foram medidas na moldura (espaço 1344x752). Filtro Nearest em tudo.
 
+# 0.20: shell de Equipamento em abas. Catálogo/estado ficam fora da apresentação.
 const DATA := preload("res://scripts/equipment_data.gd")
+const InventoryData := preload("res://scripts/inventory_data.gd")
+const InventoryState := preload("res://scripts/inventory_state.gd")
 const DIR := "res://assets/ui/equipamento/"
 const SIZE := Vector2(1344, 752)
+const TAB_NAMES := ["INVENTÁRIO", "ROBÔS", "ARMADURAS", "EQUIPADOS", "STATUS"]
+const FILTERS := [["todos", "TODOS"], ["armas", "ARMAS"], ["pecas", "PEÇAS"], ["consumiveis", "CONSUMÍVEIS"], ["recursos", "RECURSOS"]]
+const TEAL := Color("54e4e7")
+const GOLD := Color("efc56b")
+const TEXT := Color("dce8df")
+const DIM := Color("83968e")
+const PANEL := Color("102b25")
+const BRASS := Color("a87732")
+const RARITY := {"comum": Color("aab8b4"), "incomum": Color("67d591"), "raro": Color("57a8ff"), "especial": Color("d186ff"), "lendario": Color("ffc34f")}
 
-const UNIFORM_ROW := [Rect2(40, 130, 318, 86), Rect2(40, 222, 318, 81), Rect2(40, 311, 318, 86)]
-const UNIFORM_ICON := [Rect2(44, 136, 84, 74), Rect2(44, 225, 84, 75), Rect2(43, 313, 85, 77)]
-const ARMOR_SLOT := [Rect2(45, 471, 91, 94), Rect2(158, 472, 87, 93), Rect2(268, 472, 85, 93)]
-const ARMOR_TEXT := Rect2(58, 586, 292, 58)
-const ROBOT_SLOT := [Rect2(413, 540, 89, 95), Rect2(517, 541, 85, 94), Rect2(616, 541, 88, 94)]
-const ROBOT_TEXT := Rect2(728, 540, 200, 100)
-const VITRINE := Rect2(410, 100, 525, 370)
-const CARD := Rect2(492, 105, 360, 360)
-const ARROWS := [Rect2(392, 258, 38, 64), Rect2(912, 258, 38, 64)]
-const STAT_Y := [142, 184, 227, 269, 312, 354]   # topo dos segmentos de cada linha
-const SEG_X0 := 1044.0
-const SEG_STEP := 16.73
-const SEG_SIZE := Vector2(15, 15)
-const NUM_X := 1257.0
-const DESC_TEXT := Rect2(1000, 462, 296, 180)
-const TABS := [Rect2(872, 22, 204, 46), Rect2(1084, 22, 210, 46)]
-const BACK_BUTTON := Rect2(20, 680, 220, 53)
-const REFUGE_BUTTON := Rect2(1062, 680, 266, 53)
-const STATUS_LINE := Rect2(390, 30, 440, 22)
-
-const TEAL := Color("5fd6d8")
-const GOLD := Color("f3c86a")
-const TEXT := Color("d8dccf")
-const DIM := Color("7c8a86")
-const LOCKED := Color("5d6668")
-
-var host          # TemporalTerminal: dono das escolhas (outfit_choice, robot_choice, armor_choice, gear_actor)
+var host
 var app
-var focus_id := ""                  # item mostrado na vitrine
-var slots: Dictionary = {}          # id -> {"button", "icon", "frame", "rect", "name"?...}
-var order: Array = []               # ordem das setas ◀ ▶ / LB RB
+var inventory: RefCounted
+var active_tab := 0
+var focus_id := ""
+var slots: Dictionary = {}
+var order: Array = ["padrao", "mecanico", "espiao", "omega", "titan", "spectre"]
 var card: TextureRect
 var card_lock: TextureRect
-var seg_rects: Array = []           # [linha][segmento] ColorRect
 var numbers: Array = []
-var desc_title: Label
-var desc_sub: Label
-var desc_body: Label
-var armor_label: Label
 var robot_label: Label
-var robot_detail: Label
+var desc_body: Label
 var status: Label
 var tabs: Array = []
-var pulse := 0.0
-
-func unlocked(id: String) -> bool:
-	return id != "" and app.sim.is_unlocked(id)
+var page: Control
+var detail_title: Label
+var detail_rarity: Label
+var detail_text: Label
+var detail_stats: Label
+var detail_action: Button
+var detail_reason: Label
+var capacity_label: Label
+var grid_buttons: Array = []
+var inventory_page := 0
+var mission_mode := false
+var mission_signature := ""
 
 func tex(path: String) -> Texture2D:
 	return load(path) if path != "" and ResourceLoader.exists(path) else null
 
-func add_label(parent: Control, rect: Rect2, text: String, size: int, color: Color) -> Label:
-	var l := Label.new(); l.position = rect.position; l.size = rect.size; l.text = text
-	l.add_theme_font_size_override("font_size", size); l.add_theme_color_override("font_color", color)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.7)); l.add_theme_constant_override("shadow_offset_x", 1); l.add_theme_constant_override("shadow_offset_y", 1)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(l); return l
+func make_style(bg: Color, border: Color, width := 2, radius := 4) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new(); box.bg_color = bg; box.border_color = border
+	box.set_border_width_all(width); box.set_corner_radius_all(radius); return box
 
-func add_image(parent: Control, rect: Rect2, t: Texture2D, centered := true) -> TextureRect:
-	# textura desenhada 1:1 (os ícones já foram gerados no tamanho do slot), centrada na caixa
-	var r := TextureRect.new(); r.texture = t; r.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	r.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED if centered else TextureRect.STRETCH_KEEP
-	r.position = rect.position; r.size = rect.size; r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(r); return r
+func panel(parent: Control, rect: Rect2, bg := PANEL, border := BRASS) -> Panel:
+	var p := Panel.new(); p.position = rect.position; p.size = rect.size; p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_theme_stylebox_override("panel", make_style(bg, border)); parent.add_child(p); return p
 
-func add_frame(rect: Rect2, legendary: bool) -> NinePatchRect:
-	var f := NinePatchRect.new(); f.texture = load(DIR + ("icones/frame_lendario.png" if legendary else "icones/frame_selecao.png"))
-	f.patch_margin_left = 14; f.patch_margin_right = 14; f.patch_margin_top = 14; f.patch_margin_bottom = 14
-	f.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var r := rect.grow(4); f.position = r.position; f.size = r.size; f.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	f.visible = false; add_child(f); return f
+func label(parent: Control, rect: Rect2, caption: String, font_size := 16, color := TEXT) -> Label:
+	var node := Label.new(); node.position = rect.position; node.size = rect.size; node.text = caption
+	node.add_theme_font_size_override("font_size", font_size); node.add_theme_color_override("font_color", color)
+	node.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8)); node.add_theme_constant_override("shadow_offset_x", 1); node.add_theme_constant_override("shadow_offset_y", 1)
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(node); return node
 
-func flat_button(rect: Rect2, callback: Callable, id := "") -> Button:
-	var b := Button.new(); b.position = rect.position; b.size = rect.size; b.flat = true
-	var empty := StyleBoxEmpty.new()
-	for st in ["normal", "hover", "pressed", "disabled", "focus"]: b.add_theme_stylebox_override(st, empty)
+func button(parent: Control, rect: Rect2, caption: String, callback: Callable, name_value := "") -> Button:
+	var b := Button.new(); b.position = rect.position; b.size = rect.size; b.text = caption
+	b.add_theme_font_size_override("font_size", 15); b.add_theme_color_override("font_color", TEXT)
+	b.add_theme_stylebox_override("normal", make_style(Color("102d27"), Color("5e683e")))
+	b.add_theme_stylebox_override("hover", make_style(Color("15433c"), TEAL, 3))
+	b.add_theme_stylebox_override("focus", make_style(Color("123c38"), TEAL, 3))
+	b.add_theme_stylebox_override("pressed", make_style(Color("17605e"), TEAL, 3))
+	b.add_theme_stylebox_override("disabled", make_style(Color("101918"), Color("3d4844")))
 	b.pressed.connect(callback)
-	if id != "":
-		b.name = "Slot_" + id
-		b.focus_entered.connect(func(): show_item(id)); b.mouse_entered.connect(b.grab_focus)
-	add_child(b); return b
+	if name_value != "": b.name = name_value
+	parent.add_child(b); return b
 
-func outline_button(rect: Rect2, callback: Callable) -> Button:
-	# botões desenhados na moldura (VOLTAR, IR AO REFÚGIO, abas): o Button é transparente e só acende a borda
-	var b := Button.new(); b.position = rect.position; b.size = rect.size
-	var normal := StyleBoxEmpty.new()
-	var lit := StyleBoxFlat.new(); lit.bg_color = Color(0.37, 0.84, 0.85, 0.08); lit.border_color = TEAL; lit.set_border_width_all(2); lit.set_corner_radius_all(4)
-	b.add_theme_stylebox_override("normal", normal); b.add_theme_stylebox_override("disabled", normal)
-	for st in ["hover", "focus", "pressed"]: b.add_theme_stylebox_override(st, lit)
-	b.pressed.connect(callback); add_child(b); return b
+func image(parent: Control, rect: Rect2, texture: Texture2D) -> TextureRect:
+	var node := TextureRect.new(); node.position = rect.position; node.size = rect.size; node.texture = texture
+	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; node.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(node); return node
 
 func build() -> void:
 	size = SIZE; mouse_filter = Control.MOUSE_FILTER_PASS
-	var bg := TextureRect.new(); bg.texture = load(DIR + "equip_moldura.png"); bg.size = SIZE
-	bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; bg.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(bg)
-	status = add_label(self, STATUS_LINE, "", 12, DIM); status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var legacy_bg := TextureRect.new(); legacy_bg.texture = load(DIR + "equip_moldura.png"); legacy_bg.size = SIZE
+	legacy_bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; legacy_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(legacy_bg)
+	var veil := ColorRect.new(); veil.color = Color("06110fee"); veil.size = SIZE; veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(veil)
+	build_header()
+	status = label(self, Rect2(455, 707, 625, 25), "", 13, DIM); status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	host.live_status = status
-	# abas de jogador (coop local: equipar Marty ou Echo)
-	for i in 2:
-		var tab := outline_button(TABS[i], func(): host.select_actor(i))
-		tab.name = "Tab_%d" % i; tab.focus_mode = Control.FOCUS_NONE
-		tab.disabled = i == 1 and not (app.playing and app.sim.coop == "local")
-		tabs.append(tab)
-	# UNIFORME: 3 linhas
-	var uniforms := DATA.by_category("uniforme")
-	for i in mini(3, uniforms.size()):
-		var it: Dictionary = uniforms[i]
-		var row: Rect2 = UNIFORM_ROW[i]
-		var entry := {"rect": UNIFORM_ICON[i], "category": "uniforme"}
-		entry["icon"] = add_image(self, UNIFORM_ICON[i], null)
-		entry["frame"] = add_frame(UNIFORM_ICON[i], false)
-		entry["name"] = add_label(self, Rect2(row.position.x + 106, row.position.y + 8, 206, 26), "", 18, TEXT)
-		entry["sub"] = add_label(self, Rect2(row.position.x + 106, row.position.y + 33, 206, 20), "", 13, TEAL)
-		entry["line"] = add_label(self, Rect2(row.position.x + 106, row.position.y + 54, 206, 18), "", 11, DIM)
-		for k in ["name", "sub", "line"]: (entry[k] as Label).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS; (entry[k] as Label).clip_text = true
-		entry["button"] = flat_button(row, func(): pick(it.id), it.id)
-		slots[it.id] = entry; order.append(it.id)
-	# ARMADURA: 3 vagas (itens + vagas vazias)
-	var armors := DATA.by_category("armadura")
-	for i in 3:
-		if i < armors.size():
-			var it: Dictionary = armors[i]
-			var entry := {"rect": ARMOR_SLOT[i], "category": "armadura"}
-			entry["icon"] = add_image(self, ARMOR_SLOT[i], null)
-			entry["frame"] = add_frame(ARMOR_SLOT[i], it.get("raridade", "") == "lendario")
-			entry["button"] = flat_button(ARMOR_SLOT[i], func(): pick(it.id), it.id)
-			slots[it.id] = entry; order.append(it.id)
-		else:
-			add_image(self, ARMOR_SLOT[i], load(DIR + "icones/icon_slot_vazio.png")).name = "EmptyArmor_%d" % i
-	armor_label = add_label(self, ARMOR_TEXT, "", 12, TEXT); armor_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# VITRINE: card do item em foco + setas
-	card = add_image(self, CARD, null, false); card.name = "Card"
-	card_lock = add_image(self, Rect2(CARD.get_center() - Vector2(58, 56), Vector2(116, 112)), load(DIR + "icones/icon_cadeado.png"))
-	card_lock.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; card_lock.stretch_mode = TextureRect.STRETCH_SCALE   # 58x56 -> 2x exato
-	for s in [0, 1]:
-		var step := -1 if s == 0 else 1
-		var arrow := outline_button(ARROWS[s], func(): cycle(step))
-		arrow.name = "Arrow_%d" % s; arrow.focus_mode = Control.FOCUS_NONE
-	# ROBÔ: 3 vagas
-	var robots := DATA.by_category("robo")
-	for i in 3:
-		if i < robots.size():
-			var it: Dictionary = robots[i]
-			var entry := {"rect": ROBOT_SLOT[i], "category": "robo"}
-			entry["icon"] = add_image(self, ROBOT_SLOT[i], null)
-			entry["frame"] = add_frame(ROBOT_SLOT[i], it.get("raridade", "") == "lendario")
-			entry["button"] = flat_button(ROBOT_SLOT[i], func(): pick(it.id), it.id)
-			slots[it.id] = entry; order.append(it.id)
-		else:
-			add_image(self, ROBOT_SLOT[i], load(DIR + "icones/icon_slot_vazio.png")).name = "EmptyRobot_%d" % i
-	robot_label = add_label(self, Rect2(ROBOT_TEXT.position, Vector2(ROBOT_TEXT.size.x, 22)), "", 15, TEXT)
-	robot_detail = add_label(self, Rect2(ROBOT_TEXT.position + Vector2(0, 24), ROBOT_TEXT.size - Vector2(0, 24)), "", 11, DIM)
-	robot_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# STATUS: 6 linhas × 12 segmentos + número
-	for r in STAT_Y.size():
-		var row: Array = []
-		for s in DATA.SEGMENTS:
-			var seg := ColorRect.new(); seg.position = Vector2(roundf(SEG_X0 + s * SEG_STEP), STAT_Y[r]); seg.size = SEG_SIZE
-			seg.mouse_filter = Control.MOUSE_FILTER_IGNORE; seg.visible = false; add_child(seg); row.append(seg)
-		seg_rects.append(row)
-		var num := add_label(self, Rect2(NUM_X, STAT_Y[r] - 5, 45, 25), "", 12, TEXT)
-		num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		num.name = "Stat_%d" % r; numbers.append(num)
-	# DESCRIÇÃO
-	desc_title = add_label(self, Rect2(DESC_TEXT.position, Vector2(DESC_TEXT.size.x, 24)), "", 17, TEXT)
-	desc_sub = add_label(self, Rect2(DESC_TEXT.position + Vector2(0, 24), Vector2(DESC_TEXT.size.x, 18)), "", 11, DIM)
-	desc_body = add_label(self, Rect2(DESC_TEXT.position + Vector2(0, 46), DESC_TEXT.size - Vector2(0, 46)), "", 13, TEXT)
-	desc_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# rodapé: só VOLTAR e IR AO REFÚGIO (desenhados na moldura)
-	var back := outline_button(BACK_BUTTON, func(): host.show_screen("main")); back.name = "Back"
-	var refuge := outline_button(REFUGE_BUTTON, host.launch_refuge); refuge.name = "Refuge"
+	var back := button(self, Rect2(24, 699, 190, 38), "ESC / B  VOLTAR", go_back, "Back")
+	var launch := button(self, Rect2(1093, 699, 225, 38), "VOLTAR À PAUSA" if mission_mode else "IR AO REFÚGIO", go_back if mission_mode else host.launch_refuge, "Refuge")
+	back.add_theme_color_override("font_color", GOLD); launch.add_theme_color_override("font_color", GOLD)
+	build_compatibility_nodes()
+	inventory = InventoryState.new(app.sim.inventory_state)
+	if not mission_mode: sync_entitlements()
 	focus_id = host.outfit_choice
-	refresh()
-	(slots[focus_id].button as Button).grab_focus.call_deferred()
+	refresh_compat()
+	show_tab(0)
+	mission_signature = current_mission_signature()
+	focus_initial.call_deferred()
 
-# ── estado ─────────────────────────────────────────────────────────────
+func focus_initial() -> void:
+	if is_inside_tree() and not tabs.is_empty(): (tabs[0] as Button).grab_focus()
+
+
+func go_back() -> void:
+	host.show_screen("pause" if mission_mode else "play")
+
+func build_header() -> void:
+	panel(self, Rect2(18, 14, 1308, 70), Color("18362b"), BRASS)
+	var title := label(self, Rect2(38, 25, 170 if mission_mode else 285, 48), "MISSÃO" if mission_mode else "EQUIPAMENTO", 30, GOLD)
+	title.add_theme_color_override("font_outline_color", Color("5b2e13")); title.add_theme_constant_override("outline_size", 3)
+	if mission_mode and not app.online and app.sim.actors.size() > 1 and app.sim.actors[1].get("active", false):
+		button(self, Rect2(212, 30, 105, 38), "P%d • TROCAR" % (host.gear_actor + 1), toggle_actor, "ActorToggle")
+	for i in TAB_NAMES.size():
+		var tab := button(self, Rect2(330 + i * 195, 24, 184, 48), TAB_NAMES[i], func(): show_tab(i), "MenuTab_%d" % i)
+		tab.focus_entered.connect(func(): show_tab(i))
+		tabs.append(tab)
+	for i in tabs.size():
+		var prev: Button = tabs[(i - 1 + tabs.size()) % tabs.size()]
+		var next: Button = tabs[(i + 1) % tabs.size()]
+		tabs[i].focus_neighbor_left = tabs[i].get_path_to(prev); tabs[i].focus_neighbor_right = tabs[i].get_path_to(next)
+
+func update_tabs() -> void:
+	for i in tabs.size():
+		var b: Button = tabs[i]
+		b.add_theme_color_override("font_color", TEAL if i == active_tab else GOLD)
+		b.add_theme_stylebox_override("normal", make_style(Color("15534f") if i == active_tab else Color("102d27"), TEAL if i == active_tab else Color("5e683e"), 3 if i == active_tab else 2))
+
+func show_tab(index: int) -> void:
+	active_tab = clampi(index, 0, TAB_NAMES.size() - 1); update_tabs()
+	if page != null: page.queue_free()
+	page = Control.new(); page.position = Vector2(18, 94); page.size = Vector2(1308, 592); add_child(page)
+	match active_tab:
+		0: build_inventory()
+		1: build_equipment_category("robo", "ROBÔS", "Unidades de combate e apoio")
+		2: build_equipment_category("armadura", "ARMADURAS", "Tecnologia temporária de proteção")
+		3: build_equipped()
+		4: build_status()
+
+func sync_entitlements() -> void:
+	for entry in InventoryData.valid_items():
+		if entry.get("equipavel", false) == true and InventoryData.unlocked(entry, app.sim.unlocked) and inventory.quantity(entry.id) == 0:
+			inventory.add(entry.id, 1)
+	app.sim.inventory_state = inventory.to_dict()
+
+func set_inventory_filter(filter_id: String) -> void:
+	inventory_page = 0; inventory.set_filter(filter_id)
+	if not mission_mode: app.sim.inventory_state = inventory.to_dict()
+	rebuild_current()
+
+func carried(entry: Dictionary) -> bool:
+	var loadout := str(entry.get("loadout_id", ""))
+	match str(entry.get("slot", "")):
+		"uniforme": return loadout == host.outfit_choice
+		"robo": return loadout != "" and loadout == host.robot_choice
+		"armadura": return loadout != "" and loadout == host.armor_choice
+	return false
+
+func quantity_for(entry: Dictionary) -> int:
+	if not entry.get("transiente", false):
+		if mission_mode: return 1 if carried(entry) else 0
+		return inventory.quantity(entry.id)
+	match str(entry.id):
+		"missao_chaves": return maxi(0, int(app.sim.keys))
+		"missao_moedas": return maxi(0, int(app.sim.money))
+		"missao_fragmentos": return maxi(0, int(app.sim.materials) - int(app.sim.run_materials_start))
+		"missao_combustivel":
+			if host.robot_choice != "titan": return 0
+			return clampi(roundi(float(app.sim.mech.get("fuel", 0.0)) / maxf(app.sim.FUEL_MAX, 1.0) * 100.0), 0, 100)
+		"missao_energia":
+			if host.robot_choice != "spectre": return 0
+			if host.gear_actor >= 0 and host.gear_actor < app.sim.spectres.size(): return clampi(roundi(float(app.sim.spectres[host.gear_actor].get("hp", 0.0))), 0, 100)
+	return 0
+
+func inventory_entry_visible(entry: Dictionary) -> bool:
+	if mission_mode:
+		return quantity_for(entry) > 0
+	return entry.get("transiente", false) != true
+
+func build_inventory() -> void:
+	panel(page, Rect2(0, 0, 210, 592), Color("122c25"), BRASS)
+	label(page, Rect2(20, 16, 170, 30), "FILTROS", 19, GOLD)
+	for i in FILTERS.size():
+		var filter_id: String = FILTERS[i][0]
+		var b := button(page, Rect2(14, 58 + i * 63, 182, 50), FILTERS[i][1], func(): set_inventory_filter(filter_id), "Filter_%s" % filter_id)
+		if inventory.filter == filter_id: b.add_theme_stylebox_override("normal", make_style(Color("15534f"), TEAL, 3))
+	var note := "Somente itens levados\ne recursos obtidos\nnesta missão.\n\nAo sair, recursos da\ntentativa seguem as\nregras da expedição." if mission_mode else "Itens de expedição\ncomo chaves, moedas,\ngasolina e baterias\nnão ocupam este inventário."
+	label(page, Rect2(18, 395, 176, 150), note, 13, DIM).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	panel(page, Rect2(222, 0, 650, 592), Color("091d1d"), BRASS)
+	label(page, Rect2(244, 14, 380, 32), "INVENTÁRIO DA MISSÃO" if mission_mode else ("INVENTÁRIO VAZIO" if inventory.used_slots() == 0 else "INVENTÁRIO"), 22, GOLD)
+	grid_buttons.clear()
+	var all: Array = InventoryData.valid_items().filter(func(entry): return inventory_entry_visible(entry) and (inventory.filter == "todos" or entry.categoria == inventory.filter))
+	all.sort_custom(InventoryData.compare)
+	capacity_label = label(page, Rect2(700, 17, 150, 28), "%d / 60" % all.size() if mission_mode else "%d / %d" % [inventory.used_slots(), inventory.capacity], 18, TEXT); capacity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var page_count := maxi(1, ceili(all.size() / 20.0)); inventory_page = clampi(inventory_page, 0, page_count - 1)
+	var offset := inventory_page * 20
+	for i in 20:
+		var col := i % 5; var row := i / 5; var rect := Rect2(240 + col * 123, 58 + row * 126, 108, 110)
+		if offset + i < all.size(): build_inventory_slot(all[offset + i], rect)
+		else:
+			var empty := panel(page, rect, Color("081716"), Color("334b48")); empty.name = "InventoryEmpty_%d" % i
+			label(empty, Rect2(0, 30, 108, 45), "+", 30, Color("38514d")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if page_count > 1:
+		var previous := button(page, Rect2(242, 552, 100, 32), "<", func(): inventory_page -= 1; rebuild_current(), "InventoryPrevious")
+		var next := button(page, Rect2(754, 552, 100, 32), ">", func(): inventory_page += 1; rebuild_current(), "InventoryNext")
+		previous.disabled = inventory_page == 0; next.disabled = inventory_page == page_count - 1
+		var page_number := label(page, Rect2(460, 554, 180, 28), "PÁGINA %d / %d" % [inventory_page + 1, page_count], 13, DIM); page_number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	build_details_panel()
+	if inventory.selected_id == "" or not all.any(func(entry): return entry.id == inventory.selected_id): inventory.selected_id = str(all[0].id) if not all.is_empty() else ""
+	refresh_inventory_details()
+
+func build_inventory_slot(entry: Dictionary, rect: Rect2) -> void:
+	var open: bool = entry.get("transiente", false) == true or InventoryData.unlocked(entry, app.sim.unlocked)
+	var owned: bool = quantity_for(entry) > 0
+	var selected: bool = inventory.selected_id == entry.id
+	var border: Color = TEAL if selected else RARITY.get(entry.get("raridade", "comum"), DIM)
+	var p := panel(page, rect, Color("0d2525") if open else Color("101617"), border)
+	var icon := image(p, Rect2(10, 7, 88, 68), tex(entry.get("icone", ""))); icon.modulate = Color.WHITE if open and owned else Color(0.25, 0.3, 0.3)
+	var qty: int = quantity_for(entry)
+	label(p, Rect2(7, 79, 95, 24), entry.nome, 11, TEXT if open else DIM).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	if qty > 1:
+		var q := label(p, Rect2(73, 55, 29, 25), str(qty), 15, GOLD); q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	if not open:
+		var lock := label(p, Rect2(74, 4, 28, 26), "X", 14, DIM); lock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	elif not owned: label(p, Rect2(3, 3, 102, 20), "NÃO OBTIDO", 9, DIM)
+	if not entry.get("transiente", false) and inventory.equipped.values().has(entry.id): label(p, Rect2(3, 3, 60, 20), "EQUIP.", 10, TEAL)
+	if entry.get("prototipo", false): label(p, Rect2(3, 55, 68, 18), "PROTO", 9, GOLD)
+	if entry.get("icone_provisorio", false): label(p, Rect2(3, 3, 72, 18), "PROV.", 9, GOLD)
+	var hit := Button.new(); hit.flat = true; hit.position = rect.position; hit.size = rect.size; hit.name = "InventorySlot_%s" % entry.id
+	hit.add_theme_stylebox_override("normal", StyleBoxEmpty.new()); hit.add_theme_stylebox_override("pressed", make_style(Color(0, 0, 0, 0), TEAL, 4))
+	hit.add_theme_stylebox_override("hover", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 3)); hit.add_theme_stylebox_override("focus", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 4))
+	hit.focus_entered.connect(func(): select_inventory(entry.id)); hit.pressed.connect(func(): select_inventory(entry.id))
+	page.add_child(hit); grid_buttons.append(hit)
+
+func build_details_panel() -> void:
+	panel(page, Rect2(884, 0, 424, 592), Color("0b2626"), BRASS)
+	detail_title = label(page, Rect2(908, 20, 374, 42), "", 25, GOLD)
+	detail_rarity = label(page, Rect2(908, 61, 374, 28), "", 15, TEAL)
+	panel(page, Rect2(906, 98, 380, 158), Color("071b1d"), Color("316b69"))
+	detail_text = label(page, Rect2(922, 112, 348, 130), "", 14, TEXT); detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_stats = label(page, Rect2(910, 276, 368, 142), "", 15, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_action = button(page, Rect2(908, 454, 180, 50), "EQUIPAR", equip_selected_inventory, "InventoryAction")
+	var compare := button(page, Rect2(1102, 454, 180, 50), "COMPARAR", show_comparison, "InventoryCompare")
+	detail_reason = label(page, Rect2(908, 516, 374, 55), "", 13, DIM); detail_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	compare.tooltip_text = "Compara o slot atual usando os dados reais do catálogo."
+
+func select_inventory(id: String) -> void:
+	inventory.selected_id = id
+	if not mission_mode: app.sim.inventory_state = inventory.to_dict()
+	refresh_inventory_details()
+
+func refresh_inventory_details() -> void:
+	if detail_title == null: return
+	var entry := InventoryData.item(inventory.selected_id)
+	if entry.is_empty():
+		detail_title.text = "INVENTÁRIO VAZIO"; detail_rarity.text = ""; detail_text.text = "Nenhum item corresponde ao filtro."; detail_stats.text = ""; detail_action.disabled = true; detail_reason.text = "Selecione outro filtro."; return
+	var transient: bool = entry.get("transiente", false) == true
+	var open: bool = transient or InventoryData.unlocked(entry, app.sim.unlocked)
+	detail_title.text = entry.nome
+	detail_rarity.text = "%s • %s%s" % [str(entry.categoria).to_upper(), str(entry.raridade).to_upper(), " • BLOQUEADO" if not open else ""]
+	detail_rarity.add_theme_color_override("font_color", RARITY.get(entry.get("raridade", "comum"), TEXT))
+	detail_text.text = entry.get("descricao", "") if open else "Como desbloquear: " + DATA.item(entry.get("desbloqueio_id", "")).get("desbloqueio", {}).get("texto", "Prossiga na campanha.")
+	var lines: Array[String] = []
+	if transient: lines.append("QUANTIDADE  %d" % quantity_for(entry))
+	for key in entry.get("atributos", {}): lines.append("%s  %s" % [str(key).to_upper(), str(entry.atributos[key])])
+	var loadout_id := str(entry.get("loadout_id", ""))
+	if loadout_id != "":
+		var kind := "uniform" if entry.get("slot", "") == "uniforme" else loadout_id
+		for row in app.sim.loadout_stats(kind, loadout_id):
+			if lines.size() >= 6: break
+			lines.append("%s  %s" % [str(row[0]), str(row[1])])
+	detail_stats.text = "\n".join(lines) if not lines.is_empty() else "SEM ATRIBUTOS ATIVOS"
+	var usable: bool = not transient and entry.get("equipavel", false) == true and not entry.get("prototipo", false) and quantity_for(entry) > 0 and open
+	detail_action.disabled = not usable
+	detail_action.text = "EQUIPADO" if (carried(entry) if mission_mode else inventory.equipped.values().has(entry.id)) else "EQUIPAR"
+	if not open: detail_reason.text = "Ação indisponível: item bloqueado."
+	elif transient: detail_reason.text = ("Ícone provisório • " if entry.get("icone_provisorio", false) else "") + "Recurso temporário da missão • não ocupa o inventário persistente."
+	elif quantity_for(entry) <= 0: detail_reason.text = "Ação indisponível: item ainda não obtido."
+	elif entry.get("prototipo", false): detail_reason.text = "Ação indisponível: protótipo sem mecânica implementada."
+	elif entry.get("equipavel", false) != true: detail_reason.text = "Este item não ocupa um slot equipável."
+	else: detail_reason.text = "Compatível com o slot: " + str(entry.get("slot", "")).to_upper()
+
+func equip_selected_inventory() -> void:
+	var id: String = inventory.selected_id
+	var previous_inventory: Dictionary = inventory.to_dict()
+	var previous_outfit: String = host.outfit_choice; var previous_robot: String = host.robot_choice; var previous_armor: String = host.armor_choice
+	var entry := InventoryData.item(id); var loadout := str(entry.get("loadout_id", ""))
+	if entry.get("transiente", false): status.text = "Recursos da missão são usados pelas regras da expedição."; return
+	if not mission_mode and not inventory.equip(id, app.sim.unlocked): status.text = inventory.last_error; refresh_inventory_details(); return
+	match str(entry.get("slot", "")):
+		"uniforme": host.outfit_choice = loadout
+		"robo": host.robot_choice = loadout
+		"armadura": host.armor_choice = loadout
+	if host.apply_gear():
+		if mission_mode and app.online and not app.hosting:
+			host.outfit_choice = previous_outfit; host.robot_choice = previous_robot; host.armor_choice = previous_armor
+			status.text = "Solicitado ao anfitrião; aguardando confirmação."
+		else: status.text = "%s equipado." % entry.nome
+	else:
+		host.outfit_choice = previous_outfit; host.robot_choice = previous_robot; host.armor_choice = previous_armor
+		inventory.from_dict(previous_inventory); status.text = "Não é possível alterar o loadout agora."
+	if not mission_mode: app.sim.inventory_state = inventory.to_dict()
+	rebuild_current()
+
+func show_comparison() -> void:
+	var entry := InventoryData.item(inventory.selected_id)
+	if entry.is_empty(): return
+	if entry.get("transiente", false): detail_reason.text = "Quantidade atual desta tentativa: %d." % quantity_for(entry); return
+	var slot := str(entry.get("slot", "")); var current_id: String = inventory.equipped_in(slot)
+	if mission_mode:
+		for candidate in InventoryData.valid_items():
+			if candidate.get("slot", "") == slot and carried(candidate): current_id = candidate.id; break
+	var current := InventoryData.item(current_id)
+	detail_reason.text = "Sem item comparável neste slot." if current.is_empty() else "Comparando com %s • %s" % [current.nome, "mesmo item" if current_id == entry.id else "atributos acima"]
+
+func build_equipment_category(category: String, title: String, subtitle: String) -> void:
+	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
+	label(page, Rect2(28, 20, 500, 35), title, 25, GOLD); label(page, Rect2(28, 57, 700, 26), subtitle, 15, DIM)
+	var list := DATA.by_category(category)
+	for i in list.size():
+		var entry: Dictionary = list[i]; var open := unlocked(entry.id); var selected := equipped(entry.id)
+		var p := panel(page, Rect2(28 + i * 335, 108, 310, 360), Color("102c28"), TEAL if selected else RARITY.get(entry.get("raridade", "comum"), BRASS))
+		var portrait := image(p, Rect2(30, 20, 250, 190), tex(entry.get("card", ""))); portrait.modulate = Color.WHITE if open else Color(0.22, 0.25, 0.28)
+		label(p, Rect2(22, 220, 266, 32), entry.nome, 21, GOLD if open else DIM).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var state := "EQUIPADO" if selected else ("DISPONÍVEL" if open else "BLOQUEADO")
+		label(p, Rect2(22, 254, 266, 24), state, 14, TEAL if selected else DIM).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var body := label(p, Rect2(22, 285, 266, 58), entry.descricao_curta if open else entry.desbloqueio.texto, 12, TEXT if open else DIM); body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		var hit := Button.new(); hit.flat = true; hit.position = p.position; hit.size = p.size; hit.name = "%sCard_%s" % [title.capitalize(), entry.id]
+		hit.add_theme_stylebox_override("normal", StyleBoxEmpty.new()); hit.add_theme_stylebox_override("pressed", make_style(Color(0, 0, 0, 0), TEAL, 4))
+		hit.add_theme_stylebox_override("hover", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 3)); hit.add_theme_stylebox_override("focus", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 4))
+		hit.pressed.connect(func(): pick(entry.id)); hit.focus_entered.connect(func(): show_item(entry.id)); page.add_child(hit)
+	var hint := label(page, Rect2(30, 505, 1240, 55), "Os números e regras vêm diretamente da simulação. Selecione uma unidade para equipar ou ler o requisito de desbloqueio.", 14, DIM)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+func build_equipped() -> void:
+	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
+	label(page, Rect2(28, 20, 500, 38), "ITENS EQUIPADOS", 25, GOLD)
+	var rows := [["UNIFORME / ARMA", "uniforme", host.outfit_choice], ["ROBÔ", "robo", host.robot_choice], ["ARMADURA", "armadura", host.armor_choice]]
+	for i in rows.size():
+		var equipment_id: String = rows[i][2]; var entry := DATA.item(equipment_id)
+		var p := panel(page, Rect2(35, 90 + i * 145, 1238, 120), Color("102c28"), TEAL if not entry.is_empty() else Color("46534c"))
+		label(p, Rect2(20, 12, 230, 28), rows[i][0], 16, GOLD)
+		image(p, Rect2(260, 10, 95, 95), tex(entry.get("icone", DIR + "icones/icon_slot_vazio.png")))
+		label(p, Rect2(380, 17, 400, 35), entry.get("nome", "VAZIO"), 22, TEXT)
+		label(p, Rect2(380, 56, 560, 35), entry.get("descricao_curta", "Nenhum item compatível equipado."), 14, DIM)
+		var slot_name: String = rows[i][1]
+		var clear := button(p, Rect2(1010, 31, 190, 52), "DESEQUIPAR", func(): unequip_slot(slot_name), "Unequip_%s" % slot_name)
+		clear.disabled = equipment_id == "" or slot_name in ["uniforme", "armadura"]
+		if slot_name == "armadura": clear.text = "PODER FIXO"; clear.tooltip_text = "A Armadura Ômega é um poder desbloqueado e não um slot removível."
+
+func unequip_slot(slot: String) -> void:
+	if slot != "robo": status.text = "Este slot não pode ficar vazio."; return
+	var previous_robot: String = host.robot_choice; var previous_inventory: Dictionary = inventory.to_dict()
+	host.robot_choice = ""
+	if not mission_mode: inventory.unequip(slot)
+	if not host.apply_gear(): host.robot_choice = previous_robot; inventory.from_dict(previous_inventory); status.text = "Não é possível alterar o loadout agora."
+	else: status.text = "Robô desequipado."
+	if not mission_mode: app.sim.inventory_state = inventory.to_dict()
+	rebuild_current()
+
+func build_status() -> void:
+	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
+	label(page, Rect2(28, 20, 600, 38), "STATUS DO LOADOUT", 25, GOLD)
+	var combo := DATA.combine(host.outfit_choice, host.armor_choice if unlocked(host.armor_choice) else "", host.robot_choice if unlocked(host.robot_choice) else "")
+	var stat_defs := DATA.stats()
+	for i in stat_defs.size():
+		var stat: Dictionary = stat_defs[i]; var y := 86 + i * 73; var value: float = combo.final.get(stat.id, 0.0); var base: float = combo.base.get(stat.id, 0.0)
+		label(page, Rect2(42, y, 190, 30), stat.nome, 16, Color(stat.cor))
+		panel(page, Rect2(245, y + 3, 720, 22), Color("071615"), Color("31483f"))
+		var fill := ColorRect.new(); fill.position = Vector2(248, y + 6); fill.size = Vector2(714.0 * DATA.segments(stat.id, value) / DATA.SEGMENTS, 16); fill.color = Color(stat.cor); fill.mouse_filter = Control.MOUSE_FILTER_IGNORE; page.add_child(fill)
+		label(page, Rect2(990, y - 2, 120, 34), DATA.format(stat.id, value), 18, TEXT)
+		label(page, Rect2(1110, y, 155, 30), ("base %s" % DATA.format(stat.id, base)) if value != base else "sem modificador", 12, DIM)
+	var loadout := label(page, Rect2(42, 525, 1215, 42), "%s  •  %s  •  %s" % [DATA.item(host.outfit_choice).get("nome", "PADRÃO"), DATA.item(host.robot_choice).get("nome", "SEM ROBÔ"), DATA.item(host.armor_choice).get("nome", "SEM ARMADURA")], 16, GOLD)
+	loadout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func rebuild_current() -> void:
+	var focused := get_viewport().gui_get_focus_owner()
+	var focus_name := str(focused.name) if focused != null and is_ancestor_of(focused) else ""
+	show_tab(active_tab)
+	if focus_name != "": call_deferred("restore_focus", focus_name)
+
+func restore_focus(control_name: String) -> void:
+	var target := find_child(control_name, true, false)
+	if target is Button and target.visible and not target.disabled: target.grab_focus()
+
+func owns_loadout(id: String) -> bool:
+	for entry in InventoryData.valid_items():
+		if entry.get("loadout_id", "") == id: return inventory.quantity(entry.id) > 0
+	return false
+
+func toggle_actor() -> void:
+	host.select_actor(1 - host.gear_actor)
+	var actor_toggle := find_child("ActorToggle", true, false)
+	if actor_toggle is Button: actor_toggle.text = "P%d • TROCAR" % (host.gear_actor + 1)
+
+func sync_authoritative_loadout() -> void:
+	if not mission_mode or not app.online or app.hosting or host.gear_actor < 0 or host.gear_actor >= app.sim.actors.size(): return
+	var actor: Dictionary = app.sim.actors[host.gear_actor]
+	host.outfit_choice = actor.get("outfit", "padrao")
+	host.robot_choice = actor.get("selected_robot", "")
+	host.armor_choice = actor.get("armor_type", "omega") if app.sim.is_unlocked(actor.get("armor_type", "omega")) else ""
+
+func current_mission_signature() -> String:
+	if not mission_mode: return ""
+	return "%s|%s|%s|%s|%s|%s|%s" % [app.sim.keys, app.sim.money, app.sim.materials, app.sim.mech.get("fuel", 0.0), app.sim.spectres[host.gear_actor].get("hp", 0.0) if host.gear_actor >= 0 and host.gear_actor < app.sim.spectres.size() else 0, host.outfit_choice, host.robot_choice]
+
+func _process(_delta: float) -> void:
+	if not mission_mode or page == null: return
+	sync_authoritative_loadout()
+	var next_signature := current_mission_signature()
+	if next_signature != mission_signature:
+		mission_signature = next_signature
+		rebuild_current()
+
+func unlocked(id: String) -> bool:
+	return id != "" and app.sim.is_unlocked(id)
+
 func equipped(id: String) -> bool:
 	match DATA.item(id).get("categoria", ""):
 		"uniforme": return host.outfit_choice == id
@@ -191,111 +422,74 @@ func equipped(id: String) -> bool:
 	return false
 
 func pick(id: String) -> void:
-	# clicar/confirmar: equipa se estiver desbloqueado; bloqueado só mostra como desbloquear
-	focus_id = id
-	if not unlocked(id):
-		status.text = "%s ainda bloqueado." % DATA.item(id).get("nome", id); refresh(); return
-	match DATA.item(id).categoria:
+	focus_id = id; var entry := DATA.item(id)
+	if entry.is_empty(): status.text = "Item desconhecido."; return
+	if not unlocked(id): status.text = "%s ainda bloqueado." % entry.nome; refresh_compat(); return
+	if mission_mode and not owns_loadout(id) and not equipped(id): status.text = "%s não foi levado para esta missão." % entry.nome; refresh_compat(); return
+	var previous_outfit: String = host.outfit_choice; var previous_robot: String = host.robot_choice; var previous_armor: String = host.armor_choice
+	match entry.categoria:
 		"uniforme": host.outfit_choice = id
 		"robo": host.robot_choice = id
 		"armadura": host.armor_choice = id
-	if not host.apply_gear() and app.playing and not app.online:
-		var a: Dictionary = app.sim.actors[host.gear_actor]
-		host.outfit_choice = a.outfit; host.robot_choice = a.selected_robot
-	refresh()
+	if not host.apply_gear():
+		host.outfit_choice = previous_outfit; host.robot_choice = previous_robot; host.armor_choice = previous_armor
+		status.text = "Não é possível alterar o loadout agora."; refresh_compat(); return
+	if mission_mode and app.online and not app.hosting:
+		host.outfit_choice = previous_outfit; host.robot_choice = previous_robot; host.armor_choice = previous_armor
+		status.text = "Solicitado ao anfitrião; aguardando confirmação."
+	if not mission_mode:
+		for inv_entry in InventoryData.valid_items():
+			if inv_entry.get("loadout_id", "") == id:
+				if inventory.quantity(inv_entry.id) == 0: inventory.add(inv_entry.id)
+				inventory.equip(inv_entry.id, app.sim.unlocked)
+		app.sim.inventory_state = inventory.to_dict()
+	refresh_compat(); rebuild_current()
 
 func show_item(id: String) -> void:
-	focus_id = id; refresh()
+	focus_id = id; refresh_compat()
 
 func cycle(step: int) -> void:
-	var i := (order.find(focus_id) + step + order.size()) % order.size()
-	focus_id = order[i]
-	(slots[focus_id].button as Button).grab_focus()
-	refresh()
+	var i := (order.find(focus_id) + step + order.size()) % order.size(); focus_id = order[i]
+	show_tab((active_tab + step + tabs.size()) % tabs.size()); (tabs[active_tab] as Button).grab_focus(); refresh_compat()
 
-# ── desenho ────────────────────────────────────────────────────────────
-func refresh() -> void:
+func build_compatibility_nodes() -> void:
+	var compat := Control.new(); compat.name = "LegacyCompatibility"; compat.visible = false; add_child(compat)
+	for id in order:
+		var icon := TextureRect.new(); var frame := NinePatchRect.new(); var name_label := Label.new(); var sub := Label.new(); var line := Label.new(); var hit := Button.new()
+		compat.add_child(icon); compat.add_child(frame); compat.add_child(name_label); compat.add_child(sub); compat.add_child(line); compat.add_child(hit)
+		slots[id] = {"icon": icon, "frame": frame, "name": name_label, "sub": sub, "line": line, "button": hit}
+	for empty_name in ["EmptyArmor_1", "EmptyArmor_2", "EmptyRobot_2"]:
+		var empty := TextureRect.new(); empty.name = empty_name; empty.texture = load(DIR + "icones/icon_slot_vazio.png"); compat.add_child(empty)
+	card = TextureRect.new(); card.name = "Card"; compat.add_child(card)
+	card_lock = TextureRect.new(); compat.add_child(card_lock)
+	desc_body = Label.new(); compat.add_child(desc_body)
+	robot_label = Label.new(); compat.add_child(robot_label)
+	for i in 6:
+		var n := Label.new(); compat.add_child(n); numbers.append(n)
+	refresh_compat()
+
+func refresh_compat() -> void:
+	if slots.is_empty(): return
 	for id in slots:
-		var it := DATA.item(id)
-		var e: Dictionary = slots[id]
-		var open := unlocked(id)
-		e.icon.texture = tex(it.icone) if open or it.get("icone_bloqueado", "") == "" else tex(it.icone_bloqueado)
-		if not open and it.get("icone_bloqueado", "") == "": e.icon.texture = load(DIR + "icones/icon_cadeado.png")
-		var legendary: bool = it.get("raridade", "") == "lendario"
-		e.frame.visible = open and (equipped(id) or legendary) or id == focus_id
-		e.frame.modulate = Color.WHITE
-		if e.has("name"):
-			e.name.text = it.nome
-			e.name.add_theme_color_override("font_color", TEAL if equipped(id) else (TEXT if open else LOCKED))
-			e.sub.text = it.get("subtitulo", "") if open else "BLOQUEADO"
-			e.sub.add_theme_color_override("font_color", Color(it.get("cor", "5fd6d8")) if open else LOCKED)
-			e.line.text = it.get("arma", "") if open else it.desbloqueio.get("texto", "")
-	# armadura e robô equipados
-	var armor := DATA.item(host.armor_choice)
-	armor_label.text = ("%s • %s" % [armor.nome, armor.descricao_curta]) if unlocked(host.armor_choice) else "Nenhuma armadura. As armaduras aparecem aqui quando forem desbloqueadas."
-	armor_label.add_theme_color_override("font_color", GOLD if unlocked(host.armor_choice) else DIM)
-	var robot := DATA.item(host.robot_choice)
-	if unlocked(host.robot_choice):
-		robot_label.text = robot.nome; robot_detail.text = robot.descricao_curta + telemetry()
-	else:
-		robot_label.text = "SEM ROBÔ"; robot_detail.text = "Os robôs aparecem aqui quando forem encontrados."
-	# vitrine
+		var entry := DATA.item(id); var open := unlocked(id); var node: Dictionary = slots[id]
+		node.icon.texture = tex(entry.get("icone", "")) if open or entry.get("icone_bloqueado", "") == "" else tex(entry.icone_bloqueado)
+		node.sub.text = entry.get("subtitulo", "") if open else "BLOQUEADO"; node.name.text = entry.get("nome", "")
+		node.frame.texture = load(DIR + ("icones/frame_lendario.png" if entry.get("raridade", "") == "lendario" else "icones/frame_selecao.png"))
+		node.frame.visible = (open and (equipped(id) or entry.get("raridade", "") == "lendario")) or id == focus_id
+	var robot := DATA.item(host.robot_choice); robot_label.text = robot.get("nome", "SEM ROBÔ") if unlocked(host.robot_choice) else "SEM ROBÔ"
 	var focus := DATA.item(focus_id)
-	var open := unlocked(focus_id)
-	card.texture = tex(focus.get("card", ""))
-	card.modulate = Color.WHITE if open else Color(0.2, 0.2, 0.26)
-	card_lock.visible = not open
-	# descrição
-	desc_title.text = focus.get("nome", "")
-	desc_title.add_theme_color_override("font_color", GOLD if focus.get("raridade", "") == "lendario" else (TEAL if open else LOCKED))
-	var rarity: String = {"lendario": "★ LENDÁRIA", "raro": "RARO", "comum": "COMUM"}.get(focus.get("raridade", ""), "")
-	desc_sub.text = "%s • %s%s" % [focus.get("categoria", "").to_upper().replace("ROBO", "ROBÔ"), rarity, "" if open else " • BLOQUEADO"]
-	desc_body.text = focus.get("descricao", "") if open else "Como desbloquear: " + focus.get("desbloqueio", {}).get("texto", "")
-	draw_stats()
-	# abas
-	for i in tabs.size():
-		(tabs[i] as Button).add_theme_color_override("font_color", TEAL)
-		var lit := StyleBoxFlat.new(); lit.bg_color = Color(0.37, 0.84, 0.85, 0.06); lit.border_color = TEAL if i == host.gear_actor else Color(0, 0, 0, 0); lit.set_border_width_all(2); lit.set_corner_radius_all(4)
-		(tabs[i] as Button).add_theme_stylebox_override("normal", lit)
-		(tabs[i] as Button).modulate = Color(1, 1, 1, 0.45) if tabs[i].disabled else Color.WHITE
-
-func telemetry() -> String:
-	if not app.playing: return ""
-	if host.robot_choice == "titan": return "\nIntegridade %d • gasolina %d%%" % [app.sim.mech.hp, int(app.sim.mech.get("fuel", 0.0))]
-	return "\nEnergia %d" % app.sim.spectres[host.gear_actor].hp
-
-# STATUS: combinação equipada; se o foco está num item desbloqueado, mostra a combinação com ele.
-func preview_combo() -> Array:
-	var outfit: String = host.outfit_choice
-	var armor: String = host.armor_choice if unlocked(host.armor_choice) else ""
-	var robot: String = host.robot_choice if unlocked(host.robot_choice) else ""
+	card.texture = tex(focus.get("card", "")); card.modulate = Color.WHITE if unlocked(focus_id) else Color(0.2, 0.2, 0.26); card_lock.visible = not unlocked(focus_id)
+	desc_body.text = focus.get("descricao", "") if unlocked(focus_id) else "Como desbloquear: " + focus.get("desbloqueio", {}).get("texto", "")
+	var outfit: String = host.outfit_choice; var armor: String = host.armor_choice if unlocked(host.armor_choice) else ""; var robot_id: String = host.robot_choice if unlocked(host.robot_choice) else ""
 	if unlocked(focus_id):
-		match DATA.item(focus_id).categoria:
+		match focus.get("categoria", ""):
 			"uniforme": outfit = focus_id
 			"armadura": armor = focus_id
-			"robo": robot = focus_id
-	return [outfit, armor, robot]
+			"robo": robot_id = focus_id
+	var values: Dictionary = DATA.combine(outfit, armor, robot_id).final; var stats := DATA.stats()
+	for i in mini(numbers.size(), stats.size()): numbers[i].text = DATA.format(stats[i].id, values.get(stats[i].id, 0.0))
 
-func draw_stats() -> void:
-	var combo := preview_combo()
-	var values := DATA.combine(combo[0], combo[1], combo[2])
-	var stats := DATA.stats()
-	for r in mini(stats.size(), STAT_Y.size()):
-		var st: Dictionary = stats[r]
-		var color := Color(st.get("cor", "5fd6d8"))
-		var base_n := DATA.segments(st.id, values.base[st.id])
-		var final_n := DATA.segments(st.id, values.final[st.id])
-		for s in DATA.SEGMENTS:
-			var seg: ColorRect = seg_rects[r][s]
-			seg.visible = s < maxi(base_n, final_n)
-			if s < mini(base_n, final_n): seg.color = color.darkened(0.15)          # base do uniforme
-			elif s < final_n: seg.color = color.lightened(0.45)                    # bônus da armadura/robô
-			else: seg.color = Color(0.45, 0.12, 0.14, 0.8)                          # perda (ex.: Titan é mais lento)
-		numbers[r].text = DATA.format(st.id, values.final[st.id])
-		numbers[r].add_theme_color_override("font_color", color.lightened(0.3) if values.final[st.id] != values.base[st.id] else TEXT)
+func refresh() -> void:
+	refresh_compat()
+	if page != null: rebuild_current()
 
-func _process(dt: float) -> void:
-	# o slot em foco pisca de leve (o equipado fica aceso fixo)
-	pulse += dt
-	if slots.has(focus_id) and not equipped(focus_id):
-		slots[focus_id].frame.modulate = Color(1, 1, 1, 0.55 + 0.45 * absf(sin(pulse * 3.0)))

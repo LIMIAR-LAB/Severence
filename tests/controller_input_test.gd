@@ -15,7 +15,7 @@ func axis(id: JoyAxis, value: float) -> void:
 	Input.parse_input_event(e)
 func button(id: JoyButton, pressed: bool) -> void:
 	var e := InputEventJoypadButton.new(); e.device = PAD; e.button_index = id; e.pressed = pressed
-	Input.parse_input_event(e)
+	Input.parse_input_event(e); Input.flush_buffered_events()
 func frames(n: int) -> void:
 	for i in range(n): await physics_frame
 
@@ -44,6 +44,11 @@ func run() -> void:
 	check(not app.paused and not app.menu.visible, "Options/Start retoma sem teclado")
 	button(JOY_BUTTON_START, true); await frames(2); button(JOY_BUTTON_START, false); await frames(2)
 	check(app.paused and app.menu.visible, "Options/Start abre pausa")
+	var resume: Button = app.menu.content.find_child("ResumeGame", true, false)
+	var save: Button = app.menu.content.find_child("SaveGame", true, false)
+	var leave: Button = app.menu.content.find_child("ReturnToMenu", true, false)
+	check(resume.has_focus(), "primeira ação da pausa recebe foco")
+	check(resume.focus_neighbor_bottom == resume.get_path_to(save) and save.focus_neighbor_bottom == save.get_path_to(leave), "controle alcança as três ações")
 	app.menu.close()
 	var mouse := InputEventMouseMotion.new(); mouse.relative = Vector2(5, 0); Input.parse_input_event(mouse)
 	Input.flush_buffered_events()

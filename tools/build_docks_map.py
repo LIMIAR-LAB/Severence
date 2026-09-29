@@ -120,9 +120,8 @@ extra("cranes", 4400, 5800, 300, 300)      # 02 Guindastes: baia à direita
 extra("rails", 5800, 3700, 300, 320)       # 08 Ferroviário: baia à direita
 extra("market", 6320, 5900, 280, 260)      # 04 Mercado: reentrância à esquerda
 extra("warehouse", 4700, 7000, 320, 300)   # 03 Armazém: baia embaixo
-# 0.18 (Desembarque artístico): nicho de vigia na fachada — tira a sala do retângulo puro
-# e dá lugar ao abrigo militar (longe das duas portas: chapel em x~900-1100, cranes em x=2200).
-extra("entry", 1500, 5820, 320, 180)
+# 0.19: "entry" agora é a composição pintada do Desembarque (arrival_art.gd) — não usa ala/props
+# procedurais. Revertido para não conflitar com os pisos mapeados na imagem (docs/DESEMBARQUE_ARTISTICO_0_19.md).
 
 # 0.16: PORTÕES DE TENTÁCULO — poça que bloqueia um corredor e fere quem encosta (active) até o evento
 # ligado a ela acontecer; aí vira grade selada (sealed), segura e atravessável.

@@ -3,18 +3,23 @@ extends RefCounted
 const MAP = preload("res://scripts/docks_map.gd")
 const PAINTING = preload("res://assets/environment/docks12/entry/desembarque_painted_v1.png")
 
-func draw_ground(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
+func draw_ground(ci: CanvasItem, sim, rooms: Array, view: Rect2, lights: Array) -> void:
 	if sim.mode != "run" or not rooms.any(func(r): return r.get("id", "") == "entry"): return
 	if MAP.ENTRY_ART_BOUNDS.intersects(view):
 		ci.draw_texture_rect(PAINTING, MAP.ENTRY_ART_BOUNDS, false)
-		draw_environment(ci, sim.tick_time)
+		draw_environment(ci, sim.tick_time, lights)
 
 # 0.19: coordenadas da pintura; água longe do piso e reflexos discretos nas poças.
 const WATER_AREAS = [Rect2(280, 932, 770, 88), Rect2(1370, 610, 165, 125), Rect2(4, 250, 12, 530)]
 const LAMPS = [Vector2(364,68), Vector2(535,22), Vector2(932,112), Vector2(1148,116), Vector2(1127,232), Vector2(1490,331), Vector2(307,718), Vector2(1004,736)]
 const PUDDLES = [Vector2(369,217), Vector2(539,226), Vector2(935,237), Vector2(1144,289), Vector2(446,476), Vector2(959,517), Vector2(649,661)]
 
-func draw_environment(ci: CanvasItem, t: float) -> void:
+static func to_world(local: Vector2) -> Vector2:
+	# Converte um ponto em pixels da pintura (0..1536, 0..1024) para coordenadas de mundo —
+	# mesma escala usada no draw_set_transform de draw_environment().
+	return MAP.ENTRY_ART_BOUNDS.position + local * (MAP.ENTRY_ART_BOUNDS.size / Vector2(1536, 1024))
+
+func draw_environment(ci: CanvasItem, t: float, lights: Array) -> void:
 	ci.draw_set_transform(MAP.ENTRY_ART_BOUNDS.position, 0, MAP.ENTRY_ART_BOUNDS.size / Vector2(1536,1024))
 	# Filetes de água avançam e desaparecem antes de reiniciar, sem saltos na borda.
 	for area_index in range(WATER_AREAS.size()):
@@ -45,9 +50,11 @@ func draw_environment(ci: CanvasItem, t: float) -> void:
 	for i in range(LAMPS.size()):
 		var p: Vector2 = LAMPS[i]
 		var glow := 0.7 + sin(t*3.2+i*2.1)*0.18 + sin(t*7.1+i)*0.08
-		for radius in [22,14,7]:
-			ci.draw_circle(p,radius,Color(1,0.52,0.1,glow*0.035))
-		ci.draw_circle(p,2.2,Color(1,0.86,0.43,glow*0.65))
+		ci.draw_circle(p,2.2,Color(1,0.86,0.43,glow*0.65))   # filamento visível na pintura
+		# 0.19: o brilho em volta usa a MESMA camada aditiva (LightLayer) das outras salas —
+		# antes eram círculos comuns aqui, mais "achatados" que os lampiões do resto do jogo.
+		lights.append({"p": to_world(p), "kind": "amber", "s": 0.55 * glow})
+		lights.append({"p": to_world(p), "kind": "bulb"})
 	for i in range(PUDDLES.size()):
 		for j in range(8):
 			var p: Vector2 = PUDDLES[i] + Vector2(sin(t*1.6+j+i)*4,j*5)
@@ -62,13 +69,19 @@ func draw_environment(ci: CanvasItem, t: float) -> void:
 		ci.draw_circle(p+Vector2(5,-4),7+phase*11,Color(0.60,0.65,0.69,alpha*0.6))
 	ci.draw_set_transform(Vector2.ZERO)
 
-func draw_rift(ci: CanvasItem, sim) -> void:
+func draw_rift(ci: CanvasItem, sim, lights: Array) -> void:
 	if sim.mode != "run" or not sim.visited.has("entry"): return
 	# tick_time começa em zero na expedição e é replicado nos snapshots coop.
 	var t: float = sim.tick_time
 	var opening := smoothstep(0.0, 1.6, t)
 	if opening < 0.01: return
 	var p: Vector2 = MAP.POINTS.spawn + Vector2(-65, -30)
+	# 0.19: a fenda também sangra luz na camada aditiva (mesmo sistema dos postes/braseiros),
+	# em vez de só os círculos de baixa opacidade desenhados no chão comum. "cyan"/"violet"
+	# têm opacidade fixa em draw_lights(), então só entram quando a abertura já é visível.
+	if opening > 0.1:
+		lights.append({"p": p - Vector2(0, 62), "kind": "violet"})
+		lights.append({"p": p - Vector2(0, 62), "kind": "cyan"})
 	var pulse := 1.0 + sin(t * 3.0) * 0.07
 	# Reflexo suave permanece no chão; a abertura fica atrás do ponto de chegada.
 	ci.draw_set_transform(p, 0, Vector2(1.0, 0.32))

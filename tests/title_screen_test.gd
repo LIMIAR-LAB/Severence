@@ -22,14 +22,24 @@ func _initialize() -> void:
 	for n in ui.content.find_children("*", "TextureRect", true, false):
 		if n.texture and n.texture.resource_path.ends_with("_sel.png") and n.visible: lit += 1
 	check(lit == 1, "só a placa do botão focado fica acesa")
-	check(ui.content.find_child("CoopLocal", true, false) is Button, "coop local continua acessível")
-	var targets := {1: "play", 2: "online", 3: "seed", 5: "options"}
+	check(ui.content.find_child("Title_4", true, false).disabled == not app.has_saved_game(), "carregar habilitado apenas com save")
+	var targets := {1: "characters", 2: "online", 3: "seed", 5: "options"}
 	for i in targets:
 		ui.show_screen("main"); await process_frame
 		(ui.content.find_child("Title_%d" % i, true, false) as Button).pressed.emit()
 		check(ui.screen == targets[i], "botão %d abre %s" % [i, targets[i]])
-	ui.show_screen("main"); await process_frame
-	(ui.content.find_child("Title_4", true, false) as Button).pressed.emit()
-	check(ui.screen == "equipment", "EQUIPAMENTO abre a tela de equipamento")
+	ui.show_screen("characters"); await process_frame
+	check(ui.content.find_child("CharacterMarty", true, false) is Button, "Marty selecionável")
+	for i in range(1, 6):
+		check(ui.content.find_child("CharacterLocked%d" % i, true, false).disabled, "personagem futuro %d bloqueado" % i)
+	ui.content.find_child("CharacterMarty", true, false).pressed.emit()
+	check(ui.screen == "play" and ui.content.find_child("LocalChoice", true, false) is Button, "escolha de Marty abre os três modos")
+	ui.content.find_child("LocalChoice", true, false).pressed.emit()
+	check(ui.screen == "equipment" and ui.pending_mode == "local", "coop local leva à configuração de equipamento")
+	ui.content.find_child("Back", true, false).pressed.emit()
+	check(ui.screen == "play", "equipamento volta à escolha do modo")
+	ui.content.find_child("LocalChoice", true, false).pressed.emit()
+	ui.content.find_child("Refuge", true, false).pressed.emit()
+	check(app.playing and app.sim.coop == "local" and app.sim.mode == "hub", "coop local inicia no refúgio")
 	print("TITLE_SCREEN_TESTS_DONE failures=%d" % failures)
 	quit(1 if failures > 0 else 0)
