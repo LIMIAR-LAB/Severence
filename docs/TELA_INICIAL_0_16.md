@@ -28,7 +28,7 @@ reserva espaço estável para coop local, rede e identificação do protótipo.
 | EXPEDIÇÃO DIRETA | Expedição com seed. |
 | CARREGAR | Retoma uma expedição salva; fica indisponível sem save. |
 | OPÇÕES / SAIR | Como antes. |
-| COOP LOCAL • 2 JOGADORES | Linha discreta abaixo do SAIR (o desenho não tem esse botão). |
+| COOP LOCAL APÓS ESCOLHER PERSONAGEM | Aviso discreto no rodapé; a escolha aparece no fluxo de personagem. |
 
 O estado da rede é sempre texto vivo no rodapé, inclusive `OFFLINE`, e textos longos são limitados à
 área reservada. Foco, hover, pressionado e desativado usam o mesmo conjunto de estilos.

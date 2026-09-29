@@ -2,7 +2,7 @@
 title: 'Unify the title screen'
 type: 'refactor'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 baseline_commit: '1b938c74108d518d569049316856852211df8201'
 context:
   - '{project-root}/docs/architecture.md'
@@ -77,3 +77,29 @@ The console should be an intentional foreground object, not a translucent patch:
 **Manual checks (if no CLI):**
 - Inspect the captured title at 1280×800 and 1920×1080; confirm hierarchy, text clarity, safe margins, and that no baked button text shows through.
 - Navigate the full console once with a controller and once with a mouse; confirm focus order and hover/focus parity.
+
+## Suggested Review Order
+
+**Composition and state ownership**
+
+- Enter through the unified console builder and its state-dependent hierarchy.
+  [`terminal_ui.gd:166`](../../scripts/terminal_ui.gd#L166)
+
+- Review live button styling and single-highlight mouse/focus behavior.
+  [`terminal_ui.gd:143`](../../scripts/terminal_ui.gd#L143)
+
+**Fallback and navigation**
+
+- Confirm the main screen reaches video, still, or procedural background directly.
+  [`terminal_ui.gd:82`](../../scripts/terminal_ui.gd#L82)
+
+- Check active-run focus priority after explicit visual navigation links.
+  [`terminal_ui.gd:459`](../../scripts/terminal_ui.gd#L459)
+
+**Verification and maintenance**
+
+- Exercise fresh, active, saved, hover, callback, and destination states.
+  [`title_screen_test.gd:15`](../../tests/title_screen_test.gd#L15)
+
+- Read the updated ownership rules before regenerating title media.
+  [`TELA_INICIAL_0_16.md:1`](../../docs/TELA_INICIAL_0_16.md#L1)

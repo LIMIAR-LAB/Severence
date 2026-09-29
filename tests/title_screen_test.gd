@@ -2,6 +2,12 @@ extends SceneTree
 
 # Tela inicial unificada — cenário em vídeo, console vivo, estados e atalhos corretos.
 var failures := 0
+class SaveStateApp extends "res://scripts/main.gd":
+	var fake_save := false
+	var load_requested := false
+	func has_saved_game() -> bool: return fake_save
+	func load_game() -> bool: load_requested = true; return true
+
 func check(ok: bool, label: String) -> void:
 	if not ok: failures += 1; push_error("FAIL: " + label)
 	else: print("PASS: ", label)
@@ -13,7 +19,8 @@ func _initialize() -> void:
 	ui.show_screen("main"); await process_frame; await process_frame
 	check(ResourceLoader.exists("res://assets/ui/title/title_loop.ogv"), "vídeo da tela inicial no projeto (Theora)")
 	check(ui.content.find_child("TitleConsole", true, false) is Panel, "console único cobre os controles pintados no vídeo")
-	check(ui.content.find_child("TitleControlMask", true, false) is ColorRect, "máscara opaca impede vazamento das placas antigas")
+	var mask := ui.content.find_child("TitleControlMask", true, false) as ColorRect
+	check(mask != null and mask.position.y <= 261 and mask.color.a == 1.0, "máscara opaca cobre integralmente as placas antigas")
 	var buttons: Array = []
 	for i in 7: buttons.append(ui.content.find_child("Title_%d" % i, true, false))
 	check(buttons.all(func(b): return b is Button), "7 ações são controles vivos")
@@ -24,10 +31,23 @@ func _initialize() -> void:
 	check(ui.content.find_children("Plate_*", "TextureRect", true, false).is_empty(), "não usa placas recortadas sobre o cenário")
 	check(ui.content.find_child("Title_4", true, false).disabled == not app.has_saved_game(), "carregar habilitado apenas com save")
 	check(ui.content.find_child("TitleNetworkStatus", true, false) is Label, "estado da rede ocupa área própria no rodapé")
+	check(buttons[1].focus_next != NodePath(""), "navegação sequencial usa a ordem visual do console")
+	buttons[2].mouse_entered.emit(); await process_frame
+	check(root.get_viewport().gui_get_focus_owner() == buttons[2], "hover transfere o foco e mantém um único destaque")
 	app.playing = true; ui.show_screen("main"); await process_frame; await process_frame
-	check(not ui.content.find_child("Title_0", true, false).disabled, "CONTINUAR habilitado durante expedição ativa")
-	check(root.get_viewport().gui_get_focus_owner() == ui.content.find_child("Title_0", true, false), "expedição ativa prioriza CONTINUAR no foco")
-	app.playing = false; ui.show_screen("main"); await process_frame
+	var active_continue := ui.content.find_child("Title_0", true, false) as Button
+	check(not active_continue.disabled, "CONTINUAR habilitado durante expedição ativa")
+	check(root.get_viewport().gui_get_focus_owner() == active_continue, "expedição ativa prioriza CONTINUAR no foco")
+	check(active_continue.get_theme_stylebox("normal").border_color == Color("56cdd4"), "expedição ativa promove CONTINUAR à ação principal")
+	active_continue.pressed.emit(); check(not ui.visible and not app.paused, "CONTINUAR retoma a expedição ativa")
+	app.playing = false; ui.show(); ui.show_screen("main"); await process_frame
+	var save_app := SaveStateApp.new(); root.add_child(save_app); await process_frame
+	check(save_app.menu.content.find_child("Title_4", true, false).disabled, "CARREGAR fica indisponível sem save")
+	save_app.fake_save = true; save_app.menu.show_screen("main"); await process_frame
+	var saved_load := save_app.menu.content.find_child("Title_4", true, false) as Button
+	check(not saved_load.disabled, "CARREGAR fica disponível com save")
+	saved_load.pressed.emit(); check(save_app.load_requested, "CARREGAR preserva o callback de load")
+	save_app.queue_free(); await process_frame
 	var targets := {1: "characters", 2: "online", 3: "seed", 5: "options"}
 	for i in targets:
 		ui.show_screen("main"); await process_frame
