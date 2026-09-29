@@ -34,6 +34,7 @@ var marty_roll: Dictionary = {}
 var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
 var special_enemy_art: Dictionary = {}
+var pixellab_enemy_art: Dictionary = {}
 var weapon_art: Dictionary = {}
 var cockpit_texture: Texture2D
 var titan_v2: Texture2D
@@ -57,6 +58,8 @@ const GOLD := Color("e9bc77")
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	for kind in ["bomber", "guard"]: special_enemy_art[kind] = load("res://assets/enemies/" + kind + ".png")
+	# 0.20: oito direções e quatro passadas por inimigo, pivô nos pés.
+	for kind in ["bomber", "guard"]: pixellab_enemy_art[kind] = load("res://assets/enemies/" + kind + "_pixellab_v1.png")
 	marty_texture = load("res://assets/marty/marty-v2.png")
 	mech_texture = load("res://assets/mech/titan.png")
 	action_texture = load("res://assets/marty/actions-v2.png")
@@ -545,6 +548,10 @@ func direction_row(aim: Vector2) -> int:
 	if absf(aim.x) > absf(aim.y): return 1 if aim.x < 0 else 2
 	return 3 if aim.y < 0 else 0
 
+func enemy_octant(face: Vector2) -> int:
+	if face.length_squared() < 0.01: return 0
+	return posmod(roundi((PI * 0.5 - face.angle()) / (PI * 0.25)), 8)
+
 # 0.19: três vistas de esquiva, espelhadas para cobrir as oito direções.
 func marty_dash_view(direction: Vector2) -> String:
 	if absf(direction.y) < absf(direction.x) * 0.45: return "side"
@@ -913,7 +920,17 @@ func draw_enemy(e: Dictionary) -> void:
 	elif face.y < -0.6: column = 1
 	var tint := Color(1.6, 1.6, 1.6) if e.hurt > 0 else Color.WHITE
 	visual_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale * (0.78 if e.get("crouched", false) else 1.0)))
-	if special_enemy_art.has(e.kind):
+	if pixellab_enemy_art.has(e.kind):
+		var new_art: Texture2D = pixellab_enemy_art[e.kind]
+		var octant := enemy_octant(face)
+		var frame := 1 + int(e.step) % 4 if e.moving else 0
+		var size := 84.0 if e.kind == "guard" else 72.0
+		# O atlas novo já contém as oito direções; não espelhar a silhueta.
+		visual_transform(p + Vector2(0, bob), 0, Vector2(1, 1))
+		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
+			tint = Color(1.5, 0.8, 0.55)
+		draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
+	elif special_enemy_art.has(e.kind):
 		var special: Texture2D = special_enemy_art[e.kind]
 		var cell_size := special.get_size() / 4.0
 		var special_row := 3 if face.y < -0.6 else (1 if absf(face.x) > 0.6 else 0)
@@ -968,6 +985,12 @@ func draw_corpse(fx: Dictionary) -> void:
 		var tex: Texture2D = boss_art.defeat
 		var sink: float = (1.0 - fx.life / fx.max) * 50
 		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
+		return
+	if fx.enemy == "bomber": return  # desaparece na explosão, sem virar o cadáver do Brute
+	if fx.enemy == "guard":
+		visual_transform(fx.p - Vector2(0, 15), PI * 0.5)
+		draw_texture_rect_region(pixellab_enemy_art.guard, Rect2(-42, -75, 84, 84), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
+		visual_transform(Vector2.ZERO)
 		return
 	var scale := 0.6 if fx.enemy == "crawler_small" else 1.0
 	visual_transform(fx.p, 0, Vector2(-scale if fx.get("flip", false) else scale, scale))
