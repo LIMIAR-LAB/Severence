@@ -30,6 +30,8 @@ var dock_art: Dictionary = {}
 var font: Font
 var outfit_texture: Texture2D
 var marty_anim: Texture2D
+var marty_roll: Dictionary = {}
+var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
 var special_enemy_art: Dictionary = {}
 var weapon_art: Dictionary = {}
@@ -68,6 +70,12 @@ func _ready() -> void:
 	outfit_texture = load("res://assets/marty/outfits.png")
 	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
 	marty_anim = load(MARTY_ATLAS_PATH)
+	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
+	for direction in ["side", "front_diag", "back_diag"]:
+		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
+	marty_teleport["side"] = load("res://assets/marty/marty_teleport_side_v1.png")
+	marty_teleport["front_diag"] = load("res://assets/marty/marty_teleport_diagonal_v1.png")
+	marty_teleport["back_diag"] = marty_teleport["front_diag"]
 	# 0.15: Titan fechado, sem piloto exposto, com olhos ciano no visor blindado.
 	titan_v2 = load(TITAN_ATLAS_PATH)
 	cockpit_texture = load("res://assets/mech/titan_cockpit.png")
@@ -147,7 +155,7 @@ func draw_expedition_ground() -> void:
 	vis_rooms = scenery.discovered_rooms(sim)
 	vis_floors = scenery.visible_floors(sim, vis_rooms)
 	scenery.draw_water(self, sim, vis_rooms, view)
-	arrival_art.draw_ground(self, sim, vis_rooms, view)
+	arrival_art.draw_ground(self, sim, vis_rooms, view, scenery.lights)
 	scenery.draw_floors(self, sim, vis_floors, vis_rooms, view)
 	scenery.draw_floor_grunge(self, sim, vis_floors, view)
 	# balcão elevado e rampas
@@ -176,7 +184,7 @@ func draw_expedition_ground() -> void:
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
-	arrival_art.draw_rift(self, sim)
+	arrival_art.draw_rift(self, sim, scenery.lights)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
 		if h.has("trap") and seen(h.p): scenery.draw_trap(self,sim,h,t)
@@ -537,6 +545,23 @@ func direction_row(aim: Vector2) -> int:
 	if absf(aim.x) > absf(aim.y): return 1 if aim.x < 0 else 2
 	return 3 if aim.y < 0 else 0
 
+# 0.19: três vistas de esquiva, espelhadas para cobrir as oito direções.
+func marty_dash_view(direction: Vector2) -> String:
+	if absf(direction.y) < absf(direction.x) * 0.45: return "side"
+	return "front_diag" if direction.y >= 0 else "back_diag"
+
+func draw_marty_dodge(a: Dictionary, pos: Vector2, outfit: String, tint: Color) -> void:
+	var direction: Vector2 = a.dash_dir
+	var view_key := marty_dash_view(direction)
+	var frame := clampi(int((1.0 - a.dodge / 0.20) * 4.0), 0, 3)
+	var omega := outfit == "omega"
+	var texture: Texture2D = marty_teleport[view_key] if omega else marty_roll[view_key]
+	var row: int = (1 if view_key == "back_diag" else 0) if omega else OUTFIT_ROW[outfit]
+	var mirror: bool = direction.x < -0.1 or (absf(direction.x) <= 0.1 and a.facing.x < 0)
+	visual_transform(pos, 0, Vector2(-1 if mirror else 1, 1))
+	draw_texture_rect_region(texture, Rect2(-48, -92, 96, 96), Rect2(frame * 96, row * 96, 96, 96), tint)
+	visual_transform(Vector2.ZERO)
+
 func draw_actor(a: Dictionary) -> void:
 	var foot: Vector2 = a.p
 	var player_color := CYAN if a.id == 0 else GOLD
@@ -590,11 +615,14 @@ func draw_actor(a: Dictionary) -> void:
 		draw_power_aura(draw_pos, clampf(1.0 - absf(charge_t - 0.6) / 0.8, 0.25, 1.0), true)
 	elif a.armor and not a.mech:
 		draw_power_aura(draw_pos, 0.28, false)
-	visual_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
-	draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
-	visual_transform(Vector2.ZERO)
-	# Braço próximo e empunhadura ficam sobre o tronco também nas vistas traseiras.
-	draw_weapon(a, draw_pos + Vector2(0, bob))
+	if a.dodge > 0 and not a.mech:
+		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
+	else:
+		visual_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
+		draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
+		visual_transform(Vector2.ZERO)
+		# A arma é uma camada separada; durante a esquiva as mãos ficam livres.
+		draw_weapon(a, draw_pos + Vector2(0, bob))
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
 	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
