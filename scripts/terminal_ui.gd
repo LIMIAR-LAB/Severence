@@ -118,10 +118,8 @@ func close() -> void:
 	# A UI click must not become a weapon shot in the same frame.
 	app.ui_input_block = 0.2
 
-# ── Tela inicial 0.16: vídeo em loop (assets/ui/title, tools/make_title_screen.py) com o menu desenhado nele.
-# Cada botão do vídeo tem duas placas estáticas por cima (normal / aceso); o Button real é invisível.
+# ── Tela inicial: o vídeo é cenário; todo o console e seus estados são controles vivos.
 const TITLE_DIR := "res://assets/ui/title/"
-const TITLE_BUTTONS := [Rect2(30, 261, 317, 55), Rect2(30, 311, 317, 55), Rect2(30, 361, 317, 55), Rect2(30, 410, 317, 55), Rect2(30, 460, 317, 55), Rect2(30, 510, 317, 55), Rect2(30, 560, 317, 55)]
 const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher personagem e modo", "Hospedar ou entrar por IP",
 	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
 var title_video: VideoStreamPlayer
@@ -140,48 +138,58 @@ func title_background() -> Control:
 		root.add_child(title_video)
 	return root
 
-func title_button(i: int, callback: Callable, sel_layer: Control) -> Button:
-	var r: Rect2 = TITLE_BUTTONS[i]
-	var sel := TextureRect.new(); sel.texture = load(TITLE_DIR + "btn_%d_sel.png" % i); sel.position = r.position; sel.size = r.size
-	sel.mouse_filter = Control.MOUSE_FILTER_IGNORE; sel.visible = false; sel_layer.add_child(sel)
-	var b := Button.new(); b.position = r.position + Vector2(10, 5); b.size = r.size - Vector2(20, 10)   # só a placa, sem a margem
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]: b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	b.tooltip_text = TITLE_TIPS[i]; b.name = "Title_%d" % i
-	var lit := func(on: bool): sel.visible = on and not b.disabled
-	b.mouse_entered.connect(lit.bind(true)); b.mouse_exited.connect(func(): lit.call(b.has_focus()))
-	b.focus_entered.connect(lit.bind(true)); b.focus_exited.connect(lit.bind(false))
-	b.pressed.connect(callback); content.add_child(b)
-	return b
+func title_style(fill: Color, edge: Color, width: int = 2, radius: int = 4) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new(); style.bg_color = fill; style.border_color = edge
+	style.set_border_width_all(width); style.set_corner_radius_all(radius)
+	style.content_margin_left = 15; style.content_margin_right = 15
+	return style
+
+func title_button(i: int, rect: Rect2, caption: String, callback: Callable, primary: bool = false) -> Button:
+	var b := Button.new(); b.position = rect.position; b.size = rect.size; b.text = caption
+	b.name = "Title_%d" % i; b.tooltip_text = TITLE_TIPS[i]; b.focus_mode = Control.FOCUS_ALL
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.add_theme_font_size_override("font_size", 21 if primary else 17)
+	b.add_theme_color_override("font_color", Color("f1d58c") if not primary else Color("f5ead0"))
+	b.add_theme_color_override("font_hover_color", Color("ffffff")); b.add_theme_color_override("font_focus_color", Color("ffffff"))
+	b.add_theme_color_override("font_pressed_color", Color("ffffff")); b.add_theme_color_override("font_disabled_color", Color("59605b"))
+	var normal := title_style(Color("19211d") if not primary else Color("19383b"), Color("8d7540") if not primary else Color("56cdd4"), 2, 5)
+	var hover := title_style(Color("22474a"), Color("78f5f4"), 3, 5)
+	var pressed := title_style(Color("153237"), Color("f1c96d"), 3, 5)
+	var disabled := title_style(Color("101511"), Color("343a31"), 1, 5)
+	b.add_theme_stylebox_override("normal", normal); b.add_theme_stylebox_override("hover", hover)
+	b.add_theme_stylebox_override("focus", hover); b.add_theme_stylebox_override("pressed", pressed); b.add_theme_stylebox_override("disabled", disabled)
+	b.pressed.connect(callback); content.add_child(b); return b
 
 func build_main() -> void:
-	if not ResourceLoader.exists(TITLE_DIR + "btn_0.png"): return
-	var normals := Control.new(); normals.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(normals)
-	for i in range(TITLE_BUTTONS.size() - 1, -1, -1):   # de baixo para cima: o CONTINUAR fica por cima da vizinha
-		var n := TextureRect.new(); n.texture = load(TITLE_DIR + "btn_%d.png" % i); n.position = TITLE_BUTTONS[i].position; n.size = TITLE_BUTTONS[i].size
-		n.mouse_filter = Control.MOUSE_FILTER_IGNORE; n.name = "Plate_%d" % i; normals.add_child(n)
-	var sel_layer := Control.new(); sel_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(sel_layer)
+	# O vídeo antigo tem controles pintados. Esta máscara opaca entrega a área inteira
+	# ao console vivo e evita que qualquer texto/placa antiga apareça por baixo.
+	var mask := ColorRect.new(); mask.name = "TitleControlMask"; mask.position = Vector2(0, 267); mask.size = Vector2(430, 485)
+	mask.color = Color("0a100e"); mask.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(mask)
+	var console := panel(content, Rect2(18, 278, 396, 451), Color("151d18"), Color("a07f43")); console.name = "TitleConsole"
+	var inner := panel(content, Rect2(25, 285, 382, 437), Color("111713"), Color("39483d")); inner.name = "TitleConsoleInner"
+	label(content, Rect2(39, 296, 340, 24), "CENTRAL DE EXPEDIÇÕES", 14, Color("c5a85f"))
+	var rule := ColorRect.new(); rule.position = Vector2(39, 323); rule.size = Vector2(340, 2); rule.color = Color("355e5d"); rule.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(rule)
 	var callbacks: Array[Callable] = [close, func(): show_screen("characters"), func(): show_screen("online"), func(): show_screen("seed"),
 		func(): app.load_game(), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
-	for i in TITLE_BUTTONS.size():
-		var b := title_button(i, callbacks[i], sel_layer)
-		if i == 0:
-			main_resume = b; b.disabled = not app.playing
-			if b.disabled:
-				b.tooltip_text = "Nenhuma expedição em andamento"
-				normals.get_node("Plate_0").modulate = Color(0.5, 0.5, 0.5)
-	# A arte antiga tem EQUIPAMENTO pintado na quinta placa. O rótulo vivo cobre esse texto.
-	var load_plate := panel(content, TITLE_BUTTONS[4], Color("0b2a34"), CYAN)
-	load_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var load_label := label(content, Rect2(46, 469, 282, 34), "CARREGAR JOGO", 20, GOLD)
-	load_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var load_button: Button = content.find_child("Title_4", true, false)
+	# Cria CONTINUAR primeiro para ele receber o foco quando existir; desativado,
+	# focus_first() avança naturalmente para NOVA EXPEDIÇÃO.
+	main_resume = title_button(0, Rect2(39, 399, 164, 49), "CONTINUAR", callbacks[0])
+	main_resume.disabled = not app.playing
+	if main_resume.disabled: main_resume.tooltip_text = "Nenhuma expedição em andamento"
+	var new_run := title_button(1, Rect2(39, 335, 340, 56), "NOVA EXPEDIÇÃO", callbacks[1], true); new_run.name = "Title_1"
+	var load_button := title_button(4, Rect2(215, 399, 164, 49), "CARREGAR", callbacks[4])
 	load_button.disabled = not app.has_saved_game()
-	if load_button.disabled:
-		load_plate.modulate.a = 0.45; load_label.modulate.a = 0.45
-	# status da rede: o vídeo já diz OFFLINE; qualquer outro estado é escrito por cima
-	if app.network_status != "OFFLINE":
-		panel(content, Rect2(78, 667, 222, 28), Color("2c3222"), Color("2c3222"))
-		label(content, Rect2(78, 669, 222, 26), app.network_status, 14, Color("f0d9a0")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if load_button.disabled: load_button.tooltip_text = "Nenhum jogo salvo"
+	label(content, Rect2(39, 460, 340, 20), "OUTRAS ROTAS", 12, Color("7f9385"))
+	title_button(2, Rect2(39, 484, 164, 49), "ONLINE", callbacks[2])
+	title_button(3, Rect2(215, 484, 164, 49), "EXPEDIÇÃO DIRETA", callbacks[3])
+	title_button(5, Rect2(39, 545, 164, 46), "OPÇÕES", callbacks[5])
+	title_button(6, Rect2(215, 545, 164, 46), "SAIR", callbacks[6])
+	var foot := panel(content, Rect2(39, 604, 340, 96), Color("0d1310"), Color("303b32")); foot.name = "TitleFooter"
+	label(content, Rect2(52, 617, 314, 22), "COOP LOCAL APÓS ESCOLHER PERSONAGEM", 11, Color("89978d"))
+	var status_color := Color("79e5e5") if app.network_status != "OFFLINE" else Color("b9a66c")
+	var status := label(content, Rect2(52, 649, 314, 25), "●  " + app.network_status, 14, status_color); status.name = "TitleNetworkStatus"
+	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label(content, Rect2(52, 678, 314, 18), "PROTÓTIPO • DOCAS DE 1941", 11, Color("59675e"))
 
 func overlay(title: String) -> Panel:
 	var dim := ColorRect.new(); dim.color = Color(0.015, 0.025, 0.04, 0.78); dim.size = Vector2(1344, 752); content.add_child(dim)

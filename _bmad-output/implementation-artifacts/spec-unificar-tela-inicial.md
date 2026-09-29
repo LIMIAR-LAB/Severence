@@ -2,7 +2,7 @@
 title: 'Unify the title screen'
 type: 'refactor'
 created: '2026-09-29'
-status: 'in-progress'
+status: 'done'
 baseline_commit: '1b938c74108d518d569049316856852211df8201'
 context:
   - '{project-root}/docs/architecture.md'
@@ -48,10 +48,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `scripts/terminal_ui.gd` -- replace extracted button plates with one live console and reusable title-button styling; establish primary, secondary, utility, disabled, hover, focus, and pressed states while preserving callbacks.
-- [ ] `scripts/terminal_ui.gd` -- make the background fallback independent of button-image availability and keep connection/build metadata in a stable footer.
-- [ ] `tests/title_screen_test.gd` -- update structural assertions for the unified console and cover fresh, active-run, saved-run, focus, and navigation states.
-- [ ] `docs/TELA_INICIAL_0_16.md` -- document the new layer ownership and remove obsolete plate-generation guidance.
+- [x] `scripts/terminal_ui.gd` -- replace extracted button plates with one live console and reusable title-button styling; establish primary, secondary, utility, disabled, hover, focus, and pressed states while preserving callbacks.
+- [x] `scripts/terminal_ui.gd` -- make the background fallback independent of button-image availability and keep connection/build metadata in a stable footer.
+- [x] `tests/title_screen_test.gd` -- update structural assertions for the unified console and cover fresh, active-run, saved-run, focus, and navigation states.
+- [x] `docs/TELA_INICIAL_0_16.md` -- document the new layer ownership and remove obsolete plate-generation guidance.
 
 **Acceptance Criteria:**
 - Given a fresh launch, when the title appears, then it reads as one composition with a single dominant New Expedition action and no visible patched labels or mismatched button plates.
@@ -61,6 +61,8 @@ context:
 - Given missing video playback or headless execution, when the title is built, then the still/procedural fallback and every live action remain functional.
 
 ## Spec Change Log
+
+- 2026-09-29: console unificado implementado e validado em modo headless, incluindo estados sem expedição e com expedição ativa.
 
 ## Design Notes
 

@@ -1,6 +1,6 @@
 extends SceneTree
 
-# 0.16: tela inicial em vídeo — placas normal/acesa por botão, CONTINUAR só com expedição, atalhos certos.
+# Tela inicial unificada — cenário em vídeo, console vivo, estados e atalhos corretos.
 var failures := 0
 func check(ok: bool, label: String) -> void:
 	if not ok: failures += 1; push_error("FAIL: " + label)
@@ -12,17 +12,22 @@ func _initialize() -> void:
 	var ui = app.menu
 	ui.show_screen("main"); await process_frame; await process_frame
 	check(ResourceLoader.exists("res://assets/ui/title/title_loop.ogv"), "vídeo da tela inicial no projeto (Theora)")
+	check(ui.content.find_child("TitleConsole", true, false) is Panel, "console único cobre os controles pintados no vídeo")
+	check(ui.content.find_child("TitleControlMask", true, false) is ColorRect, "máscara opaca impede vazamento das placas antigas")
 	var buttons: Array = []
 	for i in 7: buttons.append(ui.content.find_child("Title_%d" % i, true, false))
-	check(buttons.all(func(b): return b is Button), "7 botões do menu desenhado no vídeo")
+	check(buttons.all(func(b): return b is Button), "7 ações são controles vivos")
 	check(buttons[0].disabled and not app.playing, "CONTINUAR desativado sem expedição")
 	var focus: Control = root.get_viewport().gui_get_focus_owner()
 	check(focus == buttons[1], "foco inicial em NOVA EXPEDIÇÃO")
-	var lit := 0
-	for n in ui.content.find_children("*", "TextureRect", true, false):
-		if n.texture and n.texture.resource_path.ends_with("_sel.png") and n.visible: lit += 1
-	check(lit == 1, "só a placa do botão focado fica acesa")
+	check(not buttons[1].disabled and buttons[1].has_focus(), "somente uma ação habilitada inicia em foco")
+	check(ui.content.find_children("Plate_*", "TextureRect", true, false).is_empty(), "não usa placas recortadas sobre o cenário")
 	check(ui.content.find_child("Title_4", true, false).disabled == not app.has_saved_game(), "carregar habilitado apenas com save")
+	check(ui.content.find_child("TitleNetworkStatus", true, false) is Label, "estado da rede ocupa área própria no rodapé")
+	app.playing = true; ui.show_screen("main"); await process_frame; await process_frame
+	check(not ui.content.find_child("Title_0", true, false).disabled, "CONTINUAR habilitado durante expedição ativa")
+	check(root.get_viewport().gui_get_focus_owner() == ui.content.find_child("Title_0", true, false), "expedição ativa prioriza CONTINUAR no foco")
+	app.playing = false; ui.show_screen("main"); await process_frame
 	var targets := {1: "characters", 2: "online", 3: "seed", 5: "options"}
 	for i in targets:
 		ui.show_screen("main"); await process_frame
