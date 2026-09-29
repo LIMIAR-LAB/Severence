@@ -156,3 +156,7 @@ independente e continua valendo. Armas seguem modulares (nunca cozidas no sprite
 - `scripts/combat_hud.gd` — minimapa/descoberta
 - `docs/SPRITE_POSE_STANDARD.md` — padrão de poses/vistas de personagens
 - `_bmad-output/implementation-artifacts/` — specs de implementação anteriores
+- **PixelLab MCP** — disponível no ambiente para gerar as artes necessárias
+  (sprites, tiles, props, animações pixel art); toda arte gerada deve seguir
+  `docs/SPRITE_POSE_STANDARD.md` e ser integrada ao renderer — PNG solto em
+  `assets/` não conta como entrega. Ver `docs/PROMPT_ROGUELIKE_HANDOFF.md`.
