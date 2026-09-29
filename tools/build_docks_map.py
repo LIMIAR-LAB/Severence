@@ -120,6 +120,9 @@ extra("cranes", 4400, 5800, 300, 300)      # 02 Guindastes: baia à direita
 extra("rails", 5800, 3700, 300, 320)       # 08 Ferroviário: baia à direita
 extra("market", 6320, 5900, 280, 260)      # 04 Mercado: reentrância à esquerda
 extra("warehouse", 4700, 7000, 320, 300)   # 03 Armazém: baia embaixo
+# 0.18 (Desembarque artístico): nicho de vigia na fachada — tira a sala do retângulo puro
+# e dá lugar ao abrigo militar (longe das duas portas: chapel em x~900-1100, cranes em x=2200).
+extra("entry", 1500, 5820, 320, 180)
 
 # 0.16: PORTÕES DE TENTÁCULO — poça que bloqueia um corredor e fere quem encosta (active) até o evento
 # ligado a ela acontecer; aí vira grade selada (sealed), segura e atravessável.
@@ -201,23 +204,8 @@ def hazard(x, y, r=62, dmg=12):
     HAZ.append({"p": (x, y), "r": r, "damage": dmg})
     dec("tentacle_pool", x, y)
 
-# ── 01 Desembarque (mockup da Sala 01) ──
-x0, y0 = 600, 6000
-facade_decor("entry", [("poster", 380), ("iron_door", 760), ("iron_door", 1250)])
-dec("rowboat", 330, 6300); dec("rowboat", 1200, 7250)
-dec("rails_diag", 700, 6130, to=(2150, 6700))
-crate_pile(720, 6140, 0); barrels(720, 6280)
-crate_pile(760, 6760, 1); ob("lobster_trap", 900, 6700); ob("fish_basket", 1000, 6780)
-ob("crate_net", 1380, 6140); ob("crate", 1440, 6140)
-col("sandbags", 1720, 6560, 4, 40); ob("sandbags_corner", 1830, 6720)
-ob("container_open", 2040, 6200); ob("crate", 1960, 6330); ob("crate_2", 2060, 6330)
-ob("lamp_post", 1180, 6420); ob("lamp_post", 1960, 6560); ob("brazier", 1540, 6420)
-ob("wheelbarrow", 1990, 6720); dec("anchor", 2120, 6760)
-row("bollard", 760, 6930, 5, 320)
-hazard(1250, 6680)
-dec("symbol_0", 1000, 6330); dec("symbol_1", 1760, 6250); dec("grate", 1320, 6250); dec("manhole", 1620, 6910)
-dec("rope", 1100, 6560); dec("debris_crate", 1560, 6760)
-spawns("dock", [(1500, 6300), (1850, 6400), (1650, 6850)])
+# ── 01 Desembarque 0.19: composição pintada, colisão derivada do piso.
+spawns("dock", [(1450, 6380), (1710, 6580), (1510, 6790)])
 
 # ── 02 Pátio dos Guindastes ──
 facade_decor("cranes", [("poster", 520), ("iron_door", 980), ("poster", 1480)])
@@ -515,6 +503,16 @@ for room, points in WAVES.items():
 ROOMS = [(i,n,k,f,r,list(dict.fromkeys(list(ex) + ROOM_EXTRA.get(i, [])))) for i,n,k,f,r,ex in ROOMS]
 ROOM_EXTRA = {i: ex for i,n,k,f,r,ex in ROOMS if ex}
 
+# 0.19: somente superfícies de pedra da arte são caminháveis. Água/navio não são piso.
+ENTRY_ART_BOUNDS = (187, 6000, 2013, 1280)
+ENTRY_RECTS = [(600,6380,1240,540), (600,6260,1050,120), (900,6000,200,260), (1840,6400,360,230), (1600,6920,160,65)]
+ROOMS = [(i,n,k,("stone" if i=="entry" else f),(ENTRY_RECTS[0] if i=="entry" else r),(ENTRY_RECTS[1:] if i=="entry" else ex)) for i,n,k,f,r,ex in ROOMS]
+R["entry"] = ENTRY_RECTS[0]
+ROOM_EXTRA["entry"] = ENTRY_RECTS[1:]
+ROOM_STYLE["entry"] = {"painted": True, "top":"none", "bottom":"none", "left":"none", "right":"none"}
+POINTS["spawn"] = (850,6550)
+POINTS["spawn2"] = (920,6590)
+
 def v2(p): return f"Vector2({p[0]}, {p[1]})"
 def r2(r): return f"Rect2({r[0]}, {r[1]}, {r[2]}, {r[3]})"
 def val(x):
@@ -535,6 +533,8 @@ def emit():
          "# Mapa FIXO das Docas de 1941 — 0.13. GERADO por tools/build_docks_map.py (edite lá e rode o script).",
          "# 13 salas + sala secreta, com laços estilo Enter the Gungeon. Esquadrões fixos; a seed varia posições e elites.",
          "# Obstáculos: [x, y, w, h, tipo] (caixa = pés do prop). Decoração: [x, y, tipo, extras?].", ""]
+    L.append("const ENTRY_ART_BOUNDS := " + r2(ENTRY_ART_BOUNDS))
+    L.append("const ENTRY_RECTS := " + val(ENTRY_RECTS))
     L.append("const ROOMS := [")
     def room_dict(i, n, k, f, r, ex):
         d = f'{{"id": "{i}", "name": "{n}", "kind": "{k}", "floor": "{f}", "r": {r2(r)}'

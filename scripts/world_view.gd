@@ -2,6 +2,8 @@ class_name DockView
 extends Node2D
 const DocksMap = preload("res://scripts/docks_map.gd")
 const SummonFX = preload("res://scripts/summon_fx.gd")
+const ArrivalArt = preload("res://scripts/arrival_art.gd")
+var arrival_art := ArrivalArt.new()
 const Scenery = preload("res://scripts/dock_scenery.gd")
 
 # Camada de luz (modo aditivo) desenhada por cima do mundo: postes, janelas, braseiros, explosões.
@@ -145,6 +147,7 @@ func draw_expedition_ground() -> void:
 	vis_rooms = scenery.discovered_rooms(sim)
 	vis_floors = scenery.visible_floors(sim, vis_rooms)
 	scenery.draw_water(self, sim, vis_rooms, view)
+	arrival_art.draw_ground(self, sim, vis_rooms, view)
 	scenery.draw_floors(self, sim, vis_floors, vis_rooms, view)
 	scenery.draw_floor_grunge(self, sim, vis_floors, view)
 	# balcão elevado e rampas
@@ -173,6 +176,7 @@ func draw_expedition_ground() -> void:
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
+	arrival_art.draw_rift(self, sim)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
 		if h.has("trap") and seen(h.p): scenery.draw_trap(self,sim,h,t)

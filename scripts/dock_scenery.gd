@@ -31,7 +31,9 @@ const SET_PROPS := {
 	"drydock": ["dock_scaffold", "dock_chain"],
 	"cellar": ["cellar_float"],
 	"boss": ["boss_skull_pile"],
-	"lighthouse": ["light_gear"]}
+	"lighthouse": ["light_gear"],
+	# 0.18: sala piloto do padrão "set-piece grande" — tools/make_entry_018.py
+	"entry": ["shipwreck", "bunker"]}
 # piso de cada conjunto: [nome, peso] (64x64, 1 px da arte = 1 px de mundo)
 const FLOOR_SETS := {
 	"workshop": [["workshop_floor_riveted", 14], ["workshop_floor_worn", 5], ["workshop_floor_oil", 2], ["workshop_floor_grate", 1]],
@@ -60,6 +62,8 @@ const DECAL_POOL_SET := {   # reforços por microbioma (somam no pool do piso)
 	"lighthouse": ["rust_stain", "stain_oil"], "drydock": ["rust_stain", "stain_water", "algae"]}
 # tinte ambiente por pele de parede / tipo de sala (bem sutil, por cima do piso)
 const AMBIENT := {"cult": Color(0.55, 0.3, 0.8, 0.07), "abyssal": Color(0.2, 0.5, 0.65, 0.09), "rail": Color(0.75, 0.72, 0.6, 0.05)}
+# 0.18: tinte por sala (independe do wall_set) — o Desembarque ganha luz âmbar de cais noturno.
+const ROOM_AMBIENT := {"entry": Color(0.95, 0.62, 0.25, 0.05)}
 
 # Escala de mundo de cada prop (1.0 = tamanho nativo da folha). Marty tem ~72 px.
 const PROP_SCALE := {"crate": 0.8, "crate_2": 0.8, "crate_3": 0.8, "crate_broken": 0.8, "crate_net": 0.8, "crate_barnacles": 0.8,
@@ -129,7 +133,9 @@ func visible_floors(sim, rooms: Array) -> Array:
 	for f in sim.floors:
 		var seen := false
 		for room in rooms:
-			if f.grow(6).intersects(room.r): seen = true; break
+			for rr: Rect2 in [room.r] + room.get("extra", []):
+				if f.grow(6).intersects(rr): seen = true; break
+			if seen: break
 		for a in sim.actors:
 			if a.active and f.has_point(a.p): seen = true
 		if seen: out.append(f)
@@ -229,6 +235,7 @@ func floor_kind(sim, rect: Rect2) -> String:
 func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
 	for rect in floors:
 		if not rect.intersects(view): continue
+		if style_of_rect(sim, rect).get("painted", false): continue
 		var kind := floor_kind(sim, rect)
 		var st := style_of_rect(sim, rect)
 		if st.has("floor_set") and not st.has("floor_patch"):
@@ -239,6 +246,8 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 			if st.has("floor_patch"): set_area(ci, st.floor_patch, view, st.floor_set)
 		scatter_decals(ci, rect, view, kind, st.get("floor_set", ""))   # 0.17: chão "sujo"
 		var amb: Color = AMBIENT.get(st.get("wall_set", ""), Color(0, 0, 0, 0))
+		var room_id: String = room_of_rect(sim, rect).get("id", "")
+		if ROOM_AMBIENT.has(room_id): amb = ROOM_AMBIENT[room_id]        # 0.18: tinte específico da sala
 		if amb.a > 0: ci.draw_rect(rect.intersection(view), amb)       # 0.17: tinte ambiente da sala
 	for room in rooms:
 		var band: float = style_of(room).get("quay_band", 0.0)
@@ -260,7 +269,8 @@ func draw_floor_grunge(ci: CanvasItem, sim, floors: Array, view: Rect2) -> void:
 	var cell_sz := 64.0
 	for rect: Rect2 in floors:
 		var st := style_of_rect(sim, rect)
-		if st.has("floor_set"): continue
+		# 0.18: salas com set-piece curado (Desembarque) já têm sujeira própria — pula pra não dobrar.
+		if st.has("floor_set") or room_of_rect(sim, rect).get("id", "") in ["entry"]: continue
 		var area: Rect2 = rect.intersection(view)
 		if area.size.x <= 0 or area.size.y <= 0: continue
 		var kind := floor_kind(sim, rect)
@@ -385,6 +395,7 @@ func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -
 	var all_floors: Array = sim.floors
 	for rect in floors:
 		if not rect.grow(WALL_H + 60).intersects(view): continue
+		if style_of_rect(sim, rect).get("painted", false): continue
 		var style: Dictionary = style_of_rect(sim, rect)   # 0.18: também cobre as alas (ROOM_EXTRA)
 		var tl: Vector2 = rect.position; var br: Vector2 = rect.end
 		# sombra de contato por dentro das paredes
@@ -660,8 +671,8 @@ func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
 				ci.draw_rect(Rect2(ep, Vector2(2.5, 2.5)), Color(1, 0.7 + 0.25 * (1 - ph), 0.25, 0.8 * (1 - ph)))
 
 # Decoração: plana (chão), na parede (fachada) ou em pé (ordenada por Y junto com as entidades).
-const FLAT_DECOR := ["workshop_oil_puddle", "grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "tentacle_pool", "ritual_circle", "tentacle_planks", "rails_diag", "rails", "rowboat", "debris_crate", "debris_barrel", "debris_sandbags", "rope", "anchor"]
-const WALL_DECOR := ["poster", "iron_door", "wall_lamp", "phone_booth_wall", "market_lanterns", "chapel_banner"]
+const FLAT_DECOR := ["workshop_oil_puddle", "grate", "manhole", "symbol_0", "symbol_1", "symbol_2", "tentacle_pool", "ritual_circle", "tentacle_planks", "rails_diag", "rails", "rowboat", "debris_crate", "debris_barrel", "debris_sandbags", "rope", "anchor", "shipwreck", "arrival_rift"]
+const WALL_DECOR := ["poster", "iron_door", "wall_lamp", "phone_booth_wall", "market_lanterns", "chapel_banner", "bunker"]
 
 func is_flat(kind: String) -> bool: return kind in FLAT_DECOR or kind in WALL_DECOR or kind.begins_with("wall_crack_")
 func handles(kind: String) -> bool: return is_flat(kind) or props.has(kind)
@@ -697,14 +708,35 @@ func draw_decor(ci: CanvasItem, d: Dictionary, t: float) -> void:
 			ci.draw_set_transform(p + Vector2(0, sin(t * 1.3) * 3), sin(t * 0.9) * 0.03)
 			ci.draw_texture(tex, -tex.get_size() * 0.5)
 			ci.draw_set_transform(Vector2.ZERO)
+		"shipwreck":
+			# 0.18: cargueiro avariado do Desembarque — casco pesado, só balança de leve na maré.
+			var tex: Texture2D = props.shipwreck
+			ci.draw_set_transform(p + Vector2(0, sin(t * 0.5) * 2), 0)
+			ci.draw_texture(tex, -Vector2(tex.get_width() * 0.5, tex.get_height()))
+			ci.draw_set_transform(Vector2.ZERO)
+			lights.append({"p": p - Vector2(tex.get_width() * 0.06, tex.get_height() * 0.18), "kind": "amber", "s": 0.9})
+		"arrival_rift":
+			# 0.18: fenda luminosa no ponto onde Marty chega — pulso de luz + rachaduras + brasas subindo.
+			var k := 0.55 + 0.45 * sin(t * 2.4)
+			ci.draw_set_transform(p, 0, Vector2(1, 0.5))
+			ci.draw_circle(Vector2.ZERO, 46 + 6 * k, Color(0.35, 0.85, 1.0, 0.10 + 0.06 * k))
+			ci.draw_set_transform(Vector2.ZERO)
+			for a in [0.2, 1.1, 2.3, 3.4, 4.6, 5.5]:
+				var dir := Vector2.RIGHT.rotated(a)
+				ci.draw_line(p, p + dir * (14 + 10 * sin(t * 3 + a)), Color(0.5, 0.95, 1.0, 0.5 + 0.3 * k), 2)
+			for n in range(3):
+				var rise := fposmod(t * 0.6 + n * 0.35, 1.0)
+				ci.draw_circle(p + Vector2(sin(t * 2 + n) * 8, -rise * 46), 2.2 * (1.0 - rise), Color(0.6, 0.95, 1.0, 0.5 * (1.0 - rise)))
+			lights.append({"p": p - Vector2(0, 6), "kind": "cyan"})
 		"rails_diag": draw_rails(ci, p, d.get("to", p + Vector2(600, 200)))
 		"rails": draw_rails(ci, p - Vector2(260, 0), p + Vector2(260, 0))
-		"poster", "iron_door", "wall_lamp":
+		"poster", "iron_door", "wall_lamp", "bunker":
 			var tex: Texture2D = props[d.kind]
-			var s := 0.75 if d.kind == "poster" else (0.95 if d.kind == "iron_door" else 0.9)
+			var s := 0.75 if d.kind == "poster" else (0.95 if d.kind == "iron_door" else (0.9 if d.kind == "wall_lamp" else 1.0))
 			var size := tex.get_size() * s
 			ci.draw_texture_rect(tex, Rect2(p - Vector2(size.x * 0.5, size.y), size), false)
 			if d.kind == "wall_lamp": lights.append({"p": p + Vector2(8, 40), "kind": "amber", "s": 0.8}); lights.append({"p": p - Vector2(-12, 22), "kind": "bulb"})
+			if d.kind == "bunker": lights.append({"p": p - Vector2(size.x * 0.5 - 4, size.y - 6), "kind": "amber", "s": 0.7}); lights.append({"p": p - Vector2(size.x * 0.5 - 4, size.y - 2), "kind": "bulb"})
 		"wall_crack_a_open", "wall_crack_b_open", "wall_crack_c_open":
 			ci.draw_texture(tiles[d.kind], p - Vector2(0, 216 + 12))
 		"workshop_oil_puddle":

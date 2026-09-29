@@ -338,29 +338,30 @@ func build_doors() -> void:
 	doors.clear(); gate_blocks.clear()
 	for room in rooms:
 		if not room.has("id") or room.kind == "secret": continue
-		var r: Rect2 = room.r
-		for f: Rect2 in DOCKS.CORRIDORS:
-			var side := ""
-			var span_x: bool = f.position.x < r.end.x and f.end.x > r.position.x
-			var span_y: bool = f.position.y < r.end.y and f.end.y > r.position.y
-			if span_x and absf(f.end.y - r.position.y) < 3: side = "top"
-			elif span_x and absf(f.position.y - r.end.y) < 3: side = "bottom"
-			elif span_y and absf(f.end.x - r.position.x) < 3: side = "left"
-			elif span_y and absf(f.position.x - r.end.x) < 3: side = "right"
-			if side == "": continue
-			var d := Rect2()
-			match side:
-				"top": d = Rect2(f.position.x, r.position.y - DOOR_DEPTH, f.size.x, DOOR_DEPTH)
-				"bottom": d = Rect2(f.position.x, r.end.y, f.size.x, DOOR_DEPTH)
-				"left": d = Rect2(r.position.x - DOOR_DEPTH, f.position.y, DOOR_DEPTH, f.size.y)
-				"right": d = Rect2(r.end.x, f.position.y, DOOR_DEPTH, f.size.y)
-			doors.append({"r": d, "room": room.id, "side": side})
+		# 0.19: saídas também nas alas das salas compostas.
+		for r: Rect2 in [room.r] + room.get("extra", []):
+			for f: Rect2 in DOCKS.CORRIDORS:
+				var side := ""
+				var span_x: bool = f.position.x < r.end.x and f.end.x > r.position.x
+				var span_y: bool = f.position.y < r.end.y and f.end.y > r.position.y
+				if span_x and absf(f.end.y - r.position.y) < 3: side = "top"
+				elif span_x and absf(f.position.y - r.end.y) < 3: side = "bottom"
+				elif span_y and absf(f.end.x - r.position.x) < 3: side = "left"
+				elif span_y and absf(f.position.x - r.end.x) < 3: side = "right"
+				if side == "": continue
+				var d := Rect2()
+				match side:
+					"top": d = Rect2(f.position.x, r.position.y - DOOR_DEPTH, f.size.x, DOOR_DEPTH)
+					"bottom": d = Rect2(f.position.x, r.end.y, f.size.x, DOOR_DEPTH)
+					"left": d = Rect2(r.position.x - DOOR_DEPTH, f.position.y, DOOR_DEPTH, f.size.y)
+					"right": d = Rect2(r.end.x, f.position.y, DOOR_DEPTH, f.size.y)
+				doors.append({"r": d, "room": room.id, "side": side})
 
 func room_contains(room: Dictionary, p: Vector2, margin: float = 0.0) -> bool:
-	# 0.18: sala composta de room.r + suas alas (ROOM_EXTRA) — não é só o retângulo principal.
-	if room.r.grow(margin).has_point(p): return true
-	for ex: Rect2 in room.get("extra", []):
-		if ex.grow(margin).has_point(p): return true
+	# 0.19: alcovas estreitas não podem gerar Rect2 negativo ao testar margem interna.
+	for rect: Rect2 in [room.r] + room.get("extra", []):
+		var inner := rect.grow(margin)
+		if inner.size.x > 0 and inner.size.y > 0 and inner.has_point(p): return true
 	return false
 
 func room_by_id(id: String) -> Dictionary:
