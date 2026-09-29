@@ -1,0 +1,44 @@
+Use case: identity-preserve pixel-art action sprite sheet addition.
+Reference (attached) is the approved Marty animation atlas "marty_anim_v3.png" — 96x96 px
+cells, 10 columns, 20 rows (4 costumes x 5 view rows; the STANDARD costume occupies the
+first 5 rows, all 10 columns). Preserve the EXACT same chibi proportions, elevated
+three-quarter top-down game camera, palette, dark outline weight and pixel density as
+that reference. Costume: brown shearling pilot jacket, cyan goggles on spiky brown hair,
+dark trousers, cyan gauntlets/backpack, empty hands (weapons are drawn separately by the
+engine, never draw a weapon).
+
+Create a NEW sprite sheet for a forward dodge-roll (tumble) animation cycle, covering ALL
+FIVE view angles already used by the reference sheet's walk cycle, so the roll matches
+every direction the character can already walk/aim in the same elevated 3/4 view.
+
+EXACT LAYOUT: flat canvas, 5 columns x 4 rows, each cell exactly 96x96 px (canvas 480x384
+px total). 20 isolated full-body sprites on a single flat magenta background #FF00FF,
+generous magenta gutters between cells, no grid lines, no text, no labels, no shadows,
+no ground plane, no numbers.
+
+COLUMNS (view angle, same convention as the reference sheet, matching its mirrored-view
+system — always draw the RIGHT-leaning/right-facing version, the engine mirrors it for
+the opposite side):
+Column 1: FRONT — rolling toward the viewer (down).
+Column 2: FRONT-RIGHT THREE-QUARTER — rolling down-and-right.
+Column 3: RIGHT PROFILE — full side view, rolling to the right.
+Column 4: BACK-RIGHT THREE-QUARTER — rolling up-and-right, back mostly visible.
+Column 5: FULL BACK — rolling away from the viewer (up), no face visible.
+
+ROWS (roll cycle phase, same for every column, just seen from that column's angle):
+Row 1: crouch launch — knees bent, weight low, body leaning into the roll, feet still
+near ground contact.
+Row 2: tucked mid-roll — body curled into a compact ball, head tucked toward knees,
+limbs pulled in, slightly airborne/rotated forward.
+Row 3: inverted roll-through — forward rotation continues, shoulder/back making contact
+with the ground, legs coming over the top, still tucked.
+Row 4: recovery — unfolding back to a low running stance, one foot planting forward,
+ready to keep moving or firing.
+
+Keep a consistent ground-contact baseline across every cell matching the reference
+sheet's foot line (about 96% down the cell), so the roll reads as travelling along the
+floor in every direction, never floating or sinking relative to the other frames. Same
+dark 1-2px outline and flat color-ramp shading as the reference, no painterly shading,
+no 3D render look, no motion blur, no dust/fx baked in (particle trail is added
+separately by the engine). Full body never cropped, nothing touching cell edges or
+bleeding into neighboring cells. Do not draw any other costume.

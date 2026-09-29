@@ -46,7 +46,7 @@ func _init() -> void:
 			var p := Vector2(n) * 8
 			if p.x < 560 or p.x > 2240 or p.y < 5960 or p.y > 7040: continue
 			if not seen.has(n) and s.clear_at(p, 11): seen[n] = true; queue.append(n)
-	for target in [["chave", DOCKS.POINTS.key], ["saída para o corredor", Vector2(2185, 6500)], ["cais de granito", Vector2(920, 6975)]]:
+	for target in [["chave", DOCKS.POINTS.key], ["saída para o corredor", Vector2(2185, 6500)], ["cais de granito", Vector2(920, 6875)]]:
 		var ok := false
 		for c in seen:
 			if (Vector2(c) * 8).distance_to(target[1]) < 24: ok = true; break
@@ -59,7 +59,7 @@ func _init() -> void:
 	s.enemies = s.enemies.filter(func(e): return e.room != "entry")
 	s.step(0.016, [{}, {}])
 	check(not entry.locked and entry.cleared and s.clear_at(Vector2(2218, 6500), 11), "sala limpa: portões abrem")
-	# Tentáculo do Desembarque causa dano
+	# Tentáculo de outra sala continua causando dano (entrada agora sem perigos)
 	var m: Dictionary = s.actors[0]
 	m.p = DOCKS.HAZARDS[0].p; m.hurt = 0; var before: float = m.hp
 	s.step(0.016, [{}, {}])

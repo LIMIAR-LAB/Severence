@@ -3,6 +3,9 @@ extends Control
 const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 const MenuBackground = preload("res://scripts/menu_background.gd")
 const EquipmentScreen = preload("res://scripts/equipment_screen.gd")
+const CharacterSilhouette = preload("res://scripts/character_silhouette.gd")
+const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png"
+const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 
 # Supplied concept screens form the decorative layer. Every active region is a
 # real Control; editable text, selections, previews and statuses are live.
@@ -10,6 +13,7 @@ const CYAN := Color("65f0f5")
 const GOLD := Color("f3dda0")
 var app: Node
 var stage: Control
+var backdrop: ColorRect
 var content: Control
 var screen := "main"
 var pending_mode := "solo"
@@ -31,7 +35,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	# Fundo que cobre a sobra de telas 16:9 / 21:9 / 4:3; o menu (arte 1280×800) fica centralizado.
-	var backdrop := ColorRect.new(); backdrop.color = Color("05080d"); backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
+	backdrop = ColorRect.new(); backdrop.color = Color("05080d"); backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
 	stage = Control.new(); stage.size = Vector2(1344, 752); stage.scale = Vector2(1280.0 / 1344, 800.0 / 752); add_child(stage)
 	get_viewport().size_changed.connect(center_stage); center_stage()
 	show_screen("main")
@@ -39,18 +43,19 @@ func _ready() -> void:
 func center_stage() -> void:
 	if stage == null: return
 	var vp := get_viewport_rect().size
-	stage.position = ((vp - Vector2(1280, 800)) * 0.5).floor()
+	var fit := minf(vp.x/1280.0,vp.y/800.0)
+	stage.scale = Vector2(1280.0/1344,800.0/752)*fit
+	stage.position = ((vp - Vector2(1280, 800)*fit) * 0.5).floor()
 	place_equipment()
 
-# 0.17: a tela de Equipamento (pixel art) fica fora do "stage" esticado: escala INTEIRA em pixels reais
-# (1x, 2x, 3x…) e centrada. Só quando a janela é menor que 1344x752 ela reduz para caber.
+# 0.17: equipamento centralizado com escala proporcional contínua para ocupar a janela.
 func place_equipment() -> void:
-	if content == null or screen != "equipment" or content.get_parent() != self: return
+	if content == null or screen not in ["equipment", "mission_inventory"] or content.get_parent() != self: return
 	var k := get_viewport().get_final_transform().get_scale().x   # lógico -> pixels da janela
 	if k <= 0: k = 1.0
 	var phys := get_viewport_rect().size * k
 	var fit := minf(phys.x / 1344.0, phys.y / 752.0)
-	var s := floorf(fit) if fit >= 1.0 else fit
+	var s := fit # 0.17: ocupa a janela também entre escalas inteiras
 	content.scale = Vector2.ONE * (s / k)
 	content.position = ((phys - Vector2(1344, 752) * s) * 0.5).floor() / k
 
@@ -76,30 +81,36 @@ func button(parent: Control, rect: Rect2, caption: String, callback: Callable, t
 
 func show_screen(next: String) -> void:
 	screen = next
+	backdrop.visible = true
+	backdrop.color = Color(0.015, 0.025, 0.04, 0.82) if next == "pause" else Color("05080d")
 	if content != null:
 		content.get_parent().remove_child(content); content.queue_free()
 	content = Control.new(); content.size = Vector2(1344, 752)
-	if next == "equipment": add_child(content); place_equipment()   # escala inteira, fora do stage
+	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()   # escala inteira, fora do stage
 	else: stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null
-	if next == "equipment": build_equipment(); return   # a moldura é desenhada pela própria tela
-	var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "menu") + ".png")
-	if next == "play": bg.texture = load("res://assets/ui/adventure.png")
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if bg.texture.resource_path.ends_with("menu.png"):
-		bg.free(); content.add_child(title_background())   # tela inicial: vídeo em loop (0.16)
-	else: content.add_child(bg)
+	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
+	if next != "pause":
+		if next == "main":
+			content.add_child(title_background())
+		else:
+			var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "menu") + ".png")
+			if next == "play": bg.texture = load("res://assets/ui/adventure.png")
+			bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			content.add_child(bg)
 	match next:
 		"main": build_main()
+		"characters": build_characters()
 		"online": build_online()
 		"play": build_play()
+		"pause": build_pause()
 		"seed": build_seed()
 		"options": build_options()
 	focus_first.call_deferred()   # navegação pelo controle
 
 func open(page: String = "main") -> void:
+	if app.playing and page == "equipment": page = "pause"
 	show(); app.paused = app.playing and not app.online
-	if page == "equipment": read_equipment()
 	show_screen(page)
 
 func close() -> void:
@@ -108,18 +119,17 @@ func close() -> void:
 	# A UI click must not become a weapon shot in the same frame.
 	app.ui_input_block = 0.2
 
-# ── Tela inicial 0.16: vídeo em loop (assets/ui/title, tools/make_title_screen.py) com o menu desenhado nele.
-# Cada botão do vídeo tem duas placas estáticas por cima (normal / aceso); o Button real é invisível.
+# ── Tela inicial: o vídeo é cenário; todo o console e seus estados são controles vivos.
 const TITLE_DIR := "res://assets/ui/title/"
-const TITLE_BUTTONS := [Rect2(30, 261, 317, 55), Rect2(30, 311, 317, 55), Rect2(30, 361, 317, 55), Rect2(30, 410, 317, 55), Rect2(30, 460, 317, 55), Rect2(30, 510, 317, 55), Rect2(30, 560, 317, 55)]
-const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher single player ou parceiro IA", "Hospedar ou entrar por IP",
-	"Escolher uma seed para as docas", "Uniforme, armadura e robô", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
+const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher personagem e modo", "Hospedar ou entrar por IP",
+	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
 var title_video: VideoStreamPlayer
 
 func title_background() -> Control:
-	if not ResourceLoader.exists(TITLE_DIR + "title_still.png"): return MenuBackground.new()
+	var still_texture = load(TITLE_DIR + "title_still.png") if ResourceLoader.exists(TITLE_DIR + "title_still.png") else null
+	if still_texture == null: return MenuBackground.new()
 	var root := Control.new(); root.size = Vector2(1344, 752); root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var still := TextureRect.new(); still.texture = load(TITLE_DIR + "title_still.png")   # quadro parado (sem vídeo / headless)
+	var still := TextureRect.new(); still.texture = still_texture   # quadro parado (sem vídeo / headless)
 	still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; still.size = root.size; still.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(still)
 	var stream = load(TITLE_DIR + "title_loop.ogv") if ResourceLoader.exists(TITLE_DIR + "title_loop.ogv") else null
 	if stream != null and DisplayServer.get_name() != "headless":
@@ -130,43 +140,73 @@ func title_background() -> Control:
 		root.add_child(title_video)
 	return root
 
-func title_button(i: int, callback: Callable, sel_layer: Control) -> Button:
-	var r: Rect2 = TITLE_BUTTONS[i]
-	var sel := TextureRect.new(); sel.texture = load(TITLE_DIR + "btn_%d_sel.png" % i); sel.position = r.position; sel.size = r.size
-	sel.mouse_filter = Control.MOUSE_FILTER_IGNORE; sel.visible = false; sel_layer.add_child(sel)
-	var b := Button.new(); b.position = r.position + Vector2(10, 5); b.size = r.size - Vector2(20, 10)   # só a placa, sem a margem
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]: b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	b.tooltip_text = TITLE_TIPS[i]; b.name = "Title_%d" % i
-	var lit := func(on: bool): sel.visible = on and not b.disabled
-	b.mouse_entered.connect(lit.bind(true)); b.mouse_exited.connect(func(): lit.call(b.has_focus()))
-	b.focus_entered.connect(lit.bind(true)); b.focus_exited.connect(lit.bind(false))
-	b.pressed.connect(callback); content.add_child(b)
-	return b
+func title_style(fill: Color, edge: Color, width: int = 2, radius: int = 4) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new(); style.bg_color = fill; style.border_color = edge
+	style.set_border_width_all(width); style.set_corner_radius_all(radius)
+	style.content_margin_left = 15; style.content_margin_right = 15
+	return style
+
+func title_button(i: int, rect: Rect2, caption: String, callback: Callable, primary: bool = false) -> Button:
+	var b := Button.new(); b.position = rect.position; b.size = rect.size; b.text = caption
+	b.name = "Title_%d" % i; b.tooltip_text = TITLE_TIPS[i]; b.focus_mode = Control.FOCUS_ALL
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.add_theme_font_size_override("font_size", 21 if primary else 17)
+	b.add_theme_color_override("font_color", Color("f1d58c") if not primary else Color("f5ead0"))
+	b.add_theme_color_override("font_hover_color", Color("ffffff")); b.add_theme_color_override("font_focus_color", Color("ffffff"))
+	b.add_theme_color_override("font_pressed_color", Color("ffffff")); b.add_theme_color_override("font_disabled_color", Color("59605b"))
+	var normal := title_style(Color("19211d") if not primary else Color("19383b"), Color("8d7540") if not primary else Color("56cdd4"), 2, 5)
+	var hover := title_style(Color("22474a"), Color("78f5f4"), 3, 5)
+	var pressed := title_style(Color("153237"), Color("f1c96d"), 3, 5)
+	var disabled := title_style(Color("101511"), Color("343a31"), 1, 5)
+	b.add_theme_stylebox_override("normal", normal); b.add_theme_stylebox_override("hover", hover)
+	b.add_theme_stylebox_override("focus", hover); b.add_theme_stylebox_override("pressed", pressed); b.add_theme_stylebox_override("disabled", disabled)
+	b.mouse_entered.connect(func():
+		if not b.disabled: b.grab_focus())
+	b.pressed.connect(callback); content.add_child(b); return b
 
 func build_main() -> void:
-	if not ResourceLoader.exists(TITLE_DIR + "btn_0.png"): return
-	var normals := Control.new(); normals.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(normals)
-	for i in range(TITLE_BUTTONS.size() - 1, -1, -1):   # de baixo para cima: o CONTINUAR fica por cima da vizinha
-		var n := TextureRect.new(); n.texture = load(TITLE_DIR + "btn_%d.png" % i); n.position = TITLE_BUTTONS[i].position; n.size = TITLE_BUTTONS[i].size
-		n.mouse_filter = Control.MOUSE_FILTER_IGNORE; n.name = "Plate_%d" % i; normals.add_child(n)
-	var sel_layer := Control.new(); sel_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(sel_layer)
-	var callbacks: Array[Callable] = [close, func(): show_screen("play"), func(): show_screen("online"), func(): show_screen("seed"),
-		func(): pending_mode = "current"; open("equipment"), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
-	for i in TITLE_BUTTONS.size():
-		var b := title_button(i, callbacks[i], sel_layer)
-		if i == 0:
-			main_resume = b; b.disabled = not app.playing
-			if b.disabled:
-				b.tooltip_text = "Nenhuma expedição em andamento"
-				normals.get_node("Plate_0").modulate = Color(0.5, 0.5, 0.5)
-	# coop local (não está no desenho do menu): linha discreta entre SAIR e o status
-	var coop := button(content, Rect2(40, 617, 298, 30), "COOP LOCAL  •  2 JOGADORES", func(): pending_mode = "local"; start_target = "arena"; read_equipment(); show_screen("equipment"), true)
-	coop.add_theme_font_size_override("font_size", 14); coop.add_theme_color_override("font_color", Color("e8c98a")); coop.name = "CoopLocal"
-	coop.tooltip_text = "Dois jogadores no mesmo computador"
-	# status da rede: o vídeo já diz OFFLINE; qualquer outro estado é escrito por cima
-	if app.network_status != "OFFLINE":
-		panel(content, Rect2(78, 667, 222, 28), Color("2c3222"), Color("2c3222"))
-		label(content, Rect2(78, 669, 222, 26), app.network_status, 14, Color("f0d9a0")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# O vídeo antigo tem controles pintados. Esta máscara opaca entrega a área inteira
+	# ao console vivo e evita que qualquer texto/placa antiga apareça por baixo.
+	var mask := ColorRect.new(); mask.name = "TitleControlMask"; mask.position = Vector2(0, 261); mask.size = Vector2(430, 491)
+	mask.color = Color("0a100e"); mask.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(mask)
+	var console := panel(content, Rect2(18, 278, 396, 451), Color("151d18"), Color("a07f43")); console.name = "TitleConsole"
+	var inner := panel(content, Rect2(25, 285, 382, 437), Color("111713"), Color("39483d")); inner.name = "TitleConsoleInner"
+	label(content, Rect2(39, 296, 340, 24), "CENTRAL DE EXPEDIÇÕES", 14, Color("c5a85f"))
+	var rule := ColorRect.new(); rule.position = Vector2(39, 323); rule.size = Vector2(340, 2); rule.color = Color("355e5d"); rule.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(rule)
+	var callbacks: Array[Callable] = [close, func(): show_screen("characters"), func(): show_screen("online"), func(): show_screen("seed"),
+		func(): app.load_game(), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
+	var new_run := title_button(1, Rect2(39, 335, 340, 56), "NOVA EXPEDIÇÃO", callbacks[1], not app.playing)
+	main_resume = title_button(0, Rect2(39, 399, 164, 49), "CONTINUAR", callbacks[0], app.playing)
+	main_resume.disabled = not app.playing
+	if main_resume.disabled: main_resume.tooltip_text = "Nenhuma expedição em andamento"
+	var load_button := title_button(4, Rect2(215, 399, 164, 49), "CARREGAR", callbacks[4])
+	load_button.disabled = not app.has_saved_game()
+	if load_button.disabled: load_button.tooltip_text = "Nenhum jogo salvo"
+	label(content, Rect2(39, 460, 340, 20), "OUTRAS ROTAS", 12, Color("7f9385"))
+	var online_button := title_button(2, Rect2(39, 484, 164, 49), "ONLINE", callbacks[2])
+	var seed_button := title_button(3, Rect2(215, 484, 164, 49), "EXPEDIÇÃO DIRETA", callbacks[3])
+	var options_button := title_button(5, Rect2(39, 545, 164, 46), "OPÇÕES", callbacks[5])
+	var exit_button := title_button(6, Rect2(215, 545, 164, 46), "SAIR", callbacks[6])
+	var visual_order: Array[Button] = [new_run, main_resume, load_button, online_button, seed_button, options_button, exit_button]
+	var enabled_order: Array[Button] = []
+	for title_action in visual_order:
+		if not title_action.disabled: enabled_order.append(title_action)
+	for i in enabled_order.size():
+		var current := enabled_order[i]
+		current.focus_next = current.get_path_to(enabled_order[(i + 1) % enabled_order.size()])
+		current.focus_previous = current.get_path_to(enabled_order[(i - 1 + enabled_order.size()) % enabled_order.size()])
+	new_run.focus_neighbor_bottom = new_run.get_path_to(main_resume if not main_resume.disabled else (load_button if not load_button.disabled else online_button))
+	main_resume.focus_neighbor_top = main_resume.get_path_to(new_run); main_resume.focus_neighbor_right = main_resume.get_path_to(load_button if not load_button.disabled else online_button); main_resume.focus_neighbor_bottom = main_resume.get_path_to(online_button)
+	load_button.focus_neighbor_top = load_button.get_path_to(new_run); load_button.focus_neighbor_left = load_button.get_path_to(main_resume if not main_resume.disabled else new_run); load_button.focus_neighbor_bottom = load_button.get_path_to(seed_button)
+	online_button.focus_neighbor_top = online_button.get_path_to(main_resume if not main_resume.disabled else new_run); online_button.focus_neighbor_right = online_button.get_path_to(seed_button); online_button.focus_neighbor_bottom = online_button.get_path_to(options_button)
+	seed_button.focus_neighbor_top = seed_button.get_path_to(load_button if not load_button.disabled else new_run); seed_button.focus_neighbor_left = seed_button.get_path_to(online_button); seed_button.focus_neighbor_bottom = seed_button.get_path_to(exit_button)
+	options_button.focus_neighbor_top = options_button.get_path_to(online_button); options_button.focus_neighbor_right = options_button.get_path_to(exit_button)
+	exit_button.focus_neighbor_top = exit_button.get_path_to(seed_button); exit_button.focus_neighbor_left = exit_button.get_path_to(options_button)
+	var foot := panel(content, Rect2(39, 604, 340, 96), Color("0d1310"), Color("303b32")); foot.name = "TitleFooter"
+	label(content, Rect2(52, 617, 314, 22), "COOP LOCAL APÓS ESCOLHER PERSONAGEM", 11, Color("89978d"))
+	var status_color := Color("79e5e5") if app.network_status != "OFFLINE" else Color("b9a66c")
+	var status := label(content, Rect2(52, 649, 314, 25), "●  " + app.network_status, 14, status_color); status.name = "TitleNetworkStatus"
+	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label(content, Rect2(52, 678, 314, 18), "PROTÓTIPO • DOCAS DE 1941", 11, Color("59675e"))
 
 func overlay(title: String) -> Panel:
 	var dim := ColorRect.new(); dim.color = Color(0.015, 0.025, 0.04, 0.78); dim.size = Vector2(1344, 752); content.add_child(dim)
@@ -174,8 +214,33 @@ func overlay(title: String) -> Panel:
 	label(p, Rect2(30, 20, 640, 55), title, 30, GOLD)
 	return p
 
+func build_characters() -> void:
+	var p := panel(content, Rect2(95, 45, 1154, 660), Color("101f2a"), Color("75b5a2"))
+	label(p, Rect2(36, 20, 1080, 48), "ESCOLHA SEU PERSONAGEM", 30, GOLD)
+	label(p, Rect2(38, 69, 1050, 30), "Marty está pronto. Outros viajantes poderão ser liberados depois.", 17, Color("b3c8c5"))
+	for i in 6:
+		var col := i % 3; var row := i / 3
+		var rect := Rect2(42 + col * 358, 116 + row * 225, 328, 205)
+		var card := panel(p, rect, Color("15343b") if i == 0 else Color("131a21"), CYAN if i == 0 else Color("35434b"))
+		if i == 0:
+			var crop := AtlasTexture.new(); crop.atlas = load(MARTY_PORTRAIT); crop.region = Rect2(65, 48, 225, 260)
+			var portrait := Sprite2D.new(); portrait.texture = crop; portrait.position = Vector2(83, 90.5)
+			portrait.scale = Vector2(130.0 / 225.0, 157.0 / 260.0); portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			card.add_child(portrait)
+			label(card, Rect2(158, 49, 155, 45), "MARTY", 27, GOLD)
+			label(card, Rect2(158, 97, 155, 55), "DISPONÍVEL", 16, CYAN)
+			var pick := button(p, rect, "", func(): show_screen("play"), true); pick.name = "CharacterMarty"
+		else:
+			var shadow := CharacterSilhouette.new(); shadow.variant = i - 1
+			shadow.position = Vector2(18, 11); shadow.size = Vector2(125, 160); shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			shadow.name = "Silhouette%d" % i; card.add_child(shadow)
+			label(card, Rect2(150, 55, 165, 90), "VIAJANTE %d\nBLOQUEADO" % (i + 1), 18, Color("687983"))
+			var locked := button(p, rect, "", func(): pass, true); locked.name = "CharacterLocked%d" % i; locked.disabled = true
+	label(p, Rect2(40, 575, 470, 30), "1 de 6 personagens disponíveis", 17, CYAN)
+	button(p, Rect2(835, 566, 270, 58), "VOLTAR", func(): show_screen("main"))
+
 func build_play() -> void:
-	if pending_mode not in ["solo", "ai"]: pending_mode = "solo"
+	if pending_mode not in ["solo", "ai", "local"]: pending_mode = "solo"
 	var choices := Control.new(); choices.size = Vector2(1344, 752); choices.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(choices)
 	for i in range(2):
 		var mode_name: String = "solo" if i == 0 else "ai"
@@ -184,9 +249,47 @@ func build_play() -> void:
 		b.tooltip_text = "Apenas Marty" if i == 0 else "Marty com parceiro IA"
 		if pending_mode == mode_name:
 			var selected := b.get_theme_stylebox("normal").duplicate(); selected.border_color = CYAN; selected.set_border_width_all(4); b.add_theme_stylebox_override("normal", selected)
-	button(content, Rect2(388, 611, 205, 55), "", func(): show_screen("main"), true).tooltip_text = "Voltar"
-	panel(content, Rect2(685, 424, 252, 31) if pending_mode == "ai" else Rect2(400,424,250,31), Color("273929"), CYAN)
-	label(content, Rect2(720, 426, 220, 29) if pending_mode == "ai" else Rect2(455,426,180,29), "SOLO + IA  ✓" if pending_mode == "ai" else "SOLO  ✓", 23, GOLD)
+	var local := button(content, Rect2(391, 517, 570, 68), "COOP LOCAL  •  2 JOGADORES", func(): pending_mode = "local"; read_equipment(); show_screen("equipment"))
+	local.name = "LocalChoice"; local.tooltip_text = "Dois jogadores no mesmo computador"
+	button(content, Rect2(388, 611, 205, 55), "", func(): show_screen("characters"), true).tooltip_text = "Voltar"
+	if pending_mode != "local":
+		panel(content, Rect2(685, 424, 252, 31) if pending_mode == "ai" else Rect2(400,424,250,31), Color("273929"), CYAN)
+		label(content, Rect2(720, 426, 220, 29) if pending_mode == "ai" else Rect2(455,426,180,29), "SOLO + IA  ✓" if pending_mode == "ai" else "SOLO  ✓", 23, GOLD)
+
+func build_pause() -> void:
+	var p := panel(content, Rect2(222, 110, 900, 532), Color("11272b"), Color("1c2829"))
+	p.name = "PausePanel"
+	if ResourceLoader.exists(PAUSE_FRAME):
+		var frame := TextureRect.new(); frame.name = "PauseFrame"; frame.texture = load(PAUSE_FRAME)
+		frame.position = Vector2.ZERO; frame.size = p.size
+		frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		frame.stretch_mode = TextureRect.STRETCH_SCALE
+		frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; p.add_child(frame)
+	label(p, Rect2(110, 89, 680, 48), "PAUSA", 31, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label(p, Rect2(110, 139, 680, 36), "Expedição em andamento", 20, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var resume := button(p, Rect2(160, 174, 580, 52), "CONTINUAR", close)
+	resume.name = "ResumeGame"
+	var save := button(p, Rect2(160, 236, 580, 52), "SALVAR JOGO", func():
+		if app.save_game(): telemetry.text = "Expedição salva."
+		else: telemetry.text = "Não foi possível salvar esta partida.")
+	save.name = "SaveGame"; save.disabled = app.online
+	var leave := button(p, Rect2(160, 298, 580, 52), "VOLTAR AO MENU", func():
+		if not app.return_to_title():
+			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
+			telemetry.add_theme_color_override("font_color", Color("ffad99")))
+	leave.name = "ReturnToMenu"
+	var mission_inventory := button(p, Rect2(160, 360, 580, 52), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
+	mission_inventory.name = "MissionInventory"
+	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
+	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
+	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
+	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
+	leave.focus_neighbor_bottom = leave.get_path_to(mission_inventory); leave.focus_next = leave.get_path_to(mission_inventory)
+	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(leave); mission_inventory.focus_previous = mission_inventory.get_path_to(leave)
+	telemetry = label(p, Rect2(105, 430, 690, 42), "Esc ou Start também continua a partida.", 16, GOLD)
+	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func build_online() -> void:
 	# Keep the user's illustrated radio and its borders; replace only live regions.
@@ -250,7 +353,6 @@ func build_controls_options(p: Control) -> void:
 		bind_buttons[action] = b
 	label(p, Rect2(30, 400, 760, 26), "Mouse: mirar e atirar (clique esquerdo) • direito também golpeia", 14, GOLD)
 	button(p, Rect2(30, 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
-	button(p, Rect2(30, 495, 400, 50), "UNIFORME / ARMADURA / ROBÔ", func(): pending_mode = "current"; read_equipment(); show_screen("equipment"))
 
 func bind_caption(action: String) -> String:
 	var label_text: String = app.KEY_BIND_LABELS.get(action, action)
@@ -318,8 +420,9 @@ func read_equipment() -> void:
 var equipment: Control
 var armor_choice := ""
 
-func build_equipment() -> void:
+func build_equipment(mission_mode: bool = false) -> void:
 	equipment = EquipmentScreen.new(); equipment.host = self; equipment.app = app
+	equipment.mission_mode = mission_mode
 	content.add_child(equipment); equipment.build()
 
 func select_actor(i: int) -> void:
@@ -342,8 +445,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		for a in bind_buttons: bind_buttons[a].text = bind_caption(a)
 		accept_event(); return
 	if event is InputEventJoypadButton and event.pressed:
-		if screen == "equipment" and event.button_index == JOY_BUTTON_LEFT_SHOULDER: cycle_outfit(-1); accept_event()
-		elif screen == "equipment" and event.button_index == JOY_BUTTON_RIGHT_SHOULDER: cycle_outfit(1); accept_event()
+		if screen in ["equipment", "mission_inventory"] and event.button_index == JOY_BUTTON_LEFT_SHOULDER: cycle_outfit(-1); accept_event()
+		elif screen in ["equipment", "mission_inventory"] and event.button_index == JOY_BUTTON_RIGHT_SHOULDER: cycle_outfit(1); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "pause": close(); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "equipment": show_screen("play"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
 	var focus := get_viewport().gui_get_focus_owner()
 	if focus == null and (event.is_action_pressed("ui_down") or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_accept")):
@@ -351,6 +458,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func focus_first() -> void:
 	# primeiro botão visível da tela recebe o foco (para jogar só com o controle)
+	if screen == "main" and main_resume != null and main_resume.visible and not main_resume.disabled:
+		main_resume.grab_focus(); return
 	var stack: Array = [content]
 	while not stack.is_empty():
 		var n: Node = stack.pop_front()
@@ -361,17 +470,16 @@ func cycle_outfit(step: int) -> void:
 	if equipment != null: equipment.cycle(step)
 
 func apply_gear() -> bool:
-	app.pref_outfit = outfit_choice; app.pref_robot = robot_choice; app.save_settings()
 	if app.playing:
-		var accepted: bool = app.request_loadout(gear_actor, outfit_choice, robot_choice, "omega")
-		if live_status != null: live_status.text = "Solicitado ao anfitrião." if app.online and not app.hosting else ("Aplicado." if accepted else app.sim.message)
+		var accepted: bool = app.request_loadout(gear_actor, outfit_choice, robot_choice, armor_choice if armor_choice != "" else "omega")
+		if live_status != null: live_status.text = "Solicitado ao anfitrião." if app.online and not app.hosting else ("Aplicado à missão." if accepted else app.sim.message)
 		return accepted
+	app.pref_outfit = outfit_choice; app.pref_robot = robot_choice; app.save_settings()
 	if live_status != null: live_status.text = "Salvo para a próxima partida."
 	return true
 
 func launch() -> void:
-	if app.playing and pending_mode == "current":
-		apply_gear(); close(); return
+	if app.playing: return
 	app.pref_outfit = outfit_choice; app.pref_robot = robot_choice; app.save_settings()
 	if pending_mode == "local": app.start_local()
 	elif pending_mode == "solo": app.start_single()

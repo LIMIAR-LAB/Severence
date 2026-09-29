@@ -4,3 +4,16 @@ build/
 test-output/
 __pycache__/
 .env
+
+# Godot regenerates import metadata locally.
+*.import
+
+# Local tooling and temporary worktrees are not game source.
+/_dev-claude-wt/
+/addons/godot_mcp_toolkit/
+/addons/rmsmartshape/
+/output/rejected/
+
+# One-off local diagnostics.
+/tests/_dbg.gd
+/tests/_dbg.gd.uid

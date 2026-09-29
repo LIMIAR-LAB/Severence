@@ -8,11 +8,11 @@ Abra `Jogar.cmd` nesta pasta. Ele usa o Godot instalado em `C:\Users\tsmar\Downl
 
 Alternativa: importe `project.godot` no Godot e pressione **F5**. Não há dependências npm, API ou login para jogar. A chave de geração de imagens não é utilizada nem incluída no jogo.
 
-No menu, escolha **JOGAR**, depois **SINGLE PLAYER — apenas Marty** ou **Marty + parceiro IA**. Escolha o equipamento e pressione **INICIAR ARENA**. A arena começa com inimigos à direita; novas ondas aparecem após dois segundos. O modo solo não tem parceiro ativo e reinicia quando Marty cai. Coop local e online possuem entradas próprias no menu.
+No menu, escolha **NOVA EXPEDIÇÃO**. Selecione **Marty** na tela de personagens; as outras cinco silhuetas são vagas bloqueadas para personagens futuros. Escolha **Solo**, **Parceiro IA** ou **Coop Local (2 jogadores)**, configure uniforme, armadura e robô na tela de equipamento e pressione **IR AO REFÚGIO**. No refúgio, suba a escadaria até o portal **DOCAS / 1941** e pressione **E**. Com um controle no coop local, ele controla o P2; Marty usa teclado e mouse.
 
-Para explorar, escolha **IR AO REFÚGIO** na tela de equipamento. No refúgio, suba a escadaria até o portal **DOCAS / 1941** e pressione **E**. A bancada (esquerda) ainda não compra melhorias; a vitrine inferior esquerda alterna a armadura de treino; o Titan fica estacionado no hangar à direita. Núcleo, mural da equipe e o portal bloqueado também respondem ao **E**. A armadura de treinamento não é um desbloqueio permanente. **EXPEDIÇÃO DIRETA** também permite escolher solo ou parceiro IA.
+Durante a partida, pressione **Esc**, **Start** ou **B** para abrir a pausa e escolha **SALVAR JOGO**. Na próxima abertura, **CARREGAR JOGO** no título retoma a sessão, inclusive posição, mapa, recursos e modo de coop. O arquivo da sessão fica em `user://expedition.save`, separado de `progress.json`, que guarda os desbloqueios. O salvamento da sessão está disponível para Solo, Parceiro IA e Coop Local; partidas online não oferecem esse botão. O menu de pausa tem **CONTINUAR** e **SALVAR JOGO**; a escolha de uniforme fica antes da partida.
 
-**B** abre o equipamento; **C** invoca/recolhe o robô selecionado; **G** funde/separa o Spectre; **E** entra/sai do Titan. Invocações respeitam espaço, recarga e integridade: recolher não cura. Spectre acompanha e atira, ou se funde a Marty para absorver dano e aumentar velocidade e poder de fogo. A armadura continua binária. As três telas fornecidas pelo usuário são a base visual dos menus, com controles reais sobre a arte. Marty, inimigos e chefe usam os sprites do conceito v1; o Titan ainda usa a arte anterior.
+**C** invoca/recolhe o robô selecionado; **G** funde/separa o Spectre; **E** entra/sai do Titan. Invocações respeitam espaço, recarga e integridade: recolher não cura. Spectre acompanha e atira, ou se funde a Marty para absorver dano e aumentar velocidade e poder de fogo. A armadura continua binária.
 
 ## Controles
 
@@ -106,6 +106,6 @@ Capturas do renderizador real (abrem uma janela temporária e encerram):
 
 ## Limites desta entrega
 
-O mapa é fixo (13 salas e uma secreta, editadas em `tools/build_docks_map.py`); a seed só varia os tipos de inimigo. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Não há seleção de personagens definitiva, outras épocas, lobby Steam, balanceamento final, remapeamento do P2/joypad, exportação independente do Godot nem validação humana de uma campanha completa.
+O mapa é fixo (13 salas e uma secreta, editadas em `tools/build_docks_map.py`); a seed só varia os tipos de inimigo. As três armas ficam acessíveis por Q para facilitar os testes. Comércio é uma compra simples, não uma loja completa. Apenas Marty é selecionável por enquanto. Não há outras épocas, lobby Steam, balanceamento final, remapeamento do P2/joypad, exportação independente do Godot nem validação humana de uma campanha completa.
 
 Próximos marcos: playtest de movimentação/combate e câmera; navegação mais refinada; arte do cenário e inimigos; Vincent; geração modular mais ampla; transporte online com lobby/relay e teste real entre dois computadores; empacotamento para Windows.

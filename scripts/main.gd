@@ -4,7 +4,9 @@ const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 const Sim = preload("res://scripts/simulation.gd")
 const View = preload("res://scripts/world_view.gd")
 const EquipmentData := preload("res://scripts/equipment_data.gd")
+const InventoryState := preload("res://scripts/inventory_state.gd")
 const PORT := 24871
+const RUN_SAVE := "user://expedition.save"
 var sim: Expedition
 var world: DockView
 var camera: Camera2D
@@ -27,6 +29,8 @@ var remote_age := 0.0
 var send_timer := 0.0
 var save_timer := 0.0
 var previous_buttons: Dictionary = {}
+# 0.19: preserva a mira do controle ao soltar o analógico.
+var joy_aim: Dictionary = {}
 var last_save := ""
 var network_status := "OFFLINE"
 var map_open := false
@@ -54,7 +58,20 @@ const KEY_BIND_RESERVED := [KEY_ESCAPE, KEY_TAB, KEY_M, KEY_B, KEY_F2]
 var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
 
+func safe_int(value, fallback: int = 0) -> int:
+	return int(value) if value is int or value is float else fallback
+
+func safe_float(value, fallback: float = 0.0) -> float:
+	return float(value) if value is int or value is float else fallback
+
+func valid_saved_actor(value) -> bool:
+	if not value is Dictionary: return false
+	var actor: Dictionary = value
+	return actor.get("p") is Vector2 and actor.p.is_finite() and (actor.get("hp") is float or actor.get("hp") is int)
+
 func _ready() -> void:
+	Input.joy_connection_changed.connect(log_joypad)
+	for device in Input.get_connected_joypads(): log_joypad(device, true)
 	sim = Sim.new(); load_progress(); load_settings()
 	display.apply(get_tree())
 	world = View.new(); world.sim = sim; add_child(world)
@@ -127,10 +144,13 @@ func _ready() -> void:
 		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))
 		if arg == "--visit-all":
 			for room in sim.rooms: sim.visited.append(room.id)
-	for page in ["main", "play", "online", "equipment", "options"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
 		if "--capture-ui-" + page in args and page == "options": menu.show_screen("options")
 		if "--capture-ui-" + page in args:
-			screenshot_mode = true; menu.read_equipment(); menu.show_screen(page)
+			screenshot_mode = true
+			if page == "pause": start_refuge(); menu.open("pause")
+			else:
+				menu.read_equipment(); menu.show_screen(page)
 	if "--network-host-test" in args: automated = true; host_game(); sim.start_run(1941)
 	if "--network-client-test" in args: automated = true; address.text = "127.0.0.1"; join_game()
 
@@ -148,7 +168,7 @@ func build_ui() -> void:
 	banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	banner.add_theme_color_override("font_color", Color("f6d59a")); banner.add_theme_color_override("font_outline_color", Color("071019")); banner.add_theme_constant_override("outline_size", 6); banner.add_theme_font_size_override("font_size", 15); root.add_child(banner)
 	help_label = Label.new(); help_label.position = Vector2(26, 744); help_label.add_theme_font_size_override("font_size", 13)
-	help_label.text = "WASD mover • Mouse atirar • F golpe • Espaço salto • Shift dash • E pilotar • B EQUIPAMENTO\nC INVOCAR/RECOLHER • G FUNDIR/SEPARAR • Q arma • R armadura • Tab mapa • Esc menu"
+	help_label.text = "WASD mover • Mouse atirar • F golpe • Espaço salto • Shift dash • E pilotar • B PAUSA\nC INVOCAR/RECOLHER • G FUNDIR/SEPARAR • Q arma • R armadura • Tab mapa • Esc menu"
 	root.add_child(help_label)
 	# Hidden defaults support direct-launch/test paths before the online screen exists.
 	address = LineEdit.new(); address.text = "127.0.0.1"; address.hide(); root.add_child(address)
@@ -270,12 +290,31 @@ func edge(action_name: String, value: bool) -> bool:
 	previous_buttons[action_name] = value
 	return value and not before
 
+func log_joypad(device: int, connected_pad: bool) -> void:
+	if connected_pad:
+		print("CONTROLE conectado: ", device, " • ", Input.get_joy_name(device), " • reconhecido=", Input.is_joy_known(device))
+	else: print("CONTROLE desconectado: ", device)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and event.relative.length_squared() > 0.0:
+		joy_aim.clear()
+
+# 0.19: um controle no coop pertence ao P2; dois controles atendem os dois pilotos.
+func connected_gamepads() -> Array:
+	return Input.get_connected_joypads()
+
+func gameplay_joypad(use_primary: bool, devices: Array) -> int:
+	if devices.is_empty(): return -1
+	if use_primary:
+		return int(devices[0]) if sim.coop != "local" or devices.size() >= 2 else -1
+	return int(devices[1] if devices.size() > 1 else devices[0])
+
 func player_input(index: int, use_primary: bool = true) -> Dictionary:
 	var a: Dictionary = sim.actors[index]
 	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false}
 	if use_primary:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
-		cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
+		if not joy_aim.get(index, false): cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
 		cmd.fire = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not map_open and not minimap_rect().has_point(get_viewport().get_mouse_position())
 		cmd.melee = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(key_binds.melee)
 		cmd.jump = Input.is_physical_key_pressed(key_binds.jump)
@@ -292,16 +331,14 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.jump = Input.is_physical_key_pressed(KEY_SLASH); cmd.dodge = Input.is_physical_key_pressed(KEY_COMMA); cmd.boost = cmd.dodge
 		cmd.interact = Input.is_physical_key_pressed(KEY_CTRL); cmd.armor = Input.is_physical_key_pressed(KEY_O); cmd.weapon = Input.is_physical_key_pressed(KEY_U)
 		cmd.summon = Input.is_physical_key_pressed(KEY_N); cmd.fusion = Input.is_physical_key_pressed(KEY_M)
-	var devices := Input.get_connected_joypads()
-	var device := -1
-	if use_primary and (sim.coop != "local" or devices.size() >= 2):
-		if devices.size() > 0: device = devices[0]
-	elif not use_primary and devices.size() > 0: device = devices[1] if devices.size() > 1 else devices[0]
+	var devices := connected_gamepads()
+	var device := gameplay_joypad(use_primary, devices)
 	if device >= 0:
 		var stick := Vector2(Input.get_joy_axis(device, JOY_AXIS_LEFT_X), Input.get_joy_axis(device, JOY_AXIS_LEFT_Y))
 		if stick.length() > 0.2: cmd.move = stick.limit_length()
 		stick = Vector2(Input.get_joy_axis(device, JOY_AXIS_RIGHT_X), Input.get_joy_axis(device, JOY_AXIS_RIGHT_Y))
-		if stick.length() > 0.25: cmd.aim = stick.normalized()
+		if stick.length() > 0.25:
+			cmd.aim = stick.normalized(); joy_aim[index] = true
 		cmd.fire = cmd.fire or Input.get_joy_axis(device, JOY_AXIS_TRIGGER_RIGHT) > 0.3
 		cmd.melee = cmd.melee or Input.is_joy_button_pressed(device, JOY_BUTTON_X)
 		cmd.jump = cmd.jump or Input.is_joy_button_pressed(device, JOY_BUTTON_A)
@@ -326,12 +363,21 @@ func _physics_process(dt: float) -> void:
 		if sim.hitstop > 0: ts = 0.12
 		Engine.time_scale = ts
 	elif Engine.time_scale != 1.0: Engine.time_scale = 1.0
-	if edge("esc", Input.is_physical_key_pressed(KEY_ESCAPE)):
-		if menu.visible: menu.close()
-		else: menu.open("main")
-	if edge("gear", Input.is_physical_key_pressed(KEY_B)):
-		if menu.visible and menu.screen == "equipment": menu.close()
-		else: menu.pending_mode = "current"; menu.open("equipment")
+	# 0.19: Options/Start também retoma a pausa automática ao perder o foco.
+	var pause_pressed := Input.is_physical_key_pressed(KEY_ESCAPE)
+	for device in connected_gamepads():
+		pause_pressed = pause_pressed or Input.is_joy_button_pressed(device, JOY_BUTTON_START)
+	if edge("esc", pause_pressed):
+		if menu.visible:
+			if menu.screen == "equipment": menu.show_screen("play")
+			elif menu.screen == "mission_inventory": menu.show_screen("pause")
+			else: menu.close()
+		elif playing: menu.open("pause")
+	if edge("gear", Input.is_physical_key_pressed(KEY_B)) and playing:
+		if menu.visible:
+			if menu.screen == "mission_inventory": menu.show_screen("pause")
+			else: menu.close()
+		else: menu.open("pause")
 	# Mapa: TAB, M ou clique no minimapa (canto superior direito)
 	var mouse_on_map := minimap_rect().has_point(get_viewport().get_mouse_position())
 	if edge("map", Input.is_physical_key_pressed(KEY_TAB) or Input.is_physical_key_pressed(KEY_M) or (mouse_on_map and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))): map_open = not map_open
@@ -424,7 +470,7 @@ func update_hud() -> void:
 	if controlled.fused: robot_status += " • FUSÃO %d" % sim.spectres[controlled.id].hp
 	hud.text = hud.text.replace(network_status, robot_status)
 	banner.text = sim.message if sim.message_time > 0 else ("OPCIONAL • %.0fs • elimine os guardiões" % sim.side_time if sim.side_active else "")
-	if paused: banner.text = "PAUSADO • Esc para continuar"
+	if paused: banner.text = "PAUSADO • Esc / Options / Start para continuar"
 	if not playing: hud.text = "MARTY — FRATURAS DO TEMPO     /     PRIMEIRA VERSÃO JOGÁVEL\n2 estados de armadura • IA / coop local / conexão online direta"
 
 func apply_preferences(id: int) -> void:
@@ -484,7 +530,7 @@ func load_settings() -> void:
 
 func save_progress() -> void:
 	if online and not hosting: return
-	var data := {"version": 1, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked, "unlocked": sim.unlocked.keys()}
+	var data := {"version": 2, "materials": sim.materials, "upgrade": sim.upgrade, "clears": sim.clears, "armor_unlocked": sim.armor_unlocked, "unlocked": sim.unlocked.keys(), "story_quest": sim.story_quest, "inventory": InventoryState.new(sim.inventory_state).to_dict()}
 	var serialized := JSON.stringify(data)
 	if serialized == last_save: return
 	var file := FileAccess.open("user://progress.tmp", FileAccess.WRITE)
@@ -493,20 +539,72 @@ func save_progress() -> void:
 	var err := DirAccess.rename_absolute("user://progress.tmp", "user://progress.json")
 	if err == OK: last_save = serialized
 
+func has_saved_game() -> bool:
+	return FileAccess.file_exists(RUN_SAVE)
+
+func save_game() -> bool:
+	if not playing or online: return false
+	save_progress()
+	var data := {"version": 2, "state": sim.snapshot(), "rng_state": sim.rng.state,
+		"arena_wait": sim.arena_wait, "uid": sim.uid, "reward_claimed": sim.reward_claimed,
+		"spectres": sim.spectres, "jump_gap": sim.jump_gap, "coop": sim.coop}
+	var file := FileAccess.open("user://expedition.tmp", FileAccess.WRITE)
+	if file == null: return false
+	file.store_var(data); file.flush()
+	var write_error := file.get_error()
+	file.close()
+	if write_error != OK: return false
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path("user://expedition.tmp"), ProjectSettings.globalize_path(RUN_SAVE)) == OK
+
+func return_to_title() -> bool:
+	if playing and not online and not save_game(): return false
+	disconnect_network()
+	playing = false; paused = false; map_open = false
+	previous_buttons.clear(); joy_aim.clear(); ui_input_block = 0.2
+	menu.open("main")
+	return true
+
+func load_game() -> bool:
+	if not has_saved_game(): return false
+	var file := FileAccess.open(RUN_SAVE, FileAccess.READ)
+	if file == null: return false
+	var data = file.get_var(false); file.close()
+	if not data is Dictionary or safe_int(data.get("version", 0)) not in [1, 2] or not data.get("state") is Dictionary: return false
+	var state: Dictionary = data.state
+	if state.get("mode") not in ["hub", "run", "arena"] or not state.get("actors") is Array or state.actors.size() != 2: return false
+	if not valid_saved_actor(state.actors[0]) or not valid_saved_actor(state.actors[1]): return false
+	var saved_spectres = state.get("spectres", data.get("spectres", []))
+	if not saved_spectres is Array or saved_spectres.size() != 2: return false
+	disconnect_network()
+	sim.apply_snapshot(state)
+	sim.rng.state = safe_int(data.get("rng_state", sim.rng.state), sim.rng.state)
+	sim.arena_wait = safe_float(data.get("arena_wait", 0.0)); sim.uid = safe_int(data.get("uid", 0))
+	sim.reward_claimed = data.get("reward_claimed", false) == true
+	if data.get("spectres") is Array and data.spectres.size() == 2: sim.spectres = data.spectres
+	sim.jump_gap = data.get("jump_gap", Rect2())
+	sim.coop = data.get("coop", "solo") if data.get("coop", "solo") in ["solo", "ai", "local"] else "solo"
+	sim.ob_grid_count = -1; sim.build_navigation()
+	playing = true; paused = false; map_open = false; previous_buttons.clear(); joy_aim.clear()
+	ui_input_block = 0.2; menu.hide()
+	return true
+
 func load_progress() -> void:
 	# 0.17: equipamento inicial definido no JSON; Titan e Spectre liberados durante os testes.
 	sim.set_unlocks(EquipmentData.starting_unlocks())
 	if not FileAccess.file_exists("user://progress.json"): sim.make_hub(); return
 	var data = JSON.parse_string(FileAccess.get_file_as_string("user://progress.json"))
-	if not data is Dictionary or data.get("version", 0) != 1: return
-	sim.materials = clampi(int(data.get("materials", 0)), 0, 9999)
-	sim.upgrade = clampi(int(data.get("upgrade", 0)), 0, 3)
-	sim.clears = clampi(int(data.get("clears", 0)), 0, 9999)
+	if not data is Dictionary or safe_int(data.get("version", 0)) not in [1, 2]: return
+	sim.materials = clampi(safe_int(data.get("materials", 0)), 0, 9999)
+	sim.upgrade = clampi(safe_int(data.get("upgrade", 0)), 0, 3)
+	sim.clears = clampi(safe_int(data.get("clears", 0)), 0, 9999)
+	sim.story_quest = clampi(safe_int(data.get("story_quest", 0)),0,2)
 	sim.armor_unlocked = data.get("armor_unlocked", false) == true
 	var saved = data.get("unlocked", [])
 	if saved is Array:
 		for id in saved:
 			if not EquipmentData.item(str(id)).is_empty(): sim.unlocked[str(id)] = true
+	if data.get("inventory") is Dictionary: sim.inventory_state = InventoryState.new(data.inventory).to_dict()
+	else: sim.inventory_state = InventoryState.new().to_dict()
 	sim.check_unlocks()      # saves antigos: libera o que o progresso (chefe, expedições) já garantia
 	sim.new_unlocks.clear()
 	sim.make_hub()
@@ -518,7 +616,7 @@ func capture() -> void:
 	if "--capture-arena" in OS.get_cmdline_user_args(): path = "res://test-output/arena-v06.png"
 	if "--capture-boss" in OS.get_cmdline_user_args(): path = "res://test-output/boss-v06.png"
 	if "--capture-docks-v04" in OS.get_cmdline_user_args(): path = "res://test-output/docks-v04.png"
-	for page in ["main", "play", "online", "equipment", "options"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
 		if "--capture-ui-" + page in OS.get_cmdline_user_args(): path = "res://test-output/ui-" + page + ".png"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-name="): path = "res://test-output/" + arg.trim_prefix("--capture-name=") + ".png"
@@ -531,4 +629,4 @@ func _notification(what: int) -> void:
 		paused = true; if_menu_show()
 
 func if_menu_show() -> void:
-	if menu != null and not menu.visible: menu.open("main")
+	if menu != null and not menu.visible: menu.open("pause")

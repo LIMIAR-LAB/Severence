@@ -89,7 +89,7 @@ func _draw() -> void:
 	var wsize: Vector2 = wtex.get_size() * minf(2.0, 80.0 / wtex.get_size().x)
 	draw_texture_rect(wtex, Rect2(Vector2(345, 44) - wsize * 0.5, wsize), false)
 	text(Vector2(380,48), "∞", 26, GOLD)
-	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
+	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else str(a.weapon_override).to_upper() if a.has("weapon_override") else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
 	if s.coop != "solo":
 		var partner: Dictionary = s.actors[1-id]
 		frame(Rect2(466,14,181,54)); text(Vector2(478,36), "PARCEIRO IA" if s.coop == "ai" else "PARCEIRO P2", 13, CYAN)
@@ -152,13 +152,14 @@ func draw_map_geometry(s, to_screen: Callable, scale_factor: float, clip: Rect2,
 		var target: Rect2 = Rect2(to_screen.call(r.position), r.size * scale_factor).intersection(clip)
 		if target.size.x > 0 and target.size.y > 0: draw_rect(target, MAP_ROOM_DIM)
 	for room in map_rooms(s):
-		var target: Rect2 = Rect2(to_screen.call(room.r.position), room.r.size * scale_factor).intersection(clip)
-		if target.size.x <= 0 or target.size.y <= 0: continue
 		var seen: bool = room_visible(s, room)
 		if not seen: continue
-		draw_rect(target, Color("5a2030") if room.get("locked", false) else MAP_ROOM)
-		draw_rect(target, MAP_LINE if seen else Color("50557a"), false, 2.0 if scale_factor > 0.1 else 1.0)
-		if room.r.has_point(a.p): draw_rect(target, Color(0.3, 0.9, 1, 0.18))
+		for rr in [room.r] + room.get("extra", []):
+			var target: Rect2 = Rect2(to_screen.call(rr.position), rr.size * scale_factor).intersection(clip)
+			if target.size.x <= 0 or target.size.y <= 0: continue
+			draw_rect(target, Color("5a2030") if room.get("locked", false) else MAP_ROOM)
+			draw_rect(target, MAP_LINE if seen else Color("50557a"), false, 2.0 if scale_factor > 0.1 else 1.0)
+			if rr.has_point(a.p): draw_rect(target, Color(0.3, 0.9, 1, 0.18))
 	for box in s.obstacles:
 		if s.mode == "run":
 			var br: Dictionary = s.room_at(box.get_center())
@@ -190,6 +191,10 @@ func draw_map_icons(s, to_screen: Callable, size: float, clip: Rect2) -> void:
 	for room in s.rooms:
 		if room.get("kind", "") == "boss" and not s.boss_dead: icons.append([room.r.get_center() + Vector2(0, 120), "boss", false])
 		if room.get("locked", false): icons.append([room.r.get_center(), "locked", false])
+	var story: Dictionary = s.room_at(s.STORY_NPC)
+	if not story.is_empty() and room_visible(s,story):
+		var location: Vector2 = to_screen.call(s.STORY_NPC)
+		if clip.has_point(location): draw_string(ThemeDB.fallback_font,location,"!",HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color("ffd36a"))
 	for pk in s.pickups:
 		if pk.kind == "key": icons.append([pk.p, "key", false])
 	if s.mech.deployed: icons.append([s.mech.p, "titan", false])

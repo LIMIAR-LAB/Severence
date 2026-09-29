@@ -16,21 +16,26 @@ OUT = ROOT / "scripts/docks_map.gd"
 
 # ─────────────────────────────────────────────────────────────── salas
 # id, nome, tipo, piso, rect (x, y, w, h)
+# id, nome, tipo, piso, rect principal, [retos extras] — alas/alcovas grudadas na sala (0.17)
 ROOMS = [
-    ("entry", "01 • DESEMBARQUE", "entry", "planks", (600, 6000, 1600, 1000)),
-    ("cranes", "02 • PÁTIO DOS GUINDASTES", "fight", "stone", (2500, 5800, 1900, 1300)),
-    ("warehouse", "03 • ARMAZÉM 7", "chest", "planks", (4700, 5900, 1600, 1100)),
-    ("market", "04 • MERCADO DE PEIXE", "fight", "cobble", (6600, 5900, 1500, 1100)),
-    ("shop", "05 • OFICINA", "shop", "cobble", (8400, 6000, 1100, 900)),
-    ("generator", "06 • O ÚLTIMO GERADOR", "side", "stone", (8300, 3900, 1300, 1100)),
-    ("ammo", "07 • DEPÓSITO DE MUNIÇÃO", "fight", "stone", (6200, 3700, 1700, 1300)),
-    ("rails", "08 • PÁTIO FERROVIÁRIO", "fight", "stone", (3900, 3700, 1900, 1300)),
-    ("stairs", "09 • BALCÃO DO FAROL", "stairs", "cobble", (1800, 3700, 1700, 1300)),
-    ("chapel", "10 • CAPELA DO CULTO", "chest", "cobble", (200, 3600, 1300, 1400)),
-    ("drydock", "11 • DOQUE SECO", "fight", "stone", (200, 1200, 1500, 1500)),
-    ("cellar", "13 • ADEGA INUNDADA", "chest", "planks", (7600, 1200, 1500, 1100)),
-    ("boss", "12 • O ALMIRANTE DAS PROFUNDEZAS", "boss", "stone", (3000, 400, 2400, 1800)),
-    ("secret", "? • CONTRABANDO", "secret", "planks", (5900, 900, 900, 700)),
+    ("entry", "01 • DESEMBARQUE", "entry", "planks", (600, 6000, 1600, 1000), []),
+    ("cranes", "02 • PÁTIO DOS GUINDASTES", "fight", "stone", (2500, 5800, 1900, 1300), []),
+    ("warehouse", "03 • ARMAZÉM 7", "chest", "planks", (4700, 5900, 1600, 1100), []),
+    ("market", "04 • MERCADO DE PEIXE", "fight", "cobble", (6600, 5900, 1500, 1100), []),
+    ("shop", "05 • OFICINA", "shop", "cobble", (8400, 6000, 1100, 900), []),
+    ("generator", "06 • O ÚLTIMO GERADOR", "side", "stone", (8300, 3900, 1300, 1100), []),
+    ("ammo", "07 • DEPÓSITO DE MUNIÇÃO", "fight", "stone", (6200, 3700, 1700, 1300), []),
+    ("rails", "08 • PÁTIO FERROVIÁRIO", "fight", "stone", (3900, 3700, 1900, 1300), []),
+    ("stairs", "09 • BALCÃO DO FAROL", "stairs", "cobble", (1800, 3700, 1700, 1300), []),
+    # Capela em T: duas relicarias abrem na parede de baixo, ladeando o corredor de entrada.
+    ("chapel", "10 • CAPELA DO CULTO", "chest", "cobble", (200, 3600, 1300, 1400), [(300, 5000, 300, 340), (1200, 5000, 300, 340)]),
+    # Doque Seco ganha uma doca menor em cima (atracação de serviço).
+    ("drydock", "11 • DOQUE SECO", "fight", "stone", (200, 1200, 1500, 1500), [(1400, 900, 500, 300)]),
+    # Adega em L: ala oeste alagada.
+    ("cellar", "13 • ADEGA INUNDADA", "chest", "planks", (7600, 1200, 1500, 1100), [(7000, 1400, 600, 600)]),
+    # Arena do Almirante: alcovas laterais no meio — a silhueta deixa de ser um retângulo.
+    ("boss", "12 • O ALMIRANTE DAS PROFUNDEZAS", "boss", "stone", (3000, 400, 2400, 1800), [(2600, 700, 400, 500), (5400, 800, 300, 600)]),
+    ("secret", "? • CONTRABANDO", "secret", "planks", (5900, 900, 900, 700), []),
 ]
 R = {r[0]: r[4] for r in ROOMS}
 
@@ -77,21 +82,22 @@ POINTS = {
 CHESTS = [(6150, 6080, False), (850, 3800, False), (8850, 1400, False), (6350, 1150, True)]
 
 # Estilo das bordas de cada sala: top facade|wall|none, bottom wall|quay|none, left/right wall|pier.
+# wall_set (0.17): pele da fachada por ambiente — default = tijolo de armazém.
 ROOM_STYLE = {
     "entry": {"top": "facade", "bottom": "quay", "left": "pier", "quay_band": 180},
     "cranes": {"top": "facade", "bottom": "quay", "quay_band": 150},
     "warehouse": {"top": "facade", "bottom": "wall"},
     "market": {"top": "facade", "bottom": "quay", "quay_band": 140, "floor_set": "market"},
     "shop": {"top": "facade", "bottom": "quay", "right": "pier", "quay_band": 130, "floor_set": "workshop"},
-    "generator": {"top": "facade", "bottom": "wall"},
-    "ammo": {"top": "facade", "bottom": "wall"},
-    "rails": {"top": "facade", "bottom": "wall"},
-    "stairs": {"top": "facade", "bottom": "wall"},
-    "chapel": {"top": "facade", "bottom": "wall", "left": "pier", "floor_set": "chapel", "floor_patch": (640, 3700, 420, 1300)},
-    "drydock": {"top": "facade", "bottom": "wall", "left": "pier"},
-    "cellar": {"top": "facade", "bottom": "wall", "right": "pier"},
-    "boss": {"top": "facade", "bottom": "wall"},
-    "secret": {"top": "facade", "bottom": "wall"},
+    "generator": {"top": "facade", "bottom": "wall", "wall_set": "rail"},
+    "ammo": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "depot"},
+    "rails": {"top": "facade", "bottom": "wall", "wall_set": "rail"},
+    "stairs": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "lighthouse"},
+    "chapel": {"top": "facade", "bottom": "wall", "left": "pier", "wall_set": "cult", "floor_set": "chapel", "floor_patch": (640, 3700, 420, 1300)},
+    "drydock": {"top": "facade", "bottom": "wall", "left": "pier", "wall_set": "rail", "floor_set": "drydock"},
+    "cellar": {"top": "facade", "bottom": "wall", "right": "pier", "wall_set": "abyssal", "floor_set": "cellar"},
+    "boss": {"top": "facade", "bottom": "wall", "wall_set": "abyssal", "floor_set": "boss"},
+    "secret": {"top": "facade", "bottom": "wall", "wall_set": "abyssal"},
 }
 # Mar visível (aparece junto com a sala dona).
 WATER = [
@@ -114,6 +120,8 @@ extra("cranes", 4400, 5800, 300, 300)      # 02 Guindastes: baia à direita
 extra("rails", 5800, 3700, 300, 320)       # 08 Ferroviário: baia à direita
 extra("market", 6320, 5900, 280, 260)      # 04 Mercado: reentrância à esquerda
 extra("warehouse", 4700, 7000, 320, 300)   # 03 Armazém: baia embaixo
+# 0.19: "entry" agora é a composição pintada do Desembarque (arrival_art.gd) — não usa ala/props
+# procedurais. Revertido para não conflitar com os pisos mapeados na imagem (docs/DESEMBARQUE_ARTISTICO_0_19.md).
 
 # 0.16: PORTÕES DE TENTÁCULO — poça que bloqueia um corredor e fere quem encosta (active) até o evento
 # ligado a ela acontecer; aí vira grade selada (sealed), segura e atravessável.
@@ -195,23 +203,8 @@ def hazard(x, y, r=62, dmg=12):
     HAZ.append({"p": (x, y), "r": r, "damage": dmg})
     dec("tentacle_pool", x, y)
 
-# ── 01 Desembarque (mockup da Sala 01) ──
-x0, y0 = 600, 6000
-facade_decor("entry", [("poster", 380), ("iron_door", 760), ("iron_door", 1250)])
-dec("rowboat", 330, 6300); dec("rowboat", 1200, 7250)
-dec("rails_diag", 700, 6130, to=(2150, 6700))
-crate_pile(720, 6140, 0); barrels(720, 6280)
-crate_pile(760, 6760, 1); ob("lobster_trap", 900, 6700); ob("fish_basket", 1000, 6780)
-ob("crate_net", 1380, 6140); ob("crate", 1440, 6140)
-col("sandbags", 1720, 6560, 4, 40); ob("sandbags_corner", 1830, 6720)
-ob("container_open", 2040, 6200); ob("crate", 1960, 6330); ob("crate_2", 2060, 6330)
-ob("lamp_post", 1180, 6420); ob("lamp_post", 1960, 6560); ob("brazier", 1540, 6420)
-ob("wheelbarrow", 1990, 6720); dec("anchor", 2120, 6760)
-row("bollard", 760, 6930, 5, 320)
-hazard(1250, 6680)
-dec("symbol_0", 1000, 6330); dec("symbol_1", 1760, 6250); dec("grate", 1320, 6250); dec("manhole", 1620, 6910)
-dec("rope", 1100, 6560); dec("debris_crate", 1560, 6760)
-spawns("dock", [(1500, 6300), (1850, 6400), (1650, 6850)])
+# ── 01 Desembarque 0.19: composição pintada, colisão derivada do piso.
+spawns("dock", [(1450, 6380), (1710, 6580), (1510, 6790)])
 
 # ── 02 Pátio dos Guindastes ──
 facade_decor("cranes", [("poster", 520), ("iron_door", 980), ("poster", 1480)])
@@ -386,16 +379,20 @@ GROUPS = {"dock": ["crawler", "fish"], "mix": ["cult", "fish", "brute", "crawler
 def rect_has(r, x, y): return r[0] <= x < r[0] + r[2] and r[1] <= y < r[1] + r[3]
 def grow(r, m): return (r[0] - m, r[1] - m, r[2] + 2 * m, r[3] + 2 * m)
 
+def room_rects(room):
+    return [room[4]] + list(room[5])
+
 def check_corridors():
     rooms = [r for r in ROOMS if r[2] != "secret"]
     for c in CORRIDORS:
-        ends = 0
-        for rid, *_rest, rr in rooms:
-            sx = c[0] < rr[0] + rr[2] and c[0] + c[2] > rr[0]
-            sy = c[1] < rr[1] + rr[3] and c[1] + c[3] > rr[1]
-            if (sx and (abs(c[1] + c[3] - rr[1]) < 3 or abs(c[1] - (rr[1] + rr[3])) < 3)) or \
-               (sy and (abs(c[0] + c[2] - rr[0]) < 3 or abs(c[0] - (rr[0] + rr[2])) < 3)): ends += 1
-        assert ends == 2, f"corredor {c} encosta em {ends} salas (esperado 2)"
+        ends = set()
+        for room in rooms:
+            for rr in room_rects(room):
+                sx = c[0] < rr[0] + rr[2] and c[0] + c[2] > rr[0]
+                sy = c[1] < rr[1] + rr[3] and c[1] + c[3] > rr[1]
+                if (sx and (abs(c[1] + c[3] - rr[1]) < 3 or abs(c[1] - (rr[1] + rr[3])) < 3)) or \
+                   (sy and (abs(c[0] + c[2] - rr[0]) < 3 or abs(c[0] - (rr[0] + rr[2])) < 3)): ends.add(room[0]); break
+        assert len(ends) == 2, f"corredor {c} encosta em {len(ends)} salas (esperado 2)"
 
 def walkable(x, y, rad, floors, blocks):
     for ox, oy in ((0, 0), (rad, 0), (-rad, 0), (0, rad), (0, -rad)):
@@ -418,7 +415,7 @@ def reach(seen, p, step=10, tol=30):
 
 def validate():
     check_corridors()
-    floors = [r[4] for r in ROOMS if r[2] != "secret"] + CORRIDORS + EXTRA_FLOORS + [RAMPS[0][0], RAMPS[1][0]] + [e for exs in ROOM_EXTRA.values() for e in exs]
+    floors = [rr for r in ROOMS if r[2] != "secret" for rr in room_rects(r)] + CORRIDORS + EXTRA_FLOORS + [RAMPS[0][0], RAMPS[1][0]]
     obstacles = [tuple(o[:4]) for o in OB]
     # portas livres: nenhum obstáculo encosta na boca de um corredor
     bad = []
@@ -434,11 +431,11 @@ def validate():
     gates = [g["block"] for g in TENTACLE_GATES]
     for sc in SHORTCUTS: assert any(rect_has(R[sc["room"]], sc["wall"][0] + 5, sc["wall"][1] + sc["wall"][3] - 5) for _ in [0]), f"atalho fora da sala {sc}"
     marty = flood(POINTS["spawn"], 11, floors, obstacles + list(GAPS) + raised_block + gates)
-    for rid, name, kind, fl, rr in ROOMS:
+    for room in ROOMS:
+        rid, kind = room[0], room[2]
         if kind == "secret": continue
-        cx, cy = rr[0] + rr[2] / 2, rr[1] + rr[3] / 2
-        ok = any(rect_has(rr, c[0] * 10, c[1] * 10) for c in marty)
-        assert ok, f"sala {rid} não é alcançável a pé"
+        ok = all(any(rect_has(rr, c[0] * 10, c[1] * 10) for c in marty) for rr in room_rects(room))
+        assert ok, f"sala {rid} não é alcançável a pé (incluindo alas extras)"
     for k in ("key", "shop", "side", "boss", "extraction", "mech"):
         assert reach(marty, POINTS[k], tol=60), f"ponto {k} não alcançável"
     for x, y, secret in CHESTS:
@@ -464,6 +461,57 @@ def validate():
           f"{len(SPAWNS)} inimigos + {sum(len(v) for v in WAVES.values())} de reforço, {len(HAZ)} perigos")
 
 # ─────────────────────────────────────────────────────────────── saída
+# 0.17: salas sem combate e paredes internas preservadas pelo gerador.
+def inside_room(p, room):
+    x,y,w,h=R[room]
+    return x <= p[0] <= x+w and y <= p[1] <= y+h
+ROOMS = [(i,n,("maze" if i=="warehouse" else "story" if i=="chapel" else k),f,r,ex) for i,n,k,f,r,ex in ROOMS]
+OB[:] = [o for o in OB if not inside_room(o,"warehouse")]
+GAPS[:] = [g for g in GAPS if not inside_room(g,"warehouse")]
+SPAWNS[:] = [p for p in SPAWNS if not any(inside_room(p,r) for r in ["warehouse","chapel"])]
+for r in ["warehouse","chapel"]: WAVES.pop(r,None)
+HAZ[:] = [h for h in HAZ if not any(inside_room(h["p"],r) for r in ["warehouse","chapel"])]
+OB.extend([(5100,6000,90,650,"maze_wall"),(5680,6370,90,530,"maze_wall")])
+# 0.17 (Tarefa C): colunas interiores do Depósito — quebram o retângulo vazio.
+OB.extend([(6680,4280,90,470,"maze_wall"),(7420,3900,90,430,"maze_wall")])
+for pos,kind,phase in [((5300,6800),"spikes",0),((5470,6150),"darts",0.8),((6000,6510),"steam",1.6)]:
+    HAZ.append({"p":pos,"r":75,"damage":12,"trap":kind,"offset":phase})
+CHESTS[:] = [c for c in CHESTS if not inside_room(c,"warehouse")]
+CHESTS.append((6100,6100,False))
+DEC[:] = [d for d in DEC if not (d[2] == "tentacle_pool" and any(inside_room(d,r) for r in ["warehouse","chapel"]))]
+
+# 0.18: esquadrões fixos por sala, sem sorteio de classes.
+SQUADS = {
+    "entry": ["crawler", "fish", "cult"],
+    "rails": ["guard", "brute", "bomber", "cult"],
+    "market": ["fish", "crawler", "guard", "bomber"],
+    "cellar": ["crawler", "cult", "bomber"],
+    "ammo": ["brute", "guard", "fish", "bomber"],
+}
+counts = {}
+for point in SPAWNS:
+    room = next((rid for rid in R if inside_room(point, rid)), "dock")
+    squad = SQUADS.get(room, ["cult", "guard", "crawler", "fish", "bomber", "brute"])
+    index = counts.get(room, 0); counts[room] = index + 1
+    point[2] = squad[index % len(squad)]
+for room, points in WAVES.items():
+    squad = SQUADS.get(room, ["guard", "bomber", "cult", "crawler"])
+    for index, point in enumerate(points): point[2] = squad[index % len(squad)]
+
+# Integração 0.18: preservar alas adicionadas na main e nas salas especiais.
+ROOMS = [(i,n,k,f,r,list(dict.fromkeys(list(ex) + ROOM_EXTRA.get(i, [])))) for i,n,k,f,r,ex in ROOMS]
+ROOM_EXTRA = {i: ex for i,n,k,f,r,ex in ROOMS if ex}
+
+# 0.19: somente superfícies de pedra da arte são caminháveis. Água/navio não são piso.
+ENTRY_ART_BOUNDS = (187, 6000, 2013, 1280)
+ENTRY_RECTS = [(600,6380,1240,540), (600,6260,1050,120), (900,6000,200,260), (1840,6400,360,230), (1600,6920,160,65)]
+ROOMS = [(i,n,k,("stone" if i=="entry" else f),(ENTRY_RECTS[0] if i=="entry" else r),(ENTRY_RECTS[1:] if i=="entry" else ex)) for i,n,k,f,r,ex in ROOMS]
+R["entry"] = ENTRY_RECTS[0]
+ROOM_EXTRA["entry"] = ENTRY_RECTS[1:]
+ROOM_STYLE["entry"] = {"painted": True, "top":"none", "bottom":"none", "left":"none", "right":"none"}
+POINTS["spawn"] = (850,6550)
+POINTS["spawn2"] = (920,6590)
+
 def v2(p): return f"Vector2({p[0]}, {p[1]})"
 def r2(r): return f"Rect2({r[0]}, {r[1]}, {r[2]}, {r[3]})"
 def val(x):
@@ -473,6 +521,7 @@ def val(x):
     if isinstance(x, tuple) and len(x) == 2: return v2(x)
     if isinstance(x, tuple) and len(x) == 4: return r2(x)
     if isinstance(x, dict): return "{" + ", ".join(f'"{k}": {val(v)}' for k, v in x.items()) + "}"
+    if isinstance(x, list): return "[" + ", ".join(val(i) for i in x) + "]"
     raise TypeError(x)
 
 def chunks(items, n=6):
@@ -481,10 +530,15 @@ def chunks(items, n=6):
 def emit():
     L = ["extends RefCounted", "",
          "# Mapa FIXO das Docas de 1941 — 0.13. GERADO por tools/build_docks_map.py (edite lá e rode o script).",
-         "# 13 salas + sala secreta, com laços estilo Enter the Gungeon. A seed só varia os tipos de inimigo.",
+         "# 13 salas + sala secreta, com laços estilo Enter the Gungeon. Esquadrões fixos; a seed varia posições e elites.",
          "# Obstáculos: [x, y, w, h, tipo] (caixa = pés do prop). Decoração: [x, y, tipo, extras?].", ""]
+    L.append("const ENTRY_ART_BOUNDS := " + r2(ENTRY_ART_BOUNDS))
+    L.append("const ENTRY_RECTS := " + val(ENTRY_RECTS))
     L.append("const ROOMS := [")
-    L.append(",\n".join(f'\t{{"id": "{i}", "name": "{n}", "kind": "{k}", "floor": "{f}", "r": {r2(r)}}}' for i, n, k, f, r in ROOMS) + "]")
+    def room_dict(i, n, k, f, r, ex):
+        d = f'{{"id": "{i}", "name": "{n}", "kind": "{k}", "floor": "{f}", "r": {r2(r)}'
+        return d + (f', "extra": {val(list(ex))}}}' if ex else "}")
+    L.append(",\n".join(room_dict(*rm) for rm in ROOMS) + "]")
     L.append(""); L.append("const EXTRA_FLOORS := [" + ", ".join(r2(r) for r in EXTRA_FLOORS) + "]")
     L.append("const ROOM_EXTRA := {" + ", ".join(f'"{k}": [' + ", ".join(r2(e) for e in v) + "]" for k, v in ROOM_EXTRA.items()) + "}")
     L.append("const CORRIDORS := [\n\t" + ",\n\t".join(", ".join(r2(c) for c in ch) for ch in chunks(CORRIDORS, 4)) + "]")
@@ -500,7 +554,7 @@ def emit():
     L.append("const ROOM_STYLE := {\n\t" + ",\n\t".join(f'"{k}": {val(v)}' for k, v in ROOM_STYLE.items()) + "}")
     L.append("const WATER := [\n\t" + ",\n\t".join(f'{{"room": "{rid}", "r": {r2(r)}}}' for rid, r in WATER) + "]")
     L.append("# Perigos: poça com tentáculo (pisar = meio coração e empurrão; saltar escapa).")
-    L.append("const HAZARDS := [\n\t" + ",\n\t".join(f'{{"p": {v2(h["p"])}, "r": {h["r"]}.0, "damage": {h["damage"]}.0}}' for h in HAZ) + "]")
+    L.append("const HAZARDS := [\n\t" + ",\n\t".join(val(h) for h in HAZ) + "]")
     L.append("# 0.16: atalhos (parede rachada que a explosão abre) e portões de tentáculo (selam num evento).")
     L.append("const SHORTCUTS := [\n\t" + ",\n\t".join(f'{{"r": {r2(c["r"])}, "wall": {r2(c["wall"])}, "room": "{c["room"]}"}}' for c in SHORTCUTS) + "]")
     L.append("const TENTACLE_GATES := [\n\t" + ",\n\t".join(f'{{"p": {v2(g["p"])}, "block": {r2(g["block"])}, "event": "{g["event"]}", "damage": {g["damage"]}.0}}' for g in TENTACLE_GATES) + "]")

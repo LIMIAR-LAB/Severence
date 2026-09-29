@@ -2,6 +2,8 @@ class_name DockView
 extends Node2D
 const DocksMap = preload("res://scripts/docks_map.gd")
 const SummonFX = preload("res://scripts/summon_fx.gd")
+const ArrivalArt = preload("res://scripts/arrival_art.gd")
+var arrival_art := ArrivalArt.new()
 const Scenery = preload("res://scripts/dock_scenery.gd")
 
 # Camada de luz (modo aditivo) desenhada por cima do mundo: postes, janelas, braseiros, explosões.
@@ -28,7 +30,12 @@ var dock_art: Dictionary = {}
 var font: Font
 var outfit_texture: Texture2D
 var marty_anim: Texture2D
+var marty_padrao_actions: Dictionary = {}
+var marty_roll: Dictionary = {}
+var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
+var special_enemy_art: Dictionary = {}
+var pixellab_enemy_art: Dictionary = {}
 var weapon_art: Dictionary = {}
 var cockpit_texture: Texture2D
 var titan_v2: Texture2D
@@ -39,9 +46,14 @@ var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
+const MARTY_PADRAO_ROOT := "res://assets/characters/marty/padrao/pixellab/"
+const MARTY_PADRAO_FRAMES := {
+	"idle": 4, "run": 8, "jump": 9, "evade": 6,
+	"shoot": 3, "melee": 6, "hurt": 6, "defeat": 7,
+}
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
-const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v2.png"
+const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
@@ -51,6 +63,9 @@ const GOLD := Color("e9bc77")
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	for kind in ["bomber", "guard"]: special_enemy_art[kind] = load("res://assets/enemies/" + kind + ".png")
+	# 0.20: oito direções e quatro passadas por inimigo, pivô nos pés.
+	for kind in ["bomber", "guard"]: pixellab_enemy_art[kind] = load("res://assets/enemies/" + kind + "_pixellab_v1.png")
 	marty_texture = load("res://assets/marty/marty-v2.png")
 	mech_texture = load("res://assets/mech/titan.png")
 	action_texture = load("res://assets/marty/actions-v2.png")
@@ -64,6 +79,15 @@ func _ready() -> void:
 	outfit_texture = load("res://assets/marty/outfits.png")
 	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
 	marty_anim = load(MARTY_ATLAS_PATH)
+	# Marty Padrao usa arte propria em oito direcoes, sem espelhar detalhes assimetricos.
+	for action in MARTY_PADRAO_FRAMES:
+		marty_padrao_actions[action] = load(MARTY_PADRAO_ROOT + action + ".png")
+	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
+	for direction in ["side", "front_diag", "back_diag"]:
+		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
+	marty_teleport["side"] = load("res://assets/marty/marty_teleport_side_v1.png")
+	marty_teleport["front_diag"] = load("res://assets/marty/marty_teleport_diagonal_v1.png")
+	marty_teleport["back_diag"] = marty_teleport["front_diag"]
 	# 0.15: Titan fechado, sem piloto exposto, com olhos ciano no visor blindado.
 	titan_v2 = load(TITAN_ATLAS_PATH)
 	cockpit_texture = load("res://assets/mech/titan_cockpit.png")
@@ -114,6 +138,8 @@ func view_rect() -> Rect2:
 func floor_kind(rect: Rect2) -> String:
 	for room in sim.rooms:
 		if room.r.encloses(rect) or room.r.has_point(rect.get_center()): return room.get("floor", "stone")
+		for ex in room.get("extra", []):
+			if ex.encloses(rect) or ex.has_point(rect.get_center()): return room.get("floor", "stone")
 	return "stone"
 
 func tile_floor(rect: Rect2, view: Rect2, kind: String) -> void:
@@ -141,6 +167,7 @@ func draw_expedition_ground() -> void:
 	vis_rooms = scenery.discovered_rooms(sim)
 	vis_floors = scenery.visible_floors(sim, vis_rooms)
 	scenery.draw_water(self, sim, vis_rooms, view)
+	arrival_art.draw_ground(self, sim, vis_rooms, view, scenery.lights)
 	scenery.draw_floors(self, sim, vis_floors, vis_rooms, view)
 	scenery.draw_floor_grunge(self, sim, vis_floors, view)
 	# balcão elevado e rampas
@@ -169,8 +196,10 @@ func draw_expedition_ground() -> void:
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
+	arrival_art.draw_rift(self, sim, scenery.lights)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
+		if h.has("trap") and seen(h.p): scenery.draw_trap(self,sim,h,t)
 		var alert := false
 		for a in sim.actors:
 			if a.active and not a.dead and a.p.distance_to(h.p) < h.r + 90: alert = true
@@ -204,7 +233,7 @@ func draw_expedition_ground() -> void:
 		draw_chest(chest)
 		if not chest.open:
 			draw_rect(Rect2(p - Vector2(4, 9), Vector2(8, 10)), CYAN if chest.secret else GOLD)
-			text_at(p + Vector2(-30, 25), "E • 1 chave", Color("c9b99c"), 12)
+			text_at(p + Vector2(-30, 25), "E • grátis" if chest.get("reward",false) else "E • 1 chave", Color("c9b99c"), 12)
 			scenery.lights.append({"p": p - Vector2(0, 20), "kind": "cyan" if chest.secret else "bulb"})
 	scenery.draw_reveal(self, sim, vis_rooms)
 
@@ -213,7 +242,7 @@ func draw_decor(d: Dictionary) -> void:
 	match d.kind:
 		"puddle": draw_texture(docks_art.puddle, p - Vector2(60, 25), Color(1, 1, 1, 0.85 + 0.15 * sin(sim.tick_time + p.x)))
 		"oil":
-			draw_set_transform(p, 0, Vector2(1, 0.45)); draw_circle(Vector2.ZERO, 34, Color(0.04, 0.04, 0.06, 0.55)); draw_circle(Vector2(-8, -6), 10, Color(0.3, 0.2, 0.4, 0.25)); draw_set_transform(Vector2.ZERO)
+			visual_transform(p, 0, Vector2(1, 0.45)); draw_circle(Vector2.ZERO, 34, Color(0.04, 0.04, 0.06, 0.55)); draw_circle(Vector2(-8, -6), 10, Color(0.3, 0.2, 0.4, 0.25)); visual_transform(Vector2.ZERO)
 		"rope": draw_texture_rect(dock_art.rope, Rect2(p - Vector2(29, 23), Vector2(58, 46)), false)
 		"anchor": draw_texture(docks_art.anchor, p - Vector2(30, 35))
 		"candles":
@@ -231,8 +260,8 @@ func draw_decor(d: Dictionary) -> void:
 func draw_obstacle(box: Rect2, kind: String) -> void:
 	if scenery.has_prop(kind) or kind == "crate_row":
 		scenery.draw_obstacle(self, box, kind, sim.tick_time); return
-	draw_set_transform(Vector2(box.position.x + box.size.x * 0.5, box.end.y + 4), 0, Vector2(1, 0.3))
-	draw_circle(Vector2.ZERO, box.size.x * 0.55, Color(0, 0, 0, 0.3)); draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2(box.position.x + box.size.x * 0.5, box.end.y + 4), 0, Vector2(1, 0.3))
+	draw_circle(Vector2.ZERO, box.size.x * 0.55, Color(0, 0, 0, 0.3)); visual_transform(Vector2.ZERO)
 	match kind:
 		"container_red", "container_blue", "container_olive":
 			draw_texture_rect(docks_art[kind], Rect2(box.position - Vector2(0, 34), Vector2(box.size.x, box.size.y + 34)), false)
@@ -259,7 +288,7 @@ func draw_entities() -> void:
 	for pickup in sim.pickups:
 		if not seen(pickup.p): continue
 		var p: Vector2 = pickup.p + Vector2(0, sin(sim.tick_time * 4) * 3)
-		draw_set_transform(pickup.p + Vector2(0, 6), 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 10, Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+		visual_transform(pickup.p + Vector2(0, 6), 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 10, Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
 		if pickup.kind == "key":
 			draw_circle(p - Vector2(0, 10), 16, Color(1, 0.85, 0.4, 0.15))
 			draw_texture_rect(docks_art.key, Rect2(p - Vector2(12, 26), Vector2(24, 27)), false)
@@ -276,6 +305,10 @@ func draw_entities() -> void:
 			draw_rect(Rect2(p - Vector2(2, 28), Vector2(4, 4)), Color(0.7, 0.95, 1))
 			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 3)), Color(0.85, 0.75, 0.3))
 		else: draw_texture_rect(docks_art.coin, Rect2(p - Vector2(8, 18), Vector2(16, 18)), false)
+	if sim.mode == "run" and seen(sim.STORY_NPC):
+		var npc: Vector2 = sim.STORY_NPC
+		draw_texture_rect_region(marty_anim,Rect2(npc-Vector2(48,92),Vector2(96,96)),Rect2(0,5*96,96,96),Color(0.65,0.85,1))
+		text_at(npc+Vector2(-65,-105),"PESCADOR • E",GOLD,14)
 	var drawable: Array = []
 	if sim.mode == "run":
 		var view := view_rect()
@@ -298,7 +331,11 @@ func draw_entities() -> void:
 		if s.state == "following" and not SummonFX.robot_hidden(sim.effects, "spectre", s.owner): drawable.append({"type": "spectre", "data": s, "y": s.p.y})
 	if sim.mode == "hub": drawable.append({"type": "core", "data": {}, "y": 436.0})
 	drawable.sort_custom(func(a, b): return a.y < b.y)
+	draw_combat_warnings()
 	for thing in drawable:
+		visual_scale = 1.12 if thing.type in ["actor", "enemy", "mech", "spectre"] else 1.0
+		visual_origin = thing.data.get("p", Vector2.ZERO)
+		visual_transform(Vector2.ZERO)
 		match thing.type:
 			"actor": draw_actor(thing.data)
 			"enemy": draw_enemy(thing.data)
@@ -308,6 +345,7 @@ func draw_entities() -> void:
 			"capsule": draw_capsule()
 			"spectre": draw_spectre(thing.data)
 			"core": draw_texture(refuge_core, CORE_OFFSET, Color(1, 1, 1, core_alpha()))
+	visual_scale = 1.0; visual_origin = Vector2.ZERO; visual_transform(Vector2.ZERO)
 	for b in sim.bullets:
 		if not seen(b.p): continue
 		var bullet_pos: Vector2 = b.p - Vector2(0, 28)
@@ -319,14 +357,23 @@ func draw_entities() -> void:
 			draw_circle(landing + Vector2(0, 4), sim.MECH_BOMB.radius * 0.55, Color(1, 0.3, 0.25, 0.08))
 			draw_bomb(b); continue
 		if kind == "p_heavy":
-			draw_circle(bullet_pos, b.r + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
+			draw_circle(bullet_pos, b.r * 1.15 + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r * 1.15, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
 			draw_line(bullet_pos, bullet_pos - b.v.normalized() * 34, Color(0.7, 0.7, 0.75, 0.35), b.r)
 			scenery.lights.append({"p": b.p, "kind": "bulb"}); continue
+		var visual_radius: float = b.get("visual_r",b.r) * 1.15
+		if b.get("arc", false):
+			draw_arc(b.to, 62, 0, TAU, 36, Color("ffe281"), 3)
+			bullet_pos -= Vector2(0, sin(clampf(b.get("age", 0.0) / b.flight, 0, 1) * PI) * 90)
+		if b.team == 1:
+			draw_circle(bullet_pos,visual_radius+2,Color("11101c"))
+			draw_circle(bullet_pos,visual_radius,Color("f965ae"))
+			draw_circle(bullet_pos,visual_radius*0.45,Color("fff4db"))
+			continue
 		if projectile_art.has(kind):
 			var tex: Texture2D = projectile_art[kind]
-			draw_set_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
-			draw_texture(tex, -tex.get_size() * 0.5)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
+			draw_texture_rect(tex, Rect2(-tex.get_size()*0.8625,tex.get_size()*1.725),false)
+			visual_transform(Vector2.ZERO)
 			continue
 		var c := CYAN if b.team == 0 else Color("fa6dbc")
 		draw_line(bullet_pos - b.v.normalized() * 14, bullet_pos, Color(c, 0.55), b.r)
@@ -342,15 +389,15 @@ func draw_entities() -> void:
 		elif fx.kind == "slash":
 			var t: float = clampf(1.0 - fx.life / 0.18, 0, 1)
 			var frame := 0 if t < 0.3 else (1 if t < 0.7 else 2)
-			draw_set_transform(fx.p - Vector2(0, 32), fx.dir.angle(), Vector2(0.85, 0.85) * fx.reach / 78.0)
+			visual_transform(fx.p - Vector2(0, 32), fx.dir.angle(), Vector2(0.85, 0.85) * fx.reach / 78.0)
 			draw_texture_rect_region(weapon_art.sword_smear, Rect2(-56, -56, 112, 112), Rect2(frame * 112, 0, 112, 112), Color(1.0, 0.85, 0.55, 1.0 - t * 0.5))
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 		elif fx.kind == "corpse": pass  # desenhado antes dos vivos
 		elif fx.kind == "casing":
 			var t: float = 1.0 - fx.life / fx.max
 			var cp: Vector2 = fx.p + fx.dir * t * 26 + Vector2(0, -30 - sin(t * PI) * 22 + t * 26)
-			draw_set_transform(cp, t * 18.0)
-			draw_rect(Rect2(-2, -1, 4, 2), Color("e0b050")); draw_set_transform(Vector2.ZERO)
+			visual_transform(cp, t * 18.0)
+			draw_rect(Rect2(-2, -1, 4, 2), Color("e0b050")); visual_transform(Vector2.ZERO)
 		elif fx.kind == "impact":
 			var t: float = 1.0 - fx.life / fx.max
 			var c := Color(0.5, 1, 1, 1 - t) if fx.omega else Color(1, 0.75, 0.35, 1 - t)
@@ -386,17 +433,17 @@ func draw_entities() -> void:
 			var frame := 0 if t < 0.3 else (1 if t < 0.7 else 2)
 			var big := 1.4 if fx.combo == 2 else 1.05
 			var flip_y := -1.0 if (fx.combo == 1) != (fx.dir.x < 0) else 1.0
-			draw_set_transform(owner.p - Vector2(0, 38), fx.dir.angle(), Vector2(big, big * flip_y))
+			visual_transform(owner.p - Vector2(0, 38), fx.dir.angle(), Vector2(big, big * flip_y))
 			draw_texture_rect_region(weapon_art.sword_smear, Rect2(-56, -56, 112, 112), Rect2(frame * 112, 0, 112, 112), Color(1, 1, 1, 1.0 - t * 0.5))
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 		elif fx.kind == "transform": draw_transform_fx(fx)
 		elif fx.kind == "shockwave":
 			var t: float = 1.0 - fx.life / fx.max
-			draw_set_transform(fx.p, 0, Vector2(1, 0.5))
+			visual_transform(fx.p, 0, Vector2(1, 0.5))
 			for k in range(3):
 				var r := t * (190 + k * 40)
 				draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(0.55, 1, 1, (1 - t) * (0.9 - k * 0.25)), 6 - k * 1.5)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 			for n in range(14):
 				var d := Vector2.RIGHT.rotated(n * TAU / 14)
 				draw_rect(Rect2(fx.p + d * t * 170 * Vector2(1, 0.5) - Vector2(2, 6 + sin(t * PI) * 26), Vector2(4, 4)), Color(0.75, 0.7, 0.6, 1 - t))
@@ -408,9 +455,9 @@ func draw_entities() -> void:
 		elif fx.kind == "weapon_drop":
 			var k: float = 1.0 - fx.life / fx.max
 			var tex: Texture2D = projectile_art.boss_harpoon
-			draw_set_transform(fx.p + Vector2(k * 40, -40 + k * k * 120), k * 5.0)
+			visual_transform(fx.p + Vector2(k * 40, -40 + k * k * 120), k * 5.0)
 			draw_texture(tex, -tex.get_size() * 0.5, Color(1, 1, 1, fx.life / fx.max))
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 		elif fx.kind in ["explosion", "tentacle_strike", "gate_open", "gate_slam", "shield_hit", "spawn_portal", "prop_break", "splinter", "splash", "flash", "recoil"]: draw_fx_013(fx)
 		else: draw_circle(fx.p, 8, GOLD)
 
@@ -498,9 +545,9 @@ func draw_capsule() -> void:
 			draw_rect(Rect2(glass.position.x + 8 + (n * 17) % 60, glass.end.y - h, 3, 3), Color(0.8, 1, 1, 1 - h / glass.size.y))
 		for k in range(3):
 			var ry := fposmod(t * 40 + k * 45, 150.0)
-			draw_set_transform(P - Vector2(0, 20 + ry), 0, Vector2(1, 0.3))
+			visual_transform(P - Vector2(0, 20 + ry), 0, Vector2(1, 0.3))
 			draw_arc(Vector2.ZERO, 58, 0, TAU, 32, Color(0.5, 1, 1, 0.8 - ry / 190.0), 3)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 		text_at(P + Vector2(-68, 70), "E • EXTRAÇÃO", CYAN, 16)
 	else:
 		draw_rect(glass, Color(0.05, 0.1, 0.15, 0.5))
@@ -510,14 +557,38 @@ func direction_row(aim: Vector2) -> int:
 	if absf(aim.x) > absf(aim.y): return 1 if aim.x < 0 else 2
 	return 3 if aim.y < 0 else 0
 
+func enemy_octant(face: Vector2) -> int:
+	if face.length_squared() < 0.01: return 0
+	return posmod(roundi((PI * 0.5 - face.angle()) / (PI * 0.25)), 8)
+
+# 0.19: três vistas de esquiva, espelhadas para cobrir as oito direções.
+func marty_dash_view(direction: Vector2) -> String:
+	if absf(direction.y) < absf(direction.x) * 0.45: return "side"
+	return "front_diag" if direction.y >= 0 else "back_diag"
+
+func draw_marty_dodge(a: Dictionary, pos: Vector2, outfit: String, tint: Color) -> void:
+	var direction: Vector2 = a.dash_dir
+	var view_key := marty_dash_view(direction)
+	var frame := clampi(int((1.0 - a.dodge / 0.20) * 4.0), 0, 3)
+	var omega := outfit == "omega"
+	var texture: Texture2D = marty_teleport[view_key] if omega else marty_roll[view_key]
+	var row: int = (1 if view_key == "back_diag" else 0) if omega else OUTFIT_ROW[outfit]
+	var mirror: bool = direction.x < -0.1 or (absf(direction.x) <= 0.1 and a.facing.x < 0)
+	visual_transform(pos, 0, Vector2(-1 if mirror else 1, 1))
+	draw_texture_rect_region(texture, Rect2(-48, -92, 96, 96), Rect2(frame * 96, row * 96, 96, 96), tint)
+	visual_transform(Vector2.ZERO)
+
 func draw_actor(a: Dictionary) -> void:
 	var foot: Vector2 = a.p
 	var player_color := CYAN if a.id == 0 else GOLD
-	draw_set_transform(foot, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 17, Color(0, 0, 0, 0.4)); draw_set_transform(Vector2.ZERO)
+	visual_transform(foot, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 17, Color(0, 0, 0, 0.4)); visual_transform(Vector2.ZERO)
 	draw_arc(foot, 16, 0, TAU, 20, player_color, 2)
 	if a.dead:
-		draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
-		draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
+		if sim.outfit_of(a) == "padrao":
+			draw_marty_padrao_frame("defeat", a.facing, MARTY_PADRAO_FRAMES.defeat - 1, foot, Color.WHITE)
+		else:
+			draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
+			draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
 		text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12); return
 	var jump_height := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
 	var elevation := sim.height_at(foot)
@@ -525,8 +596,8 @@ func draw_actor(a: Dictionary) -> void:
 	if a.fused:
 		var col := 3 if a.slash > 0 or a.get("fire_flash", 0.0) > 0 else (1 + int(a.step) % 2 if a.move.length() > 0.1 else 0)
 		var tint := Color(1.5, 1.5, 1.5, 0.65) if a.hurt > 0 else Color.WHITE
-		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 150, tint)
-		text_at(draw_pos + Vector2(-36, -145), "MARTY • FUSÃO", CYAN, 11)
+		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 144, tint)
+		text_at(draw_pos + Vector2(-36, -115), "MARTY • FUSÃO", CYAN, 11)
 		return
 	# Roupa atual: COM armadura = Ômega; SEM armadura = Padrão / Londres / Mecânico.
 	# marty_anim.png: linha = roupa*5 + vista; colunas = parado, passo 1-4, tiro, salto.
@@ -563,11 +634,20 @@ func draw_actor(a: Dictionary) -> void:
 		draw_power_aura(draw_pos, clampf(1.0 - absf(charge_t - 0.6) / 0.8, 0.25, 1.0), true)
 	elif a.armor and not a.mech:
 		draw_power_aura(draw_pos, 0.28, false)
-	draw_set_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
-	draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
-	draw_set_transform(Vector2.ZERO)
-	# Braço próximo e empunhadura ficam sobre o tronco também nas vistas traseiras.
-	draw_weapon(a, draw_pos + Vector2(0, bob))
+	if outfit_key == "padrao":
+		var padrao_action := marty_padrao_action(a, walking, firing)
+		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else (a.move if padrao_action == "run" else a.facing)
+		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
+		draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
+		if padrao_action != "evade": draw_weapon(a, draw_pos + Vector2(0, bob))
+	elif a.dodge > 0 and not a.mech:
+		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
+	else:
+		visual_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
+		draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
+		visual_transform(Vector2.ZERO)
+		# A arma é uma camada separada; durante a esquiva as mãos ficam livres.
+		draw_weapon(a, draw_pos + Vector2(0, bob))
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
 	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
@@ -575,7 +655,7 @@ func draw_actor(a: Dictionary) -> void:
 
 func draw_mech(m: Dictionary) -> void:
 	var p: Vector2 = m.p
-	draw_set_transform(p, 0, Vector2(1, 0.45)); draw_circle(Vector2.ZERO, 43, Color(0, 0, 0, 0.5)); draw_set_transform(Vector2.ZERO)
+	visual_transform(p, 0, Vector2(1, 0.45)); draw_circle(Vector2.ZERO, 43, Color(0, 0, 0, 0.5)); visual_transform(Vector2.ZERO)
 	if m.hp <= 0:
 		crate(Rect2(p - Vector2(40, 25), Vector2(80, 30))); text_at(p + Vector2(-40, -35), "INUTILIZADO", Color("b78c84"), 12); return
 	# Titan v2: 8 direções (5 vistas + espelho), viseira acesa quando pilotado, passada pesada.
@@ -605,10 +685,10 @@ func draw_mech(m: Dictionary) -> void:
 		for k in range(3):
 			var jet := base + Vector2(0, -60) + back * (40 + k * 10) + Vector2(sin(sim.tick_time * 50 + k) * 3, 0)
 			draw_circle(jet, 14 - k * 3, Color(0.4, 0.9, 1, 0.45 - k * 0.1))
-	draw_set_transform(base, 0, Vector2(-1.0 if pose[1] else 1.0, squash))
+	visual_transform(base, 0, Vector2(-1.0 if pose[1] else 1.0, squash))
 	# O atlas limpo mantém uma margem transparente entre todas as poses.
 	draw_texture_rect_region(titan_v2, Rect2(-88, -164, 176, 176), Rect2(column * 176, pose[0] * 176, 176, 176))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	if not piloted: text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)
 	else:
 		draw_rect(Rect2(p + Vector2(-35, 16), Vector2(70, 3)), Color("161824"))
@@ -685,7 +765,7 @@ func draw_warden(e: Dictionary) -> void:
 		draw_line(p, endpoint, Color(1, 0.15, 0.12, 0.2), 96)
 		draw_line(p, endpoint, Color(1, 0.65, 0.2, 0.9), 3)
 		text_at(p + Vector2(-62, 34), "INVESTIDA!" if state == "charge" else "! PREPARE O DASH !", Color("ffb451"), 13)
-	draw_set_transform(p, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 50, Color(0, 0, 0, 0.5)); draw_set_transform(Vector2.ZERO)
+	visual_transform(p, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 50, Color(0, 0, 0, 0.5)); visual_transform(Vector2.ZERO)
 	var col := 3 if state == "charge" else (1 + int(e.step) % 2 if e.moving else 0)
 	var tint := Color(1.7, 1.5, 1.5) if e.hurt > 0 else (Color(1.3, 0.8, 0.8) if state == "warning" else Color.WHITE)
 	draw_feral(warden_texture, p, e.face, col, 256, 288, tint)
@@ -704,14 +784,16 @@ func weapon_hand_anchor(a: Dictionary) -> Vector2:
 
 func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	# 0.18: dedos da própria arte cobrem a empunhadura, sem braços geométricos.
+	# O novo Padrao ja possui maos completas; nao cola nele um recorte do atlas antigo.
+	if sim.outfit_of(a) == "padrao": return
 	var pose := marty_pose(a.facing)
 	var row: int = OUTFIT_ROW[sim.outfit_of(a)] * 5 + int(pose[0])
 	var anchor := weapon_hand_anchor(a)
 	if pose[1]: anchor.x = -anchor.x
 	var patch := Rect2(anchor + Vector2(48, 92) - Vector2(4, 4), Vector2(8, 8))
-	draw_set_transform(wrist, 0, Vector2(-1 if pose[1] else 1, 1))
+	visual_transform(wrist, 0, Vector2(-1 if pose[1] else 1, 1))
 	draw_texture_rect_region(marty_anim, Rect2(-4, -4, 8, 8), Rect2(patch.position + Vector2(0, row * 96), patch.size))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 
 func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	# Arma na mão: gira com a mira (360°), espelha para a esquerda, dá tranco para trás e para cima,
@@ -736,9 +818,9 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 9)
 		draw_circle(grip + aim * 18, 9 + pulse * 3, Color(0.35, 0.9, 1, 0.12 + pulse * 0.08))
 	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15)}.get(weapon, Vector2(8, size.y * 0.5))
-	draw_set_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
+	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, -handle)
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
 	if k <= 0: return
 	var dir := Vector2.RIGHT.rotated(angle)
@@ -747,9 +829,9 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	var fx: Texture2D = weapon_art.flash_cyan if cyan else weapon_art.flash
 	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "omega": 2.2}[weapon]
 	if k > 0.55:
-		draw_set_transform(muzzle + dir * 6 * big, angle, Vector2(1.6, 1.0) * big)
+		visual_transform(muzzle + dir * 6 * big, angle, Vector2(1.6, 1.0) * big)
 		draw_texture(fx, -fx.get_size() * 0.5)
-		draw_set_transform(Vector2.ZERO)
+		visual_transform(Vector2.ZERO)
 		draw_circle(muzzle, 10 * big, Color(1, 0.95, 0.7, 0.25) if not cyan else Color(0.6, 1, 1, 0.3))
 	elif k > 0.2:
 		draw_circle(muzzle + dir * 4, 5 * big, Color(1, 0.9, 0.6, 0.55) if not cyan else Color(0.6, 1, 1, 0.55))
@@ -782,12 +864,16 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 8)
 		var tip := grip + Vector2.RIGHT.rotated(angle) * size.x
 		draw_line(grip, tip, Color(0.4, 0.95, 1, 0.18 + 0.1 * pulse), 12)
-	draw_set_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
+	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, Vector2(-6, -size.y * 0.5))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
 
 func draw_chest(chest: Dictionary) -> void:
+	if chest.get("reward",false):
+		draw_circle(chest.p,44,Color(1,0.75,0.15,0.18))
+		draw_arc(chest.p,34,0,TAU,32,GOLD,3)
+		text_at(chest.p+Vector2(-65,-70),"ARSENAL • SEM CHAVE" if not chest.open else "RECUPERADO",GOLD,12)
 	# 0.15: baú da folha docks12 (fechado / aberto) com tremida e brilho ao abrir
 	if scenery and scenery.props.has("chest"):
 		draw_chest_hd(chest); return
@@ -832,13 +918,50 @@ func marty_pose(f: Vector2) -> Array:
 		6: return [4, false]   # cima
 		_: return [3, false]   # cima-direita
 
+func marty_direction_row(direction: Vector2) -> int:
+	# Ordem do export PixelLab: sul, sudeste, leste, nordeste, norte,
+	# noroeste, oeste, sudoeste.
+	var f := direction.normalized() if direction.length() > 0.01 else Vector2.DOWN
+	var octant := int(round(fposmod(f.angle(), TAU) / (TAU / 8))) % 8
+	return [2, 1, 0, 7, 6, 5, 4, 3][octant]
+
+func marty_padrao_action(a: Dictionary, walking: bool, firing: bool) -> String:
+	if a.dodge > 0: return "evade"
+	if a.slash > 0 and not a.mech: return "melee"
+	if a.jump > 0: return "jump"
+	if a.hurt > 0: return "hurt"
+	if firing: return "shoot"
+	if walking: return "run"
+	return "idle"
+
+func marty_padrao_frame(a: Dictionary, action: String, slash_dur: float) -> int:
+	var count: int = MARTY_PADRAO_FRAMES[action]
+	match action:
+		"evade": return clampi(int((1.0 - a.dodge / 0.20) * count), 0, count - 1)
+		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
+		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
+		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
+		"run": return int(a.step) % count
+		"hurt": return int(sim.tick_time * 14.0) % count
+		_: return int(sim.tick_time * 4.0 + a.id) % count
+
+func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foot: Vector2, tint: Color) -> void:
+	var texture: Texture2D = marty_padrao_actions[action]
+	var row := marty_direction_row(direction)
+	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
+
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p
 	if e.kind == "warden": draw_warden(e); return
 	if e.kind == "boss": draw_boss(e); return
 	var small: bool = e.kind == "crawler_small"
+	p -= Vector2(0, e.get("jump_height", 0.0))
+	if e.get("elite", "") != "":
+		var elite_color: Color = {"shield": Color("6cddff"), "trail": Color("a4ec63"), "explosive": Color("ff9169")}[e.elite]
+		draw_arc(p, 25, 0, TAU, 24, elite_color, 3)
+		text_at(p + Vector2(-30, -108), {"shield": "ESCUDO", "trail": "RASTRO", "explosive": "BOMBA"}[e.elite], elite_color, 10)
 	var scale := 0.6 if small else 1.0
-	draw_set_transform(p, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 16 * scale, Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+	visual_transform(p, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 16 * scale, Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
 	var face: Vector2 = e.get("face", Vector2.DOWN)
 	var column := 0; var flip := false; var bob := 0.0
 	if e.get("shot", 0.0) > 0: column = 6; flip = face.x < 0
@@ -848,9 +971,30 @@ func draw_enemy(e: Dictionary) -> void:
 		bob = -1.0 if phase % 2 == 0 else 0.0
 	elif face.y < -0.6: column = 1
 	var tint := Color(1.6, 1.6, 1.6) if e.hurt > 0 else Color.WHITE
-	draw_set_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale))
-	draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(column * 144, ENEMY_ROW[e.kind] * 96, 144, 96), tint)
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale * (0.78 if e.get("crouched", false) else 1.0)))
+	if pixellab_enemy_art.has(e.kind):
+		var new_art: Texture2D = pixellab_enemy_art[e.kind]
+		var octant := enemy_octant(face)
+		var frame := 1 + int(e.step) % 4 if e.moving else 0
+		var size := 84.0 if e.kind == "guard" else 72.0
+		# O atlas novo já contém as oito direções; não espelhar a silhueta.
+		visual_transform(p + Vector2(0, bob), 0, Vector2(1, 1))
+		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
+			tint = Color(1.5, 0.8, 0.55)
+		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
+		draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
+	elif special_enemy_art.has(e.kind):
+		var special: Texture2D = special_enemy_art[e.kind]
+		var cell_size := special.get_size() / 4.0
+		var special_row := 3 if face.y < -0.6 else (1 if absf(face.x) > 0.6 else 0)
+		var special_col := 3 if e.combat == "warning" else (int(e.step) % 3 if e.moving else 0)
+		draw_texture_rect_region(special, Rect2(-40, -80, 80, 80), Rect2(Vector2(special_col, special_row) * cell_size, cell_size), tint)
+	else:
+		draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(column * 144, ENEMY_ROW[e.kind] * 96, 144, 96), tint)
+	visual_transform(Vector2.ZERO)
+	if e.kind == "guard" and e.combat == "attack":
+		draw_arc(p, 34, 0, TAU, 24, Color("ffad61"), 2)
+		text_at(p + Vector2(-28, -94), "ABERTO", Color("ffcb81"), 11)
 	if e.hp < e.max:
 		var w := 30.0 * scale
 		draw_rect(Rect2(p + Vector2(-w * 0.5, 6), Vector2(w, 3)), Color("1c1522"))
@@ -865,14 +1009,20 @@ func boss_pose(e: Dictionary) -> String:
 	return "idle"
 
 func draw_boss(e: Dictionary) -> void:
+	if e.get("motion", "idle") == "warning":
+		draw_arc(e.motion_to,75,0,TAU,48,Color("ffb451"),5)
+		draw_line(e.p,e.motion_to,Color(1,0.4,0.2,0.6),4)
+		text_at(e.motion_to-Vector2(50,85),"! MERGULHO" if e.motion_kind == "dive" else "! AVANÇO",GOLD,16)
+	if e.get("motion", "idle") == "moving" and e.get("motion_kind", "") == "dive":
+		draw_arc(e.p,60,0,TAU,32,CYAN,3); return
 	var p: Vector2 = e.p
 	var pose := boss_pose(e)
 	var tex: Texture2D = boss_art[pose]
 	var size := tex.get_size()
 	if pose == "spiral":
-		draw_set_transform(p - Vector2(0, 40), e.get("spin_angle", 0.0) * 0.35)
+		visual_transform(p - Vector2(0, 40), e.get("spin_angle", 0.0) * 0.35)
 		draw_texture(tex, -size * 0.5)
-		draw_set_transform(Vector2.ZERO)
+		visual_transform(Vector2.ZERO)
 	else:
 		var sway := sin(sim.tick_time * 1.6) * 2.0
 		draw_texture(tex, p + Vector2(-size.x * 0.5, 92 - size.y + sway))
@@ -892,10 +1042,16 @@ func draw_corpse(fx: Dictionary) -> void:
 		var sink: float = (1.0 - fx.life / fx.max) * 50
 		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
 		return
+	if fx.enemy == "bomber": return  # desaparece na explosão, sem virar o cadáver do Brute
+	if fx.enemy == "guard":
+		visual_transform(fx.p - Vector2(0, 15), PI * 0.5)
+		draw_texture_rect_region(pixellab_enemy_art.guard, Rect2(-42, -75, 84, 84), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
+		visual_transform(Vector2.ZERO)
+		return
 	var scale := 0.6 if fx.enemy == "crawler_small" else 1.0
-	draw_set_transform(fx.p, 0, Vector2(-scale if fx.get("flip", false) else scale, scale))
-	draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(7 * 144, ENEMY_ROW[fx.enemy] * 96, 144, 96), Color(1, 1, 1, fade))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(fx.p, 0, Vector2(-scale if fx.get("flip", false) else scale, scale))
+	draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(7 * 144, ENEMY_ROW.get(fx.enemy, 3) * 96, 144, 96), Color(1, 1, 1, fade))
+	visual_transform(Vector2.ZERO)
 
 # ───────────────────────── REFÚGIO • FORA DO TEMPO ─────────────────────────
 const VOID := Color("0a0536")
@@ -921,14 +1077,14 @@ func gear(c: Vector2, radius: float, teeth: int, angle: float, color: Color) -> 
 	draw_circle(c, radius * 0.18, color)
 
 func brick(c: Vector2, angle: float, shade: float) -> void:
-	draw_set_transform(c, angle)
+	visual_transform(c, angle)
 	draw_rect(Rect2(-13, -6, 26, 12), Color("2a1420"))
 	draw_rect(Rect2(-12, -5, 24, 10), Color(0.52, 0.25, 0.2).darkened(shade))
 	draw_rect(Rect2(-12, -5, 24, 3), Color(0.68, 0.38, 0.3).darkened(shade))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 
 func phone_booth(c: Vector2, angle: float) -> void:
-	draw_set_transform(c, angle)
+	visual_transform(c, angle)
 	draw_rect(Rect2(-17, -46, 34, 92), Color("2a0a10"))
 	draw_rect(Rect2(-15, -44, 30, 88), Color("b3262c"))
 	draw_rect(Rect2(-13, -40, 26, 7), Color("f2e6c9"))
@@ -936,7 +1092,7 @@ func phone_booth(c: Vector2, angle: float) -> void:
 		for x in range(2):
 			draw_rect(Rect2(-11 + x * 12, -28 + y * 18, 10, 15), Color("3c5e7a"))
 			draw_rect(Rect2(-11 + x * 12, -28 + y * 18, 10, 3), Color("89b4c9"))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 
 func draw_refuge_back() -> void:
 	var t: float = sim.tick_time
@@ -969,13 +1125,13 @@ func draw_refuge_back() -> void:
 		draw_rect(Rect2(1344 + 40 - (n + 1) * 3.4, 0, 3.4, 752), Color(VOID, (1.0 - alpha) * 0.9))
 	# Portal DOCAS / 1941: energia ciano girando dentro do anel.
 	var docks_c := Vector2(645, 86)
-	draw_set_transform(docks_c, 0, Vector2(1, 1.25))
+	visual_transform(docks_c, 0, Vector2(1, 1.25))
 	for k in range(4):
 		var r := 30.0 + k * 9 + sin(t * 2 + k) * 2
 		var start := t * (1.4 + k * 0.3) * (1 if k % 2 == 0 else -1)
 		draw_arc(Vector2.ZERO, r, start, start + 2.2, 24, Color(0.45, 0.95, 1.0, 0.28), 3)
 	draw_circle(Vector2.ZERO, 58, Color(0.3, 0.85, 1.0, 0.05 + 0.03 * sin(t * 3)))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	# Coordenada perdida: fissuras violeta que mudam de forma.
 	var lost_c := Vector2(1022, 166)
 	var crack_seed := int(t * 6)
@@ -1076,10 +1232,10 @@ func draw_transform_fx(fx: Dictionary) -> void:
 	# Anel de energia se fechando e depois explodindo
 	var ring_r := 90.0 * (1.0 - clampf(t / 0.46, 0, 1)) + 12.0 if t < 0.46 else 12.0 + (t - 0.46) * 420.0
 	var ring_a := 0.9 if t < 0.46 else maxf(0, 1.0 - (t - 0.46) * 2.2)
-	draw_set_transform(p - Vector2(0, 36), 0, Vector2(1, 0.8))
+	visual_transform(p - Vector2(0, 36), 0, Vector2(1, 0.8))
 	draw_arc(Vector2.ZERO, ring_r, 0, TAU, 40, Color(1, 0.9, 0.4, ring_a), 3)
 	draw_arc(Vector2.ZERO, ring_r * 0.8, sim.tick_time * 6, sim.tick_time * 6 + 4.0, 24, Color(0.5, 1, 1, ring_a), 2)
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	if t > 0.8:
 		text_at(p + Vector2(-58, -118 - (t - 0.8) * 60), "ARMADURA ÔMEGA!", Color(1, 0.9, 0.5, (1 - t) * 5), 16)
 
@@ -1125,13 +1281,13 @@ func draw_bomb(b: Dictionary) -> void:
 	var k: float = clampf(b.t / sim.MECH_BOMB.flight, 0, 1)
 	var to: Vector2 = b.to
 	# marcador de alvo no chão
-	draw_set_transform(to, 0, Vector2(1, 0.5))
+	visual_transform(to, 0, Vector2(1, 0.5))
 	draw_arc(Vector2.ZERO, sim.MECH_BOMB.radius * (0.4 + 0.6 * k), 0, TAU, 40, Color(1, 0.35, 0.2, 0.5 + 0.4 * k), 3)
 	draw_circle(Vector2.ZERO, 10, Color(1, 0.3, 0.2, 0.6))
-	draw_set_transform(Vector2.ZERO)
+	visual_transform(Vector2.ZERO)
 	var height := sin(k * PI) * 170.0
 	var p: Vector2 = b.p - Vector2(0, 30 + height)
-	draw_set_transform(b.p, 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 12 * (1.0 - height / 250.0), Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+	visual_transform(b.p, 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 12 * (1.0 - height / 250.0), Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
 	draw_circle(p, 11, Color("1d1e24")); draw_circle(p - Vector2(3, 3), 4, Color("7d808c"))
 	var spark := p + Vector2(6, -12) + Vector2(sin(sim.tick_time * 40) * 2, 0)
 	draw_circle(spark, 4, Color(1, 0.8, 0.3)); scenery.lights.append({"p": spark, "kind": "bulb"})
@@ -1142,11 +1298,11 @@ func draw_fx_013(fx: Dictionary) -> void:
 	match fx.kind:
 		"explosion":
 			var r: float = fx.get("r", 100.0)
-			draw_set_transform(p, 0, Vector2(1, 0.62))
+			visual_transform(p, 0, Vector2(1, 0.62))
 			draw_circle(Vector2.ZERO, r * (0.3 + 0.8 * t), Color(1, 0.55, 0.15, 0.45 * (1 - t)))
 			draw_circle(Vector2.ZERO, r * (0.2 + 0.5 * t), Color(1, 0.9, 0.5, 0.7 * (1 - t)))
 			draw_arc(Vector2.ZERO, r * (0.5 + 0.7 * t), 0, TAU, 40, Color(1, 0.8, 0.5, 1 - t), 4)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 			for n in range(12):
 				var d := Vector2.RIGHT.rotated(n * TAU / 12 + p.x)
 				draw_circle(p + d * r * t * Vector2(1, 0.6) - Vector2(0, sin(t * PI) * 40), 7 * (1 - t) + 2, Color(0.35, 0.3, 0.3, 0.6 * (1 - t)))
@@ -1166,27 +1322,27 @@ func draw_fx_013(fx: Dictionary) -> void:
 			draw_arc(p - Vector2(0, 40), 50 + 20 * t, 0, TAU, 6, Color(0.5, 1, 1, 1 - t), 5)
 		"spawn_portal":
 			# reforços surgindo: poça roxa que cresce e tentáculos de luz
-			draw_set_transform(p, 0, Vector2(1, 0.5))
+			visual_transform(p, 0, Vector2(1, 0.5))
 			draw_circle(Vector2.ZERO, 50 * minf(1.0, t * 2), Color(0.35, 0.05, 0.45, 0.6))
 			draw_arc(Vector2.ZERO, 55 * minf(1.0, t * 2), 0, TAU, 32, Color(0.8, 0.3, 1, 0.9), 3)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 			draw_line(p, p - Vector2(0, 120 * t), Color(0.8, 0.4, 1, 0.5 * (1 - t)), 10)
 			scenery.lights.append({"p": p, "kind": "danger"})
 		"prop_break":
 			for n in range(10):
 				var d := Vector2.RIGHT.rotated(n * TAU / 10 + p.y)
 				var q: Vector2 = p + d * (10 + 60 * t) * Vector2(1, 0.6) - Vector2(0, 30 + sin(t * PI) * 40 - t * 30)
-				draw_set_transform(q, t * 8 + n)
+				visual_transform(q, t * 8 + n)
 				draw_rect(Rect2(-5, -3, 10, 6), Color(0.55, 0.36, 0.2, 1 - t) if not fx.get("prop", "").begins_with("sandbags") else Color(0.75, 0.62, 0.4, 1 - t))
-				draw_set_transform(Vector2.ZERO)
+				visual_transform(Vector2.ZERO)
 		"splinter":
 			for n in range(4):
 				var d := Vector2.RIGHT.rotated(n * 1.7 + p.x)
 				draw_rect(Rect2(p + d * 20 * t - Vector2(0, 20), Vector2(4, 3)), Color(0.7, 0.5, 0.3, 1 - t))
 		"splash":
-			draw_set_transform(p, 0, Vector2(1, 0.5))
+			visual_transform(p, 0, Vector2(1, 0.5))
 			draw_arc(Vector2.ZERO, 20 + 40 * t, 0, TAU, 24, Color(0.7, 0.9, 1, 1 - t), 3)
-			draw_set_transform(Vector2.ZERO)
+			visual_transform(Vector2.ZERO)
 		"flash":
 			draw_circle(p - Vector2(0, 30), 18 * (1 - t) + 6, Color(1, 0.85, 0.5, 0.8 * (1 - t)))
 			scenery.lights.append({"p": p, "kind": "bulb"})
@@ -1197,12 +1353,12 @@ func draw_chest_hd(chest: Dictionary) -> void:
 	var p: Vector2 = chest.p
 	var closed: Texture2D = scenery.props.chest
 	var opened: Texture2D = scenery.props.chest_open
-	draw_set_transform(p + Vector2(0, 6), 0, Vector2(1, 0.35)); draw_circle(Vector2.ZERO, 34, Color(0, 0, 0, 0.35)); draw_set_transform(Vector2.ZERO)
+	visual_transform(p + Vector2(0, 6), 0, Vector2(1, 0.35)); draw_circle(Vector2.ZERO, 34, Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
 	var s := 0.66
 	if not chest.open:
 		var bob := sin(sim.tick_time * 2.0 + p.x) * 1.0
 		var sz := closed.get_size() * s
-		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false)
+		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false, Color(1.25,1.1,0.5) if chest.get("reward",false) else Color.WHITE)
 		var glint := fposmod(sim.tick_time * 0.7 + p.x * 0.01, 3.0)
 		if glint < 0.3: draw_circle(p + Vector2(-sz.x * 0.4 + glint * sz.x * 2.6, -sz.y + 18), 2.5, Color(1, 1, 0.85, 0.85))
 		return
@@ -1216,3 +1372,32 @@ func draw_chest_hd(chest: Dictionary) -> void:
 		var glow := 0.6 + 0.4 * sin(sim.tick_time * 5)
 		scenery.lights.append({"p": p - Vector2(0, 30), "kind": "bulb"})
 		draw_circle(p - Vector2(0, 34), 14 * glow, Color(1, 0.85, 0.4, 0.25 * glow))
+
+# 0.18: transformação única ao redor dos pés; mantém mão, arma e corpo unidos.
+var visual_origin := Vector2.ZERO
+var visual_scale := 1.0
+func visual_transform(offset: Vector2, rotation: float = 0.0, scale_value: Vector2 = Vector2.ONE) -> void:
+	draw_set_transform(visual_origin + (offset - visual_origin) * visual_scale, rotation, scale_value * visual_scale)
+
+func draw_combat_warnings() -> void:
+	for zone in sim.combat_zones:
+		if not seen(zone.p): continue
+		var color := Color("ffcf68") if zone.warning > 0 else Color("9fe341")
+		if zone.kind == "blast": color = Color("ff785c")
+		draw_circle(zone.p, zone.r, Color(color, 0.16 if zone.warning > 0 else 0.35))
+		draw_arc(zone.p, zone.r, 0, TAU, 36, color, 3)
+		if zone.warning > 0: text_at(zone.p + Vector2(-5, 4), "!", color, 18)
+	for stake in sim.harpoons:
+		if seen(stake.p):
+			draw_line(stake.p + Vector2(-7, 6), stake.p + Vector2(7, -35), Color("1a1525"), 9)
+			draw_line(stake.p + Vector2(-7, 6), stake.p + Vector2(7, -35), Color("a7e6ef"), 4)
+	for enemy in sim.enemies:
+		if not seen(enemy.p) or enemy.get("combat", "") != "warning": continue
+		var aim: Vector2 = enemy.get("locked", enemy.p)
+		if enemy.kind in ["crawler", "crawler_small"]:
+			aim = enemy.p + (aim - enemy.p).limit_length(220 if enemy.kind == "crawler" else 110)
+			draw_arc(aim, 58 if enemy.kind == "crawler" else 32, 0, TAU, 32, Color("ffe281"), 4)
+		elif enemy.kind == "bomber": draw_arc(enemy.p, 90, 0, TAU, 40, Color("ff9e61"), 4)
+		else:
+			draw_line(enemy.p - Vector2(0, 28), aim - Vector2(0, 28), Color(1, 0.75, 0.4, 0.65), 2)
+		text_at(enemy.p + Vector2(-5, -106), "!", Color("ffe281"), 20)

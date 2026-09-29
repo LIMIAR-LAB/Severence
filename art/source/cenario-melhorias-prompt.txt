@@ -1,0 +1,115 @@
+PROMPTS PARA MELHORIAS DE CENÁRIO — microbiomas, atalhos e ícones de mapa
+=======================================================================
+Onde salvar cada folha gerada: art/source/<nome>.png (fonte bruta da IA de imagem).
+Depois, um script em tools/ recorta e limpa (remove magenta, alinha grade) igual aos outros
+props — ver tools/prepare_docks_v12.py e tools/make_props_hd.py como referência de pipeline.
+Não gere texto, logo, marca-d'água ou moldura. Anexe assets/environment/docks12/props (folha
+existente) como referência de estilo/paleta quando a ferramenta permitir anexos.
+
+--- ESTILO BASE (colar no início de todos os prompts de tileset/prop) ---
+Style: 2D top-down pixel art for a retro-futuristic 1941 pulp-adventure action game (Enter the
+Gungeon-like proportions), warm night-harbor palette (deep blue-violet shadows, warm amber
+lantern glow, rust and verdigris accents), clean 1px dark outline, readable flat-shaded blocks
+with a light ramp from top-left, no photorealism, no painterly blur, no anti-aliased gradients
+(hard pixel edges only). Flat pure magenta background #ff00ff behind every object, objects
+fully isolated with wide magenta gutters, no shadows cast onto the magenta background.
+
+=======================================================================
+1) OFICINA (microbioma "metal/óleo") — assets/environment/docks12/workshop/
+=======================================================================
+Use case: tileset + props para a sala 05 Oficina, para diferenciá-la visualmente do resto das
+docas (hoje usa os mesmos tijolos/granito genéricos).
+Prompt:
+"[ESTILO BASE] Create ONLY a sprite sheet of a mechanic workshop floor tile set and props for a
+top-down game, grid-aligned, each tile 64x64px unless noted. Include: (a) 4 metal-plate floor
+tile variants (riveted steel plate, oil-stained plate, grated drain plate, worn/scratched plate);
+(b) a workbench with tools hanging (96x64px); (c) a tool rack with wrenches and hammers
+(64x96px); (d) a hanging chain pulley with hook (48x96px); (e) an oil puddle decal with a faint
+rainbow sheen (64x32px, flat on ground, no shadow); (f) a sparking welding station with a small
+blue-white spark burst (64x64px); (g) a stack of spare mech parts/gears (64x64px). All items
+isolated on magenta, consistent light source from top-left, consistent pixel scale with a
+64x64 crate reference square draw first as a scale guide (removed before final export).
+Canvas 1024x768, grid layout, no overlap."
+
+=======================================================================
+2) MERCADO DE PEIXE (microbioma "madeira/redes") — assets/environment/docks12/market/
+=======================================================================
+Use case: tileset + props para a sala 04 Mercado de Peixe.
+Prompt:
+"[ESTILO BASE] Create ONLY a sprite sheet of a fish-market top-down tile set and props, grid-
+aligned, 64x64px tiles. Include: (a) 3 weathered wood-plank floor variants with fish-scale stains
+and puddles; (b) a wooden market stall counter with awning (128x96px); (c) a hanging fishing net
+draped between two posts (96x64px, semi-transparent mesh look); (d) a pile of wicker fish
+baskets (64x64px); (e) a barrel of salt/ice with visible fish tails (64x64px); (f) a small rowboat
+propped against a wall (96x48px); (g) a string of hanging lanterns (96x32px). Isolated on
+magenta, top-left light, consistent pixel scale, canvas 1024x768."
+
+=======================================================================
+3) CAPELA DO CULTO (reforço do microbioma "ritual") — assets/environment/docks12/chapel/
+=======================================================================
+Use case: complementar a Capela, que já tem tapete e altar, com mais elementos de identidade.
+Prompt:
+"[ESTILO BASE] Create ONLY a sprite sheet of a dark ritual-chapel top-down tile set and props,
+64x64px grid. Include: (a) 2 dark stone floor variants with faint glowing violet cult runes
+etched in; (b) a broken stained-glass window fragment leaning against a wall (64x96px);
+(c) a cluster of black melted candles with violet flame glow (48x64px); (d) a hanging tattered
+banner with a cult symbol (64x128px); (e) a small offering bowl with a soft violet glow
+(64x64px). Isolated on magenta, top-left light, consistent pixel scale, canvas 800x600."
+
+=======================================================================
+4) PAREDE RACHADA / ATALHO DESTRUTÍVEL (variantes) — assets/environment/docks12/tiles/
+=======================================================================
+Use case: hoje só existe UMA parede rachada (secreta). Precisamos de 2-3 variantes visuais para
+novos atalhos abertos por explosão de barril, para não repetir sempre a mesma rachadura.
+Prompt:
+"[ESTILO BASE] Create ONLY a sprite sheet of 3 different cracked-brick-wall segments for a top-
+down game, each 128x216px (matches a warehouse facade wall section: cap + brick + base).
+Variant A: a large diagonal crack with a few loose bricks about to fall. Variant B: a crumbling
+corner with exposed rebar and a small hole showing darkness behind. Variant C: a wall visibly
+scorched black around the crack, as if hit by an explosion, with soot streaks. Each variant also
+needs a matching '_open' version showing the same wall with a dark rectangular passage broken
+through it, same size. 6 sprites total (3 cracked + 3 open), isolated on magenta, consistent
+brick color matching a warm red-brown brick palette, top-left light, canvas 1024x768."
+
+=======================================================================
+5) PONTE/POÇA DE TENTÁCULO — "hazard gate" (assets/environment/docks12/props/)
+=======================================================================
+Use case: transformar algumas poças de tentáculo em obstáculos de "portão" que ficam seguros só
+depois de um evento (ex.: matar um mini-chefe). Precisa de um estado "ativo" (perigoso) e um
+"selado" (seguro, com corrente/âncora presa no chão).
+Prompt:
+"[ESTILO BASE] Create ONLY a sprite sheet with 2 states of a tentacle hazard pool for a top-down
+game, each 140x100px (elliptical pool as seen from above). State 1 'active': dark purple water
+pool with 2-3 glowing cyan-veined tentacle tips breaking the surface, faint danger red glow at
+the edges. State 2 'sealed': the same pool now covered by a heavy chained iron grate bolted down
+with 4 large rivets, tentacles pinned underneath barely visible through the grate, a faint
+residual glow. Isolated on magenta, top-down perspective (flattened ellipse, not side view),
+top-left light, canvas 512x256."
+
+=======================================================================
+6) ÍCONES DO MAPA / MINIMAPA — assets/ui/map_icons/
+=======================================================================
+Use case: HUD do mapa (Tab/M) hoje só mostra salas descobertas sem destacar objetivo, loja ou
+desafio. Precisamos de ícones pequenos, legíveis em 24x24 e 32x32.
+Prompt:
+"[ESTILE BASE simplificado: flat pixel icon style, no magenta needed if tool supports transparent
+PNG, otherwise use magenta background] Create ONLY a sprite sheet of 6 small flat-color HUD map
+icons, each on a 48x48px cell, designed to stay readable when scaled down to 24x24px: (1) a
+golden skull-in-crosshair icon for 'boss room'; (2) a small coin-bag icon for 'shop'; (3) a
+stopwatch icon with a lightning bolt for 'optional challenge'; (4) a treasure-chest icon for
+'chest room'; (5) a padlock icon for 'locked gate'; (6) a downward arrow icon for 'exit /
+extraction point'. Each icon uses a single bold saturated color with a thin dark outline,
+no gradients, no text, simple enough to read at tiny size. Isolated per cell, canvas 512x512,
+3 columns x 2 rows grid."
+
+=======================================================================
+NOTAS PARA QUEM FOR RECORTAR (Claude/Codex)
+=======================================================================
+- Depois de gerar, escreva um tools/prepare_<nome>.py (copie a estrutura de
+  tools/prepare_docks_v12.py) que remove o magenta, detecta a grade real e recorta cada peça
+  em assets/environment/docks12/<pasta>/ ou assets/ui/map_icons/, mantendo os nomes usados no
+  código (ROOM_STYLE, PROP_NAMES, DECOR em scripts/docks_map.gd e scripts/dock_scenery.gd).
+- Gere uma prévia (art/<nome>-preview.png) como os outros itens de art/, para conferência visual
+  antes de plugar no jogo.
+- Registre a versão em docs/HISTORICO_CLAUDE.md ou crie um docs/CENARIO_0_16.md, seguindo o
+  padrão dos documentos anteriores (o que mudou, onde editar, testes).

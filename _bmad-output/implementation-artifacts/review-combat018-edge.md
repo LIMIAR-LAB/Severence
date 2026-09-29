@@ -1,0 +1,2 @@
+# Revisão pendente — casos extremos, combate 0.18
+Leia test-output/combat018-review.diff, atualizado com git diff 809406b para os arquivos de combate; inclua tests/combat_framework_test.gd e docs/COMBATE_0_18.md. Siga .agents/skills/bmad-review/references/lens-edge-case-hunter.md. Acesso de leitura ao projeto. Verifique cancelamento de alvos em coop, tempos, colisões, riscos temporários e limpeza. Não altere arquivos. Retorne apenas problemas concretos com localização, condição, consequência e correção.

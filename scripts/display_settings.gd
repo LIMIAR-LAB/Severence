@@ -11,7 +11,7 @@ const RESOLUTIONS := [
 	Vector2i(2560, 1600), Vector2i(3440, 1440), Vector2i(3840, 2160)]
 const MODES := ["JANELA", "TELA CHEIA (SEM BORDA)", "TELA CHEIA EXCLUSIVA"]
 const FPS_LIMITS := [30, 60, 120, 144, 165, 240, 0]   # 0 = sem limite
-const VIEWS := {"perto": 1.0, "normal": 0.82, "longe": 0.68}   # zoom da câmera na expedição
+const VIEWS := {"perto": 1.4, "normal": 1.22, "longe": 0.68}   # zoom da câmera na expedição
 const VIEW_NAMES := {"perto": "PERTO", "normal": "NORMAL", "longe": "LONGE (vê mais sala)"}
 const UI_SCALES := [0.75, 0.9, 1.0, 1.15, 1.3]
 
@@ -64,7 +64,7 @@ func apply(tree: SceneTree) -> void:
 	Engine.max_fps = fps_limit
 	# A janela embutida pertence ao editor; ele controla tamanho, modo e posição.
 	if "--wid" in OS.get_cmdline_args(): return
-	if "--resolution" in OS.get_cmdline_args(): return   # testes/capturas definem a janela pela linha de comando
+	if "--resolution" in OS.get_cmdline_args() or Array(OS.get_cmdline_user_args()).any(func(arg): return arg.begins_with("--capture")): return   # testes/capturas definem a janela pela linha de comando
 	match mode:
 		0:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)

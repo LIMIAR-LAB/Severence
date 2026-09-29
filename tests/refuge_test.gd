@@ -41,11 +41,9 @@ func _init() -> void:
 		check(s.message != "" and s.mode == "hub", "interação responde: " + id)
 	for point in s.HUB_POINTS:
 		if point.id == "armor": a.p = point.p
-	var seen_outfits := []
 	a.armor = false; a.outfit = "padrao"
-	for n in range(3):
-		s.interact(a); seen_outfits.append(a.outfit)
-	check(seen_outfits == ["mecanico", "espiao", "padrao"], "vitrine troca o uniforme: Mecânico → Espião → Padrão")
+	s.message = ""; s.interact(a)
+	check(a.outfit == "padrao" and s.message.contains("Configure"), "vitrine consulta o uniforme sem trocá-lo")
 	check(not a.armor, "vitrine não veste a armadura (armadura é o R)")
 	check(s.outfit_of({"armor": true, "outfit": "espiao"}) == "omega", "armadura ativa usa o visual Ômega")
 	for point in s.HUB_POINTS:

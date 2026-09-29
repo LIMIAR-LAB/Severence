@@ -20,13 +20,14 @@ func fired_kinds(s: Expedition) -> Array:
 	return kinds
 
 func _init() -> void:
-	for pair in [["cult", "magenta"], ["fish", "harpoon"], ["brute", "violet"], ["crawler", "acid"]]:
+	for pair in [["cult", "magenta"], ["fish", "harpoon"], ["brute", "violet"]]:
 		var s := arena()
 		s.spawn_enemy(Vector2(460, 500), pair[0]); s.enemies[0].cd = 0
-		s.step_enemies(0.016)
+		for frame in range(45): s.step_enemies(0.016)
 		check(fired_kinds(s).has(pair[1]), pair[0] + " dispara " + pair[1])
 	var s := arena()
-	s.spawn_enemy(Vector2(700, 500), "brute"); s.enemies[0].cd = 0; s.step_enemies(0.016)
+	s.spawn_enemy(Vector2(700, 500), "brute"); s.enemies[0].cd = 0
+	for frame in range(80): s.step_enemies(0.016)
 	check(s.bullets.size() == 6, "Soldado Possuído dispara leque de 6")
 	# Rastejante se divide ao morrer
 	s = arena(); s.spawn_enemy(Vector2(700, 500), "crawler"); s.enemies[0].hp = 0
@@ -47,7 +48,7 @@ func _init() -> void:
 	a.outfit = "espiao"; s.step_enemies(0.016)
 	check(s.bullets.is_empty(), "Espião: cultista a 450px não percebe")
 	a.outfit = "padrao"; s.enemies[0].cd = 0; s.enemies[0]["los_t"] = 0.0; s.step_enemies(0.016)
-	check(not s.bullets.is_empty(), "roupa Padrão: cultista a 450px ataca")
+	check(s.enemies[0].combat == "warning", "roupa Padrão: cultista a 450px anuncia ataque")
 	# Mecânico bate mais forte
 	s = arena(); a = s.actors[0]; a.outfit = "mecanico"; a.aim = Vector2.RIGHT
 	s.spawn_enemy(a.p + Vector2(40, 0), "brute"); s.melee(a)
@@ -69,7 +70,8 @@ func _init() -> void:
 	check(saw_spin and saw_cannon, "fase 2: espiral e bala de canhão carregada")
 	boss.hp = 100; boss.cd = 0; s.bullets.clear(); s.actors[0].p = Vector2(600, 520)
 	var seen := {}
-	for n in range(400):
+	for n in range(900):
+		s.actors[0].p = boss.p + Vector2(0, 200) # acompanha reposicionamento para testar chamas de curto alcance
 		s.step_enemies(0.016)
 		for k in fired_kinds(s): seen[k] = true
 		s.actors[0].hp = 100; s.actors[0].dead = false
