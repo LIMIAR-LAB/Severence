@@ -38,3 +38,9 @@ Portões e descoberta de corredores agora consideram as alas das salas compostas
 - `tests/scenery_test.gd`: ponto do cais atualizado para a margem de pedra pintada; ponto antigo ficou no mar.
 
 Mudanças concorrentes de outro agente em `dock_scenery.gd` (shipwreck/bunker/arrival_rift e ROOM_AMBIENT) foram preservadas; esses props não são adicionados ao novo layout.
+
+### Ambiente vivo — continuação 0.19
+
+A pintura recebe movimento em tempo real, sob os personagens: a própria textura do mar é reamostrada em faixas com deslocamento suave, com filetes de água, reflexos âmbar quebrados e espuma dissipando junto às estacas. Os lampiões oscilam, poças refletem a luz e a chaminé do cargueiro solta fumaça leve. As regiões de água são delimitadas em coordenadas da imagem para não movimentar piso, navio ou colisões. Não há alteração do raster nem efeitos no Refúgio. Todos usam `tick_time`, portanto acompanham pausa e snapshots.
+
+`tests/arrival_animation_preview.gd` captura dois instantes da paisagem sem atores/fenda e exige mudança em pelo menos 100 pixels da água: valida movimento próprio do cenário. Imagens: `test-output/entry-environment-0.0.png` e `entry-environment-1.5.png`.
