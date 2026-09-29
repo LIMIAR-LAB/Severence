@@ -37,6 +37,7 @@ var map_open := false
 var screenshot_mode := false
 var demo_ticks := 0
 var automated := false
+var automated_snapshot_logged := false
 var frames := 0
 var sounds: Dictionary = {}
 var sound_players: Array = []
@@ -47,6 +48,7 @@ var pref_gun := 0
 var pref_robot := "titan"
 var volume_percent := 70.0
 var ui_input_block := 0.0
+var presented_summary_seq := 0
 # 0.18: remapeamento de controles do P1 (teclado/mouse). P2 local e joypad ainda são fixos.
 const KEY_BIND_DEFAULTS := {"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": KEY_D,
 	"melee": KEY_F, "jump": KEY_SPACE, "dash": KEY_SHIFT, "interact": KEY_E, "armor": KEY_R,
@@ -144,11 +146,17 @@ func _ready() -> void:
 		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))
 		if arg == "--visit-all":
 			for room in sim.rooms: sim.visited.append(room.id)
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "summary"]:
 		if "--capture-ui-" + page in args and page == "options": menu.show_screen("options")
 		if "--capture-ui-" + page in args:
 			screenshot_mode = true
 			if page == "pause": start_refuge(); menu.open("pause")
+			elif page == "summary":
+				start_single(); sim.start_run(1941)
+				sim.tick_time = 1122.0; sim.visited = sim.rooms.slice(0, maxi(1, int(sim.rooms.size() * 0.7))).map(func(room): return room.id)
+				sim.run_stats = {"kills": 247, "kills_by_kind": {"fish": 14}, "damage_dealt": 48320.0, "damage_received": 2840.0, "max_streak": 36, "chests_opened": 3, "revives": 1, "fatal_source": "fish", "fatal_attack": "harpoon"}
+				sim.money = 1240; sim.materials = sim.run_materials_start + 38; sim.finish_run("death")
+				presented_summary_seq = sim.summary_seq; menu.open("summary")
 			else:
 				menu.read_equipment(); menu.show_screen(page)
 	if "--network-host-test" in args: automated = true; host_game(); sim.start_run(1941)
@@ -198,6 +206,21 @@ func start_local() -> void:
 
 func start_seed() -> void:
 	start_solo(); sim.start_run(seed_input.text.to_int() if seed_input.text.is_valid_int() else 1941); apply_preferences(0)
+
+func present_summary_if_needed() -> void:
+	if sim.summary_seq <= presented_summary_seq or sim.last_run_summary.is_empty(): return
+	presented_summary_seq = sim.summary_seq
+	if not online or hosting: save_progress()
+	menu.open("summary")
+
+func summary_new_run() -> void:
+	if online and not hosting: return
+	var next_seed := int(Time.get_ticks_msec()) % 999999
+	sim.start_run(next_seed); apply_preferences(0)
+	paused = false; map_open = false; menu.hide(); ui_input_block = 0.2
+
+func summary_return_refuge() -> void:
+	paused = false; map_open = false; menu.hide(); ui_input_block = 0.2
 
 func host_game() -> void:
 	disconnect_network()
@@ -283,7 +306,11 @@ func receive_state(packet: PackedByteArray) -> void:
 	if not decoded is Dictionary: return
 	var data: Dictionary = decoded
 	sim.apply_snapshot(data)
-	if automated and frames % 60 == 0: print("NETWORK_SNAPSHOT ", sim.actors[1].p)
+	if sim.mode == "run" and sim.last_run_summary.is_empty() and menu.visible and menu.screen == "summary":
+		menu.hide(); paused = false; map_open = false; ui_input_block = 0.2
+	if automated and not automated_snapshot_logged:
+		automated_snapshot_logged = true
+		print("NETWORK_SNAPSHOT ", sim.actors[1].p)
 
 func edge(action_name: String, value: bool) -> bool:
 	var before: bool = previous_buttons.get(action_name, false)
@@ -400,7 +427,8 @@ func _physics_process(dt: float) -> void:
 				primary = {"move": Vector2(1, 0.25).normalized(), "aim": Vector2(1, -0.15).normalized(), "fire": true}
 			var secondary := {} if menu.visible or screenshot_mode else player_input(1, false)
 			if hosting and guest_id > 0:
-				remote_age += dt; secondary = remote_cmd if remote_age < 0.4 else {}
+				remote_age += dt
+				secondary = remote_cmd if remote_age < 0.4 and not (menu.visible and menu.screen == "summary") else {}
 			sim.step(dt, [primary, secondary])
 			for key in ["interact", "armor", "weapon", "summon", "fusion", "dodge", "jump"]: remote_cmd[key] = false
 			if hosting and guest_id > 0:
@@ -411,6 +439,7 @@ func _physics_process(dt: float) -> void:
 			save_timer += dt
 			if save_timer > 2: save_timer = 0; save_progress()
 			if not sim.new_unlocks.is_empty(): sim.new_unlocks.clear(); save_progress()   # desbloqueio salva na hora
+	present_summary_if_needed()
 	var target: Vector2 = sim.actors[0].p
 	if sim.coop == "local": target = (sim.actors[0].p + sim.actors[1].p) / 2
 	elif online and not hosting: target = sim.actors[1].p
@@ -577,6 +606,7 @@ func load_game() -> bool:
 	if not saved_spectres is Array or saved_spectres.size() != 2: return false
 	disconnect_network()
 	sim.apply_snapshot(state)
+	presented_summary_seq = sim.summary_seq
 	sim.rng.state = safe_int(data.get("rng_state", sim.rng.state), sim.rng.state)
 	sim.arena_wait = safe_float(data.get("arena_wait", 0.0)); sim.uid = safe_int(data.get("uid", 0))
 	sim.reward_claimed = data.get("reward_claimed", false) == true
@@ -616,7 +646,7 @@ func capture() -> void:
 	if "--capture-arena" in OS.get_cmdline_user_args(): path = "res://test-output/arena-v06.png"
 	if "--capture-boss" in OS.get_cmdline_user_args(): path = "res://test-output/boss-v06.png"
 	if "--capture-docks-v04" in OS.get_cmdline_user_args(): path = "res://test-output/docks-v04.png"
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "summary"]:
 		if "--capture-ui-" + page in OS.get_cmdline_user_args(): path = "res://test-output/ui-" + page + ".png"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-name="): path = "res://test-output/" + arg.trim_prefix("--capture-name=") + ".png"
