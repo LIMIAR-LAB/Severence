@@ -474,6 +474,24 @@ CHESTS[:] = [c for c in CHESTS if not inside_room(c,"warehouse")]
 CHESTS.append((6100,6100,False))
 DEC[:] = [d for d in DEC if not (d[2] == "tentacle_pool" and any(inside_room(d,r) for r in ["warehouse","chapel"]))]
 
+# 0.18: esquadrões fixos por sala, sem sorteio de classes.
+SQUADS = {
+    "entry": ["crawler", "fish", "cult"],
+    "rails": ["guard", "brute", "bomber", "cult"],
+    "market": ["fish", "crawler", "guard", "bomber"],
+    "cellar": ["crawler", "cult", "bomber"],
+    "ammo": ["brute", "guard", "fish", "bomber"],
+}
+counts = {}
+for point in SPAWNS:
+    room = next((rid for rid in R if inside_room(point, rid)), "dock")
+    squad = SQUADS.get(room, ["cult", "guard", "crawler", "fish", "bomber", "brute"])
+    index = counts.get(room, 0); counts[room] = index + 1
+    point[2] = squad[index % len(squad)]
+for room, points in WAVES.items():
+    squad = SQUADS.get(room, ["guard", "bomber", "cult", "crawler"])
+    for index, point in enumerate(points): point[2] = squad[index % len(squad)]
+
 def v2(p): return f"Vector2({p[0]}, {p[1]})"
 def r2(r): return f"Rect2({r[0]}, {r[1]}, {r[2]}, {r[3]})"
 def val(x):

@@ -23,7 +23,9 @@ func _init() -> void:
 	s.spawn_enemy(Vector2(470, 500), "bomber")
 	s.enemies[0].hp = 0
 	s.step_enemies(0.016)
-	check(s.effects.any(func(fx): return fx.kind == "explosion"), "Bomber morto cria explosão")
+	check(s.combat_zones.size() == 1 and s.effects.all(func(fx): return fx.kind != "explosion"), "Bomber morto anuncia antes de explodir")
+	s.step_enemies(0.66); s.step_enemies(0.016)
+	check(s.effects.any(func(fx): return fx.kind == "explosion"), "Bomber morto cria explosão após aviso")
 	check(not s.fuses.is_empty(), "explosão do Bomber acende barril explosivo")
 
 	# Guard rebate tiro frontal, mas um tiro pelas costas causa dano.

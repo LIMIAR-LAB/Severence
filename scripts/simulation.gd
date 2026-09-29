@@ -8,6 +8,12 @@ const EquipmentData := preload("res://scripts/equipment_data.gd")
 var actors: Array = []
 var enemies: Array = []
 var bullets: Array = []
+# 0.18: ameaças temporárias autoritativas, nunca gravadas na geometria do mapa.
+var combat_zones: Array = []
+var harpoons: Array = []
+const ATTACK_LIMIT := 3
+const ATTACK_WARNING := 0.55
+const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
 var effects: Array = []
 var rooms: Array = []
@@ -200,7 +206,7 @@ func make_hub() -> void:
 	mode = "hub"
 	pending_spawns.clear()   # 0.15: portais atrasados da arena não atravessam para o Refúgio
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
-	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
+	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [
 		Rect2(420, 300, 490, 188),   # piso central (xadrez)
 		Rect2(560, 180, 190, 125),   # escadaria do portal
@@ -239,7 +245,7 @@ func start_arena() -> void:
 	pending_spawns.clear()
 	side_active = false; side_complete = false; side_failed = false; side_time = 0
 	actors = [actor(0, Vector2(400, 600)), actor(1, Vector2(470, 650))]
-	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
+	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [Rect2(80, 100, 1120, 820)]
 	rooms = [{"r": floors[0], "name": "ARENA DE TESTE • ONDAS / DASH / ROBÔ", "kind": "arena"}]
 	mech = new_mech(Vector2(250, 800)); money = 0; keys = 0; apply_unlock_state()
@@ -282,7 +288,7 @@ func start_run(new_seed: int) -> void:
 	actors = [actor(0, P.spawn), actor(1, P.spawn2)]
 	for a in actors:
 		a.hp = max_hp(); a.shield = 0.0; a.armor = false; a.armor_cd = ARMORS[a.armor_type].cooldown  # carrega durante a expedição
-	enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); decor.clear(); visited.clear()
+	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); decor.clear(); visited.clear()
 	rooms = []
 	for room in DOCKS.ROOMS: rooms.append(room.duplicate())
 	floors = []
@@ -313,10 +319,10 @@ func start_run(new_seed: int) -> void:
 	mech = new_mech(P.mech); apply_unlock_state()
 	reset_spectres()
 	for sp in DOCKS.SPAWNS:
-		var pool: Array = DOCKS.GROUPS[sp[2]]
+
 		var pos := Vector2(sp[0], sp[1]) + Vector2(rng.randf_range(-40, 40), rng.randf_range(-40, 40))
 		if not clear_at(pos, 16): pos = Vector2(sp[0], sp[1])
-		spawn_enemy(pos, pool[rng.randi_range(0, pool.size() - 1)])
+		spawn_enemy(pos, sp[2])
 	spawn_enemy(P.boss, "boss")
 	spawn_enemy(P.warden, "warden")
 	pickups.append({"p": P.key, "kind": "key"})
@@ -402,8 +408,8 @@ func step_gates(step_dt: float = 0.016) -> void:
 
 func spawn_wave(room: Dictionary) -> void:
 	for w in room.waves:
-		var pool: Array = DOCKS.GROUPS[w[2]]
-		spawn_enemy(Vector2(w[0], w[1]), pool[rng.randi_range(0, pool.size() - 1)])
+
+		spawn_enemy(Vector2(w[0], w[1]), w[2])
 		enemies[-1]["alerted"] = true; enemies[-1]["room"] = room.id
 	room.waves = []
 
@@ -501,7 +507,11 @@ func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
 	enemies.append({"id": uid, "p": pos, "kind": kind, "hp": hp, "max": hp, "cd": rng.randf_range(0.5, 1.5), "phase": 0, "hurt": 0.0, "side": optional,
 		"room": room_at(pos).get("id", "") if mode == "run" else "",
 		"face": Vector2.DOWN, "moving": false, "shot": 0.0, "stage": 1, "charge": 0.0, "spin": 0.0, "spin_angle": 0.0, "step": 0.0,
-		"fight_time": 0.0, "enraged": false, "fuse": -1.0, "zigzag": rng.randf_range(0.0, TAU), "detonated": false, "damage_scale": 1.0})
+		"fight_time": 0.0, "enraged": false, "fuse": -1.0, "zigzag": rng.randf_range(0.0, TAU), "detonated": false, "damage_scale": 1.0, "combat": "ready", "combat_t": 0.0, "target_id": -1, "elite": "", "trail_t": 0.0})
+	# Modificador único, reproduzível pela seed; a entrada e salas seguras ficam livres.
+	var room_id: String = room_at(pos).get("id", "")
+	if mode == "run" and room_id not in ["", "entry", "dock", "landing", "spawn", "chapel", "warehouse", "shop", "secret"] and kind not in ["boss", "warden", "crawler_small"] and rng.randf() < 0.16:
+		enemies[-1].elite = ["shield", "trail", "explosive"][rng.randi_range(0, 2)]
 
 func say(text: String) -> void:
 	message = text; message_time = 5.0
@@ -535,6 +545,8 @@ func clear_at(pos: Vector2, radius: float, airborne: bool = false) -> bool:
 		if gate.grow(radius).has_point(pos): return false
 	for tg in tentacle_gates:
 		if not tg.sealed and tg.block.grow(radius).has_point(pos): return false
+	for stake in harpoons:
+		if pos.distance_to(stake.p) < radius + 9: return false
 	return true
 
 func move_body(pos: Vector2, movement: Vector2, radius: float, airborne: bool = false) -> Vector2:
@@ -810,7 +822,7 @@ func step_bomb(b: Dictionary, dt: float) -> void:
 		explode(b.p, MECH_BOMB.radius, b.damage, true); b.life = 0
 
 func add_bullet(pos: Vector2, direction: Vector2, team: int, damage: float, speed: float, radius: float = 5.0, owner_id: int = -1, kind: String = "", life: float = 3.0) -> void:
-	bullets.append({"p": pos, "v": direction * speed, "team": team, "damage": damage, "r": maxf(radius, 6.0) if team == 0 else radius * 1.12, "visual_r": maxf(radius, 6.0) / 0.8 if team == 0 else radius * 1.4, "life": life, "owner": owner_id, "kind": kind})
+	bullets.append({"p": pos, "v": direction * speed, "team": team, "damage": damage, "r": maxf(radius, 6.0) if team == 0 else radius * 1.12, "visual_r": maxf(radius, 6.0) / 0.8 if team == 0 else radius * 1.4, "age": 0.0, "life": life, "owner": owner_id, "kind": kind})
 
 # 0.15: número de dano flutuante — desenhado em world_view.gd
 func pop_dmg(p: Vector2, amount: float, heavy: bool = false) -> void:
@@ -1049,6 +1061,7 @@ func detection_range(a: Dictionary, base: float) -> float:
 	return base * 0.55 if outfit_of(a) == "espiao" and not a.mech else base
 
 func step_enemies(dt: float) -> void:
+	step_combat_zones(dt)
 	# 0.15: o portal aparece primeiro; só materializa o inimigo depois de 0,8s.
 	var ready_spawns: Array = []
 	for pending in pending_spawns:
@@ -1064,15 +1077,7 @@ func step_enemies(dt: float) -> void:
 	var spawned: Array = []
 	for e in enemies:
 		e.hurt = maxf(0, e.hurt - dt); e.shot = maxf(0, e.shot - dt); e.moving = false
-		# Guard bloqueia apenas tiros que chegam pelo lado para o qual está olhando.
-		if e.kind == "guard":
-			for b in bullets:
-				if b.team != 0 or b.life <= 0 or b.p.distance_to(e.p) > 32.0 + b.r: continue
-				var bullet_side: Vector2 = (b.p - e.p).normalized()
-				if bullet_side.dot(e.face) <= 0: continue
-				b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 8.0
-				e.hurt = 0.12
-				effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18})
+		if e.hp <= 0: continue
 		var target: Dictionary = {}; var closest := 99999.0
 		# Linha de visão só é testada a cada 0,3s para quem ainda não foi alertado (mapa grande = muitos inimigos).
 		var look := true
@@ -1087,59 +1092,21 @@ func step_enemies(dt: float) -> void:
 			var reach := detection_range(a, 900.0 if e.kind == "boss" else 700.0)
 			if e.get("alerted", false): reach = maxf(reach, 640.0)
 			if d < reach and d < closest and (e.get("alerted", false) or e.kind == "boss" or line_of_fire(e.p, a.p)): closest = d; target = a
-		if target.is_empty(): continue
+		if target.is_empty():
+			e["combat"] = "ready"; e["target_id"] = -1; e["jump_height"] = 0.0; e["crouched"] = false; continue
 		e["alerted"] = true
 		var direction: Vector2 = (target.p - e.p).normalized()
 		e.face = direction
 		if e.kind == "warden": step_warden(e, target, direction, closest, dt); continue
 		if e.kind == "boss": step_boss(e, target, direction, closest, dt); continue
-		if e.kind == "bomber":
-			e.zigzag += dt * 8.0
-			if closest < 120.0:
-				e.fuse = 0.35 if e.fuse < 0 else maxf(0, e.fuse - dt)
-				if sin(e.zigzag * 2.0) > 0: e.hurt = 0.12
-			if closest < BOMBER_BLAST.trigger:
-				e.detonated = true; e.hp = 0
-				explode(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, true, true)
-				continue
-		var preferred: float = {"cult": 240.0, "fish": 210.0, "brute": 220.0, "crawler": 110.0, "crawler_small": 18.0,
-			"bomber": 0.0, "guard": 150.0}.get(e.kind, 120.0)
-		var speed: float = {"cult": 100.0, "fish": 85.0, "brute": 95.0, "crawler": 140.0, "crawler_small": 170.0,
-			"bomber": 220.0, "guard": 50.0}.get(e.kind, 100.0)
-		speed *= 1.2
-		if closest > preferred:
-			var before: Vector2 = e.p
-			var move_direction := direction.rotated(sin(e.zigzag) * 0.65) if e.kind == "bomber" else direction
-			e.p = move_body(e.p, move_direction * speed * dt, 14)
-			e.moving = e.p.distance_to(before) > 0.1; e.step += dt * 8
-		e.cd -= dt
-		if e.cd > 0: continue
-		match e.kind:
-			# 0.11: cadência ~40% maior, projéteis mais rápidos e mais fortes
-			"cult":
-				e.cd = 0.9; e.shot = 0.3
-				add_bullet(e.p, direction, 1, 12 * e.damage_scale, 240, 6, -1, "magenta")
-				if rng.randf() < 0.35: add_bullet(e.p, direction.rotated(0.18), 1, 12 * e.damage_scale, 240, 6, -1, "magenta")
-			"fish":
-				e.cd = 1.4; e.shot = 0.35
-				add_bullet(e.p, direction, 1, 22 * e.damage_scale, 320, 6, -1, "harpoon")
-			"brute":
-				e.cd = 1.2; e.shot = 0.35
-				for n in range(6): add_bullet(e.p, direction.rotated((n - 2.5) * 0.12), 1, 9 * e.damage_scale, 290, 5, -1, "violet")
-			"crawler":
-				e.cd = 0.8
-				if closest < 220:
-					e.shot = 0.3
-					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.28), 1, 9 * e.damage_scale, 250, 6, -1, "acid", 0.9)
-			"crawler_small":
-				e.cd = 0.55
-				if closest < 34: damage_actor(target, 8 * e.damage_scale)
-		e.cd *= 0.85
+		step_common_enemy(e, target, dt)
+
 	for e in enemies:
 		if e.hp > 0: continue
 		if e.kind == "bomber" and not e.detonated:
 			e.detonated = true
-			explode(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, true, true)
+			add_combat_zone(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, "blast", 0.65, 0.1)
+		if e.get("elite", "") == "explosive": add_combat_zone(e.p, 100, 22, "blast", 0.75, 0.1)
 		# 0.15: sequência de abates — bônus de moedas crescente + hitstop (maior em elites)
 		streak += 1; streak_t = 2.2
 		money += 4 + mini(streak - 1, 4)
@@ -1243,8 +1210,23 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 					for n in range(20): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 20 + e.phase * 0.3), 1, 12, 175, 7, -1, "orb")
 
 func step_bullets(dt: float) -> void:
+	var children: Array = []
 	for b in bullets:
+		if b.life <= 0: continue
 		b.life -= dt
+		if b.life <= 0:
+			if b.get("stake", false): lodge_harpoon(b.p)
+			continue
+		b["age"] = b.get("age", 0.0) + dt
+		if b.get("arc", false):
+			b.p = b.from.lerp(b.to, minf(1, b.age / b.flight))
+			if b.age >= b.flight:
+				add_combat_zone(b.to, 62, b.damage, "acid", 0, 2.5); b.life = 0
+			continue
+		b.v = b.v.rotated(b.get("curve", 0.0) * dt)
+		if b.get("accel", 0.0) != 0: b.v = b.v.normalized() * clampf(b.v.length() + b.accel * dt, 40, 620)
+		if b.get("trail", false) and b.age >= b.get("trail_next", 0.0):
+			b["trail_next"] = b.age + 0.22; add_combat_zone(b.p, 22, 10, "trail", 0.5, 1.3)
 		if b.get("kind", "") == "bomb": step_bomb(b, dt); continue
 		var distance: float = b.v.length() * dt
 		var count := maxi(1, int(ceil(distance / 5.0)))
@@ -1261,6 +1243,10 @@ func step_bullets(dt: float) -> void:
 					if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
 						var previous_hits: Array = b.get("hits", [])
 						if previous_hits.has(e.id): continue
+						if e.hp <= 0: continue
+						if (e.kind == "guard" or e.get("elite", "") == "shield") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") != "p_omega":
+							b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
+							effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
 						e.hp -= b.damage; e.hurt = 0.12; e["alerted"] = true
 						# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
 						pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
@@ -1292,7 +1278,15 @@ func step_bullets(dt: float) -> void:
 						if b.get("kind", "") == "harpoon" and not a.mech: a.snare = 0.9
 						break
 			if b.life <= 0: break
+		if b.life <= 0 and b.get("stake", false): lodge_harpoon(b.p - b.v.normalized() * 18)
+		if b.life > 0 and b.get("split_at", -1.0) > 0 and b.age >= b.split_at:
+			for n in range(4):
+				var child: Dictionary = b.duplicate(true)
+				child.v = b.v.normalized().rotated(n * TAU / 4) * 220; child.life = 2.5; child.age = 0; child.split_at = -1; child.curve = 0
+				children.append(child)
+			b.life = 0
 	bullets = bullets.filter(func(b): return b.life > 0)
+	bullets.append_array(children)
 
 func collect_pickups() -> void:
 	for pickup in pickups:
@@ -1413,7 +1407,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "story_quest", "dialogue_queue", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "upgrade", "clears", "armor_unlocked", "unlocked", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
 		data[name] = get(name)
 	return data
 
@@ -1608,3 +1602,142 @@ func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
 	if e.motion_t <= 0 or delta.length()<12:
 		e.motion="idle";e.motion_cd=3.0;e.cd=maxf(e.cd,0.5)
 	return true
+
+# 0.18: ciclo comum. Chefes conservam seus próprios estados e padrões.
+func attack_slots(target_id: int) -> int:
+	return enemies.filter(func(e): return e.hp > 0 and e.get("target_id", -1) == target_id and e.get("combat", "") in ["warning", "attack"]).size()
+
+func tactical_move(e: Dictionary, target: Dictionary, dt: float) -> void:
+	var delta: Vector2 = target.p - e.p
+	var direction := delta.normalized()
+	var distance := delta.length()
+	var speed: float = {"guard": 60.0, "bomber": 220.0, "crawler": 150.0, "crawler_small": 190.0, "fish": 110.0, "brute": 85.0}.get(e.kind, 110.0)
+	var preferred: float = {"bomber": 30.0, "crawler": 160.0, "crawler_small": 35.0, "guard": 180.0, "fish": 310.0, "brute": 290.0}.get(e.kind, 260.0)
+	var movement := direction if distance > preferred else direction.orthogonal() * (1 if int(e.id) % 2 == 0 else -1)
+	if distance < preferred * 0.65: movement = -direction
+	if e.kind == "bomber": movement = direction.rotated(sin(e.zigzag) * 0.65)
+	elif e.kind == "crawler": movement = movement.rotated(sin(e.zigzag * 0.7) * 0.4)
+	elif e.kind == "fish": movement = movement * (1.0 if fposmod(e.step, 3) < 1.7 else 0.25)
+	elif e.kind == "guard": movement = direction if distance > preferred else -direction * 0.2
+	e["crouched"] = false
+	if e.kind == "brute" and e.combat == "recover" and e.has("cover"):
+		movement = (e.cover - e.p).normalized()
+		if e.p.distance_to(e.cover) < 12: movement = Vector2.ZERO; e.crouched = true
+	var before: Vector2 = e.p
+	e.p = move_body(e.p, movement * speed * dt, 14)
+	if mode == "run" and room_at(e.p).get("kind", "") in ["entry", "maze", "story", "shop"] and room_at(e.p).get("id", "") != e.get("room", ""):
+		e.p = before
+	e.moving = e.p.distance_to(before) > 0.1; e.step += dt * 8
+
+func find_cover(e: Dictionary, target: Dictionary) -> void:
+	e.erase("cover")
+	var best := 360.0
+	for i in range(obstacles.size()):
+		if i >= obstacle_kinds.size() or obstacle_kinds[i] != "sandbags": continue
+		var box: Rect2 = obstacles[i]
+		var candidate: Vector2 = box.get_center() + (box.get_center() - target.p).normalized() * (box.size.length() * 0.5 + 24)
+		if e.p.distance_to(candidate) < best and clear_at(candidate, 16) and line_of_fire(e.p, candidate):
+			best = e.p.distance_to(candidate); e["cover"] = candidate
+
+func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
+	e["combat"] = e.get("combat", "ready"); e["combat_t"] = e.get("combat_t", 0.0) - dt
+	# 0.18: a reserva pertence a um alvo válido; não transferir ataque sem novo aviso.
+	if e.combat in ["warning", "attack"]:
+		var reserved_id: int = e.get("target_id", -1)
+		if reserved_id < 0 or reserved_id >= actors.size() or not actors[reserved_id].active or actors[reserved_id].dead:
+			e.combat = "ready"; e.target_id = -1; e["jump_height"] = 0.0; e["crouched"] = false; e.cd = 0.15
+			return
+	e.zigzag += dt * 8
+	if e.get("elite", "") == "trail":
+		e.trail_t -= dt
+		if e.trail_t <= 0: e.trail_t = 0.65; add_combat_zone(e.p, 25, 10, "trail", 0.65, 2)
+	if e.combat == "warning":
+		if e.get("target_id", -1) != target.id:
+			e.combat = "ready"; e.target_id = -1; e["jump_height"] = 0.0; return
+		e.hurt = 0.12 if sin(e.zigzag * 2) > 0 else 0
+		if e.kind != "fish": e["locked"] = target.p
+		e.face = (e.locked - e.p).normalized()
+		if e.combat_t <= 0:
+			e.combat = "attack"; e.combat_t = 0.7; e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
+		return
+	if e.combat == "attack":
+		var direction: Vector2 = (e.locked - e.p).normalized()
+		e.face = direction; e.shot = 0.15
+		match e.kind:
+			"brute":
+				e.burst_t -= dt
+				if e.burst_t <= 0 and e.burst < 6:
+					add_bullet(e.p, direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
+					bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
+			"crawler", "crawler_small":
+				var max_distance := 220.0 if e.kind == "crawler" else 110.0
+				var goal: Vector2 = e.launch + (e.locked - e.launch).limit_length(max_distance)
+				e["jump_height"] = sin(clampf(1 - e.combat_t / 0.7, 0, 1) * PI) * 65
+				var before_jump: Vector2 = e.p
+				e.p = move_body(e.p, (goal - e.p).limit_length(400 * dt), 14)
+				if mode == "run" and room_at(e.p).get("kind", "") in ["entry", "maze", "story", "shop"] and room_at(e.p).get("id", "") != e.get("room", ""):
+					e.p = before_jump
+				e.moving = true
+				if e.combat_t <= 0:
+					e.jump_height = 0
+					add_combat_zone(e.p, 58 if e.kind == "crawler" else 32, 12 * e.damage_scale, "acid", 0.15, 2.5)
+			"bomber":
+				e.hp = 0; e.detonated = true
+				combat_blast(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale)
+			_:
+				if e.burst == 0:
+					e.burst = 1
+					add_bullet(e.p, direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
+					if e.kind == "cult": bullets[-1]["split_at"] = 0.8; bullets[-1]["curve"] = 0.18
+					if e.get("elite", "") == "trail": bullets[-1]["trail"] = true
+					if e.kind == "fish": bullets[-1]["stake"] = true
+					if e.kind == "guard":
+						bullets[-1].merge({"arc": true, "from": e.p, "to": e.locked, "flight": 0.9}, true)
+		if e.combat_t <= 0:
+			e.combat = "recover"; e.combat_t = 1.4; e.target_id = -1
+			if e.kind == "brute":
+				find_cover(e, target)
+				if e.has("cover"): e.combat_t = maxf(e.combat_t, e.p.distance_to(e.cover) / 85.0 + 0.7)
+		return
+	tactical_move(e, target, dt)
+	if e.combat == "recover":
+		if e.combat_t <= 0: e.combat = "ready"; e.cd = 0.15
+		return
+	e.cd -= dt
+	if e.cd > 0 or attack_slots(target.id) >= ATTACK_LIMIT or not line_of_fire(e.p, target.p): return
+	if e.kind == "bomber" and e.p.distance_to(target.p) > 100: return
+	if e.kind in ["crawler", "crawler_small"] and e.p.distance_to(target.p) > 300: return
+	e.combat = "warning"; e.combat_t = ATTACK_WARNING; e.target_id = target.id
+	e["locked"] = target.p; e["launch"] = e.p
+
+func add_combat_zone(p: Vector2, radius: float, damage: float, kind: String, warning: float, duration: float) -> void:
+	if combat_zones.size() >= MAX_COMBAT_ZONES: return
+	combat_zones.append({"p": p, "r": radius, "damage": damage, "kind": kind, "warning": warning, "life": duration, "cd": 0.0})
+
+func step_combat_zones(dt: float) -> void:
+	for stake in harpoons: stake.life -= dt
+	harpoons = harpoons.filter(func(h): return h.life > 0)
+	for zone in combat_zones.duplicate():
+		if zone.warning > 0: zone.warning -= dt; continue
+		zone.life -= dt; zone.cd -= dt
+		if zone.kind == "blast":
+			combat_blast(zone.p, zone.r, zone.damage); zone.life = 0; continue
+		if zone.life <= 0 or zone.cd > 0: continue
+		zone.cd = 0.4
+		for a in actors:
+			if a.active and not a.dead and a.jump <= 0 and a.p.distance_to(zone.p) < zone.r * 0.8 and line_of_fire(zone.p, a.p): damage_actor(a, zone.damage)
+	combat_zones = combat_zones.filter(func(z): return z.life > 0)
+
+func lodge_harpoon(p: Vector2) -> void:
+	if harpoons.size() >= 24 or not clear_at(p, 14): return
+	for a in actors:
+		if a.active and a.p.distance_to(p) < 45: return
+	for door in doors:
+		if door.r.grow(45).has_point(p): return
+	harpoons.append({"p": p, "life": 3.5})
+
+func combat_blast(p: Vector2, radius: float, damage: float) -> void:
+	# O explode existente cuida dos barris e inimigos; jogadores respeitam paredes.
+	explode(p, radius, damage, true, false)
+	for a in actors:
+		if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8 and line_of_fire(p, a.p): damage_actor(a, damage)
