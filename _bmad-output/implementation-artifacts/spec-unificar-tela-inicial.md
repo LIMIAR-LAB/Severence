@@ -2,7 +2,7 @@
 title: 'Unify the title screen'
 type: 'refactor'
 created: '2026-09-29'
-status: 'done'
+status: 'in-review'
 baseline_commit: '1b938c74108d518d569049316856852211df8201'
 context:
   - '{project-root}/docs/architecture.md'
