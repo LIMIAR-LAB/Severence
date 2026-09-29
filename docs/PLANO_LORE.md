@@ -5,6 +5,23 @@
 > (épicos de infra roguelike já aprovados). Este documento cobre o CONTEÚDO da lore;
 > os épicos 1-5 cobrem a espinha de run/meta/seed.
 
+## Divisão em duas partes (DECIDIDO)
+
+**Parte A — PRÉ-VENDA:** Passos 0, 1 e 2. Entrega um jogo completo em si:
+loop roguelike funcional, Docas de 1941 polida e alinhada à lore, e o sistema de
+personagens jogáveis. É o que vai para pré-venda/early access.
+
+**Parte B — PÓS-LANÇAMENTO:** Passos 3, 4 e 5. As eras 2-5, o confronto final
+(Arauto + Cthulhu) e a cinemática inicial entram como conteúdo depois do lançamento.
+
+> ⚠️ Decisão pendente na Parte A (Passo 2): a lore amarra o desbloqueio dos
+> personagens ao resgate na era de cada um — que só vem na Parte B. Recomendação:
+> os caminhos de desbloqueio são **data-driven** (`unlock` no CharacterDef), então
+> na pré-venda personagens podem ser liberados por estações do Refúgio / moeda de
+> meta / quests das Docas, e a missão de resgate vira a forma "história" de obtê-los
+> depois. Assim o roster já vende o jogo sem contradizer a lore: quem comprar cedo
+> encontra o personagem na estação; quem jogar a era vê a versão dramática.
+
 ---
 
 ## 1. Estado atual (auditado no código)
@@ -59,6 +76,8 @@ A lore e a arquitetura roguelike **se encaixam perfeitamente**:
 
 ## 2. Passos para concluir (ordem de execução)
 
+### ⮕ PARTE A — PRÉ-VENDA (passos 0-2)
+
 ### Passo 0 — Espinha roguelike (Epics 1-2, já aprovados)
 RunDirector, RunState/MetaState, seed, camada de variância. **Pré-requisito de
 tudo abaixo** — resgates e recompensas vivem no MetaState.
@@ -85,6 +104,8 @@ tudo abaixo** — resgates e recompensas vivem no MetaState.
 - Atlases seguem `docs/SPRITE_POSE_STANDARD.md`; gerar arte via PixelLab MCP.
 - Desbloqueio por resgate gravado no MetaState; Letícia/Vincent/Íris só viram
   jogáveis depois da primeira vitória da era deles.
+
+### ⮕ PARTE B — PÓS-LANÇAMENTO (passos 3-5)
 
 ### Passo 3 — Eras 2-5 (uma por vez, template fixo)
 Cada era usa o molde das Docas: entrada autoral (set piece), 8-14 salas +
