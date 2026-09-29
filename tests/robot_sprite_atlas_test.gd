@@ -11,11 +11,16 @@ func _init() -> void:
 	var atlases := [
 		["res://assets/mech/titan_v5.png", Vector2i(1760, 880), "Titan limpo: 10x5 em 176px"],
 		["res://assets/mech/spectre_octopus_v2.png", Vector2i(512, 512), "Spectre: 4x4 em 128px"],
-		["res://assets/marty/spectre_fusion_v2.png", Vector2i(640, 640), "Fusão: 4x4 em 160px"]]
+		["res://assets/marty/spectre_fusion_v3.png", Vector2i(640, 640), "Fusão: 4x4 em 160px"]]
 	for spec in atlases:
 		var image := Image.load_from_file(ProjectSettings.globalize_path(spec[0]))
 		check(not image.is_empty() and image.get_size() == spec[1], spec[2])
 	var titan := Image.load_from_file(ProjectSettings.globalize_path("res://assets/mech/titan_v5.png"))
+	var fusion := Image.load_from_file(ProjectSettings.globalize_path("res://assets/marty/spectre_fusion_v3.png"))
+	for row in range(4):
+		for col in range(4):
+			var bounds := fusion.get_region(Rect2i(col*160,row*160,160,160)).get_used_rect()
+			check(bounds.position.x >= 6 and bounds.end.x <= 154 and bounds.position.y >= 6 and bounds.end.y == 154, "fusão %d,%d: corpo inteiro e pés alinhados" % [row,col])
 	for row in range(5):
 		var first := titan.get_region(Rect2i(176, row * 176 + 120, 176, 44)).get_data()
 		var second := titan.get_region(Rect2i(352, row * 176 + 120, 176, 44)).get_data()

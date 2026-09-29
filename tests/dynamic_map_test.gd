@@ -59,7 +59,7 @@ func _init() -> void:
 	# salto no canal do Armazém: quem cai na água volta para a borda
 	s.start_run(1941)
 	var m: Dictionary = s.actors[0]
-	var gap: Rect2 = DOCKS.GAPS[2]
+	var gap: Rect2 = DOCKS.GAPS[-1]
 	m.p = Vector2(gap.position.x - 20, gap.get_center().y); m.hurt = 0
 	var from: Vector2 = m.p
 	s.step_actor(m, {"jump": true, "move": Vector2.RIGHT}, 0.016)
