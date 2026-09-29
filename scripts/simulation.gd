@@ -81,6 +81,10 @@ var clutch_t := 0.0              # 0.15: slow-mo quando o jogador fica com meio 
 var clutch_cd := 0.0
 var streak := 0                  # 0.15: abates em sequência — bônus de moedas
 var streak_t := 0.0
+# Resumo da expedição: telemetria da run atual e último resultado imutável.
+var run_stats: Dictionary = {}
+var last_run_summary: Dictionary = {}
+var summary_seq := 0
 var ob_grid: Dictionary = {}     # grade espacial dos obstáculos (mapa grande = muitos props)
 var ob_grid_count := -1
 
@@ -93,7 +97,22 @@ func actor(id: int, pos: Vector2) -> Dictionary:
 		"hurt": 0.0, "step": 0.0, "mech": false, "dead": id == 1 and coop == "solo", "gun": 0, "interact_cd": 0.0, "revive": 0.0,
 		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
 		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
-		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0}
+		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0,
+		"last_damage_source": "unknown", "last_damage_attack": ""}
+
+func fresh_run_stats() -> Dictionary:
+	return {"kills": 0, "kills_by_kind": {}, "damage_dealt": 0.0, "damage_received": 0.0,
+		"max_streak": 0, "chests_opened": 0, "revives": 0, "fatal_source": "unknown", "fatal_attack": ""}
+
+func ensure_run_stats() -> void:
+	if run_stats.is_empty(): run_stats = fresh_run_stats()
+
+func hurt_enemy(enemy: Dictionary, amount: float, credit_player: bool = true) -> void:
+	var before := maxf(0.0, float(enemy.get("hp", 0.0)))
+	enemy.hp -= amount
+	if mode == "run" and credit_player:
+		ensure_run_stats()
+		run_stats.damage_dealt += minf(before, maxf(0.0, amount))
 
 # UNIFORMES (skins, sempre vestidos) e ARMADURAS (poder temporário com recarga).
 # Cada uniforme tem arma, velocidade, golpe e resistência próprios.
@@ -173,7 +192,7 @@ func transform_burst(a: Dictionary) -> void:
 	for e in enemies:
 		var d: float = e.p.distance_to(a.p)
 		if d < 190:
-			e.hp -= 40.0 if e.kind != "boss" else 25.0; e.hurt = 0.2
+			hurt_enemy(e, 40.0 if e.kind != "boss" else 25.0); e.hurt = 0.2
 			if e.kind != "boss": e.p = move_body(e.p, (e.p - a.p).normalized() * (190 - d) * 0.6, 14)
 	for b in bullets:
 		if b.team == 1 and b.p.distance_to(a.p) < 240: b.life = 0
@@ -285,7 +304,9 @@ func start_run(new_seed: int) -> void:
 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
 	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
 	seed_value = new_seed; rng.seed = seed_value
+	run_stats = fresh_run_stats(); last_run_summary = {}
 	mode = "run"; tick_time = 0; money = 12; keys = 1; run_materials_start = materials
+	streak = 0; streak_t = 0.0; hitstop = 0.0; clutch_t = 0.0; clutch_cd = 0.0
 	side_active = false; side_complete = false; side_failed = false; shop_bought = false
 	boss_dead = false; secret_open = false; reward_claimed = false
 	var P: Dictionary = DOCKS.POINTS
@@ -332,6 +353,67 @@ func start_run(new_seed: int) -> void:
 	pickups.append({"p": P.key, "kind": "key"})
 	build_navigation()
 	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. A armadura carrega em 60s.")
+
+func run_progress_percent(outcome: String = "") -> int:
+	var discoverable := rooms.filter(func(room): return room.get("kind", "") != "secret")
+	var visited_discoverable := 0
+	for room in discoverable:
+		if visited.has(room.id): visited_discoverable += 1
+	var room_part := 0.0 if discoverable.is_empty() else clampf(float(visited_discoverable) / float(discoverable.size()), 0.0, 1.0) * 80.0
+	var objective_part := (10.0 if boss_dead else 0.0) + (10.0 if outcome == "victory" else 0.0)
+	return 100 if outcome == "victory" else clampi(int(round(room_part + objective_part)), 0, 99)
+
+func run_grade(outcome: String, progress: int) -> String:
+	ensure_run_stats()
+	var score := float(progress) + minf(float(run_stats.kills), 50.0) * 0.4
+	# Até 12 pontos por eficiência; o bônus se esgota após 24 minutos.
+	score += clampf(12.0 - tick_time / 120.0, 0.0, 12.0)
+	if side_complete: score += 10.0
+	if secret_open: score += 5.0
+	if outcome == "victory": score += 20.0
+	if score >= 130.0: return "S"
+	if score >= 105.0: return "A"
+	if score >= 80.0: return "B"
+	if score >= 55.0: return "C"
+	return "D"
+
+func obituary_for(source: String, attack: String = "") -> String:
+	var lines := {
+		"fish": ["O peixe mutante arrancou os seus olhos e comeu igual jujuba.", "O peixe mutante provou que arpões também funcionam fora d'água."],
+		"crawler": ["Virou almoço de uma coisa com tentáculos demais e educação de menos."],
+		"crawler_small": ["Foi vencido por um tentáculo do tamanho de um cachecol."],
+		"brute": ["Tentou discutir estratégia com um soldado possuído. Ele preferiu violência."],
+		"bomber": ["Abraçou a explosão. A explosão não estava emocionalmente disponível."],
+		"warden": ["O Guardião carimbou sua passagem só de ida para o Refúgio."],
+		"boss": ["O Almirante promoveu Marty ao posto de decoração submarina."],
+		"hazard": ["Ignorou uma poça suspeita em 1941. A poça venceu."],
+		"water": ["Caiu nas docas e descobriu que armadura pesada não é boia."],
+		"explosion": ["Tentou abraçar uma explosão. O sentimento não era recíproco."],
+		"unknown": ["A linha do tempo se recusa a explicar o que aconteceu aqui."]}
+	var choices: Array = lines.get(source, lines.unknown)
+	var key := "%d:%s:%s" % [seed_value, source, attack]
+	return str(choices[posmod(key.hash(), choices.size())])
+
+func finish_run(outcome: String) -> Dictionary:
+	if mode != "run": return last_run_summary
+	ensure_run_stats()
+	var fatal_source := str(run_stats.get("fatal_source", "unknown"))
+	var fatal_attack := str(run_stats.get("fatal_attack", ""))
+	var progress := run_progress_percent(outcome)
+	last_run_summary = {
+		"outcome": outcome, "seed": seed_value, "time": tick_time, "progress": progress,
+		"kills": int(run_stats.kills), "kills_by_kind": run_stats.kills_by_kind.duplicate(true),
+		"damage_dealt": int(round(float(run_stats.damage_dealt))), "damage_received": int(round(float(run_stats.damage_received))),
+		"max_streak": int(run_stats.max_streak), "chests": int(run_stats.chests_opened),
+		"scrap": maxi(0, money - 12), "fragments": maxi(0, materials - run_materials_start),
+		"nucleus": 1 if outcome == "victory" else 0, "clears": clears,
+		"side_complete": side_complete, "secret_open": secret_open, "boss_dead": boss_dead,
+		"grade": run_grade(outcome, progress), "fatal_source": fatal_source, "fatal_attack": fatal_attack,
+		"obituary": "Núcleo recuperado. O tempo perdeu esta rodada." if outcome == "victory" else obituary_for(fatal_source, fatal_attack)
+	}.duplicate(true)
+	summary_seq += 1
+	make_hub()
+	return last_run_summary
 
 # ── Portões (0.12) ───────────────────────────────────────────────────────────
 # Cada ponta de corredor que encosta numa sala vira um portão. Ao entrar numa sala com inimigos,
@@ -498,7 +580,7 @@ func step_hazards(dt: float) -> void:
 				if h.cd <= 0 and not h.has("trap"):
 					h.cd = 0.7
 					effects.append({"p": h.p, "kind": "tentacle_strike", "life": 0.35, "max": 0.35, "dir": d.normalized() if d.length() > 1 else Vector2.RIGHT})
-				damage_actor(a, h.get("damage", 12.0))
+				damage_actor(a, h.get("damage", 12.0), "hazard", str(h.get("kind", "tentacle")))
 				a.p = move_body(a.p, (d.normalized() if d.length() > 1 else Vector2.DOWN) * 260 * dt, 23 if a.mech else 11)
 
 func room_at(pos: Vector2) -> Dictionary:
@@ -686,7 +768,7 @@ func step(dt: float, commands: Array) -> void:
 				for a in actors: heal(a, 2)
 				say("DESAFIO CONCLUÍDO • 2 chaves, 25 moedas, cura e 1 fragmento permanente!")
 		if actors.all(func(a): return a.dead):
-			make_hub(); say("A âncora temporal resgatou a equipe. Tente novamente.")
+			finish_run("death"); say("A âncora temporal resgatou a equipe. Confira o relatório.")
 	for fx in effects: fx.life -= dt
 	effects = effects.filter(func(fx): return fx.life > 0)
 
@@ -757,7 +839,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		a.jump = maxf(0, a.jump - dt)
 		if a.jump == 0 and not clear_at(a.p, 10):
 			# caiu na água: volta para onde saltou e perde meio coração
-			a.p = a.get("jump_from", a.p); damage_actor(a, 12)
+			a.p = a.get("jump_from", a.p); damage_actor(a, 12, "water", "fall")
 			effects.append({"p": a.p, "kind": "splash", "life": 0.5, "max": 0.5})
 		elif a.jump == 0 and a.mech:
 			# 0.15: pouso do Titan — onda de choque fere e quebra quem está perto
@@ -802,17 +884,17 @@ func throw_bomb(a: Dictionary) -> void:
 	a.bomb_cd = MECH_BOMB.cooldown
 	effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.1, "dir": a.aim})
 
-func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: bool = false) -> void:
+func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: bool = false, credit_player: bool = true) -> void:
 	for e in enemies:
 		var d: float = e.p.distance_to(p)
 		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
 			var dealt: float = damage * (1.0 - 0.45 * clampf(d / radius, 0, 1))
-			e.hp -= dealt; e.hurt = 0.2; e["alerted"] = true
+			hurt_enemy(e, dealt, credit_player); e.hurt = 0.2; e["alerted"] = true
 			pop_dmg(e.p, dealt, big)
 	if hurts_all:   # barril: atinge todo mundo (1 coração) e empurra
 		for a in actors:
 			if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8:
-				damage_actor(a, 20.0)
+				damage_actor(a, 20.0, "explosion", "barrel")
 				var push: Vector2 = (a.p - p).normalized() if a.p.distance_to(p) > 1 else Vector2.DOWN
 				a.p = move_body(a.p, push * 60, 23 if a.mech else 11)
 	# 0.16: parede rachada perto da explosão desmorona e abre o atalho
@@ -896,7 +978,7 @@ func sword_attack(a: Dictionary) -> void:
 	for e in enemies:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach + (30 if e.kind == "boss" else 0) and offset.normalized().dot(a.aim) > -arc:
-			e.hp -= damage; e.hurt = 0.18
+			hurt_enemy(e, damage); e.hurt = 0.18
 			pop_dmg(e.p, damage, finisher)
 			effects.append({"p": e.p, "kind": "impact", "life": 0.2, "max": 0.2, "omega": true})
 			if e.kind != "boss": e.p = move_body(e.p, offset.normalized() * (18 if finisher else 8), 14)
@@ -926,7 +1008,7 @@ func melee(a: Dictionary) -> void:
 		var offset: Vector2 = e.p - a.p
 		if offset.length() < reach and offset.normalized().dot(a.aim) > 0.05:
 			var mdmg: float = MECH_PUNCH if a.mech else float(uniform_of(a).melee)
-			e.hp -= mdmg; e.hurt = 0.15
+			hurt_enemy(e, mdmg); e.hurt = 0.15
 			pop_dmg(e.p, mdmg, a.mech)
 	props_in_arc(a, reach, 40.0 if a.mech else float(uniform_of(a).melee))
 	# A clearly hinted crack opens with a close attack, never a consumable key.
@@ -969,7 +1051,9 @@ func interact(a: Dictionary) -> void:
 		say("Saída bloqueada."); return
 	for other in actors:
 		if other.active and other.id != a.id and other.dead and a.p.distance_to(other.p) < 75:
-			other.dead = false; other.hp = HEART * 1.5; other.hurt = 2; say("Parceiro reanimado!"); return
+			other.dead = false; other.hp = HEART * 1.5; other.hurt = 2
+			if mode == "run": ensure_run_stats(); run_stats.revives += 1
+			say("Parceiro reanimado!"); return
 	if mech.deployed and is_unlocked("titan") and mech.hp > 0 and mech.occupant == -1 and not a.fused and a.p.distance_to(mech.p) < 90:
 		if mech.fuel <= 0: say("Titan sem gasolina • abra os baús para achar um galão."); return
 		begin_cockpit(a, true, a.p); mech.occupant = a.id; a.mech = true; a.p = mech.p; a["fuel_warned"] = false; say("TITAN-01 • Tiro: canhão pesado / R: bomba / Shift: turbo / E: sair • GASOLINA %.0f%%" % (mech.fuel / FUEL_MAX * 100)); return
@@ -1001,6 +1085,7 @@ func interact(a: Dictionary) -> void:
 			if not chest.open and a.p.distance_to(chest.p) < 65:
 				if keys <= 0: say("Baú trancado: precisa de 1 chave."); return
 				keys -= 1; chest.open = true; chest["t"] = tick_time; money += 10
+				ensure_run_stats(); run_stats.chests_opened += 1
 				heal(a, 1); a.armor_cd = 0.0
 				effects.append({"p": chest.p, "kind": "chest_burst", "life": 1.3, "max": 1.3, "secret": chest.secret})
 				# 0.14: os baús sempre soltam um galão de gasolina e uma bateria ao lado.
@@ -1027,11 +1112,13 @@ func interact(a: Dictionary) -> void:
 			if not reward_claimed:
 				reward_claimed = true; materials += 3; clears += 1; armor_unlocked = true
 				check_unlocks()
-			make_hub(); say("Núcleo recuperado! Armadura permanente e 3 fragmentos. A equipe retornou."); return
+			finish_run("victory"); say("Núcleo recuperado! Confira o relatório da expedição."); return
 	say("Aproxime-se de um portal, baú, parceiro caído, comerciante ou robô e pressione E.")
 
-func damage_actor(a: Dictionary, amount: float) -> void:
+func damage_actor(a: Dictionary, amount: float, source_kind: String = "unknown", source_attack: String = "") -> void:
 	if a.hurt > 0 or a.dodge > 0 or a.dead or a.jump > 0 or a.get("transform", 0.0) > 0: return
+	var hp_before := float(a.hp)
+	a.last_damage_source = source_kind; a.last_damage_attack = source_attack
 	a.hurt = 0.45 if a.mech else HURT_IFRAMES
 	if a.mech:
 		mech.hp = maxf(0, mech.hp - amount)
@@ -1057,6 +1144,12 @@ func damage_actor(a: Dictionary, amount: float) -> void:
 			return
 		a.hp -= hit
 		if a.hp <= 0: a.hp = 0; a.dead = true; say("Parceiro caído! Aproxime-se e pressione E para reanimar.")
+	if mode == "run":
+		ensure_run_stats()
+		run_stats.damage_received += maxf(0.0, hp_before - float(a.hp))
+		if a.dead:
+			run_stats.fatal_source = source_kind
+			run_stats.fatal_attack = source_attack
 
 # Inimigos das Docas de 1941 e o Almirante das Profundezas.
 #   cult   Cultista Atirador      orbe magenta, distância média
@@ -1116,6 +1209,11 @@ func step_enemies(dt: float) -> void:
 		if e.get("elite", "") == "explosive": add_combat_zone(e.p, 100, 22, "blast", 0.75, 0.1)
 		# 0.15: sequência de abates — bônus de moedas crescente + hitstop (maior em elites)
 		streak += 1; streak_t = 2.2
+		if mode == "run":
+			ensure_run_stats()
+			run_stats.kills += 1
+			run_stats.kills_by_kind[e.kind] = int(run_stats.kills_by_kind.get(e.kind, 0)) + 1
+			run_stats.max_streak = maxi(int(run_stats.max_streak), streak)
 		money += 4 + mini(streak - 1, 4)
 		if e.kind in ["boss", "warden"]: hit_stop(0.09); streak_t = 3.0
 		else: hit_stop(0.03)
@@ -1146,7 +1244,7 @@ func step_warden(e: Dictionary, target: Dictionary, direction: Vector2, closest:
 		e.moving = true; e.step += dt * 18
 		# Sweep contact along the actual collision-constrained movement.
 		for a in actors:
-			if a.active and not a.dead and Geometry2D.get_closest_point_to_segment(a.p, before, e.p).distance_to(a.p) < 62 and line_of_fire(e.p, a.p): damage_actor(a, 32)
+			if a.active and not a.dead and Geometry2D.get_closest_point_to_segment(a.p, before, e.p).distance_to(a.p) < 62 and line_of_fire(e.p, a.p): damage_actor(a, 32, "warden", "charge")
 		if e.attack_time <= 0 or e.p.distance_to(before) < 850.0 * dt * 0.8:
 			e.attack_state = "recover"; e.attack_time = 0.9
 		return
@@ -1211,6 +1309,7 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.35), 1, 14, 115, 11, -1, "ink", 4.5)
 				1:
 					add_bullet(e.p, direction, 1, 18, 280, 6, -1, "harpoon")
+					bullets[-1]["source"] = "boss"
 					if closest < 260:
 						for n in range(6): add_bullet(e.p + direction * 30, direction.rotated((n - 2.5) * 0.12), 1, 8, 280, 8, -1, "flame", 0.7)
 				2:
@@ -1254,7 +1353,7 @@ func step_bullets(dt: float) -> void:
 						if (e.kind == "guard" or e.get("elite", "") == "shield") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") != "p_omega":
 							b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
 							effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
-						e.hp -= b.damage; e.hurt = 0.12; e["alerted"] = true
+						hurt_enemy(e, b.damage); e.hurt = 0.12; e["alerted"] = true
 						# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
 						pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
 						if e.kind not in ["boss", "warden"]:
@@ -1263,7 +1362,7 @@ func step_bullets(dt: float) -> void:
 							var heavy_hits: Array = b.get("hits", []); heavy_hits.append(e.id)
 							for other in enemies:   # respingo não repete o dano no alvo direto
 								if not heavy_hits.has(other.id) and other.p.distance_to(b.p) < MECH_SHELL.splash + 19:
-									other.hp -= MECH_SHELL.splash_damage; other.hurt = 0.15; other["alerted"] = true
+									hurt_enemy(other, MECH_SHELL.splash_damage); other.hurt = 0.15; other["alerted"] = true
 									pop_dmg(other.p, MECH_SHELL.splash_damage)
 							effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
 						effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
@@ -1281,7 +1380,8 @@ func step_bullets(dt: float) -> void:
 				for a in actors:
 					if not a.dead and b.p.distance_to(a.p) < (27 if a.mech else 11) + b.r:
 						if a.jump > 0 or a.dodge > 0: continue
-						damage_actor(a, b.damage); b.life = 0
+						var bullet_source := str(b.get("source", {"cannon": "boss", "orb": "boss", "ink": "boss", "flame": "boss", "violet": "brute", "magenta": "cult"}.get(b.get("kind", ""), "unknown")))
+						damage_actor(a, b.damage, bullet_source, str(b.get("kind", "projectile"))); b.life = 0
 						if b.get("kind", "") == "harpoon" and not a.mech: a.snare = 0.9
 						break
 			if b.life <= 0: break
@@ -1426,7 +1526,7 @@ func step_spectres(dt: float) -> void:
 func snapshot() -> Dictionary:
 	var data := {}
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t", "run_stats", "last_run_summary", "summary_seq"]:
 		data[name] = get(name)
 	return data
 
@@ -1436,6 +1536,8 @@ func apply_snapshot(data: Dictionary) -> void:
 		if name in allowed and name != "inventory_state": set(name, data[name])
 	if data.get("inventory_state") is Dictionary: inventory_state = InventoryState.new(data.inventory_state).to_dict()
 	else: inventory_state = InventoryState.new(inventory_state).to_dict()
+	if not run_stats is Dictionary or run_stats.is_empty(): run_stats = fresh_run_stats()
+	if not last_run_summary is Dictionary: last_run_summary = {}
 
 
 # ── 0.14: números da tela de Equipamento, sempre calculados das mesmas constantes do jogo ──
@@ -1562,7 +1664,7 @@ func step_tentacle_gates(dt: float) -> void:
 			if g.cd <= 0:
 				g.cd = 0.7
 				effects.append({"p": g.p, "kind": "tentacle_strike", "life": 0.35, "max": 0.35, "dir": (a.p - g.p).normalized()})
-			damage_actor(a, g.damage)
+			damage_actor(a, g.damage, "hazard", "tentacle_gate")
 			var away: Vector2 = Vector2(signf(a.p.x - g.block.get_center().x), 0) if g.block.size.x < g.block.size.y * 3 else Vector2(0, signf(a.p.y - g.block.get_center().y))
 			a.p = move_body(a.p, away * 300 * dt, 23 if a.mech else 11)
 
@@ -1570,6 +1672,7 @@ func step_tentacle_gates(dt: float) -> void:
 func open_reward(chest: Dictionary, a: Dictionary) -> void:
 	if chest.open: return
 	chest.open = true; chest["t"] = tick_time
+	if mode == "run": ensure_run_stats(); run_stats.chests_opened += 1
 	var tiers := ["pistol", "smg", "shotgun", "omega"]
 	var current: String = a.get("weapon_override", uniform_of(a).weapon)
 	var tier := tiers.find(current)
@@ -1621,7 +1724,7 @@ func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
 		return true
 	var delta: Vector2 = e.motion_to-e.p
 	e.p=move_body(e.p,delta.normalized()*minf(delta.length(),(440.0 if e.motion_kind == "charge" else 260.0)*dt),45)
-	if e.motion_kind == "charge" and e.p.distance_to(target.p)<70: damage_actor(target,20)
+	if e.motion_kind == "charge" and e.p.distance_to(target.p)<70: damage_actor(target,20,"boss","charge")
 	if e.motion_t <= 0 or delta.length()<12:
 		e.motion="idle";e.motion_cd=3.0;e.cd=maxf(e.cd,0.5)
 	return true
@@ -1691,7 +1794,7 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < 6:
 					add_bullet(e.p, direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
-					bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
+					bullets[-1]["source"] = e.kind; bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
 			"crawler", "crawler_small":
 				var max_distance := 220.0 if e.kind == "crawler" else 110.0
 				var goal: Vector2 = e.launch + (e.locked - e.launch).limit_length(max_distance)
@@ -1711,6 +1814,7 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 				if e.burst == 0:
 					e.burst = 1
 					add_bullet(e.p, direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
+					bullets[-1]["source"] = e.kind
 					if e.kind == "cult": bullets[-1]["split_at"] = 0.8; bullets[-1]["curve"] = 0.18
 					if e.get("elite", "") == "trail": bullets[-1]["trail"] = true
 					if e.kind == "fish": bullets[-1]["stake"] = true
@@ -1748,7 +1852,7 @@ func step_combat_zones(dt: float) -> void:
 		if zone.life <= 0 or zone.cd > 0: continue
 		zone.cd = 0.4
 		for a in actors:
-			if a.active and not a.dead and a.jump <= 0 and a.p.distance_to(zone.p) < zone.r * 0.8 and line_of_fire(zone.p, a.p): damage_actor(a, zone.damage)
+			if a.active and not a.dead and a.jump <= 0 and a.p.distance_to(zone.p) < zone.r * 0.8 and line_of_fire(zone.p, a.p): damage_actor(a, zone.damage, "hazard", str(zone.kind))
 	combat_zones = combat_zones.filter(func(z): return z.life > 0)
 
 func lodge_harpoon(p: Vector2) -> void:
@@ -1761,6 +1865,6 @@ func lodge_harpoon(p: Vector2) -> void:
 
 func combat_blast(p: Vector2, radius: float, damage: float) -> void:
 	# O explode existente cuida dos barris e inimigos; jogadores respeitam paredes.
-	explode(p, radius, damage, true, false)
+	explode(p, radius, damage, true, false, false)
 	for a in actors:
-		if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8 and line_of_fire(p, a.p): damage_actor(a, damage)
+		if a.active and not a.dead and a.p.distance_to(p) < radius * 0.8 and line_of_fire(p, a.p): damage_actor(a, damage, "bomber", "blast")

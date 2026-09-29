@@ -6,6 +6,9 @@ const EquipmentScreen = preload("res://scripts/equipment_screen.gd")
 const CharacterSilhouette = preload("res://scripts/character_silhouette.gd")
 const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png"
 const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
+const RUN_SUMMARY_FRAME := "res://assets/ui/run_summary/frame_main.png"
+const RUN_SUMMARY_DIR := "res://assets/ui/run_summary/"
+const RUN_SUMMARY_LOOT := "res://assets/ui/run_summary/loot/"
 
 # Supplied concept screens form the decorative layer. Every active region is a
 # real Control; editable text, selections, previews and statuses are live.
@@ -82,7 +85,7 @@ func button(parent: Control, rect: Rect2, caption: String, callback: Callable, t
 func show_screen(next: String) -> void:
 	screen = next
 	backdrop.visible = true
-	backdrop.color = Color(0.015, 0.025, 0.04, 0.82) if next == "pause" else Color("05080d")
+	backdrop.color = Color(0.015, 0.025, 0.04, 0.9) if next in ["pause", "summary"] else Color("05080d")
 	if content != null:
 		content.get_parent().remove_child(content); content.queue_free()
 	content = Control.new(); content.size = Vector2(1344, 752)
@@ -90,7 +93,7 @@ func show_screen(next: String) -> void:
 	else: stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null
 	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
-	if next != "pause":
+	if next not in ["pause", "summary"]:
 		var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "menu") + ".png")
 		if next == "play": bg.texture = load("res://assets/ui/adventure.png")
 		bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -103,6 +106,7 @@ func show_screen(next: String) -> void:
 		"online": build_online()
 		"play": build_play()
 		"pause": build_pause()
+		"summary": build_summary()
 		"seed": build_seed()
 		"options": build_options()
 	focus_first.call_deferred()   # navegação pelo controle
@@ -266,6 +270,116 @@ func build_pause() -> void:
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
+func summary_time(seconds: float) -> String:
+	var total := maxi(0, int(seconds))
+	return "%02d:%02d" % [total / 60, total % 60]
+
+func summary_killer_texture(source: String) -> Texture2D:
+	if source not in ["cult", "fish", "crawler", "crawler_small", "brute"]: return null
+	var atlas := AtlasTexture.new()
+	atlas.atlas = load("res://assets/enemies/docas_anim.png")
+	var row: int = int({"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}.get(source, 0))
+	atlas.region = Rect2(0, row * 96, 144, 96)
+	return atlas
+
+func summary_stat(parent: Control, rect: Rect2, title: String, value: String, accent: Color = CYAN) -> void:
+	var box := panel(parent, rect, Color("071b24d9"), Color("9c7038"))
+	var head := label(box, Rect2(8, 5, rect.size.x - 16, 22), title, 13, GOLD); head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var val := label(box, Rect2(8, 26, rect.size.x - 16, rect.size.y - 30), value, 25, accent); val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func summary_texture(path: String) -> Texture2D:
+	if ResourceLoader.exists(path):
+		var imported := load(path) as Texture2D
+		if imported != null: return imported
+	if not FileAccess.file_exists(path): return null
+	var image := Image.load_from_file(ProjectSettings.globalize_path(path))
+	if image == null or image.is_empty(): return null
+	return ImageTexture.create_from_image(image)
+
+func summary_art(parent: Control, path: String, rect: Rect2, alpha: float = 1.0) -> void:
+	var texture := summary_texture(path)
+	if texture == null: return
+	var art := TextureRect.new(); art.texture = texture; art.position = rect.position; art.size = rect.size
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; art.stretch_mode = TextureRect.STRETCH_SCALE
+	art.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; art.modulate = Color(1, 1, 1, alpha)
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(art)
+
+func summary_loot(parent: Control, x: float, icon_name: String, title: String, value: int) -> void:
+	var box := panel(parent, Rect2(x, 0, 102, 122), Color("061922e8"), Color("9c7038"))
+	var path := RUN_SUMMARY_LOOT + icon_name + ".png"
+	var texture := summary_texture(path)
+	if texture != null:
+		var icon := TextureRect.new(); icon.texture = texture; icon.position = Vector2(22, 8); icon.size = Vector2(58, 58)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; box.add_child(icon)
+	label(box, Rect2(4, 68, 94, 20), title, 12, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label(box, Rect2(4, 87, 94, 29), str(value), 22, CYAN).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func build_summary() -> void:
+	var data: Dictionary = app.sim.last_run_summary
+	var victory: bool = str(data.get("outcome", "death")) == "victory"
+	var root := panel(content, Rect2(32, 16, 1280, 720), Color("07141ced"), Color("9c7038"))
+	root.name = "RunSummary"
+	var frame_texture := summary_texture(RUN_SUMMARY_FRAME)
+	if frame_texture != null:
+		var art := TextureRect.new(); art.texture = frame_texture; art.position = Vector2.ZERO; art.size = root.size
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; art.stretch_mode = TextureRect.STRETCH_SCALE
+		art.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; art.modulate = Color(1, 1, 1, 0.38)
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(art)
+	var title_text := "EXPEDIÇÃO CONCLUÍDA" if victory else "FIM DA EXPEDIÇÃO"
+	var title := label(root, Rect2(46, 20, 1015, 66), title_text, 43, GOLD); title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var grade_box := panel(root, Rect2(1080, 15, 155, 155), Color("061922e8"), CYAN)
+	summary_art(grade_box, RUN_SUMMARY_DIR + "grade_ring.png", Rect2(27, 42, 100, 100), 0.72)
+	label(grade_box, Rect2(10, 12, 135, 28), "NOTA", 18, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var grade_label := label(grade_box, Rect2(10, 48, 135, 90), str(data.get("grade", "D")), 58, Color("ffb43c"))
+	grade_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; grade_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	summary_stat(root, Rect2(62, 92, 280, 80), "TEMPO", summary_time(float(data.get("time", 0.0))))
+	summary_stat(root, Rect2(356, 92, 280, 80), "PROGRESSO", "%d%%" % int(data.get("progress", 0)))
+	summary_stat(root, Rect2(650, 92, 280, 80), "INIMIGOS", str(int(data.get("kills", 0))))
+
+	var obituary := panel(root, Rect2(48, 190, 708, 405), Color("d8c69ce8"), Color("6d482a"))
+	summary_art(obituary, RUN_SUMMARY_DIR + "frame_obituary.png", Rect2(0, 0, 708, 405), 0.38)
+	label(obituary, Rect2(22, 16, 664, 45), "RELATÓRIO DE EXTRAÇÃO" if victory else "NOTA DE FALECIMENTO", 29, Color("261c16")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var portrait_panel := panel(obituary, Rect2(24, 78, 210, 212), Color("071923"), Color("6d482a"))
+	var killer := summary_texture(RUN_SUMMARY_LOOT + "relic.png") if victory else summary_killer_texture(str(data.get("fatal_source", "unknown")))
+	if killer != null:
+		var pic := TextureRect.new(); pic.texture = killer; pic.position = Vector2(8, 22); pic.size = Vector2(194, 160)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		pic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; portrait_panel.add_child(pic)
+	else:
+		label(portrait_panel, Rect2(0, 45, 210, 110), "☠", 72, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var note := label(obituary, Rect2(260, 82, 420, 175), str(data.get("obituary", "A linha do tempo perdeu o relatório.")), 25, Color("201914"))
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var cause := "RESULTADO: NÚCLEO RECUPERADO" if victory else "CAUSA: " + str(data.get("fatal_source", "DESCONHECIDA")).to_upper()
+	label(obituary, Rect2(260, 266, 420, 28), cause, 14, Color("463427"))
+	label(obituary, Rect2(24, 322, 660, 44), "SEED %d  •  DOCAS DE 1941" % int(data.get("seed", 0)), 16, Color("463427")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	var loot := panel(root, Rect2(780, 190, 452, 174), Color("071b24e8"), Color("9c7038"))
+	summary_art(loot, RUN_SUMMARY_DIR + "loot_slot.png", Rect2(8, 38, 436, 128), 0.16)
+	label(loot, Rect2(14, 8, 424, 30), "OBTIDO NA RUN", 21, GOLD)
+	var loot_row := Control.new(); loot_row.position = Vector2(12, 42); loot_row.size = Vector2(428, 122); loot.add_child(loot_row)
+	summary_loot(loot_row, 0, "scrap", "SUCATA", int(data.get("scrap", 0)))
+	summary_loot(loot_row, 108, "fragment", "FRAGMENTOS", int(data.get("fragments", 0)))
+	summary_loot(loot_row, 216, "blueprint", "BAÚS", int(data.get("chests", 0)))
+	summary_loot(loot_row, 324, "relic", "NÚCLEO", int(data.get("nucleus", 0)))
+	var performance := panel(root, Rect2(780, 380, 452, 215), Color("071b24e8"), Color("9c7038"))
+	summary_art(performance, RUN_SUMMARY_DIR + "stat_slot.png", Rect2(8, 40, 436, 155), 0.08)
+	label(performance, Rect2(14, 8, 424, 30), "DESEMPENHO NA RUN", 21, GOLD)
+	summary_stat(performance, Rect2(12, 48, 136, 76), "DANO CAUSADO", str(int(data.get("damage_dealt", 0))))
+	summary_stat(performance, Rect2(158, 48, 136, 76), "DANO RECEBIDO", str(int(data.get("damage_received", 0))))
+	summary_stat(performance, Rect2(304, 48, 136, 76), "MAIOR COMBO", str(int(data.get("max_streak", 0))))
+	label(performance, Rect2(12, 143, 428, 48), "CONCLUSÕES %d  •  DESAFIO %s  •  SEGREDO %s" % [int(data.get("clears", 0)), "SIM" if data.get("side_complete", false) else "NÃO", "SIM" if data.get("secret_open", false) else "NÃO"], 13, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	summary_art(root, RUN_SUMMARY_DIR + "button_primary.png", Rect2(180, 620, 430, 66))
+	summary_art(root, RUN_SUMMARY_DIR + "button_secondary.png", Rect2(670, 620, 430, 66))
+	var retry := button(root, Rect2(180, 620, 430, 66), "NOVA EXPEDIÇÃO", app.summary_new_run, true)
+	retry.name = "SummaryNewRun"
+	if app.online and not app.hosting:
+		retry.disabled = true; retry.text = "AGUARDANDO ANFITRIÃO"
+	var refuge := button(root, Rect2(670, 620, 430, 66), "VOLTAR AO REFÚGIO", app.summary_return_refuge, true)
+	refuge.name = "SummaryRefuge"
+	retry.focus_neighbor_right = retry.get_path_to(refuge); retry.focus_next = retry.get_path_to(refuge)
+	refuge.focus_neighbor_left = refuge.get_path_to(retry); refuge.focus_previous = refuge.get_path_to(retry)
+
 func build_online() -> void:
 	# Keep the user's illustrated radio and its borders; replace only live regions.
 	panel(content, Rect2(713, 353, 258, 38), Color("043441"), CYAN)
@@ -426,6 +540,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == JOY_BUTTON_B and screen == "equipment": show_screen("play"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "summary": app.summary_return_refuge(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
 	var focus := get_viewport().gui_get_focus_owner()
 	if focus == null and (event.is_action_pressed("ui_down") or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_accept")):

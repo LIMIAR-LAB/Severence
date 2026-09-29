@@ -1,0 +1,14 @@
+{
+  "generated": "2026-09-29",
+  "ui_asset_id": "0eafd554-6d12-46ec-9f0e-73545fc82921",
+  "ui_seed": 1941,
+  "ui_prompt": "Text-free pixel art UI kit for a 1344x752 post-run results screen: worn brass and dark teal time-machine frame, parchment obituary plate, cyan grade ring, four loot slots, stat panels and two empty button plates; nautical 1941 sci-fi, transparent separable elements, no characters, no numbers, no words.",
+  "loot_jobs": {
+    "scrap": {"job_id": "39582c06-8900-4e03-90c9-47b43e39f177", "asset_id": "06ff0004-fada-5382-8ac0-9c508481253b", "seed": 1941, "transparent": true, "prompt": "Single compact pile of brass clockwork scrap, gears and broken time-machine parts, readable 64px pixel-art game loot icon, dark teal and aged gold palette, transparent background, no text, no border."},
+    "fragment": {"job_id": "28b98010-de10-4f3f-b117-345fa30040bd", "asset_id": "9e494ab5-f8de-545a-abcd-506d05f6416e", "seed": 1942, "transparent": true, "prompt": "Single cluster of glowing cyan temporal crystal fragments, readable 64px pixel-art game loot icon, dark teal and aged gold palette, transparent background, no text, no border."},
+    "blueprint": {"job_id": "2bb8ac30-2458-4e6a-962f-f0177c786237", "asset_id": "5bca8136-d8a6-5b8f-8075-b4700e5c24be", "seed": 1943, "transparent": true, "prompt": "Single rolled mechanical blueprint with cyan technical lines and brass clasp, readable 64px pixel-art game loot icon, dark teal and aged gold palette, transparent background, no text, no border."},
+    "relic": {"job_id": "66c9f63f-9629-4721-9850-629e56751c38", "asset_id": "03e89991-5fcd-5c74-8d0b-9b9d922a4064", "seed": 1944, "transparent": true, "prompt": "Single recovered temporal nucleus relic, circular brass mechanism around a glowing cyan core, readable 64px pixel-art game loot icon, dark teal and aged gold palette, transparent background, no text, no border."}
+  },
+  "runtime_builder": "tools/build_run_summary_assets.py",
+  "notes": "PixelLab sheet button text is excluded from runtime output."
+}
