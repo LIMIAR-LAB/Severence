@@ -32,6 +32,26 @@ arquivo de mapa GERADO (`scripts/docks_map.gd`).
 - `scripts/arrival_art.gd` — set piece autoral do Desembarque.
 - `tests/*.gd` — testes headless Godot.
 
+## Ferramentas de arte — PixelLab MCP
+
+O ambiente tem o **PixelLab disponível como servidor MCP** — use-o para gerar as
+artes necessárias ao jogo (sprites de personagens, tiles, props, animações em
+pixel art). Se as tools do MCP não estiverem visíveis de imediato, liste os
+servidores/tools MCP configurados antes de gerar.
+
+Regras ao gerar arte:
+
+- Personagens/crituras DEVEM seguir `docs/SPRITE_POSE_STANDARD.md` — mesmas
+  vistas (5 espelhadas), mesmo vocabulário de colunas/poses, mesmo estilo
+  (outline escuro, chibi, câmera 3/4 elevada, fundo magenta #FF00FF, sem fx
+  cozidos no sprite).
+- Armas nunca são cozidas no sprite do corpo — são camadas modulares.
+- Arte de ambiente segue o pipeline existente: tiles/props em `assets/` +
+  consumo por `dock_scenery.gd`; set pieces grandes (estilo Desembarque) como
+  arte autoral dedicada.
+- Toda arte gerada precisa ser INTEGRADA ao renderer/sim — um PNG solto em
+  `assets/` não conta como feature entregue.
+
 ## Passo 3 — Contratos obrigatórios (de `docs/ARQUITETURA_ROGUELIKE.md` §4)
 
 1. Toda aleatoriedade de run sai do RNG seedado do RunDirector via sub-streams —
