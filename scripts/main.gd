@@ -27,6 +27,8 @@ var remote_age := 0.0
 var send_timer := 0.0
 var save_timer := 0.0
 var previous_buttons: Dictionary = {}
+# 0.19: preserva a mira do controle ao soltar o analógico.
+var joy_aim: Dictionary = {}
 var last_save := ""
 var network_status := "OFFLINE"
 var map_open := false
@@ -55,6 +57,8 @@ var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
 
 func _ready() -> void:
+	Input.joy_connection_changed.connect(log_joypad)
+	for device in Input.get_connected_joypads(): log_joypad(device, true)
 	sim = Sim.new(); load_progress(); load_settings()
 	display.apply(get_tree())
 	world = View.new(); world.sim = sim; add_child(world)
@@ -270,12 +274,31 @@ func edge(action_name: String, value: bool) -> bool:
 	previous_buttons[action_name] = value
 	return value and not before
 
+func log_joypad(device: int, connected_pad: bool) -> void:
+	if connected_pad:
+		print("CONTROLE conectado: ", device, " • ", Input.get_joy_name(device), " • reconhecido=", Input.is_joy_known(device))
+	else: print("CONTROLE desconectado: ", device)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and event.relative.length_squared() > 0.0:
+		joy_aim.clear()
+
+# 0.19: um controle no coop pertence ao P2; dois controles atendem os dois pilotos.
+func connected_gamepads() -> Array:
+	return Input.get_connected_joypads()
+
+func gameplay_joypad(use_primary: bool, devices: Array) -> int:
+	if devices.is_empty(): return -1
+	if use_primary:
+		return int(devices[0]) if sim.coop != "local" or devices.size() >= 2 else -1
+	return int(devices[1] if devices.size() > 1 else devices[0])
+
 func player_input(index: int, use_primary: bool = true) -> Dictionary:
 	var a: Dictionary = sim.actors[index]
 	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false}
 	if use_primary:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
-		cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
+		if not joy_aim.get(index, false): cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
 		cmd.fire = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not map_open and not minimap_rect().has_point(get_viewport().get_mouse_position())
 		cmd.melee = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(key_binds.melee)
 		cmd.jump = Input.is_physical_key_pressed(key_binds.jump)
@@ -292,16 +315,14 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.jump = Input.is_physical_key_pressed(KEY_SLASH); cmd.dodge = Input.is_physical_key_pressed(KEY_COMMA); cmd.boost = cmd.dodge
 		cmd.interact = Input.is_physical_key_pressed(KEY_CTRL); cmd.armor = Input.is_physical_key_pressed(KEY_O); cmd.weapon = Input.is_physical_key_pressed(KEY_U)
 		cmd.summon = Input.is_physical_key_pressed(KEY_N); cmd.fusion = Input.is_physical_key_pressed(KEY_M)
-	var devices := Input.get_connected_joypads()
-	var device := -1
-	if use_primary and (sim.coop != "local" or devices.size() >= 2):
-		if devices.size() > 0: device = devices[0]
-	elif not use_primary and devices.size() > 0: device = devices[1] if devices.size() > 1 else devices[0]
+	var devices := connected_gamepads()
+	var device := gameplay_joypad(use_primary, devices)
 	if device >= 0:
 		var stick := Vector2(Input.get_joy_axis(device, JOY_AXIS_LEFT_X), Input.get_joy_axis(device, JOY_AXIS_LEFT_Y))
 		if stick.length() > 0.2: cmd.move = stick.limit_length()
 		stick = Vector2(Input.get_joy_axis(device, JOY_AXIS_RIGHT_X), Input.get_joy_axis(device, JOY_AXIS_RIGHT_Y))
-		if stick.length() > 0.25: cmd.aim = stick.normalized()
+		if stick.length() > 0.25:
+			cmd.aim = stick.normalized(); joy_aim[index] = true
 		cmd.fire = cmd.fire or Input.get_joy_axis(device, JOY_AXIS_TRIGGER_RIGHT) > 0.3
 		cmd.melee = cmd.melee or Input.is_joy_button_pressed(device, JOY_BUTTON_X)
 		cmd.jump = cmd.jump or Input.is_joy_button_pressed(device, JOY_BUTTON_A)
@@ -326,7 +347,11 @@ func _physics_process(dt: float) -> void:
 		if sim.hitstop > 0: ts = 0.12
 		Engine.time_scale = ts
 	elif Engine.time_scale != 1.0: Engine.time_scale = 1.0
-	if edge("esc", Input.is_physical_key_pressed(KEY_ESCAPE)):
+	# 0.19: Options/Start também retoma a pausa automática ao perder o foco.
+	var pause_pressed := Input.is_physical_key_pressed(KEY_ESCAPE)
+	for device in connected_gamepads():
+		pause_pressed = pause_pressed or Input.is_joy_button_pressed(device, JOY_BUTTON_START)
+	if edge("esc", pause_pressed):
 		if menu.visible: menu.close()
 		else: menu.open("main")
 	if edge("gear", Input.is_physical_key_pressed(KEY_B)):
@@ -424,7 +449,7 @@ func update_hud() -> void:
 	if controlled.fused: robot_status += " • FUSÃO %d" % sim.spectres[controlled.id].hp
 	hud.text = hud.text.replace(network_status, robot_status)
 	banner.text = sim.message if sim.message_time > 0 else ("OPCIONAL • %.0fs • elimine os guardiões" % sim.side_time if sim.side_active else "")
-	if paused: banner.text = "PAUSADO • Esc para continuar"
+	if paused: banner.text = "PAUSADO • Esc / Options / Start para continuar"
 	if not playing: hud.text = "MARTY — FRATURAS DO TEMPO     /     PRIMEIRA VERSÃO JOGÁVEL\n2 estados de armadura • IA / coop local / conexão online direta"
 
 func apply_preferences(id: int) -> void:
