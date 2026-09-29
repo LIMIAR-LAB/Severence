@@ -136,7 +136,6 @@ OB = []      # obstáculos [x, y, w, h, kind]
 DEC = []     # decoração [x, y, kind] (+ extras)
 HAZ = []     # perigos
 SPAWNS = []  # [x, y, grupo]
-WAVES = {}   # sala -> [[x, y, grupo], ...] (reforços quando a 1ª leva cai)
 
 FOOT = {  # caixa de colisão por prop (largura, altura) — pés do sprite
     "crate": (56, 40), "crate_2": (56, 40), "crate_3": (52, 40), "crate_net": (64, 42), "crate_barnacles": (66, 44),
@@ -220,7 +219,6 @@ dec("rails", 3400, 6250); dec("rails", 3400, 6560)
 dec("grate", 3000, 6620); dec("manhole", 3800, 6300); dec("symbol_2", 3400, 6780)
 row("bollard", 2700, 7040, 6, 330)
 spawns("mix", [(2750, 6300), (3100, 6200), (3650, 6250), (4150, 6300), (2750, 6900), (3300, 6850), (3750, 6600), (4150, 6700)])
-WAVES["cranes"] = [[2650, 6000, "dock"], [4250, 6000, "mix"], [3400, 6950, "mix"], [2650, 6950, "dock"]]
 
 ob("lamp_post", 4520, 5950); crate_pile(4550, 6000, 2)   # 0.18: baía extra (ROOM_EXTRA)
 dec("rope", 4600, 6150)
@@ -250,7 +248,6 @@ row("bollard", 6720, 6960, 5, 330)
 hazard(7420, 6700, 66)
 dec("grate", 7000, 6330); dec("symbol_1", 7550, 6330); dec("anchor", 6700, 6400)
 spawns("mix", [(6900, 6300), (7200, 6050), (7600, 6300), (7900, 6600), (7000, 6800), (7400, 6150), (7750, 6800)])
-WAVES["market"] = [[6750, 6600, "dock"], [8000, 6000, "mix"], [7400, 6000, "dock"]]
 # 0.16: microbioma do mercado (tools/prepare_market.py)
 ob("market_stall", 7150, 6160); ob("market_stall", 7580, 6460)
 ob("market_ice_barrel", 7580, 6170); ob("market_ice_barrel", 7150, 6470)
@@ -289,7 +286,6 @@ crate_pile(6300, 4520, 2); crate_pile(7700, 4520, 0)
 ob("lamp_post", 6700, 4600); ob("lamp_post", 7450, 4600)
 dec("manhole", 7050, 4300); dec("debris_sandbags", 6600, 4650)
 spawns("heavy", [(6400, 4050), (6800, 3900), (7300, 3900), (7700, 4100), (6500, 4650), (7600, 4650), (7050, 4750), (6900, 4350), (7300, 4400)])
-WAVES["ammo"] = [[6300, 3850, "heavy"], [7800, 3850, "heavy"], [7050, 4900, "mix"]]
 
 # ── 08 Pátio Ferroviário ──
 facade_decor("rails", [("poster", 400), ("iron_door", 950), ("poster", 1500)])
@@ -302,7 +298,6 @@ barrels(4900, 4600, True); ob("wheelbarrow", 4250, 4900)
 ob("lamp_post", 4300, 4300); ob("lamp_post", 5100, 4800); ob("brazier", 4850, 3950)
 dec("grate", 4700, 4400); dec("symbol_2", 5300, 4700); dec("debris_crate", 4350, 4700)
 spawns("mix", [(4100, 4100), (4500, 3900), (5000, 4250), (5600, 4150), (4400, 4550), (4900, 4850), (5500, 4650), (5250, 3900)])
-WAVES["rails"] = [[4000, 4950, "mix"], [5700, 3850, "heavy"], [4850, 4400, "cult"]]
 
 crate_pile(5900, 3780, 0); ob("lamp_post", 6000, 3950)   # 0.18: baía extra (ROOM_EXTRA)
 # ── 09 Balcão do Farol (rampas) ──
@@ -330,7 +325,6 @@ dec("rug", 850, 4500); dec("tentacle_planks", 500, 4880)
 ob("brazier", 650, 3780); ob("brazier", 1050, 3780)
 hazard(1200, 4900, 58)
 spawns("cult", [(450, 3950), (1250, 3950), (700, 4800), (1050, 4800), (850, 4350), (600, 4100)])
-WAVES["chapel"] = [[400, 4550, "cult"], [1300, 4550, "cult"], [850, 4850, "cult"]]
 
 # ── 11 Doque Seco (fosso de água no meio) ──
 facade_decor("drydock", [("poster", 350), ("iron_door", 900)])
@@ -343,7 +337,6 @@ ob("lamp_post", 560, 1400); ob("lamp_post", 1350, 2250)
 hazard(450, 2250, 60); hazard(1450, 2050, 60)
 dec("rope", 1100, 1400); dec("anchor", 300, 1350)
 spawns("heavy", [(400, 1350), (1100, 1350), (1500, 1550), (400, 2500), (1100, 2450), (1550, 2550)])
-WAVES["drydock"] = [[300, 1700, "dock"], [1550, 1300, "heavy"], [900, 2550, "dock"]]
 
 # ── 13 Adega Inundada ──
 facade_decor("cellar", [("iron_door", 400), ("iron_door", 1000)])
@@ -453,12 +446,10 @@ def validate():
                     s[0] += dx; s[1] += dy; return
         raise SystemExit(f"spawn preso {s}")
     for s in SPAWNS: nudge(s)
-    for room, pts in WAVES.items():
-        for s in pts: nudge(s)
     for x, y, secret in CHESTS:
         assert walkable(x, y + 40, 11, floors + [SECRET_CORRIDOR, R["secret"]], obstacles), f"baú sem acesso {(x, y)}"
     print(f"validado: {len(ROOMS)} salas, {len(CORRIDORS)} corredores, {len(OB)} obstáculos, {len(DEC)} decorações, "
-          f"{len(SPAWNS)} inimigos + {sum(len(v) for v in WAVES.values())} de reforço, {len(HAZ)} perigos")
+          f"{len(SPAWNS)} inimigos, {len(HAZ)} perigos")
 
 # ─────────────────────────────────────────────────────────────── saída
 # 0.17: salas sem combate e paredes internas preservadas pelo gerador.
@@ -469,7 +460,6 @@ ROOMS = [(i,n,("maze" if i=="warehouse" else "story" if i=="chapel" else k),f,r,
 OB[:] = [o for o in OB if not inside_room(o,"warehouse")]
 GAPS[:] = [g for g in GAPS if not inside_room(g,"warehouse")]
 SPAWNS[:] = [p for p in SPAWNS if not any(inside_room(p,r) for r in ["warehouse","chapel"])]
-for r in ["warehouse","chapel"]: WAVES.pop(r,None)
 HAZ[:] = [h for h in HAZ if not any(inside_room(h["p"],r) for r in ["warehouse","chapel"])]
 OB.extend([(5100,6000,90,650,"maze_wall"),(5680,6370,90,530,"maze_wall")])
 # 0.17 (Tarefa C): colunas interiores do Depósito — quebram o retângulo vazio.
@@ -494,10 +484,6 @@ for point in SPAWNS:
     squad = SQUADS.get(room, ["cult", "guard", "crawler", "fish", "bomber", "brute"])
     index = counts.get(room, 0); counts[room] = index + 1
     point[2] = squad[index % len(squad)]
-for room, points in WAVES.items():
-    squad = SQUADS.get(room, ["guard", "bomber", "cult", "crawler"])
-    for index, point in enumerate(points): point[2] = squad[index % len(squad)]
-
 # Integração 0.18: preservar alas adicionadas na main e nas salas especiais.
 ROOMS = [(i,n,k,f,r,list(dict.fromkeys(list(ex) + ROOM_EXTRA.get(i, [])))) for i,n,k,f,r,ex in ROOMS]
 ROOM_EXTRA = {i: ex for i,n,k,f,r,ex in ROOMS if ex}
@@ -571,8 +557,6 @@ def emit():
     L.append("# Inimigos posicionados à mão: [x, y, grupo]. O grupo define os tipos sorteados pela seed.")
     L.append("const SPAWNS := [")
     L.append(",\n".join("\t" + ", ".join(f'[{s[0]}, {s[1]}, "{s[2]}"]' for s in ch) for ch in chunks(SPAWNS, 6)) + "]")
-    L.append("# Reforços: quando a 1ª leva de uma sala trancada cai, esta leva surge (portões continuam fechados).")
-    L.append("const WAVES := {\n\t" + ",\n\t".join(f'"{k}": [' + ", ".join(f'[{s[0]}, {s[1]}, "{s[2]}"]' for s in v) + "]" for k, v in WAVES.items()) + "}")
     L.append("const GROUPS := " + "{" + ", ".join(f'"{k}": [' + ", ".join(f'"{t}"' for t in v) + "]" for k, v in GROUPS.items()) + "}")
     OUT.write_text("\n".join(L) + "\n", encoding="utf-8")
     print("escrito", OUT)

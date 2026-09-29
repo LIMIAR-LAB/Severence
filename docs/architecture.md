@@ -61,7 +61,7 @@ Pure rules engine, no engine draw calls, no `_ready`/`_process`. Key method grou
 - **Persistence surface:** `equip()` (validates + applies loadout), `snapshot()`/`apply_snapshot()`.
 
 ### `scripts/docks_map.gd` — `DocksMap` (static data only)
-Hand-authored dungeon: `ROOMS` (9 rooms + 1 secret, each a named `Rect2`), `CORRIDORS`, `EXTRA_FLOORS`, `RAISED`/`RAMPS` (one elevated balcony), `GAPS` (one jumpable water channel), `POINTS` (named world positions: spawn, shop, boss, extraction, etc.), `CHESTS`, `OBSTACLES` (~70 placed props with type tags), `DECOR`, `SPAWNS`/`GROUPS` (enemy spawn points + per-point enemy-type pools sampled by the run's RNG).
+Hand-authored dungeon: `ROOMS` (9 rooms + 1 secret, each a named `Rect2`), `CORRIDORS`, `EXTRA_FLOORS`, `RAISED`/`RAMPS` (one elevated balcony), `GAPS` (one jumpable water channel), `POINTS` (named world positions: spawn, shop, boss, extraction, etc.), `CHESTS`, `OBSTACLES` (~70 placed props with type tags), `DECOR`, `SPAWNS`/`GROUPS` (the single initial enemy population distributed across the map and sampled by the run's RNG). Expedition rooms do not repopulate after being cleared; the training arena's repeating waves remain a separate simulation mode.
 
 ### `scripts/main.gd` — app controller (25.7 KB, ~450 lines)
 - **Bootstrap (`_ready`):** creates `sim`, `world`, `camera`, calls `build_ui()`, loads save data, wires multiplayer signals, and parses `OS.get_cmdline_user_args()` for a large set of `--capture*`/`--network-*-test` developer flags used by the test/screenshot pipeline.

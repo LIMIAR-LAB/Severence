@@ -200,11 +200,4 @@ const SPAWNS := [
 	[2700, 4150, "guard"], [2900, 4100, "crawler"], [2000, 3900, "fish"], [3300, 4300, "bomber"], [2100, 4850, "brute"], [3200, 4900, "cult"],
 	[400, 1350, "cult"], [1100, 1350, "guard"], [1500, 1550, "crawler"], [400, 2500, "fish"], [1100, 2450, "bomber"], [1550, 2550, "brute"],
 	[8100, 1500, "crawler"], [8600, 1400, "cult"], [8900, 1600, "bomber"], [8300, 2150, "crawler"], [8800, 2150, "cult"]]
-# Reforços: quando a 1ª leva de uma sala trancada cai, esta leva surge (portões continuam fechados).
-const WAVES := {
-	"cranes": [[2650, 6000, "guard"], [4250, 6000, "bomber"], [3400, 6950, "cult"], [2650, 6950, "crawler"]],
-	"market": [[6750, 6600, "fish"], [8000, 6000, "crawler"], [7400, 6000, "guard"]],
-	"ammo": [[6300, 3850, "brute"], [7800, 3850, "guard"], [7050, 4900, "fish"]],
-	"rails": [[4000, 4950, "guard"], [5700, 3850, "brute"], [4850, 4400, "bomber"]],
-	"drydock": [[300, 1700, "guard"], [1550, 1300, "bomber"], [900, 2550, "cult"]]}
 const GROUPS := {"dock": ["crawler", "fish"], "mix": ["cult", "fish", "brute", "crawler"], "heavy": ["brute", "fish", "cult", "brute"], "cult": ["cult", "cult", "crawler"]}

@@ -26,8 +26,9 @@ acompanham o jogador durante o aviso e travam antes do ataque.
 
 ## Esquadrões e elites
 
-O gerador fixa as classes dos pontos e reforços por sala, incluindo Guard e
-Bomber. A seed mantém variação de posição/tempos e 16% de chance de elite
+O gerador fixa as classes dos pontos da população inicial de cada sala, incluindo
+Guard e Bomber. Salas limpas não repopulam; ondas repetidas pertencem apenas à
+arena de treinamento. A seed mantém variação de posição/tempos e 16% de chance de elite
 nas salas elegíveis. Uma elite recebe exatamente um modificador: escudo
 (ciano), rastro (verde) ou explosão ao morrer (laranja, aviso de 0,75 s).
 Entrada, loja, salas seguras, boss, Warden e pequenos não recebem elites.

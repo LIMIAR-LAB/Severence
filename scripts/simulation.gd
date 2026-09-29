@@ -321,8 +321,6 @@ func start_run(new_seed: int) -> void:
 		var item := {"p": Vector2(d[0], d[1]), "kind": d[2]}
 		if d.size() > 3: item.merge(d[3])
 		decor.append(item)
-	for room in rooms:
-		room["waves"] = DOCKS.WAVES.get(room.get("id", ""), []).duplicate(true)
 	for c in DOCKS.CHESTS: chests.append({"p": Vector2(c[0], c[1]), "open": false, "secret": c[2]})
 	mech = new_mech(P.mech); apply_unlock_state()
 	reset_spectres()
@@ -385,20 +383,11 @@ func refresh_gate_blocks() -> void:
 	for d in doors:
 		if room_by_id(d.room).get("locked", false): gate_blocks.append(d.r)
 
-func step_gates(step_dt: float = 0.016) -> void:
+func step_gates(_step_dt: float = 0.016) -> void:
 	var changed := false
 	for room in rooms:
 		if not room.has("id") or room.kind == "secret": continue
 		if room.get("locked", false):
-			if room.get("wave_t", 0.0) > 0:
-				room.wave_t -= step_dt
-				if room.wave_t <= 0: spawn_wave(room)
-				continue
-			if room_threats(room.id) == 0 and not room.get("waves", []).is_empty():
-				room.wave_t = 1.1
-				say("REFORÇOS! Mais criaturas emergem das docas!")
-				for w in room.waves: effects.append({"p": Vector2(w[0], w[1]), "kind": "spawn_portal", "life": 1.2, "max": 1.2})
-				continue
 			if room_threats(room.id) == 0:
 				room.locked = false; room.cleared = true; changed = true
 				say("SALA LIMPA • os portões se abriram!")
@@ -421,13 +410,6 @@ func step_gates(step_dt: float = 0.016) -> void:
 					a.p = spot if clear_at(spot, 23 if a.mech else 11) else inside.p
 					if a.mech: mech.p = a.p
 	if changed: refresh_gate_blocks()
-
-func spawn_wave(room: Dictionary) -> void:
-	for w in room.waves:
-
-		spawn_enemy(Vector2(w[0], w[1]), w[2])
-		enemies[-1]["alerted"] = true; enemies[-1]["room"] = room.id
-	room.waves = []
 
 # ── Props destrutíveis e barris explosivos (0.13) ─────────────────────────────
 const DESTRUCTIBLE := {"crate": 34.0, "crate_2": 44.0, "crate_3": 44.0, "crate_net": 40.0, "crate_barnacles": 50.0, "crate_broken": 20.0,

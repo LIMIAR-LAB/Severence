@@ -8,7 +8,6 @@ ROOMS = [(i,n,("maze" if i=="warehouse" else "story" if i=="chapel" else k),f,r)
 OB[:] = [o for o in OB if not inside_room(o,"warehouse")]
 GAPS[:] = [g for g in GAPS if not inside_room(g,"warehouse")]
 SPAWNS[:] = [p for p in SPAWNS if not any(inside_room(p,r) for r in ["warehouse","chapel"])]
-for r in ["warehouse","chapel"]: WAVES.pop(r,None)
 HAZ[:] = [h for h in HAZ if not any(inside_room(h["p"],r) for r in ["warehouse","chapel"])]
 OB.extend([(5100,6000,90,650,"maze_wall"),(5680,6370,90,530,"maze_wall")])
 for pos,kind,phase in [((5300,6800),"spikes",0),((5470,6150),"darts",0.8),((6000,6510),"steam",1.6)]:
