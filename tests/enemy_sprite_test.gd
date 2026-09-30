@@ -32,17 +32,26 @@ func _init() -> void:
 						if image.get_pixel(x, y).a > 0.5: used = true; break
 					if used: break
 				check(used, "%s: direção %d pose %d contém desenho" % [kind, row, frame])
-		var action_path := "res://assets/enemies/%s_actions_v1.png" % kind
-		check(ResourceLoader.exists(action_path), "%s: ataque e morte gerados" % kind)
+		var action_path := "res://assets/enemies/%s_actions_v2.png" % kind
+		check(ResourceLoader.exists(action_path), "%s: transições, ataque e morte gerados" % kind)
 		if ResourceLoader.exists(action_path):
 			var actions := load(action_path) as Texture2D
-			check(actions.get_size() == Vector2(320, 1024), "%s: ações em oito direções" % kind)
+			check(actions.get_size() == Vector2(1024, 1280), "%s: quatro poses em oito direções" % kind)
 			var action_image := actions.get_image()
 			for direction in range(8):
-				var attack := action_image.get_region(Rect2i(0, direction * 128, 160, 128))
-				var corpse := action_image.get_region(Rect2i(160, direction * 128, 160, 128))
-				check(attack.get_used_rect().has_area() and corpse.get_used_rect().has_area(), "%s: ataque e morte visíveis na direção %d" % [kind, direction])
-				check(hash(attack.get_data()) != hash(corpse.get_data()), "%s: ataque difere da morte na direção %d" % [kind, direction])
+				var poses := []
+				for pose in range(4): poses.append(action_image.get_region(Rect2i(pose * 256, direction * 160, 256, 160)))
+				check(poses.all(func(pose): return pose.get_used_rect().has_area()), "%s: quatro poses visíveis na direção %d" % [kind, direction])
+				check(hash(poses[0].get_data()) != hash(poses[1].get_data()) and hash(poses[1].get_data()) != hash(poses[2].get_data()), "%s: movimento de ataque distinto na direção %d" % [kind, direction])
+				if Expedition.ENEMY_MUZZLE_OFFSETS.has(kind):
+					var muzzle: Vector2 = Expedition.ENEMY_MUZZLE_OFFSETS[kind][direction]
+					var pixel := Vector2i(128 + roundi(muzzle.x), 145 + roundi(muzzle.y))
+					var tip_visible := false
+					for y in range(maxi(0, pixel.y - 8), mini(160, pixel.y + 9)):
+						for x in range(maxi(0, pixel.x - 8), mini(256, pixel.x + 9)):
+							if poses[1].get_pixel(x, y).a > 0.5: tip_visible = true; break
+						if tip_visible: break
+					check(tip_visible, "%s: origem do tiro coincide com a arma na direção %d" % [kind, direction])
 	var sim := Expedition.new()
 	sim.start_run(1941)
 	sim.spawn_enemy(sim.actors[0].p + Vector2(100, 0), "guard")

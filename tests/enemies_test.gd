@@ -25,6 +25,17 @@ func _init() -> void:
 		s.spawn_enemy(Vector2(460, 500), pair[0]); s.enemies[0].cd = 0
 		for frame in range(45): s.step_enemies(0.016)
 		check(fired_kinds(s).has(pair[1]), pair[0] + " dispara " + pair[1])
+	# O projétil nasce na ponta desenhada do cano, inclusive nas rajadas.
+	for kind in ["cult", "fish", "brute", "guard"]:
+		var shot_sim := arena()
+		shot_sim.actors[0].p = Vector2(700, 500)
+		shot_sim.spawn_enemy(Vector2(400, 500), kind)
+		var shooter: Dictionary = shot_sim.enemies[0]
+		shooter.merge({"combat": "attack", "combat_t": 0.3, "target_id": 0, "locked": shot_sim.actors[0].p, "burst": 0, "burst_t": 0.0}, true)
+		shot_sim.step_enemies(0.01)
+		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].p.distance_to(shot_sim.enemy_muzzle_position(shooter)) < 0.01, kind + " dispara da ponta do cano")
+		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].get("height", 28.0) == 0.0, kind + " desenha bala na altura do cano")
+		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].p.distance_to(shooter.p) > 25, kind + " não dispara dos pés")
 	var s := arena()
 	s.spawn_enemy(Vector2(700, 500), "brute"); s.enemies[0].cd = 0
 	for frame in range(80): s.step_enemies(0.016)
@@ -56,9 +67,10 @@ func _init() -> void:
 	# O Almirante das Profundezas
 	s = arena(); s.actors[0].p = Vector2(600, 600)
 	s.spawn_enemy(Vector2(600, 300), "boss"); var boss: Dictionary = s.enemies[0]
-	check(boss.max == 600, "Almirante tem 600 de vida")
+	check(boss.max == 900, "Almirante tem 900 de vida")
 	boss.cd = 0; s.step_enemies(0.016)
-	check(fired_kinds(s) == ["orb"] and s.bullets.size() == 16, "fase 1: anel radial de 16 orbes")
+	check(fired_kinds(s) == ["orb"] and s.bullets.size() == 22, "fase 1: anel radial de 22 orbes")
+	check(is_equal_approx(s.bullets[0].v.length(), 205.0), "orbes do Almirante são mais rápidas")
 	boss.hp = 300; boss.cd = 0; s.bullets.clear(); s.step_enemies(0.016)
 	check(boss.stage == 2 and s.effects.any(func(fx): return fx.kind == "weapon_drop"), "fase 2: larga uma arma")
 	var saw_cannon := false; var saw_spin := false

@@ -73,7 +73,6 @@ const FUSION_ACTION_CELL := 128
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 const PIXELLAB_ENEMY_VERSION := {"guard": "v1", "bomber": "v1", "cult": "v2", "fish": "v2", "crawler": "v2", "brute": "v2"}
 const PIXELLAB_ENEMY_SIZE := {"guard": 84.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
-const ENEMY_ACTION_SCALE := {"cult": 0.85, "crawler": 0.95, "fish": 1.3, "brute": 1.2, "guard": 0.85, "bomber": 0.75}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
 const CORE_OFFSET := Vector2(548, 232)
@@ -87,7 +86,7 @@ func _ready() -> void:
 	for kind in PIXELLAB_ENEMY_VERSION:
 		var path := "res://assets/enemies/%s_pixellab_%s.png" % [kind, PIXELLAB_ENEMY_VERSION[kind]]
 		if ResourceLoader.exists(path): pixellab_enemy_art[kind] = load(path)
-		var action_path := "res://assets/enemies/%s_actions_v1.png" % kind
+		var action_path := "res://assets/enemies/%s_actions_v2.png" % kind
 		if ResourceLoader.exists(action_path): pixellab_enemy_actions[kind] = load(action_path)
 	marty_texture = load("res://assets/marty/marty-v2.png")
 	mech_texture = load("res://assets/mech/titan.png")
@@ -1133,7 +1132,7 @@ func enemy_art_scale(kind: String, crouched: bool = false) -> Vector2:
 	return Vector2(size_scale, size_scale * (0.78 if crouched else 1.0))
 
 func enemy_action_scale(kind: String) -> float:
-	return ENEMY_ACTION_SCALE.get(enemy_art_kind(kind), 1.0) * (0.6 if kind == "crawler_small" else 1.0)
+	return 0.6 if kind == "crawler_small" else 1.0
 
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p
@@ -1163,21 +1162,20 @@ func draw_enemy(e: Dictionary) -> void:
 		var octant := enemy_octant(face)
 		var frame := 1 + int(e.step) % 4 if e.moving else 0
 		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
-		var attacking: bool = e.combat == "attack" or (e.kind == "bomber" and e.combat == "warning")
-		var attack_push := 0.0
-		var attack_tilt := 0.0
-		if attacking:
-			attack_push = 5.0 * (0.5 + 0.5 * sin(sim.tick_time * 28.0))
-			attack_tilt = -0.08 * signf(face.x) * sin(sim.tick_time * 28.0)
-		elif e.combat == "warning":
-			attack_tilt = 0.035 * sin(sim.tick_time * 18.0)
+		# Let the walking pose settle briefly before the windup. Swapping atlases
+		# the instant movement stops reads as a dodge instead of an attack.
+		var windup_started: bool = e.combat == "warning" and e.combat_t <= (0.65 if art_kind == "guard" else 0.36)
+		var attacking: bool = e.combat == "attack" or windup_started
 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
 			tint = Color(1.5, 0.8, 0.55)
 		if attacking and pixellab_enemy_actions.has(art_kind):
-			visual_transform(p + face * attack_push, attack_tilt, Vector2.ONE * enemy_action_scale(e.kind))
-			draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-80, -119, 160, 128), Rect2(0, octant * 128, 160, 128), tint)
+			var action_frame := 0
+			if e.combat == "attack":
+				action_frame = 1 if e.shot > 0.11 else (0 if e.shot <= 0 and art_kind in ["guard", "brute"] else 2)
+			visual_transform(p, 0, Vector2.ONE * enemy_action_scale(e.kind))
+			draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-128, -145, 256, 160), Rect2(action_frame * 256, octant * 160, 256, 160), tint)
 		else:
-			visual_transform(p + Vector2(0, bob), attack_tilt, enemy_art_scale(e.kind, e.get("crouched", false)))
+			visual_transform(p + Vector2(0, bob), 0, enemy_art_scale(e.kind, e.get("crouched", false)))
 			draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
 	elif special_enemy_art.has(e.kind):
 		var special: Texture2D = special_enemy_art[e.kind]
@@ -1242,7 +1240,7 @@ func draw_corpse(fx: Dictionary) -> void:
 	if pixellab_enemy_actions.has(art_kind):
 		var row := enemy_octant(fx.get("face", Vector2.DOWN))
 		visual_transform(fx.p, 0, Vector2.ONE * enemy_action_scale(fx.enemy))
-		draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-80, -119, 160, 128), Rect2(160, row * 128, 160, 128), Color(1, 1, 1, fade))
+		draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-128, -145, 256, 160), Rect2(768, row * 160, 256, 160), Color(1, 1, 1, fade))
 		visual_transform(Vector2.ZERO)
 		return
 	if fx.enemy == "bomber": return

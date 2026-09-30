@@ -14,11 +14,19 @@ var bullets: Array = []
 var combat_zones: Array = []
 var harpoons: Array = []
 const ATTACK_LIMIT := 3
-const ATTACK_WARNING := 0.55
-const GUARD_WARNING := 1.1  # 0.20: preparação lenta, com escudo ainda erguido.
-const GUARD_ATTACK_TIME := 2.4
-const GUARD_SHOT_INTERVAL := 0.48
+const ATTACK_WARNING := 0.5
+const GUARD_WARNING := 0.85
+const GUARD_ATTACK_TIME := 2.05
+const GUARD_SHOT_INTERVAL := 0.42
 const GUARD_SHOTS := 5
+# Offsets from the enemy's feet to the visible barrel tip in the normalized
+# attack atlas. Rows run clockwise from south through east and north.
+const ENEMY_MUZZLE_OFFSETS := {
+	"cult": [Vector2(24, -38), Vector2(46, -46), Vector2(47, -48), Vector2(42, -59), Vector2(-35, -60), Vector2(-39, -54), Vector2(-50, -45), Vector2(-44, -32)],
+	"fish": [Vector2(62, -40), Vector2(80, -33), Vector2(107, -48), Vector2(78, -74), Vector2(35, -69), Vector2(-72, -76), Vector2(-103, -45), Vector2(-72, -25)],
+	"brute": [Vector2(43, -47), Vector2(56, -50), Vector2(62, -54), Vector2(53, -63), Vector2(-38, -75), Vector2(-62, -60), Vector2(-70, -57), Vector2(-64, -42)],
+	"guard": [Vector2(-48, -36), Vector2(44, -33), Vector2(42, -48), Vector2(38, -50), Vector2(40, -61), Vector2(-38, -57), Vector2(-43, -40), Vector2(-43, -27)],
+}
 const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
 var effects: Array = []
@@ -2038,6 +2046,13 @@ func find_cover(e: Dictionary, target: Dictionary) -> void:
 		if e.p.distance_to(candidate) < best and clear_at(candidate, 16) and line_of_fire(e.p, candidate):
 			best = e.p.distance_to(candidate); e["cover"] = candidate
 
+func enemy_muzzle_position(e: Dictionary) -> Vector2:
+	var offsets: Array = ENEMY_MUZZLE_OFFSETS.get(e.kind, [])
+	if offsets.is_empty(): return e.p
+	var face: Vector2 = e.get("face", Vector2.DOWN)
+	var row := posmod(roundi((PI * 0.5 - face.angle()) / (PI * 0.25)), 8)
+	return e.p + offsets[row]
+
 func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 	e["combat"] = e.get("combat", "ready"); e["combat_t"] = e.get("combat_t", 0.0) - dt
 	# 0.18: a reserva pertence a um alvo válido; não transferir ataque sem novo aviso.
@@ -2057,31 +2072,39 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 		if e.kind != "fish": e["locked"] = target.p
 		e.face = (e.locked - e.p).normalized()
 		if e.combat_t <= 0:
-			e.combat = "attack"; e.combat_t = GUARD_ATTACK_TIME if e.kind == "guard" else 0.7
+			e.combat = "attack"; e.combat_t = GUARD_ATTACK_TIME if e.kind == "guard" else (0.6 if e.kind in ["crawler", "crawler_small", "brute"] else 0.45)
 			if e.kind in ["crawler", "crawler_small"]: emit_audio("enemy_crawler", e.p)
 			e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
 		return
 	if e.combat == "attack":
 		var direction: Vector2 = ((target.p if e.kind == "guard" else e.locked) - e.p).normalized()
-		e.face = direction; e.shot = 0.15
+		e.face = direction
+		var muzzle := enemy_muzzle_position(e)
+		var shot_direction: Vector2 = ((target.p if e.kind == "guard" else e.locked) - muzzle).normalized()
+		if shot_direction.length_squared() < 0.01: shot_direction = direction
 		match e.kind:
 			"guard":
 				# 0.20: rajada cadenciada; durante toda a ofensiva a guarda fica aberta.
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < GUARD_SHOTS:
+					e.shot = 0.22
 					emit_audio("enemy_guard", e.p)
-					add_bullet(e.p, direction, 1, 10 * e.damage_scale, 280, 7, -1, "magenta")
+					add_bullet(muzzle, shot_direction, 1, 10 * e.damage_scale, 280, 7, -1, "magenta")
+					bullets[-1]["height"] = 0.0
 					e.burst += 1; e.burst_t = GUARD_SHOT_INTERVAL
 			"brute":
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < 6:
+					e.shot = 0.22
 					emit_audio("enemy_brute", e.p)
-					add_bullet(e.p, direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
+					add_bullet(muzzle, shot_direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
+					bullets[-1]["height"] = 0.0
 					bullets[-1]["source"] = e.kind; bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
 			"crawler", "crawler_small":
 				var max_distance := 220.0 if e.kind == "crawler" else 110.0
 				var goal: Vector2 = e.launch + (e.locked - e.launch).limit_length(max_distance)
-				e["jump_height"] = sin(clampf(1 - e.combat_t / 0.7, 0, 1) * PI) * 65
+				if e.shot <= 0 and e.combat_t > 0.45: e.shot = 0.22
+				e["jump_height"] = sin(clampf(1 - e.combat_t / 0.6, 0, 1) * PI) * 65
 				var before_jump: Vector2 = e.p
 				e.p = move_body(e.p, (goal - e.p).limit_length(400 * dt), 14)
 				if mode == "run" and room_at(e.p).get("kind", "") in ["entry", "maze", "story", "shop"] and room_at(e.p).get("id", "") != e.get("room", ""):
@@ -2096,9 +2119,11 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 				combat_blast(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale)
 			_:
 				if e.burst == 0:
+					e.shot = 0.22
 					emit_audio("enemy_fish" if e.kind == "fish" else "enemy_cult", e.p)
 					e.burst = 1
-					add_bullet(e.p, direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
+					add_bullet(muzzle, shot_direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
+					bullets[-1]["height"] = 0.0
 					bullets[-1]["source"] = e.kind
 					if e.kind == "cult": bullets[-1]["split_at"] = 0.8; bullets[-1]["curve"] = 0.18
 					if e.get("elite", "") == "trail": bullets[-1]["trail"] = true
@@ -2106,7 +2131,7 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 					if e.kind == "guard":
 						bullets[-1].merge({"arc": true, "from": e.p, "to": e.locked, "flight": 0.9}, true)
 		if e.combat_t <= 0:
-			e.combat = "recover"; e.combat_t = 1.4; e.target_id = -1
+			e.combat = "recover"; e.combat_t = 0.9; e.target_id = -1
 			if e.kind == "brute":
 				find_cover(e, target)
 				if e.has("cover"): e.combat_t = maxf(e.combat_t, e.p.distance_to(e.cover) / 85.0 + 0.7)
