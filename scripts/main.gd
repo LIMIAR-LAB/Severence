@@ -52,10 +52,10 @@ var presented_summary_seq := 0
 # 0.18: remapeamento de controles do P1 (teclado/mouse). P2 local e joypad ainda são fixos.
 const KEY_BIND_DEFAULTS := {"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": KEY_D,
 	"melee": KEY_F, "jump": KEY_SPACE, "dash": KEY_SHIFT, "interact": KEY_E, "armor": KEY_R,
-	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G, "robot_switch": KEY_V}
+	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G, "robot_switch": KEY_V, "special": KEY_T}
 const KEY_BIND_LABELS := {"up": "ANDAR PRA CIMA", "down": "ANDAR PRA BAIXO", "left": "ANDAR PRA ESQUERDA",
 	"right": "ANDAR PRA DIREITA", "melee": "GOLPE", "jump": "SALTO", "dash": "DASH", "interact": "INTERAGIR",
-	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE", "robot_switch": "TROCAR ROBÔ"}
+	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE", "robot_switch": "TROCAR ROBÔ", "special": "RAIO ÔMEGA"}
 const KEY_BIND_RESERVED := [KEY_ESCAPE, KEY_TAB, KEY_M, KEY_B, KEY_F2]
 var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
@@ -273,7 +273,7 @@ func submit_input(data: Dictionary) -> void:
 	var clean := {}
 	for key in ["move", "aim"]:
 		if data.get(key) is Vector2 and data[key].is_finite(): clean[key] = data[key].limit_length()
-	for key in ["fire", "melee", "jump", "dodge", "boost", "interact", "armor", "weapon", "summon", "fusion", "robot_switch"]:
+	for key in ["fire", "melee", "jump", "dodge", "boost", "interact", "armor", "weapon", "summon", "fusion", "robot_switch", "special"]:
 		clean[key] = data.get(key, false) == true
 	remote_cmd = clean; remote_age = 0
 
@@ -357,7 +357,7 @@ func gameplay_joypad(use_primary: bool, devices: Array) -> int:
 
 func player_input(index: int, use_primary: bool = true) -> Dictionary:
 	var a: Dictionary = sim.actors[index]
-	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false, "robot_switch": false}
+	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false, "robot_switch": false, "special": false}
 	if use_primary:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
 		if not joy_aim.get(index, false): cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
@@ -367,6 +367,7 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.dodge = Input.is_physical_key_pressed(key_binds.dash); cmd.boost = cmd.dodge
 		cmd.interact = Input.is_physical_key_pressed(key_binds.interact)
 		cmd.armor = Input.is_physical_key_pressed(key_binds.armor)
+		cmd.special = Input.is_physical_key_pressed(key_binds.special)
 		cmd.weapon = Input.is_physical_key_pressed(key_binds.weapon)
 		cmd.summon = Input.is_physical_key_pressed(key_binds.summon); cmd.fusion = Input.is_physical_key_pressed(key_binds.fusion)
 		cmd.robot_switch = Input.is_physical_key_pressed(key_binds.robot_switch)
@@ -377,6 +378,7 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.fire = Input.is_physical_key_pressed(KEY_ENTER); cmd.melee = Input.is_physical_key_pressed(KEY_PERIOD)
 		cmd.jump = Input.is_physical_key_pressed(KEY_SLASH); cmd.dodge = Input.is_physical_key_pressed(KEY_COMMA); cmd.boost = cmd.dodge
 		cmd.interact = Input.is_physical_key_pressed(KEY_CTRL); cmd.armor = Input.is_physical_key_pressed(KEY_O); cmd.weapon = Input.is_physical_key_pressed(KEY_U)
+		cmd.special = Input.is_physical_key_pressed(KEY_P)
 		cmd.summon = Input.is_physical_key_pressed(KEY_N); cmd.fusion = Input.is_physical_key_pressed(KEY_M)
 		cmd.robot_switch = Input.is_physical_key_pressed(KEY_H)
 	var devices := connected_gamepads()
@@ -394,6 +396,7 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.interact = cmd.interact or Input.is_joy_button_pressed(device, JOY_BUTTON_Y)
 		cmd.weapon = cmd.weapon or Input.is_joy_button_pressed(device, JOY_BUTTON_RIGHT_SHOULDER)
 		cmd.armor = cmd.armor or Input.is_joy_button_pressed(device, JOY_BUTTON_LEFT_SHOULDER)
+		cmd.special = cmd.special or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_RIGHT)
 		cmd.summon = cmd.summon or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_UP)
 		cmd.fusion = cmd.fusion or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_DOWN)
 		cmd.robot_switch = cmd.robot_switch or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_LEFT)
@@ -459,8 +462,10 @@ func _physics_process(dt: float) -> void:
 			if hosting and guest_id > 0:
 				remote_age += dt
 				secondary = remote_cmd if remote_age < 0.4 and not (menu.visible and menu.screen == "summary") else {}
+			var screen_size := get_viewport_rect().size / camera.zoom
+			sim.visible_world_rect = Rect2(camera.position - screen_size * 0.5, screen_size)
 			sim.step(dt, [primary, secondary])
-			for key in ["interact", "armor", "weapon", "summon", "fusion", "robot_switch", "dodge", "jump"]: remote_cmd[key] = false
+	for key in ["interact", "armor", "weapon", "summon", "fusion", "robot_switch", "dodge", "jump"]: remote_cmd[key] = false
 			if hosting and guest_id > 0:
 				send_timer += dt
 				if send_timer >= 0.05:

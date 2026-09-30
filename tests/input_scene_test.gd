@@ -31,7 +31,9 @@ func run() -> void:
 	check(app.sim.actors[0].p.x > before.x + 40 and app.sim.actors[0].facing.dot(app.sim.actors[0].aim) > 0.9, "D input moves Marty; body faces the aim")
 	key(KEY_D, false); key(KEY_W, true)
 	Input.warp_mouse(center + Vector2(0, -400))
+	before = app.sim.actors[0].p
 	await frames(12)
+	check(app.sim.actors[0].p.y < before.y - 40, "W input moves Marty upward")
 	check(app.sim.actors[0].facing.dot(app.sim.actors[0].aim) > 0.9, "body turns to follow the mouse aim (up) even while walking, so the weapon never crosses the character")
 	key(KEY_W, false)
 	before = app.sim.actors[0].p

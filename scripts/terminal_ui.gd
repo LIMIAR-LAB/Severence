@@ -746,11 +746,11 @@ func build_controls_options(p: Control) -> void:
 	awaiting_bind = ""; bind_buttons.clear()
 	label(p, Rect2(30, 90, 760, 26), "MARTY / P1 — clique numa tecla e pressione a nova", 16, Color("9fc3bb"))
 	var actions: Array = app.KEY_BIND_DEFAULTS.keys()
-	var col_h := 44
+	var col_h := 38
 	for i in actions.size():
 		var action: String = actions[i]
-		var col := i / 6; var row := i % 6
-		var rect := Rect2(30 + col * 390, 125 + row * col_h, 370, 38)
+		var col := i / 7; var row := i % 7
+		var rect := Rect2(30 + col * 390, 125 + row * col_h, 370, 34)
 		var b := button(p, rect, bind_caption(action), func(): start_rebind(action))
 		b.add_theme_font_size_override("font_size", 15)
 		bind_buttons[action] = b

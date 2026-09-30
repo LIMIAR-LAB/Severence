@@ -52,6 +52,29 @@ func _init() -> void:
 	s.message = ""; s.step_actor(a, {"armor": true}, 0.016)
 	check(not a.armor and s.message.contains("recarregando"), "não veste de novo durante a recarga")
 	check(s.weapon_of(a) == "pistol", "Padrão volta ao blaster")
+	# Especial contínuo e descarga ao recolher a armadura.
+	s = Expedition.new(); s.coop = "solo"; s.start_arena(); s.enemies.clear(); s.obstacles.clear()
+	a = s.actors[0]; a.p = Vector2(400, 500); s.set_armor(a, true); a.transform = 0.0; a.armor_time = 300.0
+	s.spawn_enemy(a.p + Vector2(150, 0), "brute")
+	var beam_target: Dictionary = s.enemies[0]
+	var beam_hp: float = beam_target.hp
+	s.step_actor(a, {"special": true, "aim": Vector2.RIGHT, "fire": true}, 0.5)
+	check(a.beam_time > 0 and beam_target.hp < beam_hp and a.shot == 0, "raio segurado causa dano sem disparar a espada")
+	s.step_actor(a, {}, 0.016)
+	check(a.beam_time == 0 and a.beam_cd > 29, "soltar o raio inicia recarga de 30s")
+	beam_hp = beam_target.hp
+	s.step_actor(a, {"special": true}, 0.016)
+	check(a.beam_time == 0 and beam_target.hp == beam_hp, "raio não reinicia durante a recarga")
+	s.visible_world_rect = Rect2(Vector2(200, 300), Vector2(400, 400))
+	s.spawn_enemy(a.p + Vector2(150, 40), "brute")
+	s.spawn_enemy(a.p + Vector2(0, 250), "brute")
+	var visible_enemy: Dictionary = s.enemies[1]
+	var outside_enemy: Dictionary = s.enemies[2]
+	var visible_hp: float = visible_enemy.hp
+	var outside_hp: float = outside_enemy.hp
+	s.set_armor(a, false)
+	check(visible_enemy.hp < visible_hp and outside_enemy.hp == outside_hp, "recolher Ômega atinge somente inimigos próximos na tela")
+	check(s.effects.any(func(fx): return fx.kind == "recall_light"), "descarga de luz desenha feixes até os alvos")
 	a.outfit = "mecanico"; check(s.weapon_of(a) == "shotgun", "Mecânico usa escopeta")
 	a.outfit = "espiao"; check(s.weapon_of(a) == "smg", "Espião usa submetralhadora")
 	check(s.UNIFORMS.espiao.speed > s.UNIFORMS.padrao.speed and s.UNIFORMS.mecanico.melee > s.UNIFORMS.padrao.melee, "Espião mais rápido, Mecânico mais forte")

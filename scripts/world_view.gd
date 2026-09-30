@@ -428,7 +428,14 @@ func draw_entities() -> void:
 		draw_circle(bullet_pos, b.r + 3, Color("191126")); draw_circle(bullet_pos, b.r, c)
 		draw_circle(bullet_pos - Vector2(1, 1), b.r * 0.4, Color("fff1d7"))
 	for fx in sim.effects:
-		if fx.kind == "robot_summon" or fx.kind == "robot_recall": SummonFX.draw_auto(self, fx)
+		if fx.kind == "recall_light":
+			var alpha: float = clampf(fx.life / fx.max, 0.0, 1.0)
+			var origin: Vector2 = fx.p - Vector2(0, 38)
+			var destination: Vector2 = fx.to - Vector2(0, 32)
+			draw_line(origin, destination, Color(0.2, 0.9, 1.0, alpha * 0.35), 16)
+			draw_line(origin, destination, Color(0.9, 1.0, 1.0, alpha), 5)
+			draw_circle(destination, 11 * alpha, Color(0.8, 1.0, 1.0, alpha * 0.7))
+		elif fx.kind == "robot_summon" or fx.kind == "robot_recall": SummonFX.draw_auto(self, fx)
 		elif fx.kind == "summon":
 			draw_arc(fx.p, 70 * (1 - fx.life / 0.6), 0, TAU, 40, CYAN, 3)
 			draw_line(fx.p, fx.p - Vector2(0, 140 * fx.life / 0.6), Color(0.3, 0.95, 1, fx.life), 12)
@@ -508,6 +515,14 @@ func draw_entities() -> void:
 			visual_transform(Vector2.ZERO)
 		elif fx.kind in ["explosion", "tentacle_strike", "gate_open", "gate_slam", "shield_hit", "spawn_portal", "prop_break", "splinter", "splash", "flash", "recoil"]: draw_fx_013(fx)
 		else: draw_circle(fx.p, 8, GOLD)
+	for a in sim.actors:
+		if a.get("beam_time", 0.0) <= 0 or not a.armor: continue
+		var origin: Vector2 = a.p - Vector2(0, 38)
+		var destination: Vector2 = a.get("beam_end", a.p) - Vector2(0, 38)
+		draw_line(origin, destination, Color(0.15, 0.8, 1.0, 0.32), 30)
+		draw_line(origin, destination, Color(0.45, 0.95, 1.0, 0.8), 14)
+		draw_line(origin, destination, Color.WHITE, 5)
+		draw_circle(destination, 12, Color(0.8, 1.0, 1.0, 0.75))
 
 func lamp(p: Vector2) -> void:
 	for radius in [100, 75, 50, 30]: draw_circle(p, radius, Color(0.98, 0.57, 0.17, 0.025))
@@ -690,9 +705,8 @@ func draw_actor(a: Dictionary) -> void:
 		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else (a.move if padrao_action == "run" else a.facing)
 		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
 		draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
-		# Arma básica aparece no disparo; arma da expedição também fica visível
-		# em repouso/corrida, inclusive vazia. Ações especiais liberam as mãos.
-		if marty_padrao_shows_weapon(padrao_action, transforming) or (a.get("run_weapon", "") != "" and padrao_action in ["idle", "run"] and transforming <= 0): draw_weapon(a, draw_pos, padrao_direction if padrao_action in ["idle", "run"] else Vector2.ZERO)
+		# A arma aparece somente enquanto Marty dispara.
+		if marty_padrao_shows_weapon(padrao_action, transforming): draw_weapon(a, draw_pos)
 	elif outfit_key == "omega":
 		var omega_action := marty_omega_action(a, walking)
 		var omega_direction: Vector2 = a.dash_dir if omega_action == "evade" else (a.move if omega_action == "run" else a.facing)
@@ -1087,7 +1101,14 @@ func draw_enemy(e: Dictionary) -> void:
 		var frame := 1 + int(e.step) % 4 if e.moving else 0
 		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
 		# O atlas novo já contém as oito direções; não espelhar a silhueta.
-		visual_transform(p + Vector2(0, bob), 0, enemy_art_scale(e.kind, e.get("crouched", false)))
+		var attack_push := 0.0
+		var attack_tilt := 0.0
+		if e.combat == "attack":
+			attack_push = 5.0 * (0.5 + 0.5 * sin(sim.tick_time * 28.0))
+			attack_tilt = -0.08 * signf(face.x) * sin(sim.tick_time * 28.0)
+		elif e.combat == "warning":
+			attack_tilt = 0.035 * sin(sim.tick_time * 18.0)
+		visual_transform(p + Vector2(0, bob) + face * attack_push, attack_tilt, enemy_art_scale(e.kind, e.get("crouched", false)))
 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
 			tint = Color(1.5, 0.8, 0.55)
 		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
@@ -1153,10 +1174,14 @@ func draw_corpse(fx: Dictionary) -> void:
 	var art_kind := enemy_art_kind(fx.enemy)
 	if pixellab_enemy_art.has(art_kind):
 		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
-		# Cadáver mantém a arte e o tamanho do inimigo, inclusive os filhotes.
-		var corpse_scale := enemy_art_scale(fx.enemy) * sim.ACTOR_VISUAL_SCALE
-		draw_set_transform(fx.p - Vector2(0, 15 * corpse_scale.y), PI * 0.5, corpse_scale)
-		draw_texture_rect_region(pixellab_enemy_art[art_kind], Rect2(-size * 0.5, -size * 0.89, size, size), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
+		var fall: float = clampf((1.0 - fx.life / fx.max) * 7.0, 0.0, 1.0)
+		var corpse_scale := enemy_art_scale(fx.enemy)
+		corpse_scale.y *= lerpf(1.0, 0.28, fall)
+		visual_transform(fx.p, 0, Vector2(1.0, 0.35))
+		draw_circle(Vector2.ZERO, 23.0 * corpse_scale.x, Color(0.12, 0.03, 0.13, 0.35 * fade))
+		visual_transform(fx.p, 0, corpse_scale)
+		var row := enemy_octant(fx.get("face", Vector2.DOWN))
+		draw_texture_rect_region(pixellab_enemy_art[art_kind], Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(0, row * 96, 96, 96), Color(0.68, 0.62, 0.74, fade))
 		visual_transform(Vector2.ZERO)
 		return
 	var scale := 0.6 if fx.enemy == "crawler_small" else 1.0

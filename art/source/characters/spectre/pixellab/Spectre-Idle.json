@@ -1,0 +1,45 @@
+{
+  "character": {
+    "id": "159545f6-c40e-4217-a81f-65e706aa1b4a",
+    "name": "Idle",
+    "prompt": "Small floating mechanical octopus companion drone, dark aged brass spherical body with radio valves, one bright cyan central eye/core, eight short articulated curling tentacles with cyan accents, restrained purple temporal vapor, distinct from a monster, compact silhouette, no weapons, no projectile, transparent background. Match the exact pixel art character and color design in reference. Game character viewed from low top-down 3/4 perspective.",
+    "size": {
+      "width": 128,
+      "height": 128
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Spectre-Idle.png",
+    "cell_size": {
+      "width": 128,
+      "height": 128
+    },
+    "sheet_size": {
+      "width": 1024,
+      "height": 128
+    },
+    "columns": 8,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-09-30T04:47:53.706190+00:00"
+}

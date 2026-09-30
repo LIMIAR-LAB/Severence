@@ -22,6 +22,7 @@ const GUARD_SHOTS := 5
 const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
 var effects: Array = []
+var visible_world_rect := Rect2()
 # Host-authored transient sound cues; presentation never consumes gameplay RNG.
 const MAX_AUDIO_EVENTS := 64
 var audio_events: Array = []
@@ -110,7 +111,7 @@ func actor(id: int, pos: Vector2) -> Dictionary:
 		"hurt": 0.0, "step": 0.0, "mech": false, "dead": id == 1 and coop == "solo", "gun": 0, "interact_cd": 0.0, "revive": 0.0,
 		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
 		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
-		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0,
+		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "beam_time": 0.0, "beam_cd": 0.0, "beam_end": pos, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0,
 		"last_damage_source": "unknown", "last_damage_attack": "", "run_weapons": {}, "run_weapon": ""}
 
 func fresh_run_stats() -> Dictionary:
@@ -139,7 +140,7 @@ const UNIFORMS := {
 		"desc": "MAIS VELOCIDADE.\nSubmetralhadora: rajada rápida (7).\nVelocidade 385 • dash recarrega 2× mais rápido.\nInimigos só o notam de perto.\n+10% de dano recebido."}}
 const ARMORS := {
 	"omega": {"name": "ARMADURA ÔMEGA", "duration": 300.0, "cooldown": 60.0, "speed": 430.0, "taken": 1.0,
-		"desc": "LENDÁRIA • dura 5 min, recarrega 60s (R).\nComeça cada expedição carregada; baús recarregam na hora.\nLâmina Ômega: combo de 3 cortes (38/38/64);\no 3º solta uma onda que atravessa inimigos.\n+3 CORAÇÕES DE ESCUDO • MUITO mais rápido (430) • corte reflete tiros.\nUniforme e arma não mudam enquanto ativa."}}
+		"desc": "LENDÁRIA • dura 5 min, recarrega 60s (R).\nComeça cada expedição carregada; baús recarregam na hora.\nLâmina Ômega: combo de 3 cortes (38/38/64);\no 3º solta uma onda que atravessa inimigos.\nSegure T: raio de luz por até 3s; recarga de 30s.\nAo guardar, luz atinge inimigos próximos visíveis.\n+3 CORAÇÕES DE ESCUDO • MUITO mais rápido (430) • corte reflete tiros.\nUniforme e arma não mudam enquanto ativa."}}
 const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "ESPIÃO", "omega": "ARMADURA ÔMEGA"}
 
 # Enrage do Almirante: sem isso a luta podia travar indefinidamente contra um time passivo.
@@ -162,6 +163,12 @@ const HEART := 10.0
 const BASE_HEARTS := 3
 const HURT_IFRAMES := 0.9
 const OMEGA_SHIELD_HEARTS := 3
+const OMEGA_BEAM_DURATION := 3.0
+const OMEGA_BEAM_COOLDOWN := 30.0
+const OMEGA_BEAM_RANGE := 620.0
+const OMEGA_BEAM_DAMAGE := 90.0
+const OMEGA_RECALL_RANGE := 520.0
+const OMEGA_RECALL_DAMAGE := 40.0
 
 func max_hp() -> float:
 	# 0.14: todos começam SEMPRE com 3 corações. As melhorias da bancada estão congeladas até
@@ -200,7 +207,28 @@ func set_armor(a: Dictionary, on: bool) -> void:
 		effects.append({"p": a.p, "kind": "transform", "life": TRANSFORM_TIME, "max": TRANSFORM_TIME, "owner": a.id})
 		say("ARMADURA ÔMEGA ATIVADA!")
 	else:
+		if a.beam_time > 0: stop_omega_beam(a)
+		recall_light(a)
 		effects.append({"p": a.p, "kind": "power_down", "life": 0.45, "max": 0.45})
+
+func stop_omega_beam(a: Dictionary) -> void:
+	a.beam_time = 0.0
+	a.beam_cd = OMEGA_BEAM_COOLDOWN
+
+func omega_beam_endpoint(from: Vector2, direction: Vector2) -> Vector2:
+	var end := from + direction * OMEGA_BEAM_RANGE
+	for n in range(1, int(OMEGA_BEAM_RANGE / 10.0) + 1):
+		var point := from + direction * (n * 10.0)
+		if not clear_at(point, 0.0, true): return from + direction * ((n - 1) * 10.0)
+	return end
+
+func recall_light(a: Dictionary) -> void:
+	var screen := visible_world_rect if visible_world_rect.has_area() else Rect2(a.p - Vector2(640, 400), Vector2(1280, 800))
+	for e in enemies:
+		if e.hp <= 0 or e.p.distance_to(a.p) > OMEGA_RECALL_RANGE or not screen.has_point(e.p) or not line_of_fire(a.p, e.p): continue
+		hurt_enemy(e, OMEGA_RECALL_DAMAGE); e.hurt = 0.2; e.alerted = true
+		pop_dmg(e.p, OMEGA_RECALL_DAMAGE, true)
+		effects.append({"p": a.p, "to": e.p, "kind": "recall_light", "life": 0.42, "max": 0.42})
 
 func transform_burst(a: Dictionary) -> void:
 	effects.append({"p": a.p, "kind": "shockwave", "life": 0.55, "max": 0.55})
@@ -780,7 +808,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.dead or mech.hp <= 0: mech.cockpit_t = 0.0
 		a.move = Vector2.ZERO
 		return
-	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "combo_t", "bomb_cd", "roll_visual"]:
+	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "beam_cd", "combo_t", "bomb_cd", "roll_visual"]:
 		a[timer] = maxf(0, a.get(timer, 0.0) - dt)
 	if a.dead: return
 	if a.armor and a.get("transform", 0.0) <= 0:
@@ -801,6 +829,17 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	moving = moving.limit_length()
 	var aim: Vector2 = cmd.get("aim", a.aim)
 	if aim.length() > 0.1: a.aim = aim.normalized()
+	if a.beam_time > 0 and (not cmd.get("special", false) or not a.armor or a.mech): stop_omega_beam(a)
+	if cmd.get("special", false) and a.armor and not a.mech and a.beam_cd <= 0 and a.beam_time <= 0:
+		a.beam_time = OMEGA_BEAM_DURATION
+	if a.beam_time > 0:
+		var beam_dt: float = minf(dt, a.beam_time)
+		a.beam_end = omega_beam_endpoint(a.p, a.aim)
+		for e in enemies:
+			if e.hp <= 0 or Geometry2D.get_closest_point_to_segment(e.p, a.p, a.beam_end).distance_to(e.p) > 24: continue
+			hurt_enemy(e, OMEGA_BEAM_DAMAGE * beam_dt); e.hurt = 0.08; e.alerted = true
+		a.beam_time -= beam_dt
+		if a.beam_time <= 0: stop_omega_beam(a)
 	if cmd.get("jump", false) and a.jump <= 0 and a.jump_cd <= 0 and not a.mech:
 		emit_audio("jump", a.p)
 		a.jump = 0.65; a.jump_cd = 0.8; a["jump_from"] = a.p
@@ -856,7 +895,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.move.length() > 0.1: mech["move_dir"] = a.move.normalized()
 	if a.dodge <= 0 and (cmd.get("fire", false) or cmd.get("melee", false) or a.jump > 0): a.roll_visual = 0.0
 	if a.armor and not a.mech:
-		if (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
+		if a.beam_time <= 0 and (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
 	else:
 		if cmd.get("fire", false) and a.shot <= 0 and not (a.mech and mech.fuel <= 0): fire_actor(a)
 		if cmd.get("melee", false) and a.slash <= 0: melee(a)
@@ -1349,7 +1388,7 @@ func step_enemies(dt: float) -> void:
 		if rng.randf() < KEY_DROP_CHANCE: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
 		if e.kind not in ["crawler_small", "boss"] and rng.randf() < AMMO_DROP_CHANCE:
 			pickups.append({"p": e.p + Vector2(-15, 0), "kind": "ammo", "weapon": "bazooka", "ammo": 2})
-		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 1.2, "max": 2.6 if e.kind == "boss" else 1.2, "flip": e.face.x < 0})
+		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 1.2, "max": 2.6 if e.kind == "boss" else 1.2, "face": e.face, "flip": e.face.x < 0})
 		if e.kind == "crawler":
 			for off in [Vector2(-18, 6), Vector2(18, -6)]:
 				if clear_at(e.p + off, 10): spawned.append([e.p + off, e.side])
