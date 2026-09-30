@@ -314,7 +314,15 @@ spawns("mix", [(2400, 4100), (2700, 4150), (2900, 4100), (2000, 3900), (3300, 43
 # ── 10 Capela do Culto ──
 facade_decor("chapel", [("iron_door", 650)], lamps=False)
 ob("altar", 850, 3950)
-for yy in (4250, 4450, 4650): ob("pew", 470, yy); ob("pew", 1230, yy)
+# 0.21: colisões alinhadas aos oito bancos pintados da placa PixelLab.
+# As caixas representam somente a base dos móveis; o corredor central e as
+# conexões norte/leste/sul permanecem livres.
+OB.extend([
+    [322, 4000, 210, 44, "pew"], [545, 3998, 190, 44, "pew"],
+    [545, 4055, 190, 42, "pew"], [545, 4110, 190, 42, "pew"],
+    [966, 3998, 190, 44, "pew"], [966, 4055, 190, 42, "pew"],
+    [966, 4110, 190, 42, "pew"], [1168, 4000, 210, 44, "pew"],
+])
 dec("ritual_circle", 850, 4150); dec("symbol_0", 450, 3850); dec("symbol_2", 1250, 3850)
 for p in [(450, 3750), (1250, 3750), (400, 4850), (1300, 4850), (700, 3990), (1000, 3990)]: dec("chapel_candles", *p)
 # 0.16: microbioma da capela (tools/prepare_chapel.py); tapete e altar continuam

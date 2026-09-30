@@ -9,6 +9,19 @@ const BOSS_ARENA_PATH := BASE + "boss/boss_arena_plate.png"
 const BOSS_ARENA_RECT := Rect2(3000, 400, 2400, 1800)
 const BOSS_SAFE_CENTER := Vector2(4200, 1200)
 const BOSS_SAFE_RADIUS := 360.0
+const CHAPEL_ANIMATED_BASE := BASE + "chapel/animated/"
+const CHAPEL_FRAME_COUNT := 12
+const CHAPEL_FRAME_SECONDS := 0.110
+const CHAPEL_ROOM_RECT := Rect2(200, 3600, 1300, 1400)
+# A arte fica em escala nativa. A faixa inferior lateral permanece procedural
+# para não cobrir a conexão leste; o recorte central preserva a saída pintada.
+const CHAPEL_PLATE_RECT := Rect2(178, 3600, 1344, 752)
+const CHAPEL_PLATE_CLIPS := [Rect2(200, 3600, 1300, 600), Rect2(478, 4200, 744, 152)]
+const CHAPEL_BAKED_KINDS := [
+	"altar", "pew", "chapel_stained_glass", "chapel_offering_bowl",
+	"brazier", "ritual_circle", "symbol_0", "symbol_2", "chapel_candles",
+	"chapel_banner",
+]
 
 const TILE_NAMES := ["planks_base", "planks_knot", "planks_nails", "planks_crack", "planks_light", "planks_wet", "planks_oil", "planks_hole",
 	"granite_base", "granite_moss", "granite_cracked", "granite_puddle", "granite_yellow",
@@ -87,6 +100,8 @@ var fx := {}
 var decals := {}
 var wall_tiles := {}   # "set/nome" -> textura (0.17)
 var boss_arena: Texture2D
+var chapel_frames: Array[Texture2D] = []
+var chapel_fallback: Texture2D
 var reveal_at := {}     # id da sala -> tick_time em que apareceu
 var lights: Array = []  # poças de luz do quadro atual (desenhadas no LightLayer, modo aditivo)
 
@@ -103,6 +118,9 @@ func _init() -> void:
 		for n in WALL_TILE_NAMES: wall_tiles[s + "/" + n] = load(BASE + "walls/" + s + "/" + n + ".png")
 	# A arena dedicada e opcional: builds antigas ou asset ausente continuam com o piso boss em tiles.
 	if ResourceLoader.exists(BOSS_ARENA_PATH): boss_arena = load(BOSS_ARENA_PATH)
+	chapel_fallback = load(CHAPEL_ANIMATED_BASE + "chapel_static.png")
+	for i in CHAPEL_FRAME_COUNT:
+		chapel_frames.append(load(CHAPEL_ANIMATED_BASE + "chapel_frame_%02d.png" % i))
 
 static func hash01(ix: int, iy: int, salt: int = 0) -> float:
 	var n: int = (ix * 73856093) ^ (iy * 19349663) ^ (salt * 83492791)
@@ -143,6 +161,48 @@ func visible_floors(sim, rooms: Array) -> Array:
 			if a.active and f.has_point(a.p): seen = true
 		if seen: out.append(f)
 	return out
+
+static func chapel_frame_index(tick_time: float) -> int:
+	if tick_time <= 0.0:
+		return 0
+	return int(floor(tick_time / CHAPEL_FRAME_SECONDS)) % CHAPEL_FRAME_COUNT
+
+func chapel_texture_at(tick_time: float) -> Texture2D:
+	var index := chapel_frame_index(tick_time)
+	if index >= 0 and index < chapel_frames.size() and chapel_frames[index] != null:
+		return chapel_frames[index]
+	return chapel_fallback
+
+func chapel_is_visible(rooms: Array, view: Rect2) -> bool:
+	if not CHAPEL_PLATE_RECT.intersects(view):
+		return false
+	for room in rooms:
+		if room.get("id", "") == "chapel":
+			return true
+	return false
+
+func chapel_hides_legacy(kind: String, position: Vector2) -> bool:
+	if chapel_texture_at(0.0) == null or kind not in CHAPEL_BAKED_KINDS:
+		return false
+	if kind == "chapel_banner":
+		return CHAPEL_PLATE_RECT.grow(64.0).has_point(position)
+	for clip: Rect2 in CHAPEL_PLATE_CLIPS:
+		if clip.has_point(position):
+			return true
+	return false
+
+func draw_chapel_plate(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
+	if not chapel_is_visible(rooms, view):
+		return
+	var texture := chapel_texture_at(sim.tick_time)
+	if texture == null:
+		return
+	for allowed: Rect2 in CHAPEL_PLATE_CLIPS:
+		var clip := allowed.intersection(CHAPEL_ROOM_RECT).intersection(view)
+		if clip.size.x <= 0.0 or clip.size.y <= 0.0:
+			continue
+		var source := Rect2(clip.position - CHAPEL_PLATE_RECT.position, clip.size)
+		ci.draw_texture_rect_region(texture, clip, source)
 
 static func inside(rects: Array, p: Vector2, margin: float = 0.0) -> bool:
 	for r in rects:
