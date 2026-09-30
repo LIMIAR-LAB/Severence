@@ -17,6 +17,10 @@ func run() -> void:
 	for action in padrao_frames:
 		var texture := load("res://assets/characters/marty/padrao/pixellab/%s.png" % action) as Texture2D
 		check(texture != null and texture.get_size() == Vector2(96 * padrao_frames[action], 96 * 8), "Marty Padrao %s: 8 direcoes" % action)
+	var omega_frames := {"idle":4,"run":8,"jump":7,"evade":7,"melee":6,"hurt":6,"defeat":7}
+	for action in omega_frames:
+		var texture := load("res://assets/characters/marty/omega/pixellab/%s.png" % action) as Texture2D
+		check(texture != null and texture.get_size() == Vector2(112 * omega_frames[action], 112 * 8), "Marty Omega %s: 8 direcoes" % action)
 	for action in ["idle", "run", "jump", "evade", "melee", "hurt", "defeat"]:
 		check(not view.marty_padrao_shows_weapon(action), "Marty Padrao sem arma em " + action)
 	check(view.marty_padrao_shows_weapon("shoot"), "Marty Padrao exibe arma somente no disparo")
@@ -46,6 +50,12 @@ func run() -> void:
 	a.outfit = "mecanico"
 	check(view.weapon_hand_anchor(a) == Vector2(20,-27), "roupa legada conserva ancora existente")
 	a.outfit = "padrao"
+	a.armor = true
+	var omega_anchors := [Vector2(20,-40), Vector2(23,-43), Vector2(25,-44), Vector2(20,-47), Vector2(10,-49), Vector2(-20,-47), Vector2(-25,-44), Vector2(-23,-43)]
+	for row in range(directions.size()):
+		a.aim = directions[row]
+		check(view.weapon_hand_anchor(a) == omega_anchors[row], "ancora da espada Omega %d" % row)
+	a.armor = false
 	var start: Vector2 = a.p
 	sim.step(0.016,[{"move":Vector2(1,1),"aim":Vector2.RIGHT,"dodge":true},{}])
 	check(a.dash_dir.distance_to(Vector2(1,1).normalized())<0.001,"dash conserva direção diagonal normalizada")
