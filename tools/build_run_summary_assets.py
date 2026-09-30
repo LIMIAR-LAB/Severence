@@ -1,8 +1,9 @@
 """Build normalized runtime assets for the post-run summary.
 
 PixelLab owns the ornamental source sheet and loot illustrations. This builder
-owns sizes, crops, palette-safe fallbacks and semantic glyphs. It is deterministic
-and may be rerun whenever source art is replaced.
+owns sizes, crops, palette-safe fallbacks and semantic glyphs. ImageGen owns the
+faithful cinematic shell and editorial portraits. It is deterministic and may
+be rerun whenever source art is replaced.
 """
 
 from __future__ import annotations
@@ -12,8 +13,11 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "art" / "source" / "pixellab" / "run-summary"
+FAITHFUL_SOURCE = ROOT / "art" / "source" / "run-summary-faithful"
 RUNTIME = ROOT / "assets" / "ui" / "run_summary"
 LOOT_RUNTIME = RUNTIME / "loot"
+FAITHFUL_RUNTIME = RUNTIME / "faithful"
+FAITHFUL_LOOT_RUNTIME = FAITHFUL_RUNTIME / "loot"
 
 NAVY = (7, 25, 34, 255)
 NAVY_2 = (12, 42, 52, 255)
@@ -38,7 +42,18 @@ def normalize(source: Path, size: tuple[int, int], fallback: Image.Image | None 
     if source.exists():
         with Image.open(source) as opened:
             return opened.convert("RGBA").resize(size, Image.Resampling.NEAREST)
-    return (fallback or panel_fallback(size)).copy()
+    replacement = fallback or panel_fallback(size)
+    return replacement.copy().resize(size, Image.Resampling.NEAREST)
+
+
+def validate_rgba(image: Image.Image, expected_size: tuple[int, int], role: str, opaque: bool = False) -> None:
+    if image.size != expected_size:
+        raise ValueError(f"{role} must be {expected_size[0]}x{expected_size[1]}, got {image.size}")
+    alpha_min, alpha_max = image.getchannel("A").getextrema()
+    if alpha_max == 0:
+        raise ValueError(f"{role} is fully transparent")
+    if opaque and (alpha_min, alpha_max) != (255, 255):
+        raise ValueError(f"{role} must be fully opaque, got alpha range {(alpha_min, alpha_max)}")
 
 
 def crop_scaled(sheet: Image.Image, box: tuple[int, int, int, int], size: tuple[int, int]) -> Image.Image:
@@ -78,6 +93,48 @@ def build_semantic_icons() -> Image.Image:
     return atlas
 
 
+def build_silhouette() -> Image.Image:
+    """Deterministic portrait fallback that keeps the editorial layout intact."""
+    im = Image.new("RGBA", (512, 512), (5, 20, 31, 255))
+    d = ImageDraw.Draw(im)
+    d.ellipse((112, 86, 400, 374), fill=(8, 35, 47, 255), outline=BRASS, width=10)
+    d.polygon([(92, 244), (28, 174), (126, 188), (78, 98), (181, 155)], fill=(8, 35, 47, 255))
+    d.polygon([(420, 244), (484, 174), (386, 188), (434, 98), (331, 155)], fill=(8, 35, 47, 255))
+    d.ellipse((174, 178, 226, 230), fill=CYAN)
+    d.ellipse((286, 178, 338, 230), fill=CYAN)
+    d.arc((166, 220, 346, 348), 12, 168, fill=GOLD, width=13)
+    return im
+
+
+def build_faithful_assets() -> None:
+    FAITHFUL_RUNTIME.mkdir(parents=True, exist_ok=True)
+    FAITHFUL_LOOT_RUNTIME.mkdir(parents=True, exist_ok=True)
+
+    shell_path = FAITHFUL_SOURCE / "summary_shell_master.png"
+    if not shell_path.exists():
+        raise FileNotFoundError(f"Missing faithful shell master: {shell_path.relative_to(ROOT)}")
+    with Image.open(shell_path) as opened:
+        shell = opened.convert("RGBA")
+        validate_rgba(shell, (1672, 941), "Faithful shell", opaque=True)
+        shell.save(FAITHFUL_RUNTIME / "shell.png")
+
+    for name in ("fish", "victory"):
+        source = FAITHFUL_SOURCE / f"portrait_{name}_master.png"
+        if not source.exists():
+            raise FileNotFoundError(f"Missing faithful portrait: {source.relative_to(ROOT)}")
+        portrait = normalize(source, (512, 512))
+        validate_rgba(portrait, (512, 512), f"Faithful {name} portrait")
+        portrait.save(FAITHFUL_RUNTIME / f"portrait_{name}.png")
+    build_silhouette().save(FAITHFUL_RUNTIME / "portrait_fallback.png")
+
+    # PixelLab continues to own these illustrations; faithful presentation only
+    # normalizes them into the new runtime directory.
+    for kind in ("scrap", "fragment", "blueprint", "relic"):
+        normalize(SOURCE / f"loot_{kind}.png", (128, 128), fallback_loot(kind)).save(
+            FAITHFUL_LOOT_RUNTIME / f"{kind}.png"
+        )
+
+
 def main() -> None:
     RUNTIME.mkdir(parents=True, exist_ok=True); LOOT_RUNTIME.mkdir(parents=True, exist_ok=True)
     sheet = normalize(SOURCE / "run_summary_ui_sheet.png", (600, 448))
@@ -100,6 +157,7 @@ def main() -> None:
     for kind in ("scrap", "fragment", "blueprint", "relic"):
         normalize(SOURCE / f"loot_{kind}.png", (96, 96), fallback_loot(kind)).save(LOOT_RUNTIME / f"{kind}.png")
     build_semantic_icons().save(RUNTIME / "icons.png")
+    build_faithful_assets()
     print(f"Built run-summary assets in {RUNTIME.relative_to(ROOT)}")
 
 

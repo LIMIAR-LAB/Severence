@@ -155,7 +155,10 @@ func _ready() -> void:
 				start_single(); sim.start_run(1941)
 				sim.tick_time = 1122.0; sim.visited = sim.rooms.slice(0, maxi(1, int(sim.rooms.size() * 0.7))).map(func(room): return room.id)
 				sim.run_stats = {"kills": 247, "kills_by_kind": {"fish": 14}, "damage_dealt": 48320.0, "damage_received": 2840.0, "max_streak": 36, "chests_opened": 3, "revives": 1, "fatal_source": "fish", "fatal_attack": "harpoon"}
-				sim.money = 1240; sim.materials = sim.run_materials_start + 38; sim.finish_run("death")
+				sim.money = 1240; sim.materials = sim.run_materials_start + 38
+				var capture_outcome := "victory" if "--capture-summary-victory" in args else "death"
+				if capture_outcome == "victory": sim.boss_dead = true
+				sim.finish_run(capture_outcome)
 				presented_summary_seq = sim.summary_seq; menu.open("summary")
 			else:
 				menu.read_equipment(); menu.show_screen(page)
