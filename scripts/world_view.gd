@@ -31,6 +31,7 @@ var font: Font
 var outfit_texture: Texture2D
 var marty_anim: Texture2D
 var marty_padrao_actions: Dictionary = {}
+var marty_omega_actions: Dictionary = {}
 var marty_roll: Dictionary = {}
 var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
@@ -50,6 +51,13 @@ const MARTY_PADRAO_ROOT := "res://assets/characters/marty/padrao/pixellab/"
 const MARTY_PADRAO_FRAMES := {
 	"idle": 4, "run": 8, "jump": 9, "evade": 6,
 	"shoot": 3, "melee": 6, "hurt": 6, "defeat": 7,
+}
+const MARTY_OMEGA_ROOT := "res://assets/characters/marty/omega/pixellab/"
+const MARTY_OMEGA_CELL := 112
+const MARTY_OMEGA_DRAW_SIZE := 124.0
+const MARTY_OMEGA_FRAMES := {
+	"idle": 4, "run": 8, "jump": 7, "evade": 7,
+	"melee": 6, "hurt": 6, "defeat": 7,
 }
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
@@ -82,6 +90,9 @@ func _ready() -> void:
 	# Marty Padrao usa arte propria em oito direcoes, sem espelhar detalhes assimetricos.
 	for action in MARTY_PADRAO_FRAMES:
 		marty_padrao_actions[action] = load(MARTY_PADRAO_ROOT + action + ".png")
+	# A Armadura Omega tem celula e escala proprias para preservar seu volume.
+	for action in MARTY_OMEGA_FRAMES:
+		marty_omega_actions[action] = load(MARTY_OMEGA_ROOT + action + ".png")
 	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
 	for direction in ["side", "front_diag", "back_diag"]:
 		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
@@ -599,6 +610,8 @@ func draw_actor(a: Dictionary) -> void:
 	if a.dead:
 		if sim.outfit_of(a) == "padrao":
 			draw_marty_padrao_frame("defeat", a.facing, MARTY_PADRAO_FRAMES.defeat - 1, foot, Color.WHITE)
+		elif sim.outfit_of(a) == "omega":
+			draw_marty_omega_frame("defeat", a.facing, MARTY_OMEGA_FRAMES.defeat - 1, foot, Color.WHITE)
 		else:
 			draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
 			draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
@@ -655,6 +668,13 @@ func draw_actor(a: Dictionary) -> void:
 		# A arma entra em cena apenas no disparo. O golpe corpo a corpo usa a
 		# animacao desarmada, e as demais poses preservam a silhueta do personagem.
 		if marty_padrao_shows_weapon(padrao_action, transforming): draw_weapon(a, draw_pos + Vector2(0, bob))
+	elif outfit_key == "omega":
+		var omega_action := marty_omega_action(a, walking)
+		var omega_direction: Vector2 = a.dash_dir if omega_action == "evade" else (a.move if omega_action == "run" else a.facing)
+		var omega_frame := marty_omega_frame(a, omega_action, slash_dur)
+		draw_marty_omega_frame(omega_action, omega_direction, omega_frame, draw_pos + Vector2(0, bob), tint)
+		# A espada materializa apenas durante o combo; repouso e movimento ficam livres.
+		if omega_action == "melee": draw_weapon(a, draw_pos + Vector2(0, bob))
 	elif a.dodge > 0 and not a.mech:
 		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
 	else:
@@ -666,7 +686,7 @@ func draw_actor(a: Dictionary) -> void:
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
 	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
-	text_at(draw_pos + Vector2(-25, -96 if a.armor else -86), "MARTY" if a.id == 0 else ("ECHO • IA" if sim.coop == "ai" else "ECHO • P2"), player_color, 11)
+	text_at(draw_pos + Vector2(-25, -112 if a.armor else -86), "MARTY" if a.id == 0 else ("ECHO • IA" if sim.coop == "ai" else "ECHO • P2"), player_color, 11)
 
 func draw_mech(m: Dictionary) -> void:
 	var p: Vector2 = m.p
@@ -789,6 +809,12 @@ func draw_warden(e: Dictionary) -> void:
 	text_at(p + Vector2(-72, -293), "CÃO DE GUERRA", Color("ffb451"), 15)
 
 func weapon_hand_anchor(a: Dictionary) -> Vector2:
+	if sim.outfit_of(a) == "omega":
+		var omega_anchors := [
+			Vector2(20, -40), Vector2(23, -43), Vector2(25, -44), Vector2(20, -47),
+			Vector2(10, -49), Vector2(-20, -47), Vector2(-25, -44), Vector2(-23, -43),
+		]
+		return omega_anchors[marty_direction_row(a.get("aim", a.facing))]
 	if sim.outfit_of(a) == "padrao":
 		# O novo atlas tem oito direcoes e corpo mais alto que o legado.
 		# A ancora segue a mira para manter a empunhadura junto da mao no disparo.
@@ -977,6 +1003,31 @@ func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foo
 	var texture: Texture2D = marty_padrao_actions[action]
 	var row := marty_direction_row(direction)
 	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
+
+func marty_omega_action(a: Dictionary, walking: bool) -> String:
+	if a.dodge > 0: return "evade"
+	if a.slash > 0 and not a.mech: return "melee"
+	if a.jump > 0: return "jump"
+	if a.hurt > 0: return "hurt"
+	if walking: return "run"
+	return "idle"
+
+func marty_omega_frame(a: Dictionary, action: String, slash_dur: float) -> int:
+	var count: int = MARTY_OMEGA_FRAMES[action]
+	match action:
+		"evade": return clampi(int((1.0 - a.dodge / 0.20) * count), 0, count - 1)
+		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
+		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
+		"run": return int(a.step) % count
+		"hurt": return int(sim.tick_time * 14.0) % count
+		_: return int(sim.tick_time * 4.0 + a.id) % count
+
+func draw_marty_omega_frame(action: String, direction: Vector2, frame: int, foot: Vector2, tint: Color) -> void:
+	var texture: Texture2D = marty_omega_actions[action]
+	var row := marty_direction_row(direction)
+	var draw_size := Vector2.ONE * MARTY_OMEGA_DRAW_SIZE
+	var top_left := foot - Vector2(draw_size.x * 0.5, draw_size.y - 2.0)
+	draw_texture_rect_region(texture, Rect2(top_left, draw_size), Rect2(frame * MARTY_OMEGA_CELL, row * MARTY_OMEGA_CELL, MARTY_OMEGA_CELL, MARTY_OMEGA_CELL), tint)
 
 func draw_guard_shield_icon(p: Vector2, broken: bool) -> void:
 	# 0.20: estado do escudo sem texto, legível mesmo com vários inimigos na sala.

@@ -1,4 +1,6 @@
-# Marty — Fraturas do Tempo: base da história
+# Severence: Ecos do Tempo — base da história
+
+Título adotado para a apresentação atual: **Severence: Ecos do Tempo**. Marty permanece o protagonista. As artes anteriores podem exibir o título de trabalho antigo.
 
 ## Premissa
 

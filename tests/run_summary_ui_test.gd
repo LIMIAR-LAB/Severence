@@ -24,6 +24,25 @@ func run() -> void:
 	var refuge: Button = app.menu.content.find_child("SummaryRefuge", true, false)
 	check(retry is Button and refuge is Button, "summary exposes both actions")
 	check(app.menu.summary_texture("res://assets/ui/run_summary/definitely_missing.png") == null, "missing ornamental asset uses functional fallback")
+	check(app.menu.content.get_parent() == app.menu, "faithful summary uses its own master canvas")
+	check(app.menu.content.size == Vector2(1672, 941), "faithful summary keeps the approved 1672x941 composition")
+	check(is_equal_approx(app.menu.content.scale.x, app.menu.content.scale.y), "summary canvas scales uniformly without distortion")
+	check(is_equal_approx(app.menu.summary_fit(Vector2(1920, 1080)), minf(1920.0 / 1672.0, 1080.0 / 941.0)), "summary fit letterboxes arbitrary aspect ratios")
+	app.menu.place_summary(Vector2(1600, 1000))
+	check(is_equal_approx(app.menu.content.scale.x, app.menu.content.scale.y) and app.menu.content.position.y > 0, "16:10 viewport letterboxes vertically")
+	app.menu.place_summary(Vector2(2560, 1080))
+	check(is_equal_approx(app.menu.content.scale.x, app.menu.content.scale.y) and app.menu.content.position.x > 0, "ultrawide viewport pillarboxes horizontally")
+	app.menu.place_summary()
+	check(app.menu.faithful_portrait_path(app.sim.last_run_summary, false).ends_with("portrait_fish.png"), "fish death selects editorial monster portrait")
+	var portrait: TextureRect = app.menu.content.find_child("SummaryPortrait", true, false)
+	check(portrait is TextureRect and portrait.texture != null and portrait.texture.get_size() == Vector2(512, 512), "editorial portrait is present at production resolution")
+	app.menu.summary_force_fallback = true; app.menu.show_screen("summary"); await process_frame
+	var fallback_canvas: Control = app.menu.content.find_child("SummaryFallbackCanvas", true, false)
+	check(fallback_canvas is Control and fallback_canvas.scale.x > 1.0 and is_equal_approx(fallback_canvas.scale.x, fallback_canvas.scale.y), "real missing-art branch keeps legacy fallback centered and readable")
+	check(app.menu.content.find_child("SummaryNewRun", true, false) is Button and app.menu.content.find_child("SummaryRefuge", true, false) is Button, "fallback keeps both actions operable")
+	app.menu.summary_force_fallback = false; app.menu.show_screen("summary"); await process_frame
+	retry = app.menu.content.find_child("SummaryNewRun", true, false)
+	refuge = app.menu.content.find_child("SummaryRefuge", true, false)
 	check(root.get_viewport().gui_get_focus_owner() == retry, "primary action receives controller focus")
 	refuge.pressed.emit()
 	check(not app.menu.visible and app.sim.mode == "run", "return action closes report without mutating captured state")
@@ -44,6 +63,13 @@ func run() -> void:
 	var back := InputEventJoypadButton.new(); back.button_index = JOY_BUTTON_B; back.pressed = true
 	app.menu._unhandled_input(back)
 	check(not app.menu.visible, "controller back returns from summary to refuge")
+
+	app.online = false; app.hosting = false; app.playing = false
+	app.sim.last_run_summary = {"outcome": "victory", "grade": "S", "seed": 1941, "obituary": "Núcleo recuperado.", "nucleus": 1}
+	app.menu.open("summary"); await process_frame
+	check(app.menu.faithful_portrait_path(app.sim.last_run_summary, true).ends_with("portrait_victory.png"), "victory selects dedicated nucleus portrait")
+	portrait = app.menu.content.find_child("SummaryPortrait", true, false)
+	check(portrait is TextureRect and portrait.texture != null, "victory treatment keeps the illustrated portrait slot")
 	app.queue_free(); await process_frame
 	print("RUN_SUMMARY_UI_TEST failures=", failures)
 	quit(1 if failures else 0)
