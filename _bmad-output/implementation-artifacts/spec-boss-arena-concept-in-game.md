@@ -63,6 +63,7 @@ context:
 ## Spec Change Log
 
 - 2026-09-29: Implemented the dedicated 4:3 arena plate, visual-only water perimeter, fallback rendering, geometry/navigation contract test, and gameplay captures for the fight states.
+- 2026-09-29: Review found that the first runtime plate implied collision over water/raised scenery and that wide camera edges were under-covered. Repainted the plate as continuous walkable steel, expanded visual-only outside water, and strengthened geometry, hazard, safe-disk, navigation-locality, and camera-coverage assertions. KEEP: central compass/anchor, abyssal navy/brass palette, unchanged gameplay geometry and boss logic.
 
 ## Design Notes
 
