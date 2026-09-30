@@ -25,6 +25,8 @@ var action_texture: Texture2D
 var floor_texture: Texture2D
 var spectre_texture: Texture2D
 var fusion_texture: Texture2D
+var spectre_actions: Dictionary = {}
+var fusion_actions: Dictionary = {}
 var warden_texture: Texture2D
 var dock_art: Dictionary = {}
 var font: Font
@@ -38,6 +40,7 @@ var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
 var special_enemy_art: Dictionary = {}
 var pixellab_enemy_art: Dictionary = {}
+var pixellab_enemy_actions: Dictionary = {}
 var weapon_art: Dictionary = {}
 var cockpit_texture: Texture2D
 var titan_v2: Texture2D
@@ -63,9 +66,14 @@ const MARTY_OMEGA_FRAMES := {
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
+const SPECTRE_ACTION_ROOT := "res://assets/characters/spectre/pixellab/"
+const FUSION_ACTION_ROOT := "res://assets/characters/marty/spectre_fusion/pixellab/"
+const SPECTRE_ACTION_CELL := 128
+const FUSION_ACTION_CELL := 128
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 const PIXELLAB_ENEMY_VERSION := {"guard": "v1", "bomber": "v1", "cult": "v2", "fish": "v2", "crawler": "v2", "brute": "v2"}
 const PIXELLAB_ENEMY_SIZE := {"guard": 84.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
+const ENEMY_ACTION_SCALE := {"cult": 0.85, "crawler": 0.95, "fish": 1.3, "brute": 1.2, "guard": 0.85, "bomber": 0.75}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
 const CORE_OFFSET := Vector2(548, 232)
@@ -79,6 +87,8 @@ func _ready() -> void:
 	for kind in PIXELLAB_ENEMY_VERSION:
 		var path := "res://assets/enemies/%s_pixellab_%s.png" % [kind, PIXELLAB_ENEMY_VERSION[kind]]
 		if ResourceLoader.exists(path): pixellab_enemy_art[kind] = load(path)
+		var action_path := "res://assets/enemies/%s_actions_v1.png" % kind
+		if ResourceLoader.exists(action_path): pixellab_enemy_actions[kind] = load(action_path)
 	marty_texture = load("res://assets/marty/marty-v2.png")
 	mech_texture = load("res://assets/mech/titan.png")
 	action_texture = load("res://assets/marty/actions-v2.png")
@@ -88,6 +98,12 @@ func _ready() -> void:
 	# 0.15: Spectre é um pequeno polvo mecânico; a fusão preserva Marty visível.
 	spectre_texture = load(SPECTRE_ATLAS_PATH)
 	fusion_texture = load(FUSION_ATLAS_PATH)
+	for action in ["idle", "run", "shoot", "evade", "hurt", "defeat"]:
+		var path: String = SPECTRE_ACTION_ROOT + action + ".png"
+		if ResourceLoader.exists(path): spectre_actions[action] = load(path)
+	for action in ["idle", "run", "jump", "evade", "shoot", "melee", "hurt", "defeat"]:
+		var path: String = FUSION_ACTION_ROOT + action + ".png"
+		if ResourceLoader.exists(path): fusion_actions[action] = load(path)
 	warden_texture = load("res://assets/enemies/warden.png")
 	outfit_texture = load("res://assets/marty/outfits.png")
 	# 0.15: atlas normalizado; todas as skins compartilham a mesma grade e pivô.
@@ -647,7 +663,10 @@ func draw_actor(a: Dictionary) -> void:
 	visual_transform(foot, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 17, Color(0, 0, 0, 0.4)); visual_transform(Vector2.ZERO)
 	draw_arc(foot, 16, 0, TAU, 20, player_color, 2)
 	if a.dead:
-		if sim.outfit_of(a) == "padrao":
+		if a.fused and fusion_actions.has("defeat"):
+			var defeat_texture: Texture2D = fusion_actions["defeat"]
+			draw_character_action(defeat_texture, FUSION_ACTION_CELL, 128.0, foot, a.facing, maxi(0, int(defeat_texture.get_width() / FUSION_ACTION_CELL) - 1))
+		elif sim.outfit_of(a) == "padrao":
 			draw_marty_padrao_frame("defeat", a.facing, MARTY_PADRAO_FRAMES.defeat - 1, foot, Color.WHITE)
 		elif sim.outfit_of(a) == "omega":
 			draw_marty_omega_frame("defeat", a.facing, MARTY_OMEGA_FRAMES.defeat - 1, foot, Color.WHITE)
@@ -662,7 +681,13 @@ func draw_actor(a: Dictionary) -> void:
 	if a.fused:
 		var col := 3 if a.slash > 0 or a.get("fire_flash", 0.0) > 0 else (1 + int(a.step) % 2 if a.move.length() > 0.1 else 0)
 		var tint := Color(1.5, 1.5, 1.5, 0.65) if a.hurt > 0 else Color.WHITE
-		draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 144, tint)
+		var fusion_action := fusion_sprite_action(a)
+		if fusion_actions.has(fusion_action):
+			var direction: Vector2 = a.dash_dir if fusion_action == "evade" else (a.move if fusion_action == "run" else fusion_visual_direction(a))
+			var frame := character_action_frame(fusion_actions[fusion_action], FUSION_ACTION_CELL, fusion_action, a)
+			draw_character_action(fusion_actions[fusion_action], FUSION_ACTION_CELL, 128.0, draw_pos, direction, frame, tint)
+		else:
+			draw_feral(fusion_texture, draw_pos, fusion_visual_direction(a), col, 160, 144, tint)
 		text_at(draw_pos + Vector2(-36, -115), "MARTY • FUSÃO", CYAN, 11)
 		return
 	# Roupa atual: COM armadura = Ômega; SEM armadura = Padrão / Londres / Mecânico.
@@ -794,7 +819,15 @@ func draw_spectre(s: Dictionary) -> void:
 	var p: Vector2 = s.p
 	draw_arc(p, 17, 0, TAU, 18, Color(0.3, 0.9, 1, 0.6), 2)
 	var col := 3 if s.shot > 0.38 else (1 + int(s.get("step", 0.0)) % 2 if s.get("moving", false) else 0)
-	draw_feral(spectre_texture, p - Vector2(0, sim.height_at(p)), spectre_visual_direction(s), col, 128, 112)
+	var action := "shoot" if s.shot > 0.38 else ("run" if s.get("moving", false) else "idle")
+	var draw_pos := p - Vector2(0, sim.height_at(p))
+	if spectre_actions.has(action):
+		var texture: Texture2D = spectre_actions[action]
+		var count := maxi(1, texture.get_width() / SPECTRE_ACTION_CELL)
+		var frame := int(s.get("step", 0.0)) % count if action == "run" else (int(sim.tick_time * 4.0) % count if action == "idle" else clampi(int((sim.SPECTRE_SHOT.cooldown - s.shot) / 0.17 * count), 0, count - 1))
+		draw_character_action(texture, SPECTRE_ACTION_CELL, 112.0, draw_pos, spectre_visual_direction(s), frame)
+	else:
+		draw_feral(spectre_texture, draw_pos, spectre_visual_direction(s), col, 128, 112)
 	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40, 3)), Color("1a3541"))
 	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40 * s.hp / 100, 3)), CYAN)
 	text_at(p + Vector2(-30, -112), "SPECTRE", CYAN, 10)
@@ -1023,6 +1056,33 @@ func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foo
 	var row := marty_direction_row(direction)
 	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
 
+func fusion_sprite_action(a: Dictionary) -> String:
+	if a.get("roll_visual", a.dodge) > 0: return "evade"
+	if a.slash > 0: return "melee"
+	if a.jump > 0: return "jump"
+	if a.hurt > 0: return "hurt"
+	if a.get("fire_flash", 0.0) > 0: return "shoot"
+	if a.move.length() > 0.1: return "run"
+	return "idle"
+
+func character_action_frame(texture: Texture2D, cell: int, action: String, a: Dictionary) -> int:
+	var count := maxi(1, int(texture.get_width() / cell))
+	match action:
+		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
+		"melee": return clampi(int((1.0 - a.slash / 0.32) * count), 0, count - 1)
+		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
+		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
+		"run": return int(a.step) % count
+		"hurt": return int(sim.tick_time * 14.0) % count
+		_: return int(sim.tick_time * 4.0 + a.id) % count
+
+func draw_character_action(texture: Texture2D, cell: int, size: float, foot: Vector2,
+		direction: Vector2, frame: int, tint: Color = Color.WHITE) -> void:
+	var row := marty_direction_row(direction)
+	var draw_size := Vector2.ONE * size
+	var top_left := foot - Vector2(size * 0.5, size * (1.0 - 6.0 / cell))
+	draw_texture_rect_region(texture, Rect2(top_left, draw_size), Rect2(frame * cell, row * cell, cell, cell), tint)
+
 func marty_omega_action(a: Dictionary, walking: bool) -> String:
 	if a.get("roll_visual", a.dodge) > 0: return "evade"
 	if a.slash > 0 and not a.mech: return "melee"
@@ -1072,6 +1132,9 @@ func enemy_art_scale(kind: String, crouched: bool = false) -> Vector2:
 	var size_scale := 0.6 if kind == "crawler_small" else 1.0
 	return Vector2(size_scale, size_scale * (0.78 if crouched else 1.0))
 
+func enemy_action_scale(kind: String) -> float:
+	return ENEMY_ACTION_SCALE.get(enemy_art_kind(kind), 1.0) * (0.6 if kind == "crawler_small" else 1.0)
+
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p
 	if e.kind == "warden": draw_warden(e); return
@@ -1100,19 +1163,22 @@ func draw_enemy(e: Dictionary) -> void:
 		var octant := enemy_octant(face)
 		var frame := 1 + int(e.step) % 4 if e.moving else 0
 		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
-		# O atlas novo já contém as oito direções; não espelhar a silhueta.
+		var attacking: bool = e.combat == "attack" or (e.kind == "bomber" and e.combat == "warning")
 		var attack_push := 0.0
 		var attack_tilt := 0.0
-		if e.combat == "attack":
+		if attacking:
 			attack_push = 5.0 * (0.5 + 0.5 * sin(sim.tick_time * 28.0))
 			attack_tilt = -0.08 * signf(face.x) * sin(sim.tick_time * 28.0)
 		elif e.combat == "warning":
 			attack_tilt = 0.035 * sin(sim.tick_time * 18.0)
-		visual_transform(p + Vector2(0, bob) + face * attack_push, attack_tilt, enemy_art_scale(e.kind, e.get("crouched", false)))
 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
 			tint = Color(1.5, 0.8, 0.55)
-		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
-		draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
+		if attacking and pixellab_enemy_actions.has(art_kind):
+			visual_transform(p + face * attack_push, attack_tilt, Vector2.ONE * enemy_action_scale(e.kind))
+			draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-80, -119, 160, 128), Rect2(0, octant * 128, 160, 128), tint)
+		else:
+			visual_transform(p + Vector2(0, bob), attack_tilt, enemy_art_scale(e.kind, e.get("crouched", false)))
+			draw_texture_rect_region(new_art, Rect2(-size * 0.5, -size * 92.0 / 96.0, size, size), Rect2(frame * 96, octant * 96, 96, 96), tint)
 	elif special_enemy_art.has(e.kind):
 		var special: Texture2D = special_enemy_art[e.kind]
 		var cell_size := special.get_size() / 4.0
@@ -1170,8 +1236,14 @@ func draw_corpse(fx: Dictionary) -> void:
 		var sink: float = (1.0 - fx.life / fx.max) * 50
 		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
 		return
-	if fx.enemy == "bomber": return  # desaparece na explosão, sem virar o cadáver do Brute
 	var art_kind := enemy_art_kind(fx.enemy)
+	if pixellab_enemy_actions.has(art_kind):
+		var row := enemy_octant(fx.get("face", Vector2.DOWN))
+		visual_transform(fx.p, 0, Vector2.ONE * enemy_action_scale(fx.enemy))
+		draw_texture_rect_region(pixellab_enemy_actions[art_kind], Rect2(-80, -119, 160, 128), Rect2(160, row * 128, 160, 128), Color(1, 1, 1, fade))
+		visual_transform(Vector2.ZERO)
+		return
+	if fx.enemy == "bomber": return
 	if pixellab_enemy_art.has(art_kind):
 		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
 		var fall: float = clampf((1.0 - fx.life / fx.max) * 7.0, 0.0, 1.0)

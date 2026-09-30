@@ -3,11 +3,12 @@
 from pathlib import Path
 from PIL import Image
 import numpy as np
+from scipy.ndimage import label
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "art/source/enemy-actions-ai"
 TARGET = ROOT / "assets/enemies"
-KINDS = ("cult", "crawler", "fish", "brute")
+KINDS = ("cult", "crawler", "fish", "brute", "guard", "bomber")
 CELL = (160, 128)
 
 
@@ -31,6 +32,10 @@ def pack(kind: str) -> None:
     if image.size != (992, 1586):
         raise ValueError(f"{kind}: unexpected generated sheet size {image.size}")
     cuts = row_cuts(np.asarray(image)[:, :, 3])
+    # The guard's last three poses sit higher than an even grid; use the
+    # transparent gaps between their bodies so the helmets remain intact.
+    if kind == "guard":
+        cuts = [0, 198, 396, 578, 760, 956, 1128, 1312, image.height]
     sprites = []
     for row in range(8):
         for col, (left, right) in enumerate(((0, 520), (520, image.width))):
@@ -54,6 +59,15 @@ def pack(kind: str) -> None:
             if x < col * CELL[0] + 2 or x + sprite.width > (col + 1) * CELL[0] - 2:
                 raise ValueError(f"{kind}: sprite touches horizontal cell border")
             atlas.alpha_composite(sprite, (x, y))
+    pixels = np.array(atlas)
+    for row in range(8):
+        for col in range(2):
+            cell = pixels[row * CELL[1]:(row + 1) * CELL[1], col * CELL[0]:(col + 1) * CELL[0]]
+            components, count = label(cell[:, :, 3] > 64)
+            for component in range(1, count + 1):
+                if np.count_nonzero(components == component) < 100:
+                    cell[components == component] = 0
+    atlas = Image.fromarray(pixels, "RGBA")
     TARGET.mkdir(parents=True, exist_ok=True)
     atlas.save(TARGET / f"{kind}_actions_v1.png")
     print(f"{kind}: {atlas.size}, scale={ratio:.3f}, cuts={cuts}")

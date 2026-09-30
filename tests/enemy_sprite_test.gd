@@ -32,6 +32,17 @@ func _init() -> void:
 						if image.get_pixel(x, y).a > 0.5: used = true; break
 					if used: break
 				check(used, "%s: direção %d pose %d contém desenho" % [kind, row, frame])
+		var action_path := "res://assets/enemies/%s_actions_v1.png" % kind
+		check(ResourceLoader.exists(action_path), "%s: ataque e morte gerados" % kind)
+		if ResourceLoader.exists(action_path):
+			var actions := load(action_path) as Texture2D
+			check(actions.get_size() == Vector2(320, 1024), "%s: ações em oito direções" % kind)
+			var action_image := actions.get_image()
+			for direction in range(8):
+				var attack := action_image.get_region(Rect2i(0, direction * 128, 160, 128))
+				var corpse := action_image.get_region(Rect2i(160, direction * 128, 160, 128))
+				check(attack.get_used_rect().has_area() and corpse.get_used_rect().has_area(), "%s: ataque e morte visíveis na direção %d" % [kind, direction])
+				check(hash(attack.get_data()) != hash(corpse.get_data()), "%s: ataque difere da morte na direção %d" % [kind, direction])
 	var sim := Expedition.new()
 	sim.start_run(1941)
 	sim.spawn_enemy(sim.actors[0].p + Vector2(100, 0), "guard")

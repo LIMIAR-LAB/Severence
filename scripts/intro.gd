@@ -57,7 +57,7 @@ func _fit_video() -> void:
 	player.position = (size - fitted) * 0.5
 
 func _input(event: InputEvent) -> void:
-	var skip := (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	var skip: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
 	if skip and not leaving:
 		get_viewport().set_input_as_handled()
 		finish()

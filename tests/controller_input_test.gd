@@ -4,7 +4,9 @@ var app: Node
 var failures := 0
 const PAD := 12
 class TestApp extends "res://scripts/main.gd":
+	var force_ps := false
 	func connected_gamepads() -> Array: return [12]
+	func playstation_controller_connected() -> bool: return force_ps
 
 func _initialize() -> void: run.call_deferred()
 func check(ok: bool, label: String) -> void:
@@ -22,6 +24,15 @@ func frames(n: int) -> void:
 func run() -> void:
 	app = TestApp.new(); root.add_child(app)
 	await frames(2)
+	check(app.is_playstation_controller("DualSense Wireless Controller") and app.is_playstation_controller("DUALSHOCK 4 Wireless Controller"), "DualSense e DualShock usam símbolos PlayStation")
+	check(not app.is_playstation_controller("Xbox Wireless Controller"), "outro controle não recebe símbolos PlayStation")
+	app.menu.options_tab = "controls"; app.menu.show_screen("options")
+	check(app.menu.content.find_child("PlayStationControlsLegend", true, false) == null, "sem PlayStation a legenda não aparece")
+	app.force_ps = true; app.log_joypad(PAD, true)
+	check(app.menu.content.find_child("PlayStationControlsLegend", true, false) != null, "conexão PlayStation atualiza as instruções abertas")
+	app.force_ps = false; app.log_joypad(PAD, false)
+	check(app.menu.content.find_child("PlayStationControlsLegend", true, false) == null, "desconexão devolve as instruções de teclado")
+	app.menu.show_screen("main")
 	app.start_single(); app.sim.make_hub(); app.ui_input_block = 0
 	check(app.gameplay_joypad(true, [PAD]) == PAD, "solo usa primeiro controle")
 	app.sim.coop = "local"

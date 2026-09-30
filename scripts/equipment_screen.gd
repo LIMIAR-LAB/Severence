@@ -85,7 +85,7 @@ func build() -> void:
 	build_header()
 	status = label(self, Rect2(455, 707, 625, 25), "", 13, DIM); status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	host.live_status = status
-	var back := button(self, Rect2(24, 699, 190, 38), "ESC / B  VOLTAR", go_back, "Back")
+	var back := button(self, Rect2(24, 699, 190, 38), "ESC / ○  VOLTAR" if app.playstation_controller_connected() else "ESC / B  VOLTAR", go_back, "Back")
 	var launch := button(self, Rect2(1093, 699, 225, 38), "VOLTAR À PAUSA" if mission_mode else "IR AO REFÚGIO", go_back if mission_mode else host.launch_refuge, "Refuge")
 	back.add_theme_color_override("font_color", GOLD); launch.add_theme_color_override("font_color", GOLD)
 	build_compatibility_nodes()
@@ -313,7 +313,7 @@ func refresh_inventory_details() -> void:
 		detail_action.text = "ARMA BÁSICA" if app.sim.actors[host.gear_actor].get("run_weapon", "") == "bazooka" else "EQUIPAR"
 	if not open: detail_reason.text = "Ação indisponível: item bloqueado."
 	elif entry.id == "missao_fragmentos": detail_reason.text = "Ganho desta missão • preservado entre expedições."
-	elif transient: detail_reason.text = (("Saia do Titan ou da armadura e esteja vivo para trocar." if not usable else "Arma temporária • Q/RB também alterna; vazia continua selecionável.") if entry.id == "missao_bazuca" else "Recurso temporário • utilizado durante a expedição.")
+	elif transient: detail_reason.text = (("Saia do Titan ou da armadura e esteja vivo para trocar." if not usable else ("Arma temporária • Q/R1 também alterna; vazia continua selecionável." if app.playstation_controller_connected() else "Arma temporária • Q/RB também alterna; vazia continua selecionável.")) if entry.id == "missao_bazuca" else "Recurso temporário • utilizado durante a expedição.")
 	elif quantity_for(entry) <= 0: detail_reason.text = "Ação indisponível: item ainda não obtido."
 	elif entry.get("prototipo", false): detail_reason.text = "Ação indisponível: protótipo sem mecânica implementada."
 	elif entry.get("equipavel", false) != true: detail_reason.text = "Este item não ocupa um slot equipável."

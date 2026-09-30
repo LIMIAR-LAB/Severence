@@ -340,6 +340,21 @@ func log_joypad(device: int, connected_pad: bool) -> void:
 	if connected_pad:
 		print("CONTROLE conectado: ", device, " • ", Input.get_joy_name(device), " • reconhecido=", Input.is_joy_known(device))
 	else: print("CONTROLE desconectado: ", device)
+	if menu != null and menu.visible and menu.screen == "options" and menu.options_tab == "controls":
+		menu.show_screen("options")
+
+static func is_playstation_controller(name: String, guid: String = "") -> bool:
+	var lower_name := name.to_lower()
+	for marker in ["dualsense", "dualshock", "playstation", "ps4 controller", "ps5 controller"]:
+		if lower_name.contains(marker): return true
+	# Sony vendor ID 054c appears byte-reversed in SDL/Godot GUIDs.
+	return guid.to_lower().contains("4c05") or guid.to_lower().contains("054c")
+
+func playstation_controller_connected() -> bool:
+	for device in connected_gamepads():
+		if is_playstation_controller(Input.get_joy_name(device), Input.get_joy_guid(device)):
+			return true
+	return false
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and event.relative.length_squared() > 0.0:
@@ -465,7 +480,7 @@ func _physics_process(dt: float) -> void:
 			var screen_size := get_viewport_rect().size / camera.zoom
 			sim.visible_world_rect = Rect2(camera.position - screen_size * 0.5, screen_size)
 			sim.step(dt, [primary, secondary])
-	for key in ["interact", "armor", "weapon", "summon", "fusion", "robot_switch", "dodge", "jump"]: remote_cmd[key] = false
+			for key in ["interact", "armor", "weapon", "summon", "fusion", "robot_switch", "dodge", "jump"]: remote_cmd[key] = false
 			if hosting and guest_id > 0:
 				send_timer += dt
 				if send_timer >= 0.05:

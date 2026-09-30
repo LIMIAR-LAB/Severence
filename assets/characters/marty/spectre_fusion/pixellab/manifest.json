@@ -1,0 +1,17 @@
+{
+  "character_id": "778a0488-6cea-410b-b5c7-0e51f0263c28",
+  "cell": 128,
+  "directions": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "frames": {
+    "idle": 1
+  }
+}

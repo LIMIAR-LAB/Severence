@@ -144,6 +144,7 @@ const ARMORS := {
 const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "ESPIÃO", "omega": "ARMADURA ÔMEGA"}
 
 # Enrage do Almirante: sem isso a luta podia travar indefinidamente contra um time passivo.
+const BOSS_RADIUS := 58.0
 # Depois de BOSS_ENRAGE_TIME segundos de combate ativo, os cooldowns de ataque encolhem por BOSS_ENRAGE_SCALE.
 const BOSS_ENRAGE_TIME := 150.0
 const BOSS_ENRAGE_SCALE := 0.6
@@ -623,8 +624,8 @@ func room_at(pos: Vector2) -> Dictionary:
 
 func spawn_enemy(pos: Vector2, kind: String, optional: bool = false) -> void:
 	uid += 1
-	# 0.11: inimigos mais resistentes (≈ +50% de vida) e o Almirante com 600.
-	var hp: float = {"boss": 600.0, "brute": 95.0, "fish": 66.0, "crawler": 45.0, "crawler_small": 18.0,
+	# O Almirante sustenta uma luta mais longa que os inimigos comuns.
+	var hp: float = {"boss": 900.0, "brute": 95.0, "fish": 66.0, "crawler": 45.0, "crawler_small": 18.0,
 		"bomber": 24.0, "guard": 64.0}.get(kind, 52.0)
 	if kind == "warden": hp = 420.0
 	elif kind != "boss": hp *= 1.25
@@ -1451,15 +1452,16 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 		if e.charge <= 0:
 			emit_audio("enemy_boss", e.p)
 			e.shot = 0.4
-			add_bullet(e.p + direction * 30, direction, 1, 24, 200, 13, -1, "cannon", 4.0)
+			add_bullet(e.p + direction * BOSS_RADIUS, direction, 1, 24, 270, 13, -1, "cannon", 4.0)
 		return
 	if e.spin > 0:
 		e.spin -= dt; e.cd -= dt
 		if e.cd <= 0:
-			e.cd = 0.11 * enrage_scale(e); e.spin_angle += 0.42
+			e.cd = 0.09 * enrage_scale(e); e.spin_angle += 0.42
 			emit_audio("enemy_boss", e.p)
-			for k in range(2 if stage == 2 else 3):
-				add_bullet(e.p, Vector2.RIGHT.rotated(e.spin_angle + k * TAU / (2 if stage == 2 else 3)), 1, 10, 165, 6, -1, "orb")
+			var streams := 3 if stage == 2 else 4
+			for k in range(streams):
+				add_bullet(e.p, Vector2.RIGHT.rotated(e.spin_angle + k * TAU / streams), 1, 10, 215, 6, -1, "orb")
 		return
 	e.cd -= dt
 	if e.cd > 0: return
@@ -1467,27 +1469,27 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 	match stage:
 		1:
 			emit_audio("enemy_boss", e.p)
-			e.shot = 0.4; e.cd = 1.1 * enrage_scale(e)
+			e.shot = 0.4; e.cd = 0.85 * enrage_scale(e)
 			if e.phase % 2 == 1:
-				for n in range(16): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 16 + e.phase * 0.2), 1, 12, 150, 7, -1, "orb")
+				for n in range(22): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 22 + e.phase * 0.2), 1, 12, 205, 7, -1, "orb")
 			else:
-				for n in range(7): add_bullet(e.p, direction.rotated((n - 3) * 0.14), 1, 10, 215, 6, -1, "orb")
+				for n in range(9): add_bullet(e.p, direction.rotated((n - 4) * 0.12), 1, 10, 285, 6, -1, "orb")
 		2:
 			if e.phase % 3 == 0: e.charge = 0.9; e.cd = 1.0 * enrage_scale(e)
 			else: e.spin = 2.2; e.cd = 0.0
 		3:
-			e.shot = 0.4; e.cd = 0.8 * enrage_scale(e)
+			e.shot = 0.4; e.cd = 0.65 * enrage_scale(e)
 			emit_audio("enemy_boss", e.p)
 			match e.phase % 3:
 				0:
-					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.35), 1, 14, 115, 11, -1, "ink", 4.5)
+					for n in range(5): add_bullet(e.p, direction.rotated((n - 2) * 0.24), 1, 14, 160, 11, -1, "ink", 4.5)
 				1:
-					add_bullet(e.p, direction, 1, 18, 280, 6, -1, "harpoon")
+					add_bullet(e.p, direction, 1, 18, 370, 6, -1, "harpoon")
 					bullets[-1]["source"] = "boss"
 					if closest < 260:
-						for n in range(6): add_bullet(e.p + direction * 30, direction.rotated((n - 2.5) * 0.12), 1, 8, 280, 8, -1, "flame", 0.7)
+						for n in range(8): add_bullet(e.p + direction * BOSS_RADIUS, direction.rotated((n - 3.5) * 0.1), 1, 8, 340, 8, -1, "flame", 0.7)
 				2:
-					for n in range(20): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 20 + e.phase * 0.3), 1, 12, 175, 7, -1, "orb")
+					for n in range(26): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 26 + e.phase * 0.3), 1, 12, 235, 7, -1, "orb")
 
 func muzzle_line_clear(from: Vector2, to: Vector2) -> bool:
 	var steps := maxi(1, ceili(from.distance_to(to) / 2.0))
@@ -1497,7 +1499,7 @@ func muzzle_line_clear(from: Vector2, to: Vector2) -> bool:
 
 func hit_bullet_enemy(b: Dictionary, check_wall: bool = false) -> void:
 	for e in enemies:
-		if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
+		if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (BOSS_RADIUS if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
 			var previous_hits: Array = b.get("hits", [])
 			if previous_hits.has(e.id): continue
 			if e.hp <= 0: continue
@@ -1983,9 +1985,9 @@ func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
 		var destination: Vector2 = e.p + Vector2(260*cos(e.phase*1.9),220*sin(e.phase*1.9))
 		if not arena.grow(-80).has_point(destination): destination = arena.get_center()
 		var reached: Vector2 = e.p
-		for i in range(24): reached = move_body(reached, (destination-e.p)/24.0,45)
+		for i in range(24): reached = move_body(reached, (destination-e.p)/24.0,BOSS_RADIUS)
 		destination = reached
-		if not clear_at(destination,45): e.motion_cd=1.0; return false
+		if not clear_at(destination,BOSS_RADIUS): e.motion_cd=1.0; return false
 		e["motion_to"]=destination; e["motion"]="warning"; e["motion_t"]=0.7
 		e["motion_kind"]="dive" if e.hp/e.max <= 0.33 else ("charge" if e.hp/e.max <= 0.66 else "walk")
 		return true
@@ -1994,10 +1996,10 @@ func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
 		if e.motion_t <= 0: e.motion="moving"; e.motion_t=1.4
 		return true
 	var delta: Vector2 = e.motion_to-e.p
-	e.p=move_body(e.p,delta.normalized()*minf(delta.length(),(440.0 if e.motion_kind == "charge" else 260.0)*dt),45)
+	e.p=move_body(e.p,delta.normalized()*minf(delta.length(),(570.0 if e.motion_kind == "charge" else 340.0)*dt),BOSS_RADIUS)
 	if e.motion_kind == "charge" and e.p.distance_to(target.p)<70: damage_actor(target,20,"boss","charge")
 	if e.motion_t <= 0 or delta.length()<12:
-		e.motion="idle";e.motion_cd=3.0;e.cd=maxf(e.cd,0.5)
+		e.motion="idle";e.motion_cd=2.4;e.cd=maxf(e.cd,0.4)
 	return true
 
 # 0.18: ciclo comum. Chefes conservam seus próprios estados e padrões.

@@ -755,7 +755,13 @@ func build_controls_options(p: Control) -> void:
 		b.add_theme_font_size_override("font_size", 15)
 		bind_buttons[action] = b
 	label(p, Rect2(30, 400, 760, 26), "Mouse: mirar e atirar (clique esquerdo) • direito também golpeia", 14, GOLD)
-	button(p, Rect2(30, 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
+	if app.playstation_controller_connected():
+		var ps_legend := label(p, Rect2(30, 428, 760, 26), "CONTROLE PLAYSTATION DETECTADO", 16, GOLD)
+		ps_legend.name = "PlayStationControlsLegend"
+		label(p, Rect2(30, 453, 760, 25), "Analógico esquerdo mover • direito mirar • R2 atirar", 14)
+		label(p, Rect2(30, 478, 760, 25), "□ golpe • ✕ salto • ○ dash • △ interagir • L1 armadura • R1 arma", 14)
+		label(p, Rect2(30, 503, 760, 25), "↑ invocar • ↓ fundir • ← trocar robô • → raio Ômega • OPTIONS pausa", 14)
+	button(p, Rect2(30, 530 if app.playstation_controller_connected() else 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
 
 func bind_caption(action: String) -> String:
 	var label_text: String = app.KEY_BIND_LABELS.get(action, action)

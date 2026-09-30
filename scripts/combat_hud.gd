@@ -48,6 +48,7 @@ func text(p: Vector2, value: String, size: int = 15, color: Color = Color("e8dfb
 func _draw() -> void:
 	if app == null or app.sim == null: return
 	var s = app.sim
+	var ps: bool = app.playstation_controller_connected()
 	var id: int = 1 if app.online and not app.hosting else 0
 	var a: Dictionary = s.actors[id]
 	var portrait_sheet: Texture2D = art.portraits
@@ -74,23 +75,27 @@ func _draw() -> void:
 	var armor_info: Dictionary = s.ARMORS[a.armor_type]
 	var vp: Vector2 = get_viewport_rect().size
 	var dx := vp.x - 1280.0; var dy := vp.y - 800.0   # HUD ancorado nas bordas reais (qualquer proporção)
-	var box := Rect2(660 + dx * 0.5, 14, 260, 54)
+	var box := Rect2(660 + dx * 0.5, 14, 260, 72 if a.armor else 54)
 	frame(box)
 	var ratio := 0.0; var label := ""; var col := GOLD
 	if a.mech:
 		var bcd: float = a.get("bomb_cd", 0.0)
 		ratio = 1.0 - bcd / s.MECH_BOMB.cooldown
-		label = "R • BOMBA PRONTA" if bcd <= 0 else "BOMBA • %.1fs" % bcd
+		label = ("→ • BOMBA PRONTA" if ps else "R • BOMBA PRONTA") if bcd <= 0 else "BOMBA • %.1fs" % bcd
 		col = Color("ff9a4a") if bcd <= 0 else Color("8a7a58")
 	elif a.armor:
 		ratio = a.armor_time / armor_info.duration; label = "%s • %.0fs" % [armor_info.name, ceilf(a.armor_time)]; col = CYAN
 	elif a.armor_cd > 0:
 		ratio = 1.0 - a.armor_cd / armor_info.cooldown; label = "RECARGA • %.0fs" % ceilf(a.armor_cd); col = Color("8a7a58")
 	else:
-		ratio = 1.0; label = "R • VESTIR ARMADURA ÔMEGA"; col = CYAN.lerp(Color.WHITE, 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008))
+		ratio = 1.0; label = ("L1 • VESTIR ARMADURA ÔMEGA" if ps else "R • VESTIR ARMADURA ÔMEGA"); col = CYAN.lerp(Color.WHITE, 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008))
 	text(box.position + Vector2(12, 22), label, 13, col)
 	draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236, 10)), Color("1a2430"))
 	draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236 * clampf(ratio, 0, 1), 10)), col)
+	if a.armor:
+		var special_key := "→" if ps else ("T" if id == 0 else "P")
+		var beam_label := "RAIO ATIVO • %.1fs" % a.beam_time if a.beam_time > 0 else ("RAIO • %.0fs" % ceilf(a.beam_cd) if a.beam_cd > 0 else "%s • SEGURAR RAIO" % special_key)
+		text(box.position + Vector2(12, 59), beam_label, 12, CYAN if a.beam_cd <= 0 else Color("8a7a58"))
 	frame(Rect2(300,14,146,82))
 	var weapon: String = s.weapon_of(a)
 	if weapon == "mech": weapon = "shotgun"
@@ -98,7 +103,7 @@ func _draw() -> void:
 	var wsize: Vector2 = wtex.get_size() * minf(2.0, 80.0 / wtex.get_size().x)
 	draw_texture_rect(wtex, Rect2(Vector2(345, 44) - wsize * 0.5, wsize), false)
 	text(Vector2(380,48), str(a.get("run_weapons", {}).get(weapon, 0)) if weapon == "bazooka" else "∞", 26, GOLD)
-	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else "BAZUCA • Q TROCA" if weapon == "bazooka" else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
+	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else ("BAZUCA • R1 TROCA" if ps else "BAZUCA • Q TROCA") if weapon == "bazooka" else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
 	if s.coop != "solo":
 		var partner: Dictionary = s.actors[1-id]
 		frame(Rect2(466,14,181,54)); text(Vector2(478,36), "PARCEIRO IA" if s.coop == "ai" else "PARCEIRO P2", 13, CYAN)
@@ -119,7 +124,7 @@ func _draw() -> void:
 	if robot_id == "":
 		text(Vector2(30,704), "SEM ROBÔ", 16, Color("87959d"))
 		text(Vector2(30,730), "Nenhum módulo equipado", 12, Color("87959d"))
-		text(Vector2(30,759), "V / ◀ • TROCAR", 12, GOLD)
+		text(Vector2(30,759), "← • TROCAR" if ps else "V / ◀ • TROCAR", 12, GOLD)
 	else:
 		var robot_icon: Texture2D = art["robot_" + robot_id]
 		draw_texture_rect(robot_icon, Rect2(27,688,58,54), false)
@@ -131,12 +136,12 @@ func _draw() -> void:
 			var fuel: float = s.mech.get("fuel", 0.0) / s.FUEL_MAX
 			draw_rect(Rect2(94,723,150,6), Color("26323a")); draw_rect(Rect2(94,723,150*fuel,6), Color("e8a33d") if fuel > 0.2 else Color("d04430"))
 			text(Vector2(250,730), "GAS", 10, Color("e8a33d"))
-			text(Vector2(94,746), "C INVOCAR  •  E PILOTAR", 11)
+			text(Vector2(94,746), "↑ INVOCAR  •  △ PILOTAR" if ps else "C INVOCAR  •  E PILOTAR", 11)
 		else:
 			var spectre_state: String = str(s.spectres[id].state).to_upper()
 			text(Vector2(94,731), "ENERGIA • " + spectre_state, 10, Color("c68cff"))
-			text(Vector2(94,746), "C INVOCAR  •  G FUNDIR", 11)
-		text(Vector2(94,765), "V / ◀ • TROCAR ROBÔ", 11, GOLD)
+			text(Vector2(94,746), "↑ INVOCAR  •  ↓ FUNDIR" if ps else "C INVOCAR  •  G FUNDIR", 11)
+		text(Vector2(94,765), "← • TROCAR ROBÔ" if ps else "V / ◀ • TROCAR ROBÔ", 11, GOLD)
 	draw_set_transform(Vector2(dx, dy))
 	frame(Rect2(978,721,288,60))
 	for n in range(3):
@@ -144,7 +149,7 @@ func _draw() -> void:
 		draw_texture_rect(art[key],Rect2(992+n*87,733,25,32),false)
 		text(Vector2(1024+n*87,757), str([s.keys,s.money,s.materials][n]),22)
 	draw_set_transform(Vector2(dx * 0.5, dy))
-	text(Vector2(468,779), "B • EQUIPAMENTO     ESC • MENU", 13, GOLD)
+	text(Vector2(468,779), "OPTIONS • MENU / INVENTÁRIO" if ps else "B • EQUIPAMENTO     ESC • MENU", 13, GOLD)
 	draw_set_transform(Vector2.ZERO)
 	if app.map_open: draw_full_map(s, a)
 

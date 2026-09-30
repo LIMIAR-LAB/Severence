@@ -42,4 +42,21 @@ func run() -> void:
 		await process_frame
 		check(intro.transitions == 1, mode + " opens menu exactly once")
 		intro.free()
+	if "--full-intro" in OS.get_cmdline_user_args():
+		intro = TestIntro.new(); root.add_child(intro)
+		for second in range(65):
+			await create_timer(1.0).timeout
+			if intro.transitions > 0: break
+		check(intro.transitions == 1, "full 60-second playback finishes automatically")
+		intro.free()
+	change_scene_to_file("res://scenes/intro.tscn")
+	await process_frame
+	await process_frame
+	var press := InputEventKey.new(); press.keycode = KEY_ENTER; press.pressed = true
+	Input.parse_input_event(press)
+	for frame in range(4): await process_frame
+	check(current_scene.scene_file_path == "res://scenes/main.tscn", "skip reaches the actual menu scene")
+	check(current_scene.menu.screen == "main" and not current_scene.playing, "skip press does not start a game or activate a menu action")
+	current_scene.queue_free()
+	await process_frame
 	quit(failures)
