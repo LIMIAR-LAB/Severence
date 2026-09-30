@@ -24,10 +24,16 @@ func _initialize() -> void:
 	for i in 5: check(eq.find_child("MenuTab_%d" % i, true, false) is Button, "aba %d é interativa" % i)
 	check(eq.find_child("Filter_todos", true, false) is Button and eq.find_child("Filter_recursos", true, false) is Button, "filtros completos")
 	check(eq.find_child("InventorySlot_arma_blaster", true, false) is Button, "grade possui item real")
+	for id in ["kit_reparo", "sucata_temporal", "fragmento_cronal", "chave_fenda_do_marty"]:
+		eq.inventory.add(id, 1)
+		eq.refresh()
+		check(eq.find_child("InventorySlot_" + id, true, false) == null and eq.inventory.quantity(id) > 0, "protótipo preservado e oculto: " + id)
+	check(eq.capacity_label.text == "6 ITENS", "contador mostra somente os seis equipamentos disponíveis ou bloqueados")
+	await process_frame; await process_frame
 	var blaster_slot: Button = eq.find_child("InventorySlot_arma_blaster", true, false)
 	blaster_slot.grab_focus(); await process_frame
 	check(blaster_slot.has_focus() and blaster_slot.get_theme_stylebox("focus") is StyleBoxFlat, "slot possui foco visível para teclado/controle")
-	check(eq.detail_title.text == "BLASTER" and not eq.detail_action.disabled, "seleção alimenta detalhes e ação")
+	check(eq.detail_title.text == "UNIFORME PADRÃO" and not eq.detail_action.disabled, "seleção alimenta detalhes e ação")
 	eq.select_inventory("arma_rebite")
 	check(eq.detail_action.disabled and "bloqueado" in eq.detail_reason.text.to_lower(), "item bloqueado explica a ação indisponível")
 	eq.show_tab(1); check(eq.active_tab == 1 and eq.find_child("RobôsCard_titan", true, false) is Button, "aba Robôs lista estado real")

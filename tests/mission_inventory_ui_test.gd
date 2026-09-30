@@ -61,11 +61,12 @@ func run() -> void:
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_fragmentos")) == 3, "fragmentos contam somente o ganho desta missão")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_combustivel")) == 62, "combustível usa valor vivo quando Titan foi levado")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_energia")) == 0, "energia só aparece quando Spectre foi levado")
+	check(eq.find_child("InventorySlot_missao_combustivel", true, false) == null and eq.find_child("InventorySlot_missao_energia", true, false) == null, "reservas do robô não são consumíveis na mochila")
 	check(app.sim.inventory_state == persistent_before, "recursos da tentativa não entram no inventário persistente")
 	var transient_button: Button = eq.find_child("InventorySlot_missao_chaves", true, false); transient_button.grab_focus(); await process_frame
 	check(transient_button.has_focus() and transient_button.get_theme_stylebox("focus") is StyleBoxFlat, "recurso da missão possui foco visível")
 	eq.select_inventory("missao_chaves")
-	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and "provisório" in eq.detail_reason.text, "recurso temporário identifica ícone provisório e não oferece ação falsa")
+	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and not eq.detail_action.visible, "recurso temporário não oferece ação falsa")
 	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
 	check(not eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
 	marty.armor = true; await process_frame; await process_frame
@@ -83,6 +84,29 @@ func run() -> void:
 	check(marty.run_weapon == "bazooka" and marty.run_weapons.bazooka == 0, "Enter equipa bazuca vazia sem criar foguetes")
 	eq.detail_action.grab_focus(); await press_key(KEY_ENTER)
 	check(marty.run_weapon == "", "Enter volta à arma básica pelo inventário")
+	eq.show_tab(4)
+	var stable_health: Label = eq.find_child("MissionHealth", true, false)
+	marty.hp = 15; marty.shield = 12; marty.armor = true; marty.armor_time = 85
+	app.sim.mech.hp = 123; app.sim.mech.fuel = 41; app.sim.mech.deployed = false
+	await process_frame; await process_frame
+	# Armor activation rebuilds once; subsequent health/fuel/timer updates preserve nodes.
+	stable_health = eq.find_child("MissionHealth", true, false)
+	marty.hp = 14; marty.armor_time = 84.9; app.sim.mech.fuel = 40.9
+	await process_frame; await process_frame
+	check(stable_health == eq.find_child("MissionHealth", true, false), "alterações contínuas atualizam labels sem destruir controles")
+	marty.hp = 15
+	await process_frame
+	check("1.5 / 3" in eq.find_child("MissionHealth", true, false).text, "vida atual atualiza sem reabrir")
+	check("1.2 / 3" in eq.find_child("MissionShield", true, false).text and "85s" in eq.find_child("MissionShield", true, false).text, "escudo e duração atuais separados da referência")
+	check("123 / 240" in eq.find_child("MissionRobot", true, false).text and "41%" in eq.find_child("MissionRobot", true, false).text and "RECOLHIDO" in eq.find_child("MissionRobot", true, false).text, "integridade combustível e estado reais do Titan")
+	marty.armor = false; marty.shield = 0; marty.armor_cd = 22
+	app.menu.robot_choice = "spectre"; marty.selected_robot = "spectre"; app.sim.spectres[0].state = "following"; app.sim.spectres[0].hp = 33
+	await process_frame; await process_frame
+	check("RECARREGANDO" in eq.find_child("MissionShield", true, false).text and "22s" in eq.find_child("MissionShield", true, false).text, "recarga Ômega acompanha estado atual")
+	check("ACOMPANHANDO" in eq.find_child("MissionRobot", true, false).text and "33 / 100" in eq.find_child("MissionRobot", true, false).text, "energia e estado Spectre atualizam ao vivo")
+	check(eq.find_child("MartyReference_0", true, false).text == "3", "ferimentos não alteram referência de vida")
+	eq.show_tab(0)
+	check(eq.find_child("EquippedBadge_nucleo_spectre", true, false) != null and eq.find_child("EquippedBadge_modulo_titan", true, false) == null, "marcador equipado acompanha robô selecionado sem usar inventário antigo")
 	app.sim.start_run(1942); await process_frame; await process_frame
 	check(eq.find_child("InventorySlot_missao_bazuca", true, false) == null, "nova RUN não herda a arma encontrada")
 	await press_key(KEY_ESCAPE); await process_frame

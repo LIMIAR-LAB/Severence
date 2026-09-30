@@ -1,0 +1,198 @@
+{
+  "generator": "PixelLab Pro",
+  "reference": "assets/environment/docks12/boss/boss_arena_plate.png",
+  "rooms": [
+    {
+      "id": "cranes",
+      "job_id": "e0e87585-49c2-4ab3-893c-9f4aa3af98f3",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Crane loading yard. Weathered blue grey granite, embedded brass crane rotation rings at four corners, rusty steel tracks, yellow loading bay floor markings, wet puddle reflections. Industrial maritime 1941.",
+      "download_url": "https://api.pixellab.ai/mcp/images/e0e87585-49c2-4ab3-893c-9f4aa3af98f3/download",
+      "source_size": [
+        560,
+        384
+      ],
+      "crop": [
+        0,
+        0,
+        560,
+        384
+      ]
+    },
+    {
+      "id": "warehouse",
+      "job_id": "b1e3b61d-bb42-46cd-a7f1-50ce0706db9c",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. 1941 cargo warehouse floor. Rich dark brown timber boards with steel reinforcement strips, worn loading lane paint, inset iron cargo hatches and scattered flat scraps along edges. Long shadow and amber light pools from off-screen warehouse lamps.",
+      "download_url": "https://api.pixellab.ai/mcp/images/b1e3b61d-bb42-46cd-a7f1-50ce0706db9c/download",
+      "source_size": [
+        576,
+        396
+      ],
+      "crop": [
+        0,
+        0,
+        576,
+        396
+      ]
+    },
+    {
+      "id": "market",
+      "job_id": "06666407-74c6-4777-abd7-588fc58bef98",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Abandoned 1941 fish market quay floor. Hand laid blue grey cobblestone, turquoise glazed drainage channels, wet reflective scales, seaweed in cracks, antique iron grates, warm amber reflections around the edges.",
+      "download_url": "https://api.pixellab.ai/mcp/images/06666407-74c6-4777-abd7-588fc58bef98/download",
+      "source_size": [
+        576,
+        420
+      ],
+      "crop": [
+        18,
+        11,
+        558,
+        412
+      ]
+    },
+    {
+      "id": "shop",
+      "job_id": "12195480-c33d-4823-8bcd-b22d246311e6",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. 1941 dockside mechanic workshop floor. Oil stained steel panels with brass rivets, cream and dark green cracked ceramic inset tiles, restrained yellow safety markings, a large flat outlined repair bay, tiny scattered washers at edges. Cyan welder light reflection at right.",
+      "download_url": "https://api.pixellab.ai/mcp/images/12195480-c33d-4823-8bcd-b22d246311e6/download",
+      "source_size": [
+        552,
+        452
+      ],
+      "crop": [
+        22,
+        16,
+        530,
+        435
+      ]
+    },
+    {
+      "id": "ammo",
+      "job_id": "37452952-64d7-4f93-a59c-0a44c4a9ab6b",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. 1941 naval ammunition magazine floor. Slate blue concrete and riveted iron, parallel faded yellow ammunition storage bay markings, restrained hazard stripes along edge, copper drainage grilles, chipped concrete, very subtle warm red lamp reflections at corners.",
+      "download_url": "https://api.pixellab.ai/mcp/images/37452952-64d7-4f93-a59c-0a44c4a9ab6b/download",
+      "source_size": [
+        576,
+        440
+      ],
+      "crop": [
+        0,
+        0,
+        576,
+        440
+      ]
+    },
+    {
+      "id": "rails",
+      "job_id": "b5937869-dc40-44bb-aad7-ee7247bf79bc",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. 1941 harbor rail freight yard ground. Beautiful weathered blue slate cobbles, rusty iron railway tracks running horizontally through upper and lower thirds, flush timber sleepers, oil, rain reflections and golden amber light at the edges. All tracks flush and walkable.",
+      "download_url": "https://api.pixellab.ai/mcp/images/b5937869-dc40-44bb-aad7-ee7247bf79bc/download",
+      "source_size": [
+        576,
+        396
+      ],
+      "crop": [
+        3,
+        0,
+        572,
+        389
+      ]
+    },
+    {
+      "id": "stairs",
+      "job_id": "31cd4a48-b6a2-46ab-a163-a86270f26984",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Old 1941 lighthouse balcony floor, weathered radial stone mosaic and curved flush brass gear engravings around a broad central light grey sandstone landing, nautical compass details subtle, sea salt, rain and amber lamp reflections. NO stairs or elevation change depicted; flat continuous walkable floor.",
+      "download_url": "https://api.pixellab.ai/mcp/images/31cd4a48-b6a2-46ab-a163-a86270f26984/download",
+      "source_size": [
+        576,
+        440
+      ],
+      "crop": [
+        0,
+        0,
+        576,
+        440
+      ]
+    },
+    {
+      "id": "drydock",
+      "job_id": "506b567f-82ea-4076-85fd-e2de1bf1f4db",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. 1941 ship repair drydock floor. Weathered steel plates, longitudinal flush hull support rails on sides, rust and blue verdigris, brass bolts, industrial grate channels, worn cream safety bands, wet amber reflections. Continuous flat ground; NO hull, ships, holes, water pools or pit.",
+      "download_url": "https://api.pixellab.ai/mcp/images/506b567f-82ea-4076-85fd-e2de1bf1f4db/download",
+      "source_size": [
+        512,
+        512
+      ],
+      "crop": [
+        0,
+        0,
+        512,
+        512
+      ]
+    },
+    {
+      "id": "generator",
+      "job_id": "1da77236-3cbb-44d3-8d2e-3ef74ffb893a",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Last generator room floor in 1941 industrial dock. Heavy dark petrol blue riveted steel plates, four brass framed inset cable trenches converging toward a CLEAR empty central machinery pad, modest electric cyan seams, amber work light reflections, soot and weathering.",
+      "download_url": "https://api.pixellab.ai/mcp/images/1da77236-3cbb-44d3-8d2e-3ef74ffb893a/download",
+      "source_size": [
+        548,
+        460
+      ],
+      "crop": [
+        0,
+        0,
+        548,
+        460
+      ]
+    },
+    {
+      "id": "chapel",
+      "job_id": "80c5fd9a-70eb-4c55-a8b2-2d2e2cdd9ad4",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Drowned maritime cult chapel floor. Dark desaturated blue grey stone slabs, faded violet and teal mosaic aisle running vertically, subtle engraved occult circular motifs, small melted wax drips at margins, amber candle reflections. Upper half quiet dark neutral stone to sit under a separate animated altar scene.",
+      "download_url": "https://api.pixellab.ai/mcp/images/80c5fd9a-70eb-4c55-a8b2-2d2e2cdd9ad4/download",
+      "source_size": [
+        476,
+        512
+      ],
+      "crop": [
+        0,
+        0,
+        476,
+        512
+      ]
+    },
+    {
+      "id": "cellar",
+      "job_id": "1840c5f6-c3be-4109-9c2e-37cc196096e7",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Flood damaged 1941 maritime cellar floor. Rich dark desaturated wooden boards with metal bands, teal wet sheen, green moss in cracks, flush copper cellar hatch toward a corner, faint amber reflections and cold cyan salt deposits. Shallow wetness only, NO deep water or impassable features.",
+      "download_url": "https://api.pixellab.ai/mcp/images/1840c5f6-c3be-4109-9c2e-37cc196096e7/download",
+      "source_size": [
+        576,
+        420
+      ],
+      "crop": [
+        17,
+        9,
+        559,
+        412
+      ]
+    },
+    {
+      "id": "secret",
+      "job_id": "f12a5012-6109-415c-8a87-b44bd38d09bb",
+      "prompt": "Production pixel art game environment ground plate, orthographic straight overhead, entire rectangular canvas is continuous traversable floor, no perspective, no walls, no characters, no text, no furniture, no raised props. Premium detailed dark maritime steampunk pixel art matching reference palette, material richness, brass and navy shading. Unique composed environment, not a repetitive tile swatch. Keep middle 70 percent low contrast and readable for combat, detailed perimeter. Secret smuggler cache floor beneath 1941 docks. Dark worn oak planks and antique riveted iron hatch inset at upper edge, faint chalk nautical symbols, golden flecks and tiny discarded paper at edges, discreet violet cracks and warm amber pools, rich handcrafted detail.",
+      "download_url": "https://api.pixellab.ai/mcp/images/f12a5012-6109-415c-8a87-b44bd38d09bb/download",
+      "source_size": [
+        576,
+        448
+      ],
+      "crop": [
+        12,
+        6,
+        563,
+        441
+      ]
+    }
+  ]
+}
