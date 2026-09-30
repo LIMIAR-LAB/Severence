@@ -2,8 +2,8 @@ class_name EncyclopediaScreen
 extends Control
 
 const EncyclopediaData = preload("res://scripts/encyclopedia_data.gd")
-const ARCHIVE_BACKDROP: Texture2D = preload("res://assets/ui/title/title_still.png")
-const ORNATE_FRAME: Texture2D = preload("res://assets/ui/pause/pause_frame_pixellab.png")
+const ARCHIVE_BACKDROP_PATH := "res://assets/ui/title/title_still.png"
+const ORNATE_FRAME_PATH := "res://assets/ui/pause/pause_frame_pixellab.png"
 
 const CYAN := Color("65f0f5")
 const CYAN_DIM := Color("2d7b83")
@@ -25,10 +25,12 @@ var list_box: VBoxContainer
 var empty_label: Label
 var portrait: TextureRect
 var fallback: Label
+var fallback_glyph: Label
 var name_label: Label
 var subtitle_label: Label
 var description_label: Label
 var traits_label: Label
+var detail_scroll: ScrollContainer
 var count_label: Label
 var back_button: Button
 
@@ -96,8 +98,10 @@ func build() -> void:
 	make_label(detail_panel, Rect2(590, 9, 150, 21), "CLASSIFICAÇÃO R-7", 10, VIOLET).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var portrait_frame := NinePatchRect.new()
 	portrait_frame.name = "ArchivePortraitFrame"; portrait_frame.position = Vector2(20, 38); portrait_frame.size = Vector2(246, 264)
-	portrait_frame.texture = ORNATE_FRAME; portrait_frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	portrait_frame.texture = _safe_texture(ORNATE_FRAME_PATH); portrait_frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	portrait_frame.patch_margin_left = 44; portrait_frame.patch_margin_top = 44; portrait_frame.patch_margin_right = 44; portrait_frame.patch_margin_bottom = 44
+	portrait_frame.draw_center = false
+	portrait_frame.z_index = 2
 	portrait_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail_panel.add_child(portrait_frame)
 	var image_well := make_panel(Rect2(39, 58, 208, 224), DEEP, CYAN_DIM, 1)
@@ -108,10 +112,12 @@ func build() -> void:
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	image_well.add_child(portrait)
-	fallback = make_label(image_well, Rect2(9, 9, 190, 206), "?", 58, Color("8c8258"))
+	fallback = make_label(image_well, Rect2(9, 9, 190, 206), "", 58, Color("8c8258"))
 	fallback.name = "EntryFallback"; fallback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; fallback.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var seal_ring := make_panel(Rect2(41, 49, 108, 108), Color("0a1110"), Color("8c8258"), 2)
 	seal_ring.name = "MissingArtSeal"; seal_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE; fallback.add_child(seal_ring)
+	fallback_glyph = make_label(seal_ring, Rect2(8, 8, 92, 58), "?", 36, GOLD)
+	fallback_glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; fallback_glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	make_label(seal_ring, Rect2(8, 72, 92, 20), "SEM IMAGEM", 9, MUTED).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var scan_label := make_label(detail_panel, Rect2(43, 307, 200, 20), "ARTEFATO VISUAL // 01", 10, CYAN_DIM)
 	scan_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -123,13 +129,14 @@ func build() -> void:
 	var fracture := ColorRect.new()
 	fracture.name = "FractureAccent"; fracture.color = VIOLET; fracture.position = Vector2(289, 121); fracture.size = Vector2(445, 2); fracture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail_panel.add_child(fracture)
-	var text_scroll := ScrollContainer.new()
-	text_scroll.name = "DetailScroll"; text_scroll.position = Vector2(289, 135); text_scroll.size = Vector2(451, 260)
-	text_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	detail_panel.add_child(text_scroll)
+	detail_scroll = ScrollContainer.new()
+	detail_scroll.name = "DetailScroll"; detail_scroll.position = Vector2(289, 135); detail_scroll.size = Vector2(451, 260)
+	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	detail_scroll.focus_mode = Control.FOCUS_ALL
+	detail_panel.add_child(detail_scroll)
 	var text_stack := VBoxContainer.new()
 	text_stack.custom_minimum_size = Vector2(429, 0); text_stack.add_theme_constant_override("separation", 16)
-	text_scroll.add_child(text_stack)
+	detail_scroll.add_child(text_stack)
 	description_label = make_label(text_stack, Rect2(), "", 16, CREAM)
 	description_label.name = "EntryDescription"; description_label.custom_minimum_size = Vector2(429, 114)
 	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -149,7 +156,7 @@ func build() -> void:
 
 func _build_atmosphere() -> void:
 	var backdrop := TextureRect.new()
-	backdrop.name = "ArchiveBackdrop"; backdrop.size = size; backdrop.texture = ARCHIVE_BACKDROP
+	backdrop.name = "ArchiveBackdrop"; backdrop.size = size; backdrop.texture = _safe_texture(ARCHIVE_BACKDROP_PATH)
 	backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; backdrop.modulate = Color(0.22, 0.28, 0.22, 1.0)
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
@@ -159,6 +166,11 @@ func _build_atmosphere() -> void:
 	for rect in [Rect2(0, 18, 1344, 4), Rect2(0, 730, 1344, 4), Rect2(18, 0, 3, 752), Rect2(1323, 0, 3, 752)]:
 		var trace := ColorRect.new(); trace.color = Color(0.25, 0.85, 0.88, 0.24); trace.position = rect.position; trace.size = rect.size
 		trace.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(trace)
+
+func _safe_texture(path: String) -> Texture2D:
+	if not ResourceLoader.exists(path): return null
+	var resource := load(path)
+	return resource as Texture2D
 
 func _add_corner_rivets(parent: Control) -> void:
 	for point in [Vector2(8, 8), Vector2(1238, 8), Vector2(8, 680), Vector2(1238, 680)]:
@@ -200,7 +212,11 @@ func select_category(next_category: String) -> void:
 		style.bg_color = Color("334036") if category_id == category else Color("18221d")
 		style.border_color = BRASS if category_id == category else Color("55583d")
 		tab.add_theme_stylebox_override("normal", style)
+		var focus_style: StyleBoxFlat = tab.get_theme_stylebox("focus").duplicate()
+		focus_style.border_width_bottom = 5 if category_id == category else 2
+		tab.add_theme_stylebox_override("focus", focus_style)
 		tab.add_theme_color_override("font_color", GOLD if category_id == category else CREAM)
+		tab.add_theme_color_override("font_focus_color", GOLD if category_id == category else CYAN)
 	rebuild_list()
 
 func rebuild_list() -> void:
@@ -212,6 +228,9 @@ func rebuild_list() -> void:
 	count_label.text = "%02d DOSSIÊS // %s" % [records.size(), category.to_upper()]
 	if records.is_empty():
 		show_entry({})
+		var empty_tab: Button = tabs[category]
+		empty_tab.focus_neighbor_bottom = empty_tab.get_path_to(back_button)
+		back_button.focus_neighbor_top = back_button.get_path_to(empty_tab)
 		back_button.grab_focus.call_deferred()
 		return
 	var wanted := str(selected_ids.get(category, records[0].id))
@@ -221,7 +240,8 @@ func rebuild_list() -> void:
 		var row_text := "%02d  //  %s" % [i + 1, str(entry.nome)]
 		var entry_button := make_button(list_box, Rect2(), row_text)
 		entry_button.name = "Entry_" + entry.id; entry_button.custom_minimum_size = Vector2(364, 50)
-		entry_button.alignment = HORIZONTAL_ALIGNMENT_LEFT; entry_button.tooltip_text = entry.subtitulo
+		entry_button.alignment = HORIZONTAL_ALIGNMENT_LEFT; entry_button.tooltip_text = "%s\n%s" % [entry.nome, entry.subtitulo]
+		entry_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		entry_button.add_theme_constant_override("outline_size", 1)
 		entry_button.pressed.connect(func(): select_entry(entry))
 		entry_buttons.append(entry_button)
@@ -234,6 +254,10 @@ func rebuild_list() -> void:
 	entry_buttons[0].focus_neighbor_top = entry_buttons[0].get_path_to(active_tab)
 	entry_buttons[-1].focus_neighbor_bottom = entry_buttons[-1].get_path_to(back_button)
 	back_button.focus_neighbor_top = back_button.get_path_to(entry_buttons[-1])
+	for entry_button in entry_buttons:
+		entry_button.focus_neighbor_right = entry_button.get_path_to(detail_scroll)
+	detail_scroll.focus_neighbor_left = detail_scroll.get_path_to(entry_buttons[selected_index])
+	detail_scroll.focus_neighbor_bottom = detail_scroll.get_path_to(back_button)
 	select_entry(records[selected_index])
 	entry_buttons[selected_index].grab_focus.call_deferred()
 
@@ -253,12 +277,19 @@ func select_entry(entry: Dictionary) -> void:
 		style.bg_color = Color("303b30") if active else Color("18221d")
 		style.border_width_left = 5 if active else 2
 		entry_button.add_theme_stylebox_override("normal", style)
+		var focus_style: StyleBoxFlat = entry_button.get_theme_stylebox("focus").duplicate()
+		focus_style.border_width_left = 5 if active else 2
+		entry_button.add_theme_stylebox_override("focus", focus_style)
 		entry_button.add_theme_color_override("font_color", GOLD if active else CREAM)
+		entry_button.add_theme_color_override("font_focus_color", GOLD if active else CYAN)
+		if active: detail_scroll.focus_neighbor_left = detail_scroll.get_path_to(entry_button)
 
 func show_entry(entry: Dictionary) -> void:
+	if detail_scroll != null: detail_scroll.scroll_vertical = 0
 	if entry.is_empty():
-		portrait.texture = null; portrait.visible = false; fallback.visible = true; fallback.text = "—"
-		name_label.text = "SEM REGISTROS"; subtitle_label.text = "CANAL TEMPORAL OCIOSO"
+		portrait.texture = null; portrait.visible = false; fallback.visible = true; fallback_glyph.text = "—"
+		name_label.text = "SEM REGISTROS"; name_label.tooltip_text = ""
+		subtitle_label.text = "CANAL TEMPORAL OCIOSO"; subtitle_label.tooltip_text = ""
 		description_label.text = "Esta categoria ainda pode receber novos conteúdos."
 		traits_label.text = "SISTEMA\n• Catálogo pronto para sincronização"
 		return
@@ -269,4 +300,16 @@ func show_entry(entry: Dictionary) -> void:
 	portrait.texture = load(image_path) if not image_path.is_empty() else null
 	portrait.visible = portrait.texture != null
 	fallback.visible = not portrait.visible
-	fallback.text = entry.nome.substr(0, 1).to_upper()
+	fallback_glyph.text = entry.nome.substr(0, 1).to_upper()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if detail_scroll == null or not is_visible_in_tree() or not detail_scroll.has_focus(): return
+	if event.is_action_pressed("ui_down"):
+		detail_scroll.scroll_vertical += 48; get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_up"):
+		detail_scroll.scroll_vertical = maxi(0, detail_scroll.scroll_vertical - 48); get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel") and not entry_buttons.is_empty():
+		var selected_id := str(selected_ids.get(category, ""))
+		for entry_button in entry_buttons:
+			if entry_button.name == "Entry_" + selected_id: entry_button.grab_focus(); break
+		get_viewport().set_input_as_handled()

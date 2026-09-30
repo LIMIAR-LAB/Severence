@@ -15,9 +15,11 @@ func _initialize() -> void:
 		check(not EncyclopediaData.by_category(category).is_empty(), "categoria " + category + " possui entradas")
 	check(EncyclopediaData.item("monstro_almirante").nome == "O ALMIRANTE DAS PROFUNDEZAS", "chefe atual está documentado")
 	check(EncyclopediaData.item("robo_titan").categoria == "robos" and EncyclopediaData.item("robo_spectre").categoria == "robos", "Titan e Spectre estão documentados")
+	for monster in EncyclopediaData.by_category("monstros"):
+		check(not EncyclopediaData.image_path(monster).is_empty(), "retrato do monstro %s resolve como textura" % monster.id)
 	check(EncyclopediaData.image_path(EncyclopediaData.item("item_fragmento")) == "", "imagem opcional ausente produz fallback seguro")
 	check(not EncyclopediaData.image_path(EncyclopediaData.item("robo_titan")).is_empty(), "imagem existente é aceita")
-	check(EncyclopediaData.item("item_bazuca").imagem == "res://assets/weapons/bazooka.png", "Bazuca usa sua própria arte")
+	check(EncyclopediaData.item("item_bazuca").imagem == "res://assets/weapons/bazooka_v2.png", "Bazuca usa sua arte final")
 	check(EncyclopediaData.image_path({"imagem":"res://nao-existe.png"}) == "", "caminho de imagem indisponível produz fallback")
 	check(EncyclopediaData.image_path({"imagem":"res://scripts/main.gd"}) == "", "recurso existente que não é textura é rejeitado")
 

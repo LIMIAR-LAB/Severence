@@ -67,7 +67,12 @@ const WATER := [
 	{"room": "shop", "r": Rect2(9500, 5800, 900, 1800)},
 	{"room": "chapel", "r": Rect2(-500, 3400, 700, 1800)},
 	{"room": "drydock", "r": Rect2(-500, 1000, 700, 1900)},
-	{"room": "cellar", "r": Rect2(9100, 1000, 900, 1500)}]
+	{"room": "cellar", "r": Rect2(9100, 1000, 900, 1500)},
+	# Moldura aquática visual da arena; pisos/alas são desenhados por cima e mantêm a colisão original.
+	{"room": "boss", "r": Rect2(500, -1000, 7400, 1500)},
+	{"room": "boss", "r": Rect2(500, 400, 2500, 3200)},
+	{"room": "boss", "r": Rect2(5400, 400, 2500, 3200)},
+	{"room": "boss", "r": Rect2(500, 2200, 7400, 1400)}]
 # Perigos: poça com tentáculo (pisar = meio coração e empurrão; saltar escapa).
 const HAZARDS := [
 	{"p": Vector2(7420, 6700), "r": 66, "damage": 12},

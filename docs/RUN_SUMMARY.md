@@ -42,6 +42,29 @@ descartadas pelo builder.
 ícones semânticos desenhados deterministicamente. Todo texto, nota, valor,
 estado de foco e área clicável é um Control real do Godot.
 
+### Sistema visual fiel ao conceito
+
+A apresentação normal usa um canvas lógico de **1672×941**, derivado da
+composição aprovada em `art/concept/resumo-pos-run-ux-v1.png`. O canvas é
+centralizado e recebe uma única escala uniforme calculada por
+`min(viewport/master)`. Assim a medalha continua circular e telas 16:10,
+ultrawide ou janelas menores recebem letterbox/pillarbox em vez de distorção.
+
+O shell cinematográfico text-free, o retrato editorial do peixe e o retrato do
+núcleo recuperado foram gerados com o ImageGen integrado. Os masters, prompts e
+proveniência ficam em `art/source/run-summary-faithful/`. O builder valida o
+shell exatamente em 1672×941, rejeita imagens totalmente transparentes e exige
+opacidade integral no cenário; depois produz os arquivos de runtime em
+`assets/ui/run_summary/faithful/`, incluindo uma silhueta local determinística
+para inimigos sem retrato. Os quatro loots continuam sendo as ilustrações do
+PixelLab; o builder apenas os normaliza para o novo diretório.
+
+Todos os conteúdos variáveis continuam vivos no Godot: título de vitória ou
+derrota, nota, estatísticas, falecimento, causa, seed, recompensas e rótulos dos
+botões. O raster contém somente cenário, materiais e superfícies vazias. Se o
+shell fiel não puder ser carregado, `build_summary_fallback()` mantém a tela
+anterior completamente legível e operável.
+
 Reconstrução:
 
 ```powershell
@@ -52,6 +75,13 @@ Captura da tela real:
 
 ```powershell
 & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path . -- --capture-ui-summary
+```
+
+Capturas de regressão da apresentação fiel:
+
+```powershell
+& 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path . -- --capture-ui-summary --capture-name=run-summary-faithful
+& 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path . -- --capture-ui-summary --capture-summary-victory --capture-name=run-summary-faithful-victory
 ```
 
 ## Validação

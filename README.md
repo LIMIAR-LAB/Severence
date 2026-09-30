@@ -10,7 +10,7 @@ Alternativa: importe `project.godot` no Godot e pressione **F5**. Não há depen
 
 No menu, escolha **NOVA EXPEDIÇÃO**. Selecione **Marty** na tela de personagens; as outras cinco silhuetas são vagas bloqueadas para personagens futuros. Escolha **Solo**, **Parceiro IA** ou **Coop Local (2 jogadores)**, configure uniforme, armadura e robô na tela de equipamento e pressione **IR AO REFÚGIO**. No refúgio, suba a escadaria até o portal **DOCAS / 1941** e pressione **E**. Com um controle no coop local, ele controla o P2; Marty usa teclado e mouse.
 
-Durante a partida, pressione **Esc**, **Start** ou **B** para abrir a pausa e escolha **SALVAR JOGO**. Na próxima abertura, **CARREGAR JOGO** no título retoma a sessão, inclusive posição, mapa, recursos e modo de coop. O arquivo da sessão fica em `user://expedition.save`, separado de `progress.json`, que guarda os desbloqueios. O salvamento da sessão está disponível para Solo, Parceiro IA e Coop Local; partidas online não oferecem esse botão. O menu de pausa tem **CONTINUAR** e **SALVAR JOGO**; a escolha de uniforme fica antes da partida.
+Durante a partida, pressione **Esc** ou **Start** para abrir a pausa e escolha **SALVAR JOGO**. O **INVENTÁRIO DA MISSÃO** é a ação destacada no topo da pausa; no teclado, **B** abre essa tela diretamente tanto durante a partida quanto a partir da pausa. Dentro do inventário, **B**, **Esc** ou **Voltar** retorna à pausa sem retomar a partida. Na próxima abertura, **CARREGAR JOGO** no título retoma a sessão, inclusive posição, mapa, recursos e modo de coop. O arquivo da sessão fica em `user://expedition.save`, separado de `progress.json`, que guarda os desbloqueios. O salvamento da sessão está disponível para Solo, Parceiro IA e Coop Local; partidas online não oferecem esse botão. A escolha de uniforme continua antes da partida.
 
 **C** invoca/recolhe o robô selecionado; **G** funde/separa o Spectre; **E** entra/sai do Titan. Invocações respeitam espaço, recarga e integridade: recolher não cura. Spectre acompanha e atira, ou se funde a Marty para absorver dano e aumentar velocidade e poder de fogo. A armadura continua binária.
 
@@ -29,6 +29,7 @@ Durante a partida, pressione **Esc**, **Start** ou **B** para abrir a pausa e es
 | Mapa completo | Tab, M ou clique no minimapa | — | — |
 | Alternar IA / coop local | F2 | — | — |
 | Menu/pausa offline | Esc | — | — |
+| Inventário da Missão | B | — | Start → ação destacada |
 
 Com um controle no coop local, ele controla o P2 e o teclado/mouse controla Marty. Com dois controles, cada um controla um personagem. Mapeamento implementado, mas ainda precisa de teste físico com os controles do usuário. Teclado compartilhado está sujeito ao limite de teclas simultâneas do dispositivo.
 

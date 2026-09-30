@@ -10,6 +10,8 @@ const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 const RUN_SUMMARY_FRAME := "res://assets/ui/run_summary/frame_main.png"
 const RUN_SUMMARY_DIR := "res://assets/ui/run_summary/"
 const RUN_SUMMARY_LOOT := "res://assets/ui/run_summary/loot/"
+const RUN_SUMMARY_FAITHFUL := "res://assets/ui/run_summary/faithful/"
+const RUN_SUMMARY_MASTER_SIZE := Vector2(1672, 941)
 
 # Supplied concept screens form the decorative layer. Every active region is a
 # real Control; editable text, selections, previews and statuses are live.
@@ -36,6 +38,7 @@ var main_resume: Button
 var telemetry: Label
 var encyclopedia: Control
 var encyclopedia_return_screen := "main"
+var summary_force_fallback := false
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -56,6 +59,17 @@ func center_stage() -> void:
 		var title_scene := content.find_child("TitleSceneCrop", false, false) as Control
 		if title_scene != null: fit_title_background(title_scene)
 	place_equipment()
+	place_summary()
+
+func summary_fit(viewport_size: Vector2) -> float:
+	return minf(viewport_size.x / RUN_SUMMARY_MASTER_SIZE.x, viewport_size.y / RUN_SUMMARY_MASTER_SIZE.y)
+
+func place_summary(viewport_size: Vector2 = Vector2.ZERO) -> void:
+	if content == null or screen != "summary" or content.get_parent() != self: return
+	if viewport_size == Vector2.ZERO: viewport_size = get_viewport_rect().size
+	var fit := summary_fit(viewport_size)
+	content.scale = Vector2.ONE * fit
+	content.position = ((viewport_size - RUN_SUMMARY_MASTER_SIZE * fit) * 0.5).floor()
 
 func fit_title_background(title_scene: Control) -> void:
 	# O cenário compensa a escala legada do palco e usa aspect-cover uniforme.
@@ -105,8 +119,9 @@ func show_screen(next: String) -> void:
 	backdrop.color = Color(0.015, 0.025, 0.04, 0.9) if next in ["pause", "summary"] else Color("05080d")
 	if content != null:
 		content.get_parent().remove_child(content); content.queue_free()
-	content = Control.new(); content.size = Vector2(1344, 752)
+	content = Control.new(); content.size = RUN_SUMMARY_MASTER_SIZE if next == "summary" else Vector2(1344, 752)
 	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()   # escala inteira, fora do stage
+	elif next == "summary": add_child(content); place_summary()
 	else: stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null; encyclopedia = null
 	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
@@ -303,29 +318,40 @@ func build_pause() -> void:
 		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; p.add_child(frame)
 	label(p, Rect2(110, 89, 680, 48), "PAUSA", 31, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label(p, Rect2(110, 139, 680, 36), "Expedição em andamento", 20, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var resume := button(p, Rect2(160, 174, 580, 52), "CONTINUAR", close)
+	var mission_inventory := button(p, Rect2(160, 174, 580, 52), "INVENTÁRIO DA MISSÃO   [B]", func(): read_equipment(); show_screen("mission_inventory"))
+	mission_inventory.name = "MissionInventory"
+	mission_inventory.tooltip_text = "Consultar itens levados e recursos obtidos nesta missão"
+	mission_inventory.add_theme_font_size_override("font_size", 21)
+	mission_inventory.add_theme_color_override("font_color", GOLD)
+	var inventory_normal := mission_inventory.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+	inventory_normal.bg_color = Color("16444a"); inventory_normal.border_color = CYAN; inventory_normal.set_border_width_all(3)
+	mission_inventory.add_theme_stylebox_override("normal", inventory_normal)
+	var resume := button(p, Rect2(160, 236, 580, 52), "CONTINUAR", close)
 	resume.name = "ResumeGame"
-	var save := button(p, Rect2(160, 236, 580, 52), "SALVAR JOGO", func():
+	var save := button(p, Rect2(160, 298, 580, 52), "SALVAR JOGO", func():
 		if app.save_game(): telemetry.text = "Expedição salva."
 		else: telemetry.text = "Não foi possível salvar esta partida.")
 	save.name = "SaveGame"; save.disabled = app.online
-	var leave := button(p, Rect2(160, 298, 580, 52), "VOLTAR AO MENU", func():
+	var leave := button(p, Rect2(160, 360, 580, 48), "VOLTAR AO MENU", func():
 		if not app.return_to_title():
 			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
 			telemetry.add_theme_color_override("font_color", Color("ffad99")))
 	leave.name = "ReturnToMenu"
-	var encyclopedia_button := button(p, Rect2(160, 360, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
+	var encyclopedia_button := button(p, Rect2(160, 416, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
 	encyclopedia_button.name = "PauseEncyclopedia"
-	var mission_inventory := button(p, Rect2(160, 416, 580, 48), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
-	mission_inventory.name = "MissionInventory"
+	mission_inventory.focus_neighbor_bottom = mission_inventory.get_path_to(resume); mission_inventory.focus_next = mission_inventory.get_path_to(resume)
+	resume.focus_neighbor_top = resume.get_path_to(mission_inventory); resume.focus_previous = resume.get_path_to(mission_inventory)
 	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
 	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
 	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
 	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
 	leave.focus_neighbor_bottom = leave.get_path_to(encyclopedia_button); leave.focus_next = leave.get_path_to(encyclopedia_button)
-	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
-	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
-	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button); mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
+	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave)
+	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave)
+	encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
+	encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
+	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button)
+	mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
 	telemetry = label(p, Rect2(105, 476, 690, 34), "Esc ou Start também continua a partida.", 15, GOLD)
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -364,6 +390,115 @@ func summary_art(parent: Control, path: String, rect: Rect2, alpha: float = 1.0)
 	art.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; art.modulate = Color(1, 1, 1, alpha)
 	art.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(art)
 
+func summary_live_label(parent: Control, rect: Rect2, caption: String, font_size: int, color: Color, outline_size: int = 3, outline_color: Color = Color("07131b")) -> Label:
+	var live := label(parent, rect, caption, font_size, color)
+	live.add_theme_constant_override("outline_size", outline_size)
+	live.add_theme_color_override("font_outline_color", outline_color)
+	live.add_theme_constant_override("shadow_offset_x", 2)
+	live.add_theme_constant_override("shadow_offset_y", 3)
+	live.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	return live
+
+func faithful_portrait_path(data: Dictionary, victory: bool) -> String:
+	if victory: return RUN_SUMMARY_FAITHFUL + "portrait_victory.png"
+	if str(data.get("fatal_source", "unknown")) == "fish": return RUN_SUMMARY_FAITHFUL + "portrait_fish.png"
+	return RUN_SUMMARY_FAITHFUL + "portrait_fallback.png"
+
+func faithful_assets_ready(data: Dictionary, victory: bool) -> bool:
+	var required := ["shell.png", "portrait_fallback.png"]
+	for kind in ["scrap", "fragment", "blueprint", "relic"]:
+		required.append("loot/%s.png" % kind)
+	for relative_path in required:
+		if summary_texture(RUN_SUMMARY_FAITHFUL + relative_path) == null: return false
+	return true
+
+func faithful_loot(parent: Control, rect: Rect2, icon_name: String, title: String, value: int) -> void:
+	var texture := summary_texture(RUN_SUMMARY_FAITHFUL + "loot/" + icon_name + ".png")
+	if texture != null:
+		var icon := TextureRect.new(); icon.texture = texture; icon.position = rect.position + Vector2(34, 1); icon.size = Vector2(64, 64)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(icon)
+	var loot_title := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 83, rect.size.x, 22), title, 14, Color("f7e6b6"), 2)
+	loot_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var loot_value := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 107, rect.size.x, 34), str(value), 27, CYAN, 3)
+	loot_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func build_summary_faithful(data: Dictionary, victory: bool) -> void:
+	var root := Control.new(); root.name = "RunSummary"; root.size = RUN_SUMMARY_MASTER_SIZE; content.add_child(root)
+	summary_art(root, RUN_SUMMARY_FAITHFUL + "shell.png", Rect2(Vector2.ZERO, RUN_SUMMARY_MASTER_SIZE))
+
+	var title_text := "EXPEDIÇÃO CONCLUÍDA" if victory else "FIM DA EXPEDIÇÃO"
+	var title_size := 58 if victory else 72
+	var title := summary_live_label(root, Rect2(365, 58, 860, 138), title_text, title_size, Color("f4ddb0"), 9, Color("1b211d"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	var grade_head := summary_live_label(root, Rect2(1300, 79, 196, 40), "NOTA", 24, Color("f7e6b6"), 3)
+	grade_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var grade_text := str(data.get("grade", "D")).left(2)
+	var grade := summary_live_label(root, Rect2(1285, 108, 226, 140), grade_text, 100, Color("ffb72f"), 8, Color("462608"))
+	grade.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; grade.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	var stat_specs := [
+		[Rect2(320, 231, 250, 82), "TEMPO", summary_time(float(data.get("time", 0.0)))],
+		[Rect2(621, 231, 250, 82), "PROGRESSO", "%d%%" % int(data.get("progress", 0))],
+		[Rect2(920, 231, 250, 82), "INIMIGOS", str(int(data.get("kills", 0)))],
+	]
+	for spec in stat_specs:
+		var heading := summary_live_label(root, Rect2(spec[0].position, Vector2(spec[0].size.x, 26)), spec[1], 18, Color("f5dda1"), 2)
+		heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var value := summary_live_label(root, Rect2(spec[0].position + Vector2(0, 24), Vector2(spec[0].size.x, 54)), spec[2], 40, CYAN, 4)
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	var report_title := summary_live_label(root, Rect2(365, 371, 545, 54), "RELATÓRIO DE EXTRAÇÃO" if victory else "NOTA DE FALECIMENTO", 31, Color("2b251d"), 1, Color("d5c18d"))
+	report_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var portrait := summary_texture(faithful_portrait_path(data, victory))
+	if portrait == null: portrait = summary_texture(RUN_SUMMARY_FAITHFUL + "portrait_fallback.png")
+	if portrait != null:
+		var picture := TextureRect.new(); picture.name = "SummaryPortrait"
+		picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		picture.texture = portrait; picture.position = Vector2(337, 468); picture.size = Vector2(238, 260); picture.clip_contents = true
+		picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; picture.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(picture)
+	var note_text := str(data.get("obituary", "A linha do tempo perdeu o relatório.")).left(240)
+	if victory: note_text = str(data.get("obituary", "O núcleo temporal foi recuperado e a expedição voltou inteira."))
+	var note := summary_live_label(root, Rect2(610, 468, 310, 188), note_text, 24, Color("231d16"), 1, Color("ead9b0"))
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	note.clip_text = true; note.max_lines_visible = 6; note.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	var cause := "RESULTADO: NÚCLEO RECUPERADO" if victory else "CAUSA: " + str(data.get("fatal_source", "DESCONHECIDA")).to_upper().left(32)
+	var cause_label := summary_live_label(root, Rect2(610, 660, 310, 25), cause, 13, Color("493b2e"), 1, Color("ead9b0"))
+	var seed_label := summary_live_label(root, Rect2(610, 697, 310, 24), "SEED %d  •  DOCAS DE 1941" % int(data.get("seed", 0)), 13, Color("493b2e"), 1, Color("ead9b0"))
+	cause_label.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
+	cause_label.clip_text = true; cause_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	seed_label.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
+
+	var loot_head := summary_live_label(root, Rect2(1010, 361, 555, 38), "OBTIDO NA RUN", 23, Color("f5dda1"), 3)
+	loot_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	faithful_loot(root, Rect2(1007, 416, 132, 142), "scrap", "SUCATA", int(data.get("scrap", 0)))
+	faithful_loot(root, Rect2(1154, 416, 132, 142), "fragment", "FRAGMENTOS", int(data.get("fragments", 0)))
+	faithful_loot(root, Rect2(1300, 416, 132, 142), "blueprint", "BAÚS", int(data.get("chests", 0)))
+	faithful_loot(root, Rect2(1447, 416, 132, 142), "relic", "NÚCLEO", int(data.get("nucleus", 0)))
+
+	var perf_head := summary_live_label(root, Rect2(1010, 641, 555, 36), "DESEMPENHO NA RUN", 23, Color("f5dda1"), 3)
+	perf_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	var perf_specs := [
+		[Rect2(1004, 693, 182, 72), "DANO CAUSADO", str(int(data.get("damage_dealt", 0)))],
+		[Rect2(1200, 693, 182, 72), "DANO RECEBIDO", str(int(data.get("damage_received", 0)))],
+		[Rect2(1395, 693, 182, 72), "MAIOR COMBO", str(int(data.get("max_streak", 0)))],
+	]
+	for spec in perf_specs:
+		var perf_label := summary_live_label(root, Rect2(spec[0].position, Vector2(spec[0].size.x, 24)), spec[1], 14, Color("f7e6b6"), 2)
+		perf_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var perf_value := summary_live_label(root, Rect2(spec[0].position + Vector2(0, 24), Vector2(spec[0].size.x, 43)), spec[2], 28, CYAN, 3)
+		perf_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	var retry := button(root, Rect2(381, 802, 550, 92), "▶  NOVA EXPEDIÇÃO", app.summary_new_run, true)
+	retry.name = "SummaryNewRun"; retry.add_theme_font_size_override("font_size", 28); retry.add_theme_color_override("font_color", Color("ecffff")); retry.add_theme_constant_override("outline_size", 4); retry.add_theme_color_override("font_outline_color", Color("06343d"))
+	if app.online and not app.hosting:
+		retry.disabled = true; retry.text = "AGUARDANDO ANFITRIÃO"
+	var refuge := button(root, Rect2(1007, 802, 398, 92), "⌂  VOLTAR AO REFÚGIO", app.summary_return_refuge, true)
+	refuge.name = "SummaryRefuge"; refuge.add_theme_font_size_override("font_size", 24); refuge.add_theme_color_override("font_color", Color("f7e6b6")); refuge.add_theme_constant_override("outline_size", 4); refuge.add_theme_color_override("font_outline_color", Color("2b1b08"))
+	retry.focus_neighbor_right = retry.get_path_to(refuge); retry.focus_next = retry.get_path_to(refuge)
+	refuge.focus_neighbor_left = refuge.get_path_to(retry); refuge.focus_previous = refuge.get_path_to(retry)
+
 func summary_loot(parent: Control, x: float, icon_name: String, title: String, value: int) -> void:
 	var box := panel(parent, Rect2(x, 0, 102, 122), Color("061922e8"), Color("9c7038"))
 	var path := RUN_SUMMARY_LOOT + icon_name + ".png"
@@ -378,7 +513,20 @@ func summary_loot(parent: Control, x: float, icon_name: String, title: String, v
 func build_summary() -> void:
 	var data: Dictionary = app.sim.last_run_summary
 	var victory: bool = str(data.get("outcome", "death")) == "victory"
-	var root := panel(content, Rect2(32, 16, 1280, 720), Color("07141ced"), Color("9c7038"))
+	if not summary_force_fallback and faithful_assets_ready(data, victory):
+		build_summary_faithful(data, victory)
+	else:
+		build_summary_fallback()
+
+func build_summary_fallback() -> void:
+	var data: Dictionary = app.sim.last_run_summary
+	var victory: bool = str(data.get("outcome", "death")) == "victory"
+	var legacy := Control.new(); legacy.name = "SummaryFallbackCanvas"; legacy.size = Vector2(1344, 752)
+	var legacy_fit := minf(RUN_SUMMARY_MASTER_SIZE.x / legacy.size.x, RUN_SUMMARY_MASTER_SIZE.y / legacy.size.y)
+	legacy.scale = Vector2.ONE * legacy_fit
+	legacy.position = ((RUN_SUMMARY_MASTER_SIZE - legacy.size * legacy_fit) * 0.5).floor()
+	content.add_child(legacy)
+	var root := panel(legacy, Rect2(32, 16, 1280, 720), Color("07141ced"), Color("9c7038"))
 	root.name = "RunSummary"
 	var frame_texture := summary_texture(RUN_SUMMARY_FRAME)
 	if frame_texture != null:

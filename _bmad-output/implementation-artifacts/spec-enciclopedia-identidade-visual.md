@@ -2,7 +2,7 @@
 title: 'Bring the encyclopedia into the game visual identity'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 baseline_commit: '41f296266cf478be895bd5637c8b80a77a279a30'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-enciclopedia-dinamica.md'
@@ -75,3 +75,35 @@ The visual hierarchy should read as an artifact from the Refúgio rather than a 
 
 **Manual checks:**
 - Compare the capture with `assets/ui/menu.png` and `assets/ui/equipment_v3.png`; confirm shared visual language without copying their layouts.
+
+## Suggested Review Order
+
+**Archive composition**
+
+- The entry point assembles the riveted chassis, dossier index, detail panel, and controls.
+  [`encyclopedia_screen.gd:36`](../../scripts/encyclopedia_screen.gd#L36)
+
+- Existing dock imagery becomes a subdued nearest-filtered atmosphere behind live controls.
+  [`encyclopedia_screen.gd:155`](../../scripts/encyclopedia_screen.gd#L155)
+
+- Decorative textures fail safely to plain live panels when resources are unavailable.
+  [`encyclopedia_screen.gd:168`](../../scripts/encyclopedia_screen.gd#L168)
+
+**Dynamic states**
+
+- Category styling keeps active and focused states distinct across pointer-free navigation.
+  [`encyclopedia_screen.gd:204`](../../scripts/encyclopedia_screen.gd#L204)
+
+- Data-driven dossier rows retain selection, overflow handling, focus links, and scrolling.
+  [`encyclopedia_screen.gd:220`](../../scripts/encyclopedia_screen.gd#L220)
+
+- Detail binding preserves live artwork while turning missing art into an intentional seal.
+  [`encyclopedia_screen.gd:277`](../../scripts/encyclopedia_screen.gd#L277)
+
+**Verification**
+
+- Semantic identity markers verify the new layers without coupling tests to pixel coordinates.
+  [`encyclopedia_ui_test.gd:29`](../../tests/encyclopedia_ui_test.gd#L29)
+
+- Long injected content proves the internal dossier scroll activates for overflow.
+  [`encyclopedia_ui_test.gd:71`](../../tests/encyclopedia_ui_test.gd#L71)

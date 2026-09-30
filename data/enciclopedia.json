@@ -8,7 +8,7 @@
       "ordem": 10,
       "nome": "CULTISTA ABISSAL",
       "subtitulo": "Atirador das docas",
-      "imagem": "",
+      "imagem": "res://assets/enemies/encyclopedia/cultista_abissal.png",
       "descricao": "Um devoto das forças que tomaram as docas. Mantém distância e dispara projéteis instáveis que se dividem durante o voo.",
       "tracos": ["Ataque à distância", "Projétil divisível", "Comum nas áreas do culto"]
     },
@@ -18,7 +18,7 @@
       "ordem": 20,
       "nome": "ARPOADOR",
       "subtitulo": "Caçador anfíbio",
-      "imagem": "",
+      "imagem": "res://assets/enemies/encyclopedia/arpoador.png",
       "descricao": "Criatura das águas escuras que luta com arpões. Prefere atacar de longe e pode prender Marty por um breve instante.",
       "tracos": ["Longo alcance", "Arpão imobilizante", "Movimento cadenciado"]
     },
@@ -28,7 +28,7 @@
       "ordem": 30,
       "nome": "RASTEJANTE",
       "subtitulo": "Predador corrosivo",
-      "imagem": "",
+      "imagem": "res://assets/enemies/encyclopedia/rastejante.png",
       "descricao": "Avança de forma irregular e contamina o chão com ácido. As crias menores surgem quando um adulto é derrotado.",
       "tracos": ["Investida curta", "Área de ácido", "Pode gerar crias"]
     },
@@ -38,7 +38,7 @@
       "ordem": 40,
       "nome": "BRUTAMONTES",
       "subtitulo": "Unidade pesada",
-      "imagem": "",
+      "imagem": "res://assets/enemies/encyclopedia/brutamontes.png",
       "descricao": "Combatente resistente que usa cobertura e pressiona o campo com ataques pesados. É lento, mas difícil de interromper.",
       "tracos": ["Alta resistência", "Usa cobertura", "Ataque pesado"]
     },
@@ -128,7 +128,7 @@
       "ordem": 50,
       "nome": "BAZUCA",
       "subtitulo": "Arma de missão",
-      "imagem": "res://assets/weapons/bazooka.png",
+      "imagem": "res://assets/weapons/bazooka_v2.png",
       "descricao": "Lança foguetes de munição limitada encontrados durante a expedição. A explosão atinge alvos próximos do impacto.",
       "tracos": ["48 de dano direto", "Dano em área", "Munição limitada"]
     },

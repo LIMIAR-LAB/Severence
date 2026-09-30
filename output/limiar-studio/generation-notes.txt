@@ -1,0 +1,17 @@
+LIMIAR STUDIO — logo explorations
+
+1. limiar-studio-chatgpt.png
+Provider: built-in image_gen (not CLI).
+Prompt direction: minimalist geometric doorway formed by offset ivory and cyan/violet shapes, negative-space passage, exact LIMIAR / STUDIO lettering, midnight navy background. No mockup or illustrative scene.
+
+2. limiar-studio-higgsfield.png
+Provider: Higgsfield; model gpt_image_2_5.
+Job: 9a60fa7f-844b-4937-8386-47c861803b60
+Prompt direction: incomplete orbital ring interrupted by a luminous threshold suggesting L; cyan/violet, ivory geometric LIMIAR / STUDIO lettering on navy; simple graphic identity for time-travel adventures.
+
+3. limiar-studio-pixellab.png
+Provider: PixelLab; Pro, 512x512.
+Job: edd7f5bc-31e5-4318-92d7-f9f6a527943e
+Prompt direction: pixel-art dimensional doorway with chunky L-shaped frame, cyan interior and four-point star; restrained cyan/violet/ivory, exact LIMIAR / STUDIO pixel lettering, transparent surrounding background.
+
+These are raster logo concepts, not vector master files.

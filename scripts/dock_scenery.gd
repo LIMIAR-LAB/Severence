@@ -5,6 +5,10 @@ extends RefCounted
 
 const DOCKS := preload("res://scripts/docks_map.gd")
 const BASE := "res://assets/environment/docks12/"
+const BOSS_ARENA_PATH := BASE + "boss/boss_arena_plate.png"
+const BOSS_ARENA_RECT := Rect2(3000, 400, 2400, 1800)
+const BOSS_SAFE_CENTER := Vector2(4200, 1200)
+const BOSS_SAFE_RADIUS := 360.0
 const CHAPEL_ANIMATED_BASE := BASE + "chapel/animated/"
 const CHAPEL_FRAME_COUNT := 12
 const CHAPEL_FRAME_SECONDS := 0.110
@@ -95,6 +99,7 @@ var props := {}
 var fx := {}
 var decals := {}
 var wall_tiles := {}   # "set/nome" -> textura (0.17)
+var boss_arena: Texture2D
 var chapel_frames: Array[Texture2D] = []
 var chapel_fallback: Texture2D
 var reveal_at := {}     # id da sala -> tick_time em que apareceu
@@ -111,6 +116,8 @@ func _init() -> void:
 	for n in DECAL_NAMES: decals[n] = load(BASE + "decals/" + n + ".png")
 	for s in WALL_SETS:
 		for n in WALL_TILE_NAMES: wall_tiles[s + "/" + n] = load(BASE + "walls/" + s + "/" + n + ".png")
+	# A arena dedicada e opcional: builds antigas ou asset ausente continuam com o piso boss em tiles.
+	if ResourceLoader.exists(BOSS_ARENA_PATH): boss_arena = load(BOSS_ARENA_PATH)
 	chapel_fallback = load(CHAPEL_ANIMATED_BASE + "chapel_static.png")
 	for i in CHAPEL_FRAME_COUNT:
 		chapel_frames.append(load(CHAPEL_ANIMATED_BASE + "chapel_frame_%02d.png" % i))
@@ -288,9 +295,21 @@ func floor_kind(sim, rect: Rect2) -> String:
 	var room := room_of_rect(sim, rect)
 	return room.get("floor", "planks" if room.is_empty() else "stone")   # corredores: passarelas de madeira
 
+func draw_boss_arena(ci: CanvasItem, rect: Rect2, view: Rect2) -> void:
+	if boss_arena == null or not rect.intersects(view): return
+	# O viewport já recorta a placa; desenhá-la inteira evita costuras entre recortes da câmera.
+	ci.draw_texture_rect(boss_arena, rect, false)
+	# O emblema continua aparente, mas o miolo recebe um véu discreto para projéteis e telegraphs.
+	if view.grow(BOSS_SAFE_RADIUS).has_point(BOSS_SAFE_CENTER):
+		ci.draw_circle(BOSS_SAFE_CENTER, BOSS_SAFE_RADIUS, Color(0.015, 0.035, 0.065, 0.16))
+
 func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
 	for rect in floors:
 		if not rect.intersects(view): continue
+		# A placa 4:3 substitui apenas o retângulo principal; alas/entradas seguem o piso navegável normal.
+		if rect == BOSS_ARENA_RECT and boss_arena != null:
+			draw_boss_arena(ci, rect, view)
+			continue
 		if style_of_rect(sim, rect).get("painted", false): continue
 		var kind := floor_kind(sim, rect)
 		var st := style_of_rect(sim, rect)

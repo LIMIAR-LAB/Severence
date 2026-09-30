@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-09-29",
+  "generator": "OpenAI built-in ImageGen",
+  "reference": "art/concept/resumo-pos-run-ux-v1.png",
+  "assets": [
+    {
+      "file": "summary_shell_master.png",
+      "generated_file": "exec-3e39666b-4829-4a45-9c26-ebbcb37d1d04.png",
+      "size": [1672, 941],
+      "role": "text-free cinematic backdrop and console shell"
+    },
+    {
+      "file": "portrait_fish_master.png",
+      "generated_file": "exec-0d276896-6f69-4a9f-b900-87fc657032ed.png",
+      "size": [1254, 1254],
+      "role": "editorial fish obituary portrait"
+    },
+    {
+      "file": "portrait_victory_master.png",
+      "generated_file": "exec-844880b8-bf8c-4825-97cd-f3cf119412e5.png",
+      "size": [1254, 1254],
+      "role": "editorial recovered-nucleus portrait"
+    }
+  ]
+}
