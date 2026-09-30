@@ -102,7 +102,7 @@ func actor(id: int, pos: Vector2) -> Dictionary:
 		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
 		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
 		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0,
-		"last_damage_source": "unknown", "last_damage_attack": ""}
+		"last_damage_source": "unknown", "last_damage_attack": "", "run_weapons": {}, "run_weapon": ""}
 
 func fresh_run_stats() -> Dictionary:
 	return {"kills": 0, "kills_by_kind": {}, "damage_dealt": 0.0, "damage_received": 0.0,
@@ -143,6 +143,8 @@ const BOMBER_BLAST := {"radius": 90.0, "damage": 22.0, "trigger": 40.0}
 const ARENA_SPAWN_DELAY := 0.8
 const ARENA_HP_PER_WAVE := 0.15
 const ARENA_DAMAGE_PER_WAVE := 0.04
+const KEY_DROP_CHANCE := 0.04   # 0.21: chaves devem exigir escolha nos baús.
+const AMMO_DROP_CHANCE := 0.06  # Foguetes são suprimento raro durante a RUN.
 
 # ── Vida em corações (0.12) ─────────────────────────────────────────────────
 # 1 coração = 10 de vida. Marty começa com 3. Golpe comum tira meio coração; golpe pesado
@@ -231,6 +233,7 @@ const HUB_TITAN_BAY := Vector2(1140, 548)
 func make_hub() -> void:
 	doors.clear(); gate_blocks.clear(); hazards.clear(); tentacle_gates.clear()
 	mode = "hub"
+	money = 0; keys = 0  # 0.21: moeda e chaves não atravessam o portal temporal.
 	pending_spawns.clear()   # 0.15: portais atrasados da arena não atravessam para o Refúgio
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
 	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
@@ -342,8 +345,6 @@ func start_run(new_seed: int) -> void:
 		var item := {"p": Vector2(d[0], d[1]), "kind": d[2]}
 		if d.size() > 3: item.merge(d[3])
 		decor.append(item)
-	for room in rooms:
-		room["waves"] = DOCKS.WAVES.get(room.get("id", ""), []).duplicate(true)
 	for c in DOCKS.CHESTS: chests.append({"p": Vector2(c[0], c[1]), "open": false, "secret": c[2]})
 	mech = new_mech(P.mech); apply_unlock_state()
 	reset_spectres()
@@ -355,6 +356,7 @@ func start_run(new_seed: int) -> void:
 	spawn_enemy(P.boss, "boss")
 	spawn_enemy(P.warden, "warden")
 	pickups.append({"p": P.key, "kind": "key"})
+	pickups.append({"p": P.spawn + Vector2(165, 0), "kind": "weapon", "weapon": "bazooka", "ammo": 6})
 	build_navigation()
 	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. A armadura carrega em 60s.")
 
@@ -467,20 +469,11 @@ func refresh_gate_blocks() -> void:
 	for d in doors:
 		if room_by_id(d.room).get("locked", false): gate_blocks.append(d.r)
 
-func step_gates(step_dt: float = 0.016) -> void:
+func step_gates(_step_dt: float = 0.016) -> void:
 	var changed := false
 	for room in rooms:
 		if not room.has("id") or room.kind == "secret": continue
 		if room.get("locked", false):
-			if room.get("wave_t", 0.0) > 0:
-				room.wave_t -= step_dt
-				if room.wave_t <= 0: spawn_wave(room)
-				continue
-			if room_threats(room.id) == 0 and not room.get("waves", []).is_empty():
-				room.wave_t = 1.1
-				say("REFORÇOS! Mais criaturas emergem das docas!")
-				for w in room.waves: effects.append({"p": Vector2(w[0], w[1]), "kind": "spawn_portal", "life": 1.2, "max": 1.2})
-				continue
 			if room_threats(room.id) == 0:
 				room.locked = false; room.cleared = true; changed = true
 				say("SALA LIMPA • os portões se abriram!")
@@ -503,13 +496,6 @@ func step_gates(step_dt: float = 0.016) -> void:
 					a.p = spot if clear_at(spot, 23 if a.mech else 11) else inside.p
 					if a.mech: mech.p = a.p
 	if changed: refresh_gate_blocks()
-
-func spawn_wave(room: Dictionary) -> void:
-	for w in room.waves:
-
-		spawn_enemy(Vector2(w[0], w[1]), w[2])
-		enemies[-1]["alerted"] = true; enemies[-1]["room"] = room.id
-	room.waves = []
 
 # ── Props destrutíveis e barris explosivos (0.13) ─────────────────────────────
 const DESTRUCTIBLE := {"crate": 34.0, "crate_2": 44.0, "crate_3": 44.0, "crate_net": 40.0, "crate_barnacles": 50.0, "crate_broken": 20.0,
@@ -863,6 +849,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	if cmd.get("armor", false):
 		if a.mech: throw_bomb(a)   # no Titan, R / LB lança uma bomba
 		else: toggle_armor(a)
+	if cmd.get("weapon", false) and not a.mech: toggle_run_weapon(a)
 
 # ── Titan: canhão pesado, bombas e combustível (0.14) ─────────────────────────
 # Canhão: projétil grande e lento que explode no impacto (dano em área).
@@ -932,13 +919,33 @@ func hit_stop(d: float) -> void:
 func weapon_of(a: Dictionary) -> String:
 	if a.mech: return "mech"
 	if a.armor: return "omega_sword"
-	return a.get("weapon_override", uniform_of(a).weapon)
+	var selected: String = a.get("run_weapon", "")
+	if selected != "" and int(a.get("run_weapons", {}).get(selected, 0)) > 0: return selected
+	return uniform_of(a).weapon
+
+func grant_run_weapon(a: Dictionary, name: String, ammo: int) -> void:
+	var owned: Dictionary = a.get("run_weapons", {})
+	var first: bool = not owned.has(name)
+	owned[name] = mini(12, int(owned.get(name, 0)) + ammo)
+	a["run_weapons"] = owned
+	if first: a["run_weapon"] = name
+	say("%s • %d foguetes nesta expedição • Q/RB troca arma" % [name.to_upper(), owned[name]])
+
+func toggle_run_weapon(a: Dictionary) -> void:
+	var owned: Dictionary = a.get("run_weapons", {})
+	if a.get("run_weapon", "") != "":
+		a["run_weapon"] = ""; say("ARMA BÁSICA • munição infinita"); return
+	for name in owned:
+		if int(owned[name]) > 0:
+			a["run_weapon"] = name; say("%s • %d foguetes" % [str(name).to_upper(), owned[name]]); return
+	say("Nenhuma arma de expedição com munição.")
 
 # 0.14: tabela única das armas — o jogo e a tela de Equipamento (loadout_stats) leem daqui.
 const WEAPONS := {
 	"pistol": {"count": 1, "damage": 16.0, "cooldown": 0.22, "speed": 660.0, "radius": 4.0, "spread": 0.12, "kind": "p_pistol", "pierce": 0},
 	"shotgun": {"count": 6, "damage": 9.0, "cooldown": 0.65, "speed": 620.0, "radius": 4.0, "spread": 0.11, "kind": "p_pellet", "pierce": 0},
 	"smg": {"count": 1, "damage": 7.0, "cooldown": 0.085, "speed": 740.0, "radius": 4.0, "spread": 0.12, "kind": "p_smg", "pierce": 0},
+	"bazooka": {"count": 1, "damage": 48.0, "cooldown": 0.9, "speed": 390.0, "radius": 10.0, "spread": 0.0, "kind": "p_rocket", "pierce": 0},
 	# Canhão de Plasma Ômega: disparo duplo, perfurante.
 	"omega": {"count": 2, "damage": 24.0, "cooldown": 0.2, "speed": 860.0, "radius": 7.0, "spread": 0.05, "kind": "p_omega", "pierce": 2}}
 const SWORD := {"hit": 38.0, "finisher": 64.0, "wave": 30.0}   # Lâmina Ômega (3º corte + onda)
@@ -949,6 +956,10 @@ const FUSION := {"damage": 1.35, "cadence": 0.8, "speed": 360.0}
 
 func fire_actor(a: Dictionary) -> void:
 	var weapon := weapon_of(a)
+	if weapon == "bazooka":
+		var owned: Dictionary = a.run_weapons
+		owned.bazooka = maxi(0, int(owned.bazooka) - 1)
+		a.run_weapons = owned
 	var w: Dictionary = WEAPONS.get(weapon, WEAPONS.pistol)
 	var count: int = w.count; var damage: float = w.damage; var cooldown: float = w.cooldown; var speed: float = w.speed
 	var radius: float = w.radius; var spread: float = w.spread; var kind: String = w.kind; var pierce: int = w.pierce
@@ -963,6 +974,8 @@ func fire_actor(a: Dictionary) -> void:
 		bullets[-1]["pierce"] = pierce
 		if weapon == "shotgun": bullets[-1].v *= rng.randf_range(0.85, 1.1)
 	a.shot = cooldown; a["fire_flash"] = 0.09
+	if weapon == "bazooka" and int(a.run_weapons.bazooka) == 0:
+		a.run_weapon = ""; say("BAZUCA SEM FOGUETES • arma básica equipada")
 	if a.mech: effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.12, "dir": a.aim}); effects.append({"p": a.p, "kind": "recoil", "life": 0.2, "max": 0.2, "dir": a.aim})
 	elif weapon in ["shotgun", "smg"]:
 		effects.append({"p": a.p, "kind": "casing", "life": 0.5, "max": 0.5, "dir": a.aim.rotated(-PI / 2 if a.aim.x >= 0 else PI / 2), "seed": rng.randi() % 1000})
@@ -1222,7 +1235,9 @@ func step_enemies(dt: float) -> void:
 		if e.kind in ["boss", "warden"]: hit_stop(0.09); streak_t = 3.0
 		else: hit_stop(0.03)
 		pickups.append({"p": e.p, "kind": "coin"})
-		if rng.randf() < 0.2: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
+		if rng.randf() < KEY_DROP_CHANCE: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
+		if e.kind not in ["crawler_small", "boss"] and rng.randf() < AMMO_DROP_CHANCE:
+			pickups.append({"p": e.p + Vector2(-15, 0), "kind": "ammo", "weapon": "bazooka", "ammo": 2})
 		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 1.2, "max": 2.6 if e.kind == "boss" else 1.2, "flip": e.face.x < 0})
 		if e.kind == "crawler":
 			for off in [Vector2(-18, 6), Vector2(18, -6)]:
@@ -1346,6 +1361,7 @@ func step_bullets(dt: float) -> void:
 				b.life = 0
 				if mode == "run" and b.get("kind", "") != "p_heavy": damage_obstacle(obstacle_at(b.p), b.damage * (0.5 if b.team == 1 else 1.0))
 				if b.get("kind", "") == "p_heavy": explode(b.p, MECH_SHELL.splash, MECH_SHELL.splash_damage, false)
+				if b.get("kind", "") == "p_rocket": explode(b.p, 72, 30, false)
 				if b.team == 0: effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
 				break
 			if b.team == 0:
@@ -1354,10 +1370,12 @@ func step_bullets(dt: float) -> void:
 						var previous_hits: Array = b.get("hits", [])
 						if previous_hits.has(e.id): continue
 						if e.hp <= 0: continue
-						if (e.kind == "guard" or e.get("elite", "") == "shield") and not (e.kind == "guard" and e.combat == "attack") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") != "p_omega":
+						if (e.kind == "guard" or e.get("elite", "") == "shield") and not (e.kind == "guard" and e.combat == "attack") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") not in ["p_omega", "p_rocket"]:
 							b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
 							effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
 						hurt_enemy(e, b.damage); e.hurt = 0.12; e["alerted"] = true
+						if b.get("kind", "") == "p_rocket":
+							explode(b.p, 72, 30, false); b.life = 0; break
 						# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
 						pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
 						if e.kind not in ["boss", "warden"]:
@@ -1404,6 +1422,10 @@ func collect_pickups() -> void:
 		for a in actors:
 			if a.active and not a.dead and a.p.distance_to(pickup.p) < 32:
 				if pickup.kind == "key": keys += 1
+				elif pickup.kind == "weapon": grant_run_weapon(a, pickup.weapon, int(pickup.ammo))
+				elif pickup.kind == "ammo":
+					if not a.run_weapons.has(pickup.weapon): continue
+					grant_run_weapon(a, pickup.weapon, int(pickup.ammo))
 				elif pickup.kind == "fuel":
 					mech.fuel = minf(FUEL_MAX, mech.fuel + FUEL_PICKUP); say("GALÃO DE GASOLINA • Titan +%.0f%% de combustível" % (FUEL_PICKUP / FUEL_MAX * 100))
 				elif pickup.kind == "battery":
@@ -1677,15 +1699,10 @@ func open_reward(chest: Dictionary, a: Dictionary) -> void:
 	if chest.open: return
 	chest.open = true; chest["t"] = tick_time
 	if mode == "run": ensure_run_stats(); run_stats.chests_opened += 1
-	var tiers := ["pistol", "smg", "shotgun", "omega"]
-	var current: String = a.get("weapon_override", uniform_of(a).weapon)
-	var tier := tiers.find(current)
-	if tier < tiers.size()-1:
-		a["weapon_override"] = tiers[maxi(0,tier+1)]
-		say("ARMA RECUPERADA • " + str(a.weapon_override).to_upper() + " • equipada nesta expedição")
-	else:
-		materials += 3; keys += 2; heal(a,2)
-		say("ARSENAL COMPLETO • +3 materiais, +2 chaves e cura")
+	if a.run_weapons.has("bazooka"):
+		materials += 3; heal(a, 2)
+		say("SUPRIMENTOS RESGATADOS • +3 fragmentos e cura")
+	else: grant_run_weapon(a, "bazooka", 3)
 	effects.append({"p":chest.p,"kind":"chest_burst","life":1.3,"max":1.3,"secret":true})
 
 func trap_phase(h: Dictionary) -> String:

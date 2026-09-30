@@ -1,9 +1,10 @@
-# Tela inicial — cenário animado e console unificado
+# Tela inicial — cenário animado em tela cheia
 
-O fundo da tela inicial é o vídeo em pixel art enviado pelo usuário (loop de 8 s, 24 fps). Ele funciona
-somente como cenário cinematográfico. O logotipo permanece na arte, mas toda a área de navegação é
-um console vivo construído por `scripts/terminal_ui.gd`. Uma máscara opaca cobre os controles antigos
-que já estavam pintados no vídeo, impedindo sobreposição de textos e remendos de estado.
+O fundo da tela inicial é o vídeo em pixel art enviado pelo usuário (loop de 8 s, 24 fps). Somente a
+parte cinematográfica é reenquadrada e ampliada uniformemente: a sidebar pintada é cortada na fonte,
+sem máscara ou painel colocado por cima. O logotipo vivo ocupa o canto superior esquerdo e toda a
+navegação pertence a um único deck horizontal na base, seguindo o conceito
+`art/concept/tela-inicial-conceito-v2.png`.
 
 ## Arquivos (`assets/ui/title/`)
 
@@ -13,20 +14,19 @@ que já estavam pintados no vídeo, impedindo sobreposição de textos e remendo
 | `title_still.png` | Quadro parado (mediana do vídeo). Aparece por baixo e no modo headless dos testes. |
 | `btn_N.png` / `btn_N_sel.png` | Recortes legados, mantidos apenas como fonte histórica; não são usados pela interface. |
 
-O console tem um único quadro industrial, fundo opaco e hierarquia consistente. **NOVA EXPEDIÇÃO** é
-a ação dominante. **CONTINUAR** e **CARREGAR** compartilham a área de retomada; **ONLINE** e
-**EXPEDIÇÃO DIRETA** ficam em “Outras rotas”; **OPÇÕES** e **SAIR** são utilidades discretas. O rodapé
-reserva espaço estável para coop local, rede e identificação do protótipo.
+O deck tem cinco ações. **NOVA EXPEDIÇÃO** inicia o fluxo de personagem; **CONTINUAR** volta à
+partida ativa ou, quando não há partida ativa, carrega a última expedição salva. **ONLINE**,
+**OPÇÕES** e **SAIR** formam a fileira secundária. **OPÇÕES** também dá acesso ao Arquivo do Refúgio
+sem acrescentar uma sexta ação ao deck. O estado de rede e a indicação de coop local ficam
+na mesma estrutura, sem criar outro painel de menu.
 
 ## Botões
 
 | Botão | Ação |
 |---|---|
-| CONTINUAR | Volta para a expedição em andamento (desativado e escurecido sem expedição). |
+| CONTINUAR | Volta à expedição ativa ou carrega o save; fica indisponível sem ambos. |
 | NOVA EXPEDIÇÃO | Escolha solo / parceiro IA. |
 | ONLINE | Hospedar ou entrar por IP. |
-| EXPEDIÇÃO DIRETA | Expedição com seed. |
-| CARREGAR | Retoma uma expedição salva; fica indisponível sem save. |
 | OPÇÕES / SAIR | Como antes. |
 | COOP LOCAL APÓS ESCOLHER PERSONAGEM | Aviso discreto no rodapé; a escolha aparece no fluxo de personagem. |
 

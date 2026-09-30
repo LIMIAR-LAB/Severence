@@ -4,6 +4,7 @@ const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 const MenuBackground = preload("res://scripts/menu_background.gd")
 const EquipmentScreen = preload("res://scripts/equipment_screen.gd")
 const CharacterSilhouette = preload("res://scripts/character_silhouette.gd")
+const EncyclopediaScreen = preload("res://scripts/encyclopedia_screen.gd")
 const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png"
 const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 const RUN_SUMMARY_FRAME := "res://assets/ui/run_summary/frame_main.png"
@@ -33,6 +34,8 @@ var start_target := "arena"
 var current_choice: Label
 var main_resume: Button
 var telemetry: Label
+var encyclopedia: Control
+var encyclopedia_return_screen := "main"
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -49,7 +52,21 @@ func center_stage() -> void:
 	var fit := minf(vp.x/1280.0,vp.y/800.0)
 	stage.scale = Vector2(1280.0/1344,800.0/752)*fit
 	stage.position = ((vp - Vector2(1280, 800)*fit) * 0.5).floor()
+	if screen == "main" and content != null:
+		var title_scene := content.find_child("TitleSceneCrop", false, false) as Control
+		if title_scene != null: fit_title_background(title_scene)
 	place_equipment()
+
+func fit_title_background(title_scene: Control) -> void:
+	# O cenário compensa a escala legada do palco e usa aspect-cover uniforme.
+	var vp := get_viewport_rect().size
+	var cover := maxf(vp.x / 1344.0, vp.y / 752.0)
+	title_scene.scale = Vector2(cover / stage.scale.x, cover / stage.scale.y)
+	var target := (vp - Vector2(1344, 752) * cover) * 0.5
+	title_scene.position = Vector2(
+		(target.x - stage.position.x) / stage.scale.x,
+		(target.y - stage.position.y) / stage.scale.y
+	)
 
 # 0.17: equipamento centralizado com escala proporcional contínua para ocupar a janela.
 func place_equipment() -> void:
@@ -91,11 +108,11 @@ func show_screen(next: String) -> void:
 	content = Control.new(); content.size = Vector2(1344, 752)
 	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()   # escala inteira, fora do stage
 	else: stage.add_child(content)
-	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null
+	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null; encyclopedia = null
 	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
 	if next not in ["pause", "summary"]:
 		if next == "main":
-			content.add_child(title_background())
+			var title_scene := title_background(); content.add_child(title_scene); fit_title_background(title_scene)
 		else:
 			var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "menu") + ".png")
 			if next == "play": bg.texture = load("res://assets/ui/adventure.png")
@@ -110,6 +127,7 @@ func show_screen(next: String) -> void:
 		"summary": build_summary()
 		"seed": build_seed()
 		"options": build_options()
+		"encyclopedia": build_encyclopedia()
 	focus_first.call_deferred()   # navegação pelo controle
 
 func open(page: String = "main") -> void:
@@ -125,20 +143,28 @@ func close() -> void:
 
 # ── Tela inicial: o vídeo é cenário; todo o console e seus estados são controles vivos.
 const TITLE_DIR := "res://assets/ui/title/"
+const TITLE_SCENE_CROP := Rect2(384, 107, 960, 537)
 const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher personagem e modo", "Hospedar ou entrar por IP",
-	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
+	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo",
+	"Consultar monstros, itens e robôs"]
 var title_video: VideoStreamPlayer
 
 func title_background() -> Control:
 	var still_texture = load(TITLE_DIR + "title_still.png") if ResourceLoader.exists(TITLE_DIR + "title_still.png") else null
-	if still_texture == null: return MenuBackground.new()
-	var root := Control.new(); root.size = Vector2(1344, 752); root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var still := TextureRect.new(); still.texture = still_texture   # quadro parado (sem vídeo / headless)
+	if still_texture == null:
+		var fallback := MenuBackground.new(); fallback.name = "TitleSceneCrop"; fallback.scene_only = true
+		return fallback
+	var root := Control.new(); root.name = "TitleSceneCrop"; root.size = Vector2(1344, 752); root.clip_contents = true; root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cropped := AtlasTexture.new(); cropped.atlas = still_texture; cropped.region = TITLE_SCENE_CROP
+	var still := TextureRect.new(); still.name = "TitleStillCropped"; still.texture = cropped
 	still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; still.size = root.size; still.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(still)
 	var stream = load(TITLE_DIR + "title_loop.ogv") if ResourceLoader.exists(TITLE_DIR + "title_loop.ogv") else null
 	if stream != null and DisplayServer.get_name() != "headless":
 		title_video = VideoStreamPlayer.new(); title_video.stream = stream; title_video.expand = true
-		title_video.size = root.size; title_video.mouse_filter = Control.MOUSE_FILTER_IGNORE; title_video.autoplay = true
+		var crop_scale := root.size.x / TITLE_SCENE_CROP.size.x
+		title_video.position = -TITLE_SCENE_CROP.position * crop_scale
+		title_video.size = Vector2(1344, 752) * crop_scale
+		title_video.mouse_filter = Control.MOUSE_FILTER_IGNORE; title_video.autoplay = true
 		if "loop" in title_video: title_video.set("loop", true)
 		title_video.finished.connect(title_video.play)   # garante o loop em qualquer versão
 		root.add_child(title_video)
@@ -150,10 +176,10 @@ func title_style(fill: Color, edge: Color, width: int = 2, radius: int = 4) -> S
 	style.content_margin_left = 15; style.content_margin_right = 15
 	return style
 
-func title_button(i: int, rect: Rect2, caption: String, callback: Callable, primary: bool = false) -> Button:
+func title_button(parent: Control, i: int, rect: Rect2, caption: String, callback: Callable, primary: bool = false) -> Button:
 	var b := Button.new(); b.position = rect.position; b.size = rect.size; b.text = caption
 	b.name = "Title_%d" % i; b.tooltip_text = TITLE_TIPS[i]; b.focus_mode = Control.FOCUS_ALL
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT; b.add_theme_font_size_override("font_size", 21 if primary else 17)
+	b.alignment = HORIZONTAL_ALIGNMENT_CENTER; b.add_theme_font_size_override("font_size", 23 if primary else 17)
 	b.add_theme_color_override("font_color", Color("f1d58c") if not primary else Color("f5ead0"))
 	b.add_theme_color_override("font_hover_color", Color("ffffff")); b.add_theme_color_override("font_focus_color", Color("ffffff"))
 	b.add_theme_color_override("font_pressed_color", Color("ffffff")); b.add_theme_color_override("font_disabled_color", Color("59605b"))
@@ -165,32 +191,45 @@ func title_button(i: int, rect: Rect2, caption: String, callback: Callable, prim
 	b.add_theme_stylebox_override("focus", hover); b.add_theme_stylebox_override("pressed", pressed); b.add_theme_stylebox_override("disabled", disabled)
 	b.mouse_entered.connect(func():
 		if not b.disabled: b.grab_focus())
-	b.pressed.connect(callback); content.add_child(b); return b
+	b.pressed.connect(callback); parent.add_child(b); return b
+
+func continue_title() -> void:
+	if app.playing: close()
+	elif app.has_saved_game(): app.load_game()
 
 func build_main() -> void:
-	# O vídeo antigo tem controles pintados. Esta máscara opaca entrega a área inteira
-	# ao console vivo e evita que qualquer texto/placa antiga apareça por baixo.
-	var mask := ColorRect.new(); mask.name = "TitleControlMask"; mask.position = Vector2(0, 261); mask.size = Vector2(430, 491)
-	mask.color = Color("0a100e"); mask.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(mask)
-	var console := panel(content, Rect2(18, 278, 396, 451), Color("151d18"), Color("a07f43")); console.name = "TitleConsole"
-	var inner := panel(content, Rect2(25, 285, 382, 437), Color("111713"), Color("39483d")); inner.name = "TitleConsoleInner"
-	label(content, Rect2(39, 296, 340, 24), "CENTRAL DE EXPEDIÇÕES", 14, Color("c5a85f"))
-	var rule := ColorRect.new(); rule.position = Vector2(39, 323); rule.size = Vector2(340, 2); rule.color = Color("355e5d"); rule.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(rule)
-	var callbacks: Array[Callable] = [close, func(): show_screen("characters"), func(): show_screen("online"), func(): show_screen("seed"),
-		func(): app.load_game(), func(): show_screen("options"), func(): app.save_progress(); app.get_tree().quit()]
-	var new_run := title_button(1, Rect2(39, 335, 340, 56), "NOVA EXPEDIÇÃO", callbacks[1], not app.playing)
-	main_resume = title_button(0, Rect2(39, 399, 164, 49), "CONTINUAR", callbacks[0], app.playing)
-	main_resume.disabled = not app.playing
-	if main_resume.disabled: main_resume.tooltip_text = "Nenhuma expedição em andamento"
-	var load_button := title_button(4, Rect2(215, 399, 164, 49), "CARREGAR", callbacks[4])
-	load_button.disabled = not app.has_saved_game()
-	if load_button.disabled: load_button.tooltip_text = "Nenhum jogo salvo"
-	label(content, Rect2(39, 460, 340, 20), "OUTRAS ROTAS", 12, Color("7f9385"))
-	var online_button := title_button(2, Rect2(39, 484, 164, 49), "ONLINE", callbacks[2])
-	var seed_button := title_button(3, Rect2(215, 484, 164, 49), "EXPEDIÇÃO DIRETA", callbacks[3])
-	var options_button := title_button(5, Rect2(39, 545, 164, 46), "OPÇÕES", callbacks[5])
-	var exit_button := title_button(6, Rect2(215, 545, 164, 46), "SAIR", callbacks[6])
-	var visual_order: Array[Button] = [new_run, main_resume, load_button, online_button, seed_button, options_button, exit_button]
+	var lockup := Control.new(); lockup.name = "TitleLockup"; lockup.position = Vector2(45, 34); lockup.size = Vector2(455, 185); lockup.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(lockup)
+	var title_top := label(lockup, Rect2(0, 0, 455, 67), "FRATURAS", 50, Color("e1a84f"))
+	var title_bottom := label(lockup, Rect2(0, 55, 455, 72), "DO TEMPO", 55, Color("e9ecea"))
+	for title_line in [title_top, title_bottom]:
+		title_line.add_theme_color_override("font_outline_color", Color("10171a")); title_line.add_theme_constant_override("outline_size", 9)
+	var bolt := ColorRect.new(); bolt.position = Vector2(326, 7); bolt.size = Vector2(7, 119); bolt.rotation = 0.08; bolt.color = Color("57f1f5"); bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE; lockup.add_child(bolt)
+	var era := label(lockup, Rect2(7, 137, 305, 26), "DOCAS DE 1941", 14, Color("f0d48b")); era.add_theme_color_override("font_outline_color", Color("10171a")); era.add_theme_constant_override("outline_size", 5)
+
+	var deck := panel(content, Rect2(28, 565, 1288, 165), Color("111813e8"), Color("b28b43")); deck.name = "TitleCommandDeck"
+	deck.add_theme_stylebox_override("panel", title_style(Color("111813e8"), Color("b28b43"), 4, 9))
+	var callbacks: Dictionary = {
+		"new": func(): show_screen("characters"), "online": func(): show_screen("online"),
+		"options": func(): show_screen("options"),
+		"exit": func(): app.save_progress(); app.get_tree().quit(),
+	}
+	var has_continue: bool = app.playing or app.has_saved_game()
+	var new_run := title_button(deck, 1, Rect2(20, 16, 430, 62), "▶  NOVA EXPEDIÇÃO", callbacks.new, not app.playing)
+	main_resume = title_button(deck, 0, Rect2(464, 16, 330, 62), "CONTINUAR", continue_title, app.playing)
+	main_resume.disabled = not has_continue
+	if app.playing: main_resume.tooltip_text = "Voltar para a expedição em andamento"
+	elif app.has_saved_game(): main_resume.tooltip_text = "Carregar a última expedição salva"
+	else: main_resume.tooltip_text = "Nenhuma expedição para continuar"
+	var status_panel := panel(deck, Rect2(808, 16, 460, 62), Color("0d1310"), Color("34443b")); status_panel.name = "TitleStatusPanel"
+	var status_color := Color("79e5e5") if app.network_status != "OFFLINE" else Color("b9a66c")
+	var status := label(status_panel, Rect2(18, 11, 424, 24), "●  " + app.network_status, 14, status_color); status.name = "TitleNetworkStatus"
+	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label(status_panel, Rect2(18, 35, 424, 17), "COOP LOCAL APÓS ESCOLHER PERSONAGEM", 10, Color("69796e"))
+	var online_button := title_button(deck, 2, Rect2(20, 91, 240, 50), "ONLINE", callbacks.online)
+	var options_button := title_button(deck, 5, Rect2(274, 91, 240, 50), "OPÇÕES", callbacks.options)
+	var exit_button := title_button(deck, 6, Rect2(528, 91, 240, 50), "SAIR", callbacks.exit)
+	label(deck, Rect2(808, 99, 445, 28), "FRATURAS DO TEMPO  •  PROTÓTIPO", 12, Color("78867c")).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var visual_order: Array[Button] = [new_run, main_resume, online_button, options_button, exit_button]
 	var enabled_order: Array[Button] = []
 	for title_action in visual_order:
 		if not title_action.disabled: enabled_order.append(title_action)
@@ -198,19 +237,11 @@ func build_main() -> void:
 		var current := enabled_order[i]
 		current.focus_next = current.get_path_to(enabled_order[(i + 1) % enabled_order.size()])
 		current.focus_previous = current.get_path_to(enabled_order[(i - 1 + enabled_order.size()) % enabled_order.size()])
-	new_run.focus_neighbor_bottom = new_run.get_path_to(main_resume if not main_resume.disabled else (load_button if not load_button.disabled else online_button))
-	main_resume.focus_neighbor_top = main_resume.get_path_to(new_run); main_resume.focus_neighbor_right = main_resume.get_path_to(load_button if not load_button.disabled else online_button); main_resume.focus_neighbor_bottom = main_resume.get_path_to(online_button)
-	load_button.focus_neighbor_top = load_button.get_path_to(new_run); load_button.focus_neighbor_left = load_button.get_path_to(main_resume if not main_resume.disabled else new_run); load_button.focus_neighbor_bottom = load_button.get_path_to(seed_button)
-	online_button.focus_neighbor_top = online_button.get_path_to(main_resume if not main_resume.disabled else new_run); online_button.focus_neighbor_right = online_button.get_path_to(seed_button); online_button.focus_neighbor_bottom = online_button.get_path_to(options_button)
-	seed_button.focus_neighbor_top = seed_button.get_path_to(load_button if not load_button.disabled else new_run); seed_button.focus_neighbor_left = seed_button.get_path_to(online_button); seed_button.focus_neighbor_bottom = seed_button.get_path_to(exit_button)
-	options_button.focus_neighbor_top = options_button.get_path_to(online_button); options_button.focus_neighbor_right = options_button.get_path_to(exit_button)
-	exit_button.focus_neighbor_top = exit_button.get_path_to(seed_button); exit_button.focus_neighbor_left = exit_button.get_path_to(options_button)
-	var foot := panel(content, Rect2(39, 604, 340, 96), Color("0d1310"), Color("303b32")); foot.name = "TitleFooter"
-	label(content, Rect2(52, 617, 314, 22), "COOP LOCAL APÓS ESCOLHER PERSONAGEM", 11, Color("89978d"))
-	var status_color := Color("79e5e5") if app.network_status != "OFFLINE" else Color("b9a66c")
-	var status := label(content, Rect2(52, 649, 314, 25), "●  " + app.network_status, 14, status_color); status.name = "TitleNetworkStatus"
-	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	label(content, Rect2(52, 678, 314, 18), "PROTÓTIPO • DOCAS DE 1941", 11, Color("59675e"))
+	new_run.focus_neighbor_right = new_run.get_path_to(main_resume if not main_resume.disabled else online_button); new_run.focus_neighbor_bottom = new_run.get_path_to(online_button)
+	main_resume.focus_neighbor_left = main_resume.get_path_to(new_run); main_resume.focus_neighbor_bottom = main_resume.get_path_to(exit_button)
+	online_button.focus_neighbor_top = online_button.get_path_to(new_run); online_button.focus_neighbor_right = online_button.get_path_to(options_button)
+	options_button.focus_neighbor_top = options_button.get_path_to(new_run); options_button.focus_neighbor_left = options_button.get_path_to(online_button); options_button.focus_neighbor_right = options_button.get_path_to(exit_button)
+	exit_button.focus_neighbor_top = exit_button.get_path_to(main_resume if not main_resume.disabled else new_run); exit_button.focus_neighbor_left = exit_button.get_path_to(options_button)
 
 func overlay(title: String) -> Panel:
 	var dim := ColorRect.new(); dim.color = Color(0.015, 0.025, 0.04, 0.78); dim.size = Vector2(1344, 752); content.add_child(dim)
@@ -283,15 +314,19 @@ func build_pause() -> void:
 			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
 			telemetry.add_theme_color_override("font_color", Color("ffad99")))
 	leave.name = "ReturnToMenu"
-	var mission_inventory := button(p, Rect2(160, 360, 580, 52), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
+	var encyclopedia_button := button(p, Rect2(160, 360, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
+	encyclopedia_button.name = "PauseEncyclopedia"
+	var mission_inventory := button(p, Rect2(160, 416, 580, 48), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
 	mission_inventory.name = "MissionInventory"
 	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
 	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
 	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
 	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
-	leave.focus_neighbor_bottom = leave.get_path_to(mission_inventory); leave.focus_next = leave.get_path_to(mission_inventory)
-	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(leave); mission_inventory.focus_previous = mission_inventory.get_path_to(leave)
-	telemetry = label(p, Rect2(105, 430, 690, 42), "Esc ou Start também continua a partida.", 16, GOLD)
+	leave.focus_neighbor_bottom = leave.get_path_to(encyclopedia_button); leave.focus_next = leave.get_path_to(encyclopedia_button)
+	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
+	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
+	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button); mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
+	telemetry = label(p, Rect2(105, 476, 690, 34), "Esc ou Start também continua a partida.", 15, GOLD)
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -418,6 +453,14 @@ func build_online() -> void:
 	app.status_label = label(content, Rect2(438, 493, 490, 33), "PRONTO • escolha hospedar ou conectar", 17)
 	label(content, Rect2(355, 543, 660, 26), "Conexão direta por IP • internet requer UDP 24871 acessível", 15, GOLD)
 
+func open_encyclopedia(return_screen: String) -> void:
+	encyclopedia_return_screen = return_screen if return_screen in ["main", "options", "pause"] else "main"
+	show_screen("encyclopedia")
+
+func build_encyclopedia() -> void:
+	encyclopedia = EncyclopediaScreen.new(); encyclopedia.host = self
+	content.add_child(encyclopedia); encyclopedia.build()
+
 func build_seed() -> void:
 	var p := overlay("EXPEDIÇÃO DIRETA")
 	label(p, Rect2(30, 87, 640, 44), "A mesma seed reproduz os encontros e atalhos das docas.", 18, Color("c6dccd"))
@@ -451,6 +494,8 @@ func build_options() -> void:
 			volume.value_changed.connect(func(value): app.set_volume(value)); p.add_child(volume)
 		"controls": build_controls_options(p)
 	button(p, Rect2(30, 585, 200, 48), "VOLTAR", func(): app.save_settings(); show_screen("main"))
+	var encyclopedia_button := button(p, Rect2(550, 585, 240, 48), "ARQUIVO DO REFÚGIO", func(): app.save_settings(); open_encyclopedia("options"))
+	encyclopedia_button.name = "EncyclopediaButton"
 
 # 0.18: remapeamento do P1 (teclado/mouse). P2 local e joypad continuam fixos.
 func build_controls_options(p: Control) -> void:
@@ -564,6 +609,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == JOY_BUTTON_B and screen == "pause": close(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "equipment": show_screen("play"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "encyclopedia": show_screen(encyclopedia_return_screen); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "summary": app.summary_return_refuge(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
@@ -573,7 +619,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func focus_first() -> void:
 	# primeiro botão visível da tela recebe o foco (para jogar só com o controle)
-	if screen == "main" and main_resume != null and main_resume.visible and not main_resume.disabled:
+	if screen == "main" and app.playing and main_resume != null and main_resume.visible and not main_resume.disabled:
 		main_resume.grab_focus(); return
 	var stack: Array = [content]
 	while not stack.is_empty():

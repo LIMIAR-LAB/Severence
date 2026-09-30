@@ -1,0 +1,166 @@
+{
+  "versao": 1,
+  "_leia": "Para adicionar conteúdo, inclua um objeto em entradas. Campos obrigatórios: id único, categoria (monstros, itens ou robos), nome e descricao. ordem controla a posição; imagem é opcional; tracos é uma lista opcional de textos curtos.",
+  "entradas": [
+    {
+      "id": "monstro_cultista",
+      "categoria": "monstros",
+      "ordem": 10,
+      "nome": "CULTISTA ABISSAL",
+      "subtitulo": "Atirador das docas",
+      "imagem": "",
+      "descricao": "Um devoto das forças que tomaram as docas. Mantém distância e dispara projéteis instáveis que se dividem durante o voo.",
+      "tracos": ["Ataque à distância", "Projétil divisível", "Comum nas áreas do culto"]
+    },
+    {
+      "id": "monstro_peixeiro",
+      "categoria": "monstros",
+      "ordem": 20,
+      "nome": "ARPOADOR",
+      "subtitulo": "Caçador anfíbio",
+      "imagem": "",
+      "descricao": "Criatura das águas escuras que luta com arpões. Prefere atacar de longe e pode prender Marty por um breve instante.",
+      "tracos": ["Longo alcance", "Arpão imobilizante", "Movimento cadenciado"]
+    },
+    {
+      "id": "monstro_rastejante",
+      "categoria": "monstros",
+      "ordem": 30,
+      "nome": "RASTEJANTE",
+      "subtitulo": "Predador corrosivo",
+      "imagem": "",
+      "descricao": "Avança de forma irregular e contamina o chão com ácido. As crias menores surgem quando um adulto é derrotado.",
+      "tracos": ["Investida curta", "Área de ácido", "Pode gerar crias"]
+    },
+    {
+      "id": "monstro_brutamontes",
+      "categoria": "monstros",
+      "ordem": 40,
+      "nome": "BRUTAMONTES",
+      "subtitulo": "Unidade pesada",
+      "imagem": "",
+      "descricao": "Combatente resistente que usa cobertura e pressiona o campo com ataques pesados. É lento, mas difícil de interromper.",
+      "tracos": ["Alta resistência", "Usa cobertura", "Ataque pesado"]
+    },
+    {
+      "id": "monstro_bombardeiro",
+      "categoria": "monstros",
+      "ordem": 50,
+      "nome": "BOMBARDEIRO",
+      "subtitulo": "Ameaça explosiva",
+      "imagem": "res://assets/enemies/bomber.png",
+      "descricao": "Corre em zigue-zague para encurtar a distância e detona perto do alvo. Pouca resistência compensa uma explosão perigosa.",
+      "tracos": ["Muito veloz", "Baixa vida", "Explode a curta distância"]
+    },
+    {
+      "id": "monstro_guarda",
+      "categoria": "monstros",
+      "ordem": 60,
+      "nome": "GUARDA DAS DOCAS",
+      "subtitulo": "Defensor disciplinado",
+      "imagem": "res://assets/enemies/guard.png",
+      "descricao": "Mantém a guarda fechada contra tiros frontais e responde com rajadas cadenciadas. Fica vulnerável durante a ofensiva.",
+      "tracos": ["Bloqueio frontal", "Rajada de tiros", "Abre a guarda ao atacar"]
+    },
+    {
+      "id": "monstro_vigia",
+      "categoria": "monstros",
+      "ordem": 70,
+      "nome": "VIGIA",
+      "subtitulo": "Minichefe das docas",
+      "imagem": "res://assets/enemies/warden.png",
+      "descricao": "Sentinela enorme que protege as passagens centrais. Alterna pressão direta, disparos e golpes de grande alcance.",
+      "tracos": ["Minichefe", "Grande reserva de vida", "Múltiplos padrões de ataque"]
+    },
+    {
+      "id": "monstro_almirante",
+      "categoria": "monstros",
+      "ordem": 80,
+      "nome": "O ALMIRANTE DAS PROFUNDEZAS",
+      "subtitulo": "Senhor das docas de 1941",
+      "imagem": "res://assets/ui/portraits_v3/almirante.png",
+      "descricao": "A presença que comanda a ocupação abissal. Muda de comportamento conforme perde vida e domina a arena com ataques em sequência.",
+      "tracos": ["Chefe", "Três estágios", "Protege o núcleo temporal"]
+    },
+    {
+      "id": "item_blaster",
+      "categoria": "itens",
+      "ordem": 10,
+      "nome": "BLASTER",
+      "subtitulo": "Arma do uniforme Padrão",
+      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_padrao.png",
+      "descricao": "Arma de energia equilibrada, com boa cadência e precisão. É a ferramenta mais confiável para qualquer expedição.",
+      "tracos": ["16 de dano por tiro", "Cadência média", "Disponível desde o início"]
+    },
+    {
+      "id": "item_escopeta_rebite",
+      "categoria": "itens",
+      "ordem": 20,
+      "nome": "ESCOPETA DE REBITE",
+      "subtitulo": "Arma do uniforme Mecânico",
+      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_mecanico.png",
+      "descricao": "Dispara seis rebites de uma vez. Excelente de perto e acompanhada pela pesada chave inglesa do Mecânico.",
+      "tracos": ["Seis projéteis", "Alto dano próximo", "Conclua 1 expedição"]
+    },
+    {
+      "id": "item_smg",
+      "categoria": "itens",
+      "ordem": 30,
+      "nome": "SUBMETRALHADORA",
+      "subtitulo": "Arma do uniforme Espião",
+      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_espiao.png",
+      "descricao": "Arma leve de disparo muito rápido. Combina com a mobilidade e a aproximação discreta do uniforme Espião.",
+      "tracos": ["Cadência alta", "Dano leve por tiro", "Conclua 2 expedições"]
+    },
+    {
+      "id": "item_lamina_omega",
+      "categoria": "itens",
+      "ordem": 40,
+      "nome": "LÂMINA ÔMEGA",
+      "subtitulo": "Arma lendária temporária",
+      "imagem": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
+      "descricao": "Manifestada pela Armadura Ômega, executa um combo de três cortes. O golpe final lança uma onda que atravessa inimigos.",
+      "tracos": ["Combo de três golpes", "Reflete projéteis", "Exige Armadura Ômega ativa"]
+    },
+    {
+      "id": "item_bazuca",
+      "categoria": "itens",
+      "ordem": 50,
+      "nome": "BAZUCA",
+      "subtitulo": "Arma de missão",
+      "imagem": "res://assets/weapons/bazooka.png",
+      "descricao": "Lança foguetes de munição limitada encontrados durante a expedição. A explosão atinge alvos próximos do impacto.",
+      "tracos": ["48 de dano direto", "Dano em área", "Munição limitada"]
+    },
+    {
+      "id": "item_fragmento",
+      "categoria": "itens",
+      "ordem": 60,
+      "nome": "FRAGMENTO CRONAL",
+      "subtitulo": "Recurso temporal",
+      "imagem": "",
+      "descricao": "Matéria instável recuperada das fraturas. É preservada entre expedições para futuras melhorias no Refúgio.",
+      "tracos": ["Recurso persistente", "Origem temporal", "Uso futuro na oficina"]
+    },
+    {
+      "id": "robo_titan",
+      "categoria": "robos",
+      "ordem": 10,
+      "nome": "TITAN",
+      "subtitulo": "Robô pilotável de combate",
+      "imagem": "res://assets/ui/portraits_v3/titan.png",
+      "descricao": "Plataforma pesada que pode ser invocada e pilotada. Seu canhão, bombas e turbo consomem uma reserva limitada de combustível.",
+      "tracos": ["Canhão com dano em área", "Bomba em arco", "Turbo e 6 corações extras"]
+    },
+    {
+      "id": "robo_spectre",
+      "categoria": "robos",
+      "ordem": 20,
+      "nome": "SPECTRE",
+      "subtitulo": "Companheiro simbionte",
+      "imagem": "res://assets/ui/portraits_v3/spectre.png",
+      "descricao": "Predador mecânico que acompanha Marty e dispara sozinho. Pode se fundir ao piloto para absorver golpes e ampliar sua mobilidade e poder de fogo.",
+      "tracos": ["Companheiro autônomo", "Fusão com Marty", "Energia absorve dano"]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ Ao ativar, dá **3 corações temporários de escudo**, que aparecem em ciano no
 - **Aberto:** lanternas âmbar, luz dourada e setas animadas no chão apontando a saída.
 - **Fechado:** lanternas vermelhas piscando, grade de ferro descida e brilho vermelho.
 - Ao entrar numa sala com inimigos, **todos os portões dela fecham** até o último inimigo daquela sala cair. O HUD avisa "PORTÕES FECHADOS" e depois "SALA LIMPA". Um parceiro que ficou no corredor é puxado para dentro.
+- Cada sala da expedição usa apenas sua população inicial. Ao derrotar a última ameaça, os portões abrem imediatamente e a sala não repopula; os inimigos das salas seguintes permanecem aguardando o jogador.
 - Portões fechados bloqueiam movimento, salto e tiros. Inimigos do desafio opcional não trancam a sala.
 - Código: `build_doors`, `step_gates` (`scripts/simulation.gd`) e `draw_gate` (`scripts/dock_scenery.gd`).
 

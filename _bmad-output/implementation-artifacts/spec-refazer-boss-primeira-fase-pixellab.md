@@ -2,7 +2,7 @@
 title: 'Remake the first-stage boss with PixelLab'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-progress'
+status: 'done'
 baseline_commit: '1b938c74108d518d569049316856852211df8201'
 context:
   - '{project-root}/docs/SPRITES_0_6.md'
@@ -46,10 +46,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `art/source/pixellab/almirante/` -- create and retain the canonical PixelLab boss output plus pose candidates and a concise generation record -- preserves provenance and enables later refinement.
-- [ ] `assets/boss/almirante_*.png` -- normalize and replace all seven runtime poses with the coherent PixelLab set -- keeps the existing loading/state contract intact.
-- [ ] `assets/boss/almirante_*.png` -- verify transparency, dimensions, pixel-grid sharpness, stable waterline/foot anchor, pose readability, and visual consistency -- prevents jitter and broken combat presentation.
-- [ ] `test-output/` -- capture the boss at representative health/states using the existing game capture flow -- validates the assets in the real arena rather than only in isolation.
+- [x] `art/source/pixellab/almirante/` -- create and retain the canonical PixelLab boss output plus pose candidates and a concise generation record -- preserves provenance and enables later refinement.
+- [x] `assets/boss/almirante_*.png` -- normalize and replace all seven runtime poses with the coherent PixelLab set -- keeps the existing loading/state contract intact.
+- [x] `assets/boss/almirante_*.png` -- verify transparency, dimensions, pixel-grid sharpness, stable waterline/foot anchor, pose readability, and visual consistency -- prevents jitter and broken combat presentation.
+- [x] `test-output/` -- capture the boss at representative health/states using the existing game capture flow -- validates the assets in the real arena rather than only in isolation.
 
 **Acceptance Criteria:**
 - Given the boss is above 66% HP, when idle and firing, then the new `idle` and `ring` poses clearly depict the same Almirante and align to the same world anchor.
@@ -70,4 +70,30 @@ The canonical design should favor a compact, centered 256px-class canvas and a s
 - `godot --path . -- --capture-boss --boss-hp=0.8` -- expected: stage-one arena capture shows the new boss, aligned and unobstructed.
 - `godot --path . -- --capture-boss --boss-hp=0.2` -- expected: fury-state capture loads and remains readable in combat.
 - `git status --short -- assets/boss art/source/pixellab/almirante _bmad-output/implementation-artifacts/spec-refazer-boss-primeira-fase-pixellab.md` -- expected: only scoped boss/source/spec files appear.
+
+## Suggested Review Order
+
+**Direção visual**
+
+- Comece pelo conjunto completo para validar identidade, escala e leitura das sete poses.
+  [`preview.png:1`](../../art/source/pixellab/almirante/preview.png#L1)
+
+- Confira a proveniência PixelLab e as decisões de aceitação da espiral.
+  [`README.md:5`](../../art/source/pixellab/almirante/README.md#L5)
+
+**Integração em jogo**
+
+- Revise primeiro a pose rotativa, corrigida para manter escala e área segura.
+  [`almirante_spiral.png:1`](../../assets/boss/almirante_spiral.png#L1)
+
+- Compare com a pose canônica que define identidade e massa visual.
+  [`almirante_idle.png:1`](../../assets/boss/almirante_idle.png#L1)
+
+- Verifique o contrato dimensional, a âncora e a folga do HUD.
+  [`README.md:19`](../../art/source/pixellab/almirante/README.md#L19)
+
+**Evidência**
+
+- Veja a espiral final renderizada na arena, sem recorte ou salto de escala.
+  [`boss-pixellab-stage2-final.png:1`](../../test-output/boss-pixellab-stage2-final.png#L1)
 

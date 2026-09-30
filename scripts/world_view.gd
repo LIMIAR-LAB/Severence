@@ -95,7 +95,7 @@ func _ready() -> void:
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
 	cobble_texture = load("res://assets/environment/cobble.png")
 	enemy_anim = load("res://assets/enemies/docas_anim.png")
-	for key in ["pistol", "shotgun", "smg", "omega", "omega_sword", "knife", "wrench", "sword_smear", "flash", "flash_cyan"]:
+	for key in ["pistol", "shotgun", "smg", "bazooka", "omega", "omega_sword", "knife", "wrench", "sword_smear", "flash", "flash_cyan"]:
 		weapon_art[key] = load("res://assets/weapons/" + key + ".png")
 	for key in ["pistol", "smg", "pellet", "omega", "wave"]:
 		projectile_art["p_" + key] = load("res://assets/weapons/b_" + key + ".png")
@@ -292,6 +292,14 @@ func draw_entities() -> void:
 		if pickup.kind == "key":
 			draw_circle(p - Vector2(0, 10), 16, Color(1, 0.85, 0.4, 0.15))
 			draw_texture_rect(docks_art.key, Rect2(p - Vector2(12, 26), Vector2(24, 27)), false)
+		elif pickup.kind == "weapon":
+			draw_circle(p - Vector2(0, 13), 34, Color(0.35, 0.9, 1, 0.15))
+			draw_texture_rect(weapon_art.bazooka, Rect2(p - Vector2(32, 30), Vector2(64, 28)), false)
+		elif pickup.kind == "ammo":
+			draw_circle(p - Vector2(0, 9), 17, Color(1, 0.65, 0.3, 0.18))
+			draw_rect(Rect2(p - Vector2(7, 22), Vector2(14, 17)), Color("36443c"))
+			draw_rect(Rect2(p - Vector2(5, 20), Vector2(10, 8)), Color("c49553"))
+			draw_rect(Rect2(p - Vector2(3, 11), Vector2(6, 4)), Color("4be4f0"))
 		elif pickup.kind == "fuel":
 			# Galão de gasolina (0.14): corpo vermelho com alça escura
 			draw_circle(p - Vector2(0, 10), 17, Color(1, 0.5, 0.25, 0.15))
@@ -360,6 +368,12 @@ func draw_entities() -> void:
 			draw_circle(bullet_pos, b.r * 1.15 + 6, Color(1, 0.6, 0.2, 0.25)); draw_circle(bullet_pos, b.r * 1.15, Color("2a2a30")); draw_circle(bullet_pos - Vector2(3, 3), b.r * 0.45, Color("ffcf7a"))
 			draw_line(bullet_pos, bullet_pos - b.v.normalized() * 34, Color(0.7, 0.7, 0.75, 0.35), b.r)
 			scenery.lights.append({"p": b.p, "kind": "bulb"}); continue
+		if kind == "p_rocket":
+			var tail: Vector2 = b.v.normalized()
+			draw_line(bullet_pos - tail * 29, bullet_pos - tail * 7, Color("ff883e"), 9)
+			draw_line(bullet_pos - tail * 21, bullet_pos - tail * 7, Color("ffe5a1"), 4)
+			draw_circle(bullet_pos, 10, Color("222b29")); draw_circle(bullet_pos + tail * 3, 5, Color("74dce5"))
+			continue
 		var visual_radius: float = b.get("visual_r",b.r) * 1.15
 		if b.get("arc", false):
 			draw_arc(b.to, 62, 0, TAU, 36, Color("ffe281"), 3)
@@ -639,7 +653,9 @@ func draw_actor(a: Dictionary) -> void:
 		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else (a.move if padrao_action == "run" else a.facing)
 		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
 		draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
-		if padrao_action != "evade": draw_weapon(a, draw_pos + Vector2(0, bob))
+		# A arma entra em cena apenas no disparo. O golpe corpo a corpo usa a
+		# animacao desarmada, e as demais poses preservam a silhueta do personagem.
+		if marty_padrao_shows_weapon(padrao_action, transforming): draw_weapon(a, draw_pos + Vector2(0, bob))
 	elif a.dodge > 0 and not a.mech:
 		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
 	else:
@@ -774,6 +790,14 @@ func draw_warden(e: Dictionary) -> void:
 	text_at(p + Vector2(-72, -293), "CÃO DE GUERRA", Color("ffb451"), 15)
 
 func weapon_hand_anchor(a: Dictionary) -> Vector2:
+	if sim.outfit_of(a) == "padrao":
+		# O novo atlas tem oito direcoes e corpo mais alto que o legado.
+		# A ancora segue a mira para manter a empunhadura junto da mao no disparo.
+		var padrao_anchors := [
+			Vector2(10, -35), Vector2(15, -36), Vector2(17, -35), Vector2(14, -38),
+			Vector2(7, -40), Vector2(-14, -38), Vector2(-17, -35), Vector2(-15, -36),
+		]
+		return padrao_anchors[marty_direction_row(a.get("aim", a.facing))]
 	# 0.17: acompanha a mão visível de cada vista, em vez de orbitar o centro do corpo.
 	var pose := marty_pose(a.facing)
 	var anchors := [Vector2(20, -27), Vector2(21, -28), Vector2(18, -26), Vector2(18, -26), Vector2(20, -25)]
@@ -807,9 +831,9 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 		draw_blade(a, base, tool, 0.45, false); return
 	var tex: Texture2D = weapon_art[weapon]
 	var k: float = clampf(a.get("fire_flash", 0.0) / 0.09, 0, 1)
-	var kick_back: float = k * {"pistol": 4.0, "shotgun": 8.0, "smg": 3.0, "omega": 6.0}[weapon]
+	var kick_back: float = k * {"pistol": 4.0, "shotgun": 8.0, "smg": 3.0, "bazooka": 10.0, "omega": 6.0}[weapon]
 	var mirrored: bool = aim.x < 0
-	var lift: float = k * {"pistol": 0.25, "shotgun": 0.45, "smg": 0.12, "omega": 0.3}[weapon]
+	var lift: float = k * {"pistol": 0.25, "shotgun": 0.45, "smg": 0.12, "bazooka": 0.5, "omega": 0.3}[weapon]
 	var angle: float = aim.angle() + (lift if mirrored else -lift)
 	var wrist := base + weapon_hand_anchor(a)
 	var grip: Vector2 = wrist
@@ -817,7 +841,7 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	if weapon == "omega":
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 9)
 		draw_circle(grip + aim * 18, 9 + pulse * 3, Color(0.35, 0.9, 1, 0.12 + pulse * 0.08))
-	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15)}.get(weapon, Vector2(8, size.y * 0.5))
+	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15), "bazooka": Vector2(32, 25)}.get(weapon, Vector2(8, size.y * 0.5))
 	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, -handle)
 	visual_transform(Vector2.ZERO)
@@ -827,7 +851,7 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	var muzzle: Vector2 = grip + Vector2(size.x - 2 - handle.x, (size.y * 0.5 - handle.y) * (-1 if mirrored else 1)).rotated(angle)
 	var cyan: bool = weapon in ["pistol", "omega"]
 	var fx: Texture2D = weapon_art.flash_cyan if cyan else weapon_art.flash
-	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "omega": 2.2}[weapon]
+	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "bazooka": 2.2, "omega": 2.2}[weapon]
 	if k > 0.55:
 		visual_transform(muzzle + dir * 6 * big, angle, Vector2(1.6, 1.0) * big)
 		draw_texture(fx, -fx.get_size() * 0.5)
@@ -934,6 +958,11 @@ func marty_padrao_action(a: Dictionary, walking: bool, firing: bool) -> String:
 	if walking: return "run"
 	return "idle"
 
+func marty_padrao_shows_weapon(action: String, transforming: float = 0.0) -> bool:
+	# Durante a transformação, o visual pisca entre Padrão e Ômega; ocultar a
+	# camada evita misturar o corpo de uma roupa com a arma da outra.
+	return action == "shoot" and transforming <= 0.0
+
 func marty_padrao_frame(a: Dictionary, action: String, slash_dur: float) -> int:
 	var count: int = MARTY_PADRAO_FRAMES[action]
 	match action:
@@ -949,6 +978,23 @@ func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foo
 	var texture: Texture2D = marty_padrao_actions[action]
 	var row := marty_direction_row(direction)
 	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
+
+func draw_guard_shield_icon(p: Vector2, broken: bool) -> void:
+	# 0.20: estado do escudo sem texto, legível mesmo com vários inimigos na sala.
+	visual_transform(p)
+	draw_circle(Vector2.ZERO, 16, Color("101b25"))
+	if broken:
+		var edge := Color("ffd092")
+		draw_colored_polygon(PackedVector2Array([Vector2(-10, -10), Vector2(-2, -12), Vector2(-3, -3), Vector2(0, 1), Vector2(-2, 10), Vector2(-8, 5)]), Color("a7553e"))
+		draw_colored_polygon(PackedVector2Array([Vector2(2, -12), Vector2(10, -10), Vector2(8, 5), Vector2(3, 10), Vector2(1, 3), Vector2(4, -2)]), Color("df7c4a"))
+		draw_polyline(PackedVector2Array([Vector2(-10, -10), Vector2(-2, -12), Vector2(-3, -3), Vector2(0, 1), Vector2(-2, 10), Vector2(-8, 5), Vector2(-10, -10)]), edge, 2)
+		draw_polyline(PackedVector2Array([Vector2(2, -12), Vector2(10, -10), Vector2(8, 5), Vector2(3, 10), Vector2(1, 3), Vector2(4, -2), Vector2(2, -12)]), edge, 2)
+	else:
+		var outline := PackedVector2Array([Vector2(0, -12), Vector2(10, -9), Vector2(9, 4), Vector2(0, 11), Vector2(-9, 4), Vector2(-10, -9), Vector2(0, -12)])
+		draw_colored_polygon(outline, Color("348b9b"))
+		draw_polyline(outline, Color("b8f6fa"), 2)
+		draw_line(Vector2(0, -8), Vector2(0, 6), Color("d5ffff"), 2)
+	visual_transform(Vector2.ZERO)
 
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p
@@ -992,9 +1038,7 @@ func draw_enemy(e: Dictionary) -> void:
 	else:
 		draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(column * 144, ENEMY_ROW[e.kind] * 96, 144, 96), tint)
 	visual_transform(Vector2.ZERO)
-	if e.kind == "guard" and e.combat == "attack":
-		draw_arc(p, 34, 0, TAU, 24, Color("ffad61"), 2)
-		text_at(p + Vector2(-28, -94), "ABERTO", Color("ffcb81"), 11)
+	if e.kind == "guard": draw_guard_shield_icon(p + Vector2(0, -101), e.combat == "attack")
 	if e.hp < e.max:
 		var w := 30.0 * scale
 		draw_rect(Rect2(p + Vector2(-w * 0.5, 6), Vector2(w, 3)), Color("1c1522"))

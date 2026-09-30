@@ -40,8 +40,8 @@ func run() -> void:
 	app.queue_free(); await process_frame; await process_frame
 	var loaded = load("res://scenes/main.tscn").instantiate(); root.add_child(loaded)
 	await process_frame
-	var load_button: Button = loaded.menu.content.find_child("Title_4", true, false)
-	check(not load_button.disabled, "Carregar Jogo habilitado após salvar")
+	var load_button: Button = loaded.menu.content.find_child("Title_0", true, false)
+	check(not load_button.disabled, "Continuar habilitado após salvar")
 	load_button.pressed.emit()
 	check(loaded.playing and not loaded.menu.visible and loaded.sim.mode == "run", "retoma dentro das docas")
 	check(loaded.sim.coop == "local" and loaded.sim.actors[1].active, "coop local preservado")

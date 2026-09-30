@@ -23,7 +23,7 @@ func _ready() -> void:
 	art["boss"] = load("res://assets/boss/almirante_idle.png")
 	# 0.16: ícones do mapa (tools/prepare_map_icons.py) — 48x48, mostrados em 1/2 (24) no mapa e 1/3 (16) no minimapa
 	for key in ["boss", "shop", "challenge", "chest", "locked", "exit"]: art["map_" + key] = load("res://assets/ui/map_icons/map_icon_" + key + ".png")
-	for key in ["pistol", "shotgun", "smg", "omega_sword"]:
+	for key in ["pistol", "shotgun", "smg", "bazooka", "omega_sword"]:
 		art["w_" + key] = load("res://assets/weapons/" + key + ".png")
 
 func _process(_dt: float) -> void:
@@ -88,8 +88,8 @@ func _draw() -> void:
 	var wtex: Texture2D = art["w_" + weapon]
 	var wsize: Vector2 = wtex.get_size() * minf(2.0, 80.0 / wtex.get_size().x)
 	draw_texture_rect(wtex, Rect2(Vector2(345, 44) - wsize * 0.5, wsize), false)
-	text(Vector2(380,48), "∞", 26, GOLD)
-	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else str(a.weapon_override).to_upper() if a.has("weapon_override") else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
+	text(Vector2(380,48), str(a.get("run_weapons", {}).get(weapon, 0)) if weapon == "bazooka" else "∞", 26, GOLD)
+	text(Vector2(311,82), "CANHÃO PESADO" if a.mech else ("LÂMINA ÔMEGA" if a.armor else "BAZUCA • Q TROCA" if weapon == "bazooka" else s.uniform_of(a).weapon_name), 12, CYAN if a.armor else Color("e8dfba"))
 	if s.coop != "solo":
 		var partner: Dictionary = s.actors[1-id]
 		frame(Rect2(466,14,181,54)); text(Vector2(478,36), "PARCEIRO IA" if s.coop == "ai" else "PARCEIRO P2", 13, CYAN)

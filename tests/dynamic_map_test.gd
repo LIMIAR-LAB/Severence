@@ -1,6 +1,6 @@
 extends SceneTree
 
-# 0.13: mapa grande e dinâmico — props destrutíveis, barris explosivos em cadeia, reforços por sala e salto no canal.
+# Mapa grande e dinâmico — props destrutíveis, barris explosivos em cadeia, encontros por sala e salto no canal.
 const DOCKS := preload("res://scripts/docks_map.gd")
 var failures := 0
 func check(ok: bool, label: String) -> void:
@@ -44,17 +44,38 @@ func _init() -> void:
 	check(s.obstacle_kinds.count("barrel_explosive") <= barrels_before - 2, "reação em cadeia: barris vizinhos também explodem")
 	check(s.effects.any(func(fx): return fx.kind == "explosion") or true, "efeito de explosão")
 
-	# reforços: sala trancada solta a 2ª leva antes de abrir
+	# Cada sala tem uma população inicial: ao derrotá-la, abre e não repopula.
 	s.start_run(1941)
 	var room: Dictionary = s.room_by_id("cranes")
+	var next_room: Dictionary = s.room_by_id("market")
+	var next_room_enemies: int = s.room_threats("market")
+	check(next_room_enemies > 0, "sala seguinte conserva sua população inicial")
 	s.actors[0].p = room.r.get_center() + Vector2(0, 120); s.step(0.016, [{}, {}])
 	check(room.get("locked", false), "entrar no Pátio tranca os portões")
 	s.enemies = s.enemies.filter(func(en): return en.room != "cranes")
-	for k in 90: s.step(0.016, [{}, {}])
-	check(room.locked and s.enemies.any(func(en): return en.room == "cranes"), "reforços surgem com a sala ainda trancada")
-	s.enemies = s.enemies.filter(func(en): return en.room != "cranes")
 	s.step(0.016, [{}, {}])
-	check(not room.locked and room.cleared, "sem mais levas: portões abrem")
+	check(not room.locked and room.cleared, "eliminar a população atual abre a sala imediatamente")
+	for k in 90: s.step(0.016, [{}, {}])
+	check(s.room_threats("cranes") == 0 and not room.locked and room.cleared, "sala limpa não repopula após o antigo atraso")
+	check(s.room_threats("market") == next_room_enemies, "limpar uma sala não remove inimigos das áreas seguintes")
+	s.actors[0].p = next_room.r.get_center()
+	s.step(0.016, [{}, {}])
+	check(next_room.locked and s.room_threats("market") == next_room_enemies, "entrar na sala seguinte ativa seu encontro normalmente")
+
+	# Morte real do crawler: os filhos nascem antes da checagem dos portões e mantêm a sala trancada.
+	s.start_run(1941)
+	room = s.room_by_id("cranes")
+	var crawler: Dictionary = s.enemies.filter(func(en): return en.room == "cranes" and en.kind == "crawler")[0]
+	s.enemies = s.enemies.filter(func(en): return en.room != "cranes" or en.id == crawler.id)
+	s.actors[0].p = room.r.get_center() + Vector2(0, 120); s.step(0.016, [{}, {}])
+	check(room.locked and s.room_threats("cranes") == 1, "crawler sozinho mantém a sala trancada")
+	crawler.hp = 0; s.step(0.016, [{}, {}])
+	var children: Array = s.enemies.filter(func(en): return en.room == "cranes" and en.kind == "crawler_small")
+	check(children.size() == 2 and room.locked, "filhos do crawler surgem antes de os portões abrirem")
+	check(children.all(func(en): return en.room == "cranes"), "filhos do crawler preservam a sala de origem")
+	for child in children: child.hp = 0
+	s.step(0.016, [{}, {}])
+	check(s.room_threats("cranes") == 0 and not room.locked and room.cleared, "portões abrem depois que os filhos morrem")
 
 	# salto no canal do Armazém: quem cai na água volta para a borda
 	s.start_run(1941)
