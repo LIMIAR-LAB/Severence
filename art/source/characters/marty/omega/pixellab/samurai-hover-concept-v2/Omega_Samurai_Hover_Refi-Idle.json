@@ -1,0 +1,45 @@
+{
+  "character": {
+    "id": "d68a139b-c5c1-4af5-8f14-9abdba20cad9",
+    "name": "Idle",
+    "prompt": "Eight rotations of this exact refined elite Omega samurai armor sprite. Preserve the small angular enclosed helmet, cyan T visor and heart core, ivory white and antique-gold plated chest/arms/thighs, dark joints, short hip-length purple cape, readable athletic armored proportions. Hovering boots with small cyan thruster glints, no walking stride. Arms held high and ready to control one separate sword, empty hands. Transparent background; no sword, energy blade, arc, trail, environment or text. Match source south frame exactly and keep consistent body scale, cape length, and armor construction from all directions.",
+    "size": {
+      "width": 96,
+      "height": 96
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Omega_Samurai_Hover_Refi-Idle.png",
+    "cell_size": {
+      "width": 96,
+      "height": 96
+    },
+    "sheet_size": {
+      "width": 768,
+      "height": 96
+    },
+    "columns": 8,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-09-30T13:07:36.041847+00:00"
+}

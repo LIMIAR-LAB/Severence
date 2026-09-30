@@ -80,6 +80,15 @@ func run() -> void:
 	for row in range(directions.size()):
 		a.aim = directions[row]
 		check(view.weapon_hand_anchor(a) == omega_anchors[row], "ancora da espada Omega %d" % row)
+	check(view.marty_omega_action(a, true) == "idle", "Omega se desloca flutuando sem passos")
+	for frame in range(6):
+		check(view.omega_sword_should_draw("melee", frame) == (frame >= 3), "Omega desembainha somente na fase de corte %d" % frame)
+	check(not view.omega_sword_should_draw("idle", 3), "Omega guarda a espada em repouso")
+	for row in range(directions.size()):
+		check(view.omega_sword_behind_body(directions[row]) == (row in [3, 4, 5]), "Omega oculta o punho atras do corpo na direcao %d" % row)
+	a.facing = Vector2.DOWN
+	a.slash = 0.08
+	check(absf(view.omega_samurai_swing_angle(a, 0.32)) < 0.65, "corte frontal nao aponta a lamina para a cintura")
 	a.armor = false
 	var start: Vector2 = a.p
 	sim.step(0.016,[{"move":Vector2(1,1),"aim":Vector2.RIGHT,"dodge":true},{}])

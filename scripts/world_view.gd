@@ -735,9 +735,16 @@ func draw_actor(a: Dictionary) -> void:
 		var omega_action := marty_omega_action(a, walking)
 		var omega_direction: Vector2 = a.dash_dir if omega_action == "evade" else (a.move if omega_action == "run" else a.facing)
 		var omega_frame := marty_omega_frame(a, omega_action, slash_dur)
-		draw_marty_omega_frame(omega_action, omega_direction, omega_frame, draw_pos + Vector2(0, bob), tint)
-		# A espada materializa apenas durante o combo; repouso e movimento ficam livres.
-		if omega_action == "melee": draw_weapon(a, draw_pos)
+		if walking and omega_action == "idle":
+			bob = -7.0 + sin(sim.tick_time * 7.0 + a.id) * 2.0
+		var omega_pos := draw_pos + Vector2(0, bob)
+		var sword_visible := omega_sword_should_draw(omega_action, omega_frame)
+		var sword_anchor := omega_melee_hand_anchor(omega_direction, omega_frame) if sword_visible else Vector2.ZERO
+		if sword_visible and omega_sword_behind_body(omega_direction):
+			draw_weapon(a, omega_pos, Vector2.ZERO, sword_anchor)
+		draw_marty_omega_frame(omega_action, omega_direction, omega_frame, omega_pos, tint)
+		if sword_visible and not omega_sword_behind_body(omega_direction):
+			draw_weapon(a, omega_pos, Vector2.ZERO, sword_anchor)
 	elif a.get("roll_visual", a.dodge) > 0 and not a.mech:
 		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
 	else:
@@ -900,12 +907,12 @@ func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	draw_texture_rect_region(marty_anim, Rect2(-4, -4, 8, 8), Rect2(patch.position + Vector2(0, row * 96), patch.size))
 	visual_transform(Vector2.ZERO)
 
-func draw_weapon(a: Dictionary, base: Vector2, body_direction: Vector2 = Vector2.ZERO) -> void:
+func draw_weapon(a: Dictionary, base: Vector2, body_direction: Vector2 = Vector2.ZERO, hand_override: Variant = null) -> void:
 	# Arma e cano compartilham a mira (360°) e o espelhamento com a simulação,
 	# e o clarão passa por 3 estágios (estrela → brilho → fumaça).
 	var weapon: String = sim.weapon_of(a)
 	var aim: Vector2 = a.aim.normalized()
-	if weapon == "omega_sword": draw_blade(a, base, weapon_art.omega_sword, 0.32, true); return
+	if weapon == "omega_sword": draw_blade(a, base, weapon_art.omega_sword, 0.32, true, hand_override); return
 	if a.slash > 0:
 		# golpe corpo a corpo do uniforme: chave inglesa (Mecânico), faca (Espião) ou coronhada (Padrão)
 		var tool: Texture2D = {"mecanico": weapon_art.wrench, "espiao": weapon_art.knife}.get(a.outfit, weapon_art[weapon])
@@ -951,13 +958,25 @@ func swing_angle(a: Dictionary, duration: float) -> float:
 	if aim.x < 0: dir = -dir
 	return aim.angle() + dir * lerpf(-width, width, e)
 
-func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, energy: bool) -> void:
+func omega_samurai_swing_angle(a: Dictionary, duration: float) -> float:
+	# O corte varre a partir da guarda alta e evita apontar para a cintura.
+	var row := marty_direction_row(a.facing)
+	var base: float = [0.0, 0.1, 0.0, -0.75, -PI * 0.5, -PI + 0.75, PI, PI - 0.1][row]
+	var progress := clampf(1.0 - a.slash / duration, 0.0, 1.0)
+	var strike := clampf((progress - 0.5) * 2.0, 0.0, 1.0)
+	var eased := strike * strike * (3.0 - 2.0 * strike)
+	if a.get("swing", 0) == 1: eased = 1.0 - eased
+	return base + lerpf(-0.55, 0.55, eased)
+
+func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, energy: bool, hand_override: Variant = null) -> void:
 	var aim: Vector2 = a.aim.normalized()
 	var mirrored: bool = aim.x < 0
 	var angle: float
-	if a.slash > 0: angle = swing_angle(a, duration)
+	if a.slash > 0: angle = omega_samurai_swing_angle(a, duration) if energy else swing_angle(a, duration)
 	else: angle = aim.angle() + (-1.0 if mirrored else 1.0) * 1.05  # em guarda, lâmina baixa à frente
-	var wrist := base + weapon_hand_anchor(a)
+	var hand_anchor := weapon_hand_anchor(a)
+	if hand_override != null: hand_anchor = hand_override
+	var wrist := base + hand_anchor
 	var grip: Vector2 = wrist
 	var size := tex.get_size()
 	if energy:
@@ -968,6 +987,27 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 	draw_texture(tex, Vector2(-6, -size.y * 0.5))
 	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
+
+func omega_melee_hand_anchor(direction: Vector2, frame: int) -> Vector2:
+	# Pivô da mão nas seis poses de cada direção da folha PixelLab atual.
+	var anchors := [
+		[Vector2(8,-46), Vector2(8,-46), Vector2(8,-46), Vector2(8,-46), Vector2(8,-46), Vector2(8,-46)],
+		[Vector2(12,-46), Vector2(12,-46), Vector2(12,-46), Vector2(12,-46), Vector2(12,-46), Vector2(12,-46)],
+		[Vector2(17,-44), Vector2(17,-44), Vector2(19,-46), Vector2(20,-44), Vector2(20,-44), Vector2(20,-44)],
+		[Vector2(17,-46), Vector2(14,-47), Vector2(14,-47), Vector2(16,-47), Vector2(17,-47), Vector2(14,-47)],
+		[Vector2(10,-49), Vector2(10,-49), Vector2(10,-49), Vector2(10,-49), Vector2(10,-49), Vector2(10,-49)],
+		[Vector2(-18,-47), Vector2(-17,-47), Vector2(-18,-47), Vector2(-18,-47), Vector2(-18,-47), Vector2(-16,-47)],
+		[Vector2(-16,-47), Vector2(-16,-44), Vector2(-18,-44), Vector2(-19,-44), Vector2(-17,-44), Vector2(-13,-46)],
+		[Vector2(-12,-46), Vector2(-12,-46), Vector2(-12,-46), Vector2(-12,-46), Vector2(-12,-46), Vector2(-12,-46)],
+	]
+	return anchors[marty_direction_row(direction)][clampi(frame, 0, 5)]
+
+func omega_sword_behind_body(direction: Vector2) -> bool:
+	return marty_direction_row(direction) in [3, 4, 5]
+
+func omega_sword_should_draw(action: String, frame: int) -> bool:
+	# O início prepara o golpe; a lâmina aparece apenas na fase do corte.
+	return action == "melee" and frame >= 3
 
 func draw_chest(chest: Dictionary) -> void:
 	if chest.get("reward",false):
@@ -1087,7 +1127,7 @@ func marty_omega_action(a: Dictionary, walking: bool) -> String:
 	if a.slash > 0 and not a.mech: return "melee"
 	if a.jump > 0: return "jump"
 	if a.hurt > 0: return "hurt"
-	if walking: return "run"
+	if walking: return "idle"
 	return "idle"
 
 func marty_omega_frame(a: Dictionary, action: String, slash_dur: float) -> int:
