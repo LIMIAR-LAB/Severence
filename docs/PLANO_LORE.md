@@ -1,4 +1,4 @@
-# PLANO DE CONCLUSÃO — "Marty: Fraturas do Tempo" (baseado na lore)
+# PLANO DE CONCLUSÃO — "Severence — Ecos do Tempo" (baseado na lore)
 
 > Revisão do estado atual + passos para concluir o jogo conforme `docs/LORE.md`.
 > Compatível com `docs/ARQUITETURA_ROGUELIKE.md` e `_bmad-output/planning-artifacts/epics.md`

@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo - Development Guide
+# Severence — Ecos do Tempo - Development Guide
 
 **Date:** 2026-09-25
 

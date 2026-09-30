@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo - Component & State Management Inventory
+# Severence — Ecos do Tempo - Component & State Management Inventory
 
 **Date:** 2026-09-25
 

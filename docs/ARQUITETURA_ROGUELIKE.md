@@ -1,4 +1,4 @@
-# Arquitetura Roguelike — "Marty: Fraturas do Tempo"
+# Arquitetura Roguelike — "Severence — Ecos do Tempo"
 
 > **Documento canônico de decisões de arquitetura.** Fonte: sessão Cloud Dragonborn
 > (Game Architect) + Tsmar. Todas as IAs que trabalharem neste projeto (Claude, GPT,

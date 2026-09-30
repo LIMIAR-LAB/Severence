@@ -511,7 +511,7 @@ func update_hud() -> void:
 	hud.text = hud.text.replace(network_status, robot_status)
 	banner.text = sim.message if sim.message_time > 0 else ("OPCIONAL • %.0fs • elimine os guardiões" % sim.side_time if sim.side_active else "")
 	if paused: banner.text = "PAUSADO • Esc / Options / Start para continuar"
-	if not playing: hud.text = "MARTY — FRATURAS DO TEMPO     /     PRIMEIRA VERSÃO JOGÁVEL\n2 estados de armadura • IA / coop local / conexão online direta"
+	if not playing: hud.text = "SEVERENCE — ECOS DO TEMPO     /     PRIMEIRA VERSÃO JOGÁVEL\n2 estados de armadura • IA / coop local / conexão online direta"
 
 func apply_preferences(id: int) -> void:
 	# 0.17: só o que estiver desbloqueado; sem robô liberado, o ator fica sem robô

@@ -6,12 +6,12 @@ inputDocuments:
   - _bmad-output/implementation-artifacts/ (specs existentes como contexto)
 ---
 
-# Jogo Steam (Marty — Fraturas do Tempo) - Epic Breakdown
+# Severence — Ecos do Tempo - Epic Breakdown
 
 ## Overview
 
 This document provides the complete epic and story breakdown for transforming
-"Marty — Fraturas do Tempo" into a roguelike, decomposing the decisions sealed in
+"Severence — Ecos do Tempo" into a roguelike, decomposing the decisions sealed in
 `docs/ARQUITETURA_ROGUELIKE.md` into implementable stories. There is no formal GDD
 for this phase — the architecture document is the canonical requirements source.
 

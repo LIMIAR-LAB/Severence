@@ -1,7 +1,7 @@
 # Padrão de sprites dos personagens
 
 Este documento define o contrato para criar e integrar a arte dos personagens de
-**Marty — Fraturas do Tempo**. Ele vale para toda arte nova e orienta a migração
+**Severence — Ecos do Tempo**. Ele vale para toda arte nova e orienta a migração
 gradual dos atlas antigos.
 
 ## Decisão principal

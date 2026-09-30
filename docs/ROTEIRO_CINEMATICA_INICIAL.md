@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo: cinemática inicial
+# Severence — Ecos do Tempo: cinemática inicial
 
 Versão 1.1 — roteiro e storyboard de produção; falas e direção de atuação ajustadas às personalidades de Marty e Letícia.
 
@@ -177,7 +177,7 @@ As características novas de Vincent, Elias e Íris são propostas visuais para 
 
 ### 18 · O mar escuta · 02:05–02:12
 
-**Imagem:** um último plano rente à água mostra uma sombra enorme cruzando sob o píer. Reflexos das estrelas formam por um instante a mesma marca do ataque. Corte ao título, MARTY — FRATURAS DO TEMPO, por três segundos. Retorno à posição de Marty no Desembarque e entrada do controle do jogador.
+**Imagem:** um último plano rente à água mostra uma sombra enorme cruzando sob o píer. Reflexos das estrelas formam por um instante a mesma marca do ataque. Corte ao título, SEVERENCE — ECOS DO TEMPO, por três segundos. Retorno à posição de Marty no Desembarque e entrada do controle do jogador.
 
 **Som:** madeira rangendo; um sussurro indistinto; depois, apenas a ambiência do porto. Sem explicação em voz alta.
 

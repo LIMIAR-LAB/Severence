@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo Documentation Index
+# Severence — Ecos do Tempo Documentation Index
 
 **Type:** Monolith (single Godot project)
 **Primary Language:** GDScript (Godot 4.7.2)

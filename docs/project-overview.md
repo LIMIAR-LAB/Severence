@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo - Project Overview
+# Severence — Ecos do Tempo - Project Overview
 
 **Date:** 2026-09-25
 **Type:** game
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-"Marty — Fraturas do Tempo" is a top-down (3/4 perspective) pixel-art action game built in **Godot 4.7.2** (GL Compatibility renderer). The player controls Marty through a hub area ("Refúgio • Fora do Tempo") and a fixed dungeon-style map ("Docas de 1941") fighting enemies, collecting keys/coins/fragments, piloting a mech ("Titan"), and using a drone companion ("Spectre") that can fuse with the player. The game supports solo play, an AI companion, local split-input co-op, and direct-IP online co-op (ENet, host-authoritative). This is version 0.11, a functional MVP prototype — not a finished campaign or final art pass.
+"Severence — Ecos do Tempo" is a top-down (3/4 perspective) pixel-art action game built in **Godot 4.7.2** (GL Compatibility renderer). The player controls Marty through a hub area ("Refúgio • Fora do Tempo") and a fixed dungeon-style map ("Docas de 1941") fighting enemies, collecting keys/coins/fragments, piloting a mech ("Titan"), and using a drone companion ("Spectre") that can fuse with the player. The game supports solo play, an AI companion, local split-input co-op, and direct-IP online co-op (ENet, host-authoritative). This is version 0.11, a functional MVP prototype — not a finished campaign or final art pass.
 
 ## Project Classification
 

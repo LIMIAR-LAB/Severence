@@ -13,18 +13,36 @@ func check(ok: bool, label: String) -> void:
 	else: print("PASS: ", label)
 
 func _initialize() -> void:
+	check(ProjectSettings.get_setting("application/config/name") == "Severence — Ecos do Tempo", "janela do Godot usa o nome oficial")
+	var launcher := FileAccess.get_file_as_string("res://Jogar.cmd")
+	check(launcher.contains("chcp 65001") and launcher.contains("start \"Severence — Ecos do Tempo\""), "lançador do Windows usa UTF-8 e o nome oficial")
 	var app = SaveStateApp.new(); root.add_child(app)
 	await process_frame
 	var ui = app.menu
 	ui.show_screen("main"); await process_frame; await process_frame
 	check(ResourceLoader.exists("res://assets/ui/title/title_loop.ogv"), "vídeo da tela inicial no projeto (Theora)")
 	check(ui.content.find_child("TitleLockup", true, false) is Control, "novo lockup pertence ao cenário")
+	var lockup := ui.content.find_child("TitleLockup", true, false) as Control
+	var title_primary := lockup.find_child("TitlePrimary", false, false) as Label
+	var title_subtitle := lockup.find_child("TitleSubtitle", false, false) as Label
+	check(title_primary != null and title_primary.text == "SEVERENCE", "linha principal usa o nome oficial")
+	check(title_subtitle != null and title_subtitle.text == "ECOS DO TEMPO", "subtítulo usa o nome oficial")
+	check(title_primary.get_combined_minimum_size().x <= title_primary.size.x and title_primary.get_combined_minimum_size().y <= title_primary.size.y, "glifos da linha principal cabem no lockup")
+	check(title_subtitle.get_combined_minimum_size().x <= title_subtitle.size.x and title_subtitle.get_combined_minimum_size().y <= title_subtitle.size.y, "glifos do subtítulo cabem no lockup")
+	var title_footer := ui.content.find_child("TitleFooter", true, false) as Label
+	check(title_footer != null and title_footer.text == "SEVERENCE — ECOS DO TEMPO  •  PROTÓTIPO", "rodapé usa o nome oficial")
 	check(ui.content.find_child("TitleCommandDeck", true, false) is Panel, "um único deck concentra toda a navegação")
 	var scene_crop := ui.content.find_child("TitleStillCropped", true, false) as TextureRect
 	check(scene_crop != null and scene_crop.texture is AtlasTexture and scene_crop.texture.region == Rect2(384, 107, 960, 537), "fundo recorta a sidebar na fonte sem distorção não uniforme")
 	var title_scene := ui.content.find_child("TitleSceneCrop", true, false) as Control
 	var final_bg_scale: Vector2 = ui.stage.scale * title_scene.scale
 	check(is_equal_approx(final_bg_scale.x, final_bg_scale.y), "cenário mantém escala uniforme após o ajuste global")
+	var video_rect: Rect2 = ui.title_video_rect()
+	check(video_rect.position.x < 0 and video_rect.position.y < 0 and video_rect.end.x >= 1344 and video_rect.end.y >= 752, "vídeo cobre a área após recortar a marca antiga")
+	var forced_fallback: Control = ui.unbranded_background("FallbackScene", "FallbackVisual", true)
+	var fallback_visual: Node = forced_fallback.find_child("FallbackVisual", false, false)
+	check(fallback_visual is Control and bool(fallback_visual.get("scene_only")), "ausência da imagem estática usa fallback sem marca antiga")
+	forced_fallback.free()
 	var button_ids := [0, 1, 2, 5, 6]
 	var buttons: Array = button_ids.map(func(i): return ui.content.find_child("Title_%d" % i, true, false))
 	check(buttons.all(func(b): return b is Button), "5 ações do conceito são controles vivos")
@@ -61,6 +79,18 @@ func _initialize() -> void:
 		ui.show_screen("main"); await process_frame
 		(ui.content.find_child("Title_%d" % i, true, false) as Button).pressed.emit()
 		check(ui.screen == targets[i], "botão %d abre %s" % [i, targets[i]])
+		if targets[i] != "online":
+			var secondary_bg := ui.content.find_child("SecondaryMenuBackdrop", true, false) as TextureRect
+			check(secondary_bg != null and secondary_bg.texture is AtlasTexture and secondary_bg.texture.region == Rect2(384, 107, 960, 537), "tela %s usa cenário sem a marca antiga" % targets[i])
+			var secondary_scene := ui.content.find_child("SecondaryMenuScene", true, false) as Control
+			var final_secondary_scale: Vector2 = ui.stage.scale * secondary_scene.scale
+			check(is_equal_approx(final_secondary_scale.x, final_secondary_scale.y), "tela %s mantém fundo sem distorção" % targets[i])
+	ui.show_screen("encyclopedia"); await process_frame
+	var archive_bg := ui.content.find_child("ArchiveBackdrop", true, false) as TextureRect
+	check(archive_bg != null and archive_bg.texture is AtlasTexture and archive_bg.texture.region == Rect2(384, 107, 960, 537), "Arquivo recorta a marca antiga do cenário")
+	var archive_scene := ui.content.find_child("ArchiveBackdropScene", true, false) as Control
+	var final_archive_scale: Vector2 = ui.stage.scale * archive_scene.scale
+	check(is_equal_approx(final_archive_scale.x, final_archive_scale.y), "Arquivo mantém fundo sem distorção")
 	ui.show_screen("characters"); await process_frame
 	check(ui.content.find_child("CharacterMarty", true, false) is Button, "Marty selecionável")
 	for i in range(1, 6):

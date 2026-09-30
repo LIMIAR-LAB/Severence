@@ -58,6 +58,11 @@ func center_stage() -> void:
 	if screen == "main" and content != null:
 		var title_scene := content.find_child("TitleSceneCrop", false, false) as Control
 		if title_scene != null: fit_title_background(title_scene)
+	elif content != null:
+		var secondary_scene := content.find_child("SecondaryMenuScene", true, false) as Control
+		if secondary_scene != null: fit_title_background(secondary_scene)
+		var archive_scene := content.find_child("ArchiveBackdropScene", true, false) as Control
+		if archive_scene != null: fit_title_background(archive_scene)
 	place_equipment()
 	place_summary()
 
@@ -129,10 +134,13 @@ func show_screen(next: String) -> void:
 		if next == "main":
 			var title_scene := title_background(); content.add_child(title_scene); fit_title_background(title_scene)
 		else:
-			var bg := TextureRect.new(); bg.texture = load("res://assets/ui/" + ("online" if next == "online" else "menu") + ".png")
-			if next == "play": bg.texture = load("res://assets/ui/adventure.png")
-			bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			content.add_child(bg)
+			if next == "online":
+				var bg := TextureRect.new(); bg.name = "SecondaryMenuBackdrop"; bg.texture = load("res://assets/ui/online.png")
+				bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = Vector2(1344, 752); bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				content.add_child(bg)
+			else:
+				var secondary_scene := unbranded_background("SecondaryMenuScene", "SecondaryMenuBackdrop")
+				content.add_child(secondary_scene); fit_title_background(secondary_scene)
 	match next:
 		"main": build_main()
 		"characters": build_characters()
@@ -176,13 +184,36 @@ func title_background() -> Control:
 	var stream = load(TITLE_DIR + "title_loop.ogv") if ResourceLoader.exists(TITLE_DIR + "title_loop.ogv") else null
 	if stream != null and DisplayServer.get_name() != "headless":
 		title_video = VideoStreamPlayer.new(); title_video.stream = stream; title_video.expand = true
-		var crop_scale := root.size.x / TITLE_SCENE_CROP.size.x
-		title_video.position = -TITLE_SCENE_CROP.position * crop_scale
-		title_video.size = Vector2(1344, 752) * crop_scale
+		var video_rect := title_video_rect()
+		title_video.position = video_rect.position; title_video.size = video_rect.size
 		title_video.mouse_filter = Control.MOUSE_FILTER_IGNORE; title_video.autoplay = true
 		if "loop" in title_video: title_video.set("loop", true)
 		title_video.finished.connect(title_video.play)   # garante o loop em qualquer versão
 		root.add_child(title_video)
+	return root
+
+func title_video_rect() -> Rect2:
+	var crop_scale := 1344.0 / TITLE_SCENE_CROP.size.x
+	return Rect2(-TITLE_SCENE_CROP.position * crop_scale, Vector2(1344, 752) * crop_scale)
+
+func unbranded_title_texture() -> Texture2D:
+	if not ResourceLoader.exists(TITLE_DIR + "title_still.png"): return null
+	var cropped := AtlasTexture.new()
+	cropped.atlas = load(TITLE_DIR + "title_still.png")
+	cropped.region = TITLE_SCENE_CROP
+	return cropped
+
+func unbranded_background(root_name: String, visual_name: String, force_fallback: bool = false) -> Control:
+	var root := Control.new(); root.name = root_name; root.size = Vector2(1344, 752)
+	root.clip_contents = true; root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var texture: Texture2D = null if force_fallback else unbranded_title_texture()
+	if texture != null:
+		var still := TextureRect.new(); still.name = visual_name; still.texture = texture
+		still.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; still.stretch_mode = TextureRect.STRETCH_SCALE
+		still.size = root.size; still.mouse_filter = Control.MOUSE_FILTER_IGNORE; root.add_child(still)
+	else:
+		var fallback := MenuBackground.new(); fallback.name = visual_name; fallback.scene_only = true
+		root.add_child(fallback)
 	return root
 
 func title_style(fill: Color, edge: Color, width: int = 2, radius: int = 4) -> StyleBoxFlat:
@@ -214,11 +245,11 @@ func continue_title() -> void:
 
 func build_main() -> void:
 	var lockup := Control.new(); lockup.name = "TitleLockup"; lockup.position = Vector2(45, 34); lockup.size = Vector2(455, 185); lockup.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(lockup)
-	var title_top := label(lockup, Rect2(0, 0, 455, 67), "FRATURAS", 50, Color("e1a84f"))
-	var title_bottom := label(lockup, Rect2(0, 55, 455, 72), "DO TEMPO", 55, Color("e9ecea"))
+	var title_top := label(lockup, Rect2(0, 0, 455, 62), "SEVERENCE", 48, Color("e1a84f")); title_top.name = "TitlePrimary"
+	var title_bottom := label(lockup, Rect2(0, 55, 455, 62), "ECOS DO TEMPO", 40, Color("e9ecea")); title_bottom.name = "TitleSubtitle"
 	for title_line in [title_top, title_bottom]:
 		title_line.add_theme_color_override("font_outline_color", Color("10171a")); title_line.add_theme_constant_override("outline_size", 9)
-	var bolt := ColorRect.new(); bolt.position = Vector2(326, 7); bolt.size = Vector2(7, 119); bolt.rotation = 0.08; bolt.color = Color("57f1f5"); bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE; lockup.add_child(bolt)
+	var bolt := ColorRect.new(); bolt.position = Vector2(422, 7); bolt.size = Vector2(7, 112); bolt.rotation = 0.08; bolt.color = Color("57f1f5"); bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE; lockup.add_child(bolt)
 	var era := label(lockup, Rect2(7, 137, 305, 26), "DOCAS DE 1941", 14, Color("f0d48b")); era.add_theme_color_override("font_outline_color", Color("10171a")); era.add_theme_constant_override("outline_size", 5)
 
 	var deck := panel(content, Rect2(28, 565, 1288, 165), Color("111813e8"), Color("b28b43")); deck.name = "TitleCommandDeck"
@@ -243,7 +274,8 @@ func build_main() -> void:
 	var online_button := title_button(deck, 2, Rect2(20, 91, 240, 50), "ONLINE", callbacks.online)
 	var options_button := title_button(deck, 5, Rect2(274, 91, 240, 50), "OPÇÕES", callbacks.options)
 	var exit_button := title_button(deck, 6, Rect2(528, 91, 240, 50), "SAIR", callbacks.exit)
-	label(deck, Rect2(808, 99, 445, 28), "FRATURAS DO TEMPO  •  PROTÓTIPO", 12, Color("78867c")).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var title_footer := label(deck, Rect2(808, 99, 445, 28), "SEVERENCE — ECOS DO TEMPO  •  PROTÓTIPO", 12, Color("78867c")); title_footer.name = "TitleFooter"
+	title_footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var visual_order: Array[Button] = [new_run, main_resume, online_button, options_button, exit_button]
 	var enabled_order: Array[Button] = []
 	for title_action in visual_order:

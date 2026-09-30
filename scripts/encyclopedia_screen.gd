@@ -2,7 +2,6 @@ class_name EncyclopediaScreen
 extends Control
 
 const EncyclopediaData = preload("res://scripts/encyclopedia_data.gd")
-const ARCHIVE_BACKDROP_PATH := "res://assets/ui/title/title_still.png"
 const ORNATE_FRAME_PATH := "res://assets/ui/pause/pause_frame_pixellab.png"
 
 const CYAN := Color("65f0f5")
@@ -155,11 +154,10 @@ func build() -> void:
 	select_category(category)
 
 func _build_atmosphere() -> void:
-	var backdrop := TextureRect.new()
-	backdrop.name = "ArchiveBackdrop"; backdrop.size = size; backdrop.texture = _safe_texture(ARCHIVE_BACKDROP_PATH)
-	backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	var backdrop_scene: Control = host.unbranded_background("ArchiveBackdropScene", "ArchiveBackdrop")
+	var backdrop := backdrop_scene.find_child("ArchiveBackdrop", false, false) as CanvasItem
 	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; backdrop.modulate = Color(0.22, 0.28, 0.22, 1.0)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
+	add_child(backdrop_scene); host.fit_title_background(backdrop_scene)
 	var shade := ColorRect.new()
 	shade.name = "ArchiveAtmosphereShade"; shade.color = Color(0.025, 0.045, 0.05, 0.76); shade.size = size
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(shade)

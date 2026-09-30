@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo - Architecture
+# Severence — Ecos do Tempo - Architecture
 
 **Date:** 2026-09-25
 **Engine:** Godot 4.7.2 (GL Compatibility)

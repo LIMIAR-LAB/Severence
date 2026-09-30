@@ -1,4 +1,4 @@
-# Storyboard — Severence: Ecos do Tempo
+# Storyboard — Severence — Ecos do Tempo
 
 ## Intro atual — 60 segundos
 

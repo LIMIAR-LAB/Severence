@@ -1,4 +1,4 @@
-# Marty — Fraturas do Tempo - Asset Inventory
+# Severence — Ecos do Tempo - Asset Inventory
 
 **Date:** 2026-09-25
 

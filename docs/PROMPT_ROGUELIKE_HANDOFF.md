@@ -1,11 +1,11 @@
-# PROMPT DE HANDOFF — Transformar "Marty — Fraturas do Tempo" em roguelike
+# PROMPT DE HANDOFF — Transformar "Severence — Ecos do Tempo" em roguelike
 
 Cole o texto abaixo na outra IA (Claude / GPT / Codex). Ele assume que a IA tem
 acesso a este repositório (branch `main` já contém todos os documentos citados).
 
 ---
 
-Você está no repositório do jogo **"Marty — Fraturas do Tempo"** (Godot 4.7.2,
+Você está no repositório do jogo **"Severence — Ecos do Tempo"** (Godot 4.7.2,
 GDScript, Windows). Atenção: este NÃO é um projeto Godot convencional de cenas por
 entidade — o mundo é simulado em `scripts/simulation.gd` e desenhado
 proceduralmente por renderers (`world_view.gd`, `dock_scenery.gd`) a partir de um
