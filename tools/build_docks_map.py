@@ -79,7 +79,7 @@ POINTS = {
     "boss": (4200, 1200), "extraction": (4200, 720), "mech": (9250, 6700),
     "ammo_center": (7050, 4350), "warden": (4850, 4350),
 }
-CHESTS = [(6150, 6080, False), (850, 3800, False), (8850, 1400, False), (6350, 1150, True)]
+CHESTS = [(700, 4470, False), (8850, 1400, False), (6350, 1150, True)]
 
 # Estilo das bordas de cada sala: top facade|wall|none, bottom wall|quay|none, left/right wall|pier.
 # wall_set (0.17): pele da fachada por ambiente — default = tijolo de armazém.
@@ -106,6 +106,9 @@ WATER = [
     ("shop", (8400, 6900, 1100, 700)), ("shop", (9500, 5800, 900, 1800)),
     ("chapel", (-500, 3400, 700, 1800)), ("drydock", (-500, 1000, 700, 1900)),
     ("cellar", (9100, 1000, 900, 1500)),
+    # Moldura aquática visual da arena; o piso da arena é desenhado por cima.
+    ("boss", (500, -1000, 7400, 1500)), ("boss", (500, 400, 2500, 3200)),
+    ("boss", (5400, 400, 2500, 3200)), ("boss", (500, 2200, 7400, 1400)),
 ]
 
 # 0.16: ATALHOS — corredor fechado por uma fachada rachada. Explosão (barril, bomba, canhão) perto da
@@ -313,26 +316,28 @@ spawns("mix", [(2400, 4100), (2700, 4150), (2900, 4100), (2000, 3900), (3300, 43
 
 # ── 10 Capela do Culto ──
 facade_decor("chapel", [("iron_door", 650)], lamps=False)
-ob("altar", 850, 3950)
-# 0.21: colisões alinhadas aos oito bancos pintados da placa PixelLab.
-# As caixas representam somente a base dos móveis; o corredor central e as
-# conexões norte/leste/sul permanecem livres.
+# 0.22: estas caixas são o contrato da placa unificada. Cada uma coincide com
+# a base pintada por tools/build_chapel_unified.py; arte opaca nunca vira colisão.
 OB.extend([
-    [322, 4000, 210, 44, "pew"], [545, 3998, 190, 44, "pew"],
-    [545, 4055, 190, 42, "pew"], [545, 4110, 190, 42, "pew"],
-    [966, 3998, 190, 44, "pew"], [966, 4055, 190, 42, "pew"],
-    [966, 4110, 190, 42, "pew"], [1168, 4000, 210, 44, "pew"],
+    [680, 3888, 340, 62, "altar"],
+    [575, 4138, 165, 36, "pew"], [950, 4138, 165, 36, "pew"],
+    [565, 4228, 175, 38, "pew"], [940, 4228, 175, 38, "pew"],
+    [565, 4318, 180, 40, "pew"], [935, 4318, 185, 40, "pew"],
+    [365, 4510, 275, 112, "chapel_reliquary"], [1055, 4510, 285, 112, "chapel_reliquary"],
+    [200, 3600, 400, 300, "chapel_wall"], [1000, 3600, 500, 300, "chapel_wall"],
+    [200, 3600, 105, 1400, "chapel_wall"],
+    [1395, 3600, 105, 530, "chapel_wall"], [1395, 4470, 105, 530, "chapel_wall"],
+    [200, 4622, 250, 378, "chapel_wall"], [1350, 4622, 150, 378, "chapel_wall"],
 ])
-dec("ritual_circle", 850, 4150); dec("symbol_0", 450, 3850); dec("symbol_2", 1250, 3850)
-for p in [(450, 3750), (1250, 3750), (400, 4850), (1300, 4850), (700, 3990), (1000, 3990)]: dec("chapel_candles", *p)
-# 0.16: microbioma da capela (tools/prepare_chapel.py); tapete e altar continuam
-ob("chapel_stained_glass", 400, 3700); ob("chapel_stained_glass", 1300, 3700)
-ob("chapel_offering_bowl", 650, 4010); ob("chapel_offering_bowl", 1050, 4010)
-dec("chapel_banner", 560, 3590); dec("chapel_banner", 1140, 3590)
-dec("rug", 850, 4500); dec("tentacle_planks", 500, 4880)
-ob("brazier", 650, 3780); ob("brazier", 1050, 3780)
-hazard(1200, 4900, 58)
-spawns("cult", [(450, 3950), (1250, 3950), (700, 4800), (1050, 4800), (850, 4350), (600, 4100)])
+# A placa contém somente cenário estático; porta, baú, NPC e atores continuam dinâmicos.
+for kind, x, y in [
+    ("ritual_circle",850,4150),("symbol_0",450,3850),("symbol_2",1250,3850),
+    ("chapel_candles",450,3750),("chapel_candles",1250,3750),
+    ("chapel_candles",400,4850),("chapel_candles",1300,4850),
+    ("chapel_candles",700,3990),("chapel_candles",1000,3990),
+    ("chapel_banner",560,3590),("chapel_banner",1140,3590),
+    ("rug",850,4500),("tentacle_planks",500,4880),
+]: dec(kind,x,y)
 
 # ── 11 Doque Seco (fosso de água no meio) ──
 facade_decor("drydock", [("poster", 350), ("iron_door", 900)])

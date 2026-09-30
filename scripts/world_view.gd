@@ -237,6 +237,7 @@ func draw_expedition_ground() -> void:
 	for d in sim.doors:
 		var room: Dictionary = sim.room_by_id(d.room)
 		if room.is_empty() or not d.r.grow(200).intersects(view) or not seen(d.r.get_center(), 60): continue
+		if scenery.chapel_hides_gate(d.room, d.r): continue
 		scenery.draw_gate(self, d, room.get("locked", false), t, room.r)
 	if sim.mode == "run": draw_docks()
 	else:
@@ -326,10 +327,6 @@ func draw_entities() -> void:
 			draw_rect(Rect2(p - Vector2(2, 28), Vector2(4, 4)), Color(0.7, 0.95, 1))
 			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 3)), Color(0.85, 0.75, 0.3))
 		else: draw_texture_rect(docks_art.coin, Rect2(p - Vector2(8, 18), Vector2(16, 18)), false)
-	if sim.mode == "run" and seen(sim.STORY_NPC):
-		var npc: Vector2 = sim.STORY_NPC
-		draw_texture_rect_region(marty_anim,Rect2(npc-Vector2(48,92),Vector2(96,96)),Rect2(0,5*96,96,96),Color(0.65,0.85,1))
-		text_at(npc+Vector2(-65,-105),"PESCADOR • E",GOLD,14)
 	var drawable: Array = []
 	if sim.mode == "run":
 		var view := view_rect()
@@ -342,6 +339,7 @@ func draw_entities() -> void:
 			if scenery.handles(d.kind) and not scenery.is_flat(d.kind) and view.has_point(d.p) and seen(d.p, 60) and not scenery.chapel_hides_legacy(d.kind, d.p):
 				drawable.append({"type": "decor", "data": d, "y": d.p.y})
 		if seen(DocksMap.POINTS.extraction): drawable.append({"type": "capsule", "data": {}, "y": DocksMap.POINTS.extraction.y + 20})
+		if seen(sim.STORY_NPC): drawable.append({"type": "chapel_npc", "data": {"p": sim.STORY_NPC}, "y": sim.STORY_NPC.y})
 	else:
 		for box in sim.obstacles: drawable.append({"type": "obstacle", "data": {"r": box, "k": "crate"}, "y": box.end.y})
 	for a in sim.actors:
@@ -366,9 +364,24 @@ func draw_entities() -> void:
 			"obstacle": draw_obstacle(thing.data.r, thing.data.k)
 			"decor": scenery.draw_prop(self, thing.data.kind, thing.data.p, sim.tick_time)
 			"capsule": draw_capsule()
+			"chapel_npc":
+				var npc_texture: Texture2D = scenery.chapel_fisherman_texture(sim.tick_time)
+				if npc_texture != null:
+					draw_texture_rect(npc_texture, Rect2(thing.data.p - Vector2(40, 112), Vector2(80, 112)), false)
+				else:
+					scenery.draw_prop(self, "npc_fisherman", thing.data.p, sim.tick_time)
 			"spectre": draw_spectre(thing.data)
 			"core": draw_texture(refuge_core, CORE_OFFSET, Color(1, 1, 1, core_alpha()))
 	visual_scale = 1.0; visual_origin = Vector2.ZERO; visual_transform(Vector2.ZERO)
+	if sim.mode == "run" and seen(sim.STORY_NPC):
+		var nearest_actor: float = 99999.0
+		for actor in sim.actors:
+			if actor.active: nearest_actor = minf(nearest_actor, actor.p.distance_to(sim.STORY_NPC))
+		if sim.story_quest < 2 or nearest_actor < 145.0:
+			var npc_label := chapel_npc_label(sim.story_quest)
+			# O rótulo usa coordenadas mundiais, fora de qualquer transform de sprite.
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			text_at(sim.STORY_NPC + Vector2(-82, -112), npc_label, GOLD if sim.story_quest < 2 else Color("c9b99c"), 14)
 	for b in sim.bullets:
 		if not seen(b.p): continue
 		var bullet_pos: Vector2 = b.p - Vector2(0, 28)
@@ -1500,3 +1513,5 @@ func draw_combat_warnings() -> void:
 		else:
 			draw_line(enemy.p - Vector2(0, 28), aim - Vector2(0, 28), Color(1, 0.75, 0.4, 0.65), 2)
 		text_at(enemy.p + Vector2(-5, -106), "!", Color("ffe281"), 20)
+static func chapel_npc_label(quest_state: int) -> String:
+	return "PESCADOR • INTERAGIR" if quest_state == 0 else ("PESCADOR • RETORNAR" if quest_state == 1 else "PESCADOR")
