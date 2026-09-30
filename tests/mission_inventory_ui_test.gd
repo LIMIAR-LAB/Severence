@@ -56,6 +56,7 @@ func run() -> void:
 	check(eq.find_child("InventorySlot_missao_moedas", true, false) is Button, "moedas coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_missao_bazuca", true, false) is Button, "bazuca aparece no inventário da missão")
 	check(eq.find_child("InventorySlot_missao_foguetes", true, false) is Button and eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_foguetes")) == 6, "foguetes aparecem com munição real")
+	check(eq.find_child("InventorySlot_modulo_titan", true, false) is Button and eq.find_child("InventorySlot_nucleo_spectre", true, false) is Button, "módulos Titan e Spectre possuídos ficam disponíveis durante a missão")
 	check(load("res://assets/weapons/bazooka_v2.png") is Texture2D and load("res://assets/ui/equipamento/icones/icon_foguete_v1.png") is Texture2D, "inventário carrega arte final da bazuca e da munição")
 	check(eq.find_child("InventorySlot_prototipo_reparo", true, false) == null, "item persistente não levado fica fora da missão")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_fragmentos")) == 3, "fragmentos contam somente o ganho desta missão")

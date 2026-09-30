@@ -22,6 +22,10 @@ const GUARD_SHOTS := 5
 const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
 var effects: Array = []
+# Host-authored transient sound cues; presentation never consumes gameplay RNG.
+const MAX_AUDIO_EVENTS := 64
+var audio_events: Array = []
+var audio_sequence := 0
 var rooms: Array = []
 var floors: Array = []
 var obstacles: Array = []
@@ -94,6 +98,11 @@ var ob_grid_count := -1
 
 func _init() -> void:
 	make_hub()
+
+func emit_audio(key: String, p: Vector2) -> void:
+	audio_sequence += 1
+	audio_events.append({"id": audio_sequence, "key": key, "p": p, "time": tick_time})
+	if audio_events.size() > MAX_AUDIO_EVENTS: audio_events.pop_front()
 
 func actor(id: int, pos: Vector2) -> Dictionary:
 	return {"id": id, "active": id == 0 or coop != "solo", "p": pos, "aim": Vector2.RIGHT, "facing": Vector2.DOWN, "dash_dir": Vector2.RIGHT, "move": Vector2.ZERO, "hp": BASE_HEARTS * HEART, "shield": 0.0, "armor": false,
@@ -231,6 +240,7 @@ const HUB_POINTS := [
 const HUB_TITAN_BAY := Vector2(1140, 548)
 
 func make_hub() -> void:
+	audio_events.clear()
 	doors.clear(); gate_blocks.clear(); hazards.clear(); tentacle_gates.clear()
 	mode = "hub"
 	money = 0; keys = 0  # 0.21: moeda e chaves não atravessam o portal temporal.
@@ -271,6 +281,7 @@ func hub_point_near(pos: Vector2) -> Dictionary:
 	return {}
 
 func start_arena() -> void:
+	audio_events.clear()
 	mode = "arena"; tick_time = 0; arena_wave = 0; arena_wait = 0
 	pending_spawns.clear()
 	side_active = false; side_complete = false; side_failed = false; side_time = 0
@@ -308,6 +319,7 @@ func spawn_arena_wave() -> void:
 		if not a.dead: heal(a, 1)
 
 func start_run(new_seed: int) -> void:
+	audio_events.clear()
 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
 	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
 	seed_value = new_seed; rng.seed = seed_value
@@ -784,13 +796,16 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.transform > 0.25: return
 	if cmd.get("summon", false): summon_robot(a)
 	if cmd.get("fusion", false): toggle_fusion(a)
+	if cmd.get("robot_switch", false): cycle_owned_robot(a)
 	var moving: Vector2 = cmd.get("move", Vector2.ZERO)
 	moving = moving.limit_length()
 	var aim: Vector2 = cmd.get("aim", a.aim)
 	if aim.length() > 0.1: a.aim = aim.normalized()
 	if cmd.get("jump", false) and a.jump <= 0 and a.jump_cd <= 0 and not a.mech:
+		emit_audio("jump", a.p)
 		a.jump = 0.65; a.jump_cd = 0.8; a["jump_from"] = a.p
 	if cmd.get("dodge", false) and a.dodge_cd <= 0 and not a.mech:
+		emit_audio("dash", a.p)
 		a.dodge = 0.20; a.roll_visual = 0.36; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
 		a.dash_dir = moving.normalized() if moving.length() > 0.1 else a.facing.normalized()
 	var speed: float = 190.0 if a.mech else (ARMORS[a.armor_type].speed if a.armor else uniform_of(a).speed)
@@ -877,6 +892,7 @@ func throw_bomb(a: Dictionary) -> void:
 	effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.1, "dir": a.aim})
 
 func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: bool = false, credit_player: bool = true) -> void:
+	emit_audio("explosion", p)
 	for e in enemies:
 		var d: float = e.p.distance_to(p)
 		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
@@ -1030,6 +1046,7 @@ func fire_actor(a: Dictionary) -> void:
 	if weapon == "bazooka":
 		var owned: Dictionary = a.run_weapons
 		if int(owned.get("bazooka", 0)) <= 0:
+			emit_audio("dry_fire", a.p)
 			a.shot = 0.3; say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica"); return
 		owned.bazooka = maxi(0, int(owned.bazooka) - 1)
 		a.run_weapons = owned
@@ -1063,6 +1080,7 @@ func fire_actor(a: Dictionary) -> void:
 			hit_bullet_enemy(bullet, true)
 			if bullet.life <= 0 or bullet.team != 0: break
 	a.shot = cooldown; a["fire_flash"] = 0.09
+	emit_audio(weapon, a.p)
 	if weapon == "bazooka" and int(a.run_weapons.bazooka) == 0:
 		say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica")
 	if a.mech: effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.12, "dir": a.aim}); effects.append({"p": a.p, "kind": "recoil", "life": 0.2, "max": 0.2, "dir": a.aim})
@@ -1071,6 +1089,7 @@ func fire_actor(a: Dictionary) -> void:
 
 # Lâmina Ômega: combo de 3 cortes em arco. O 3º é mais largo e solta uma onda perfurante.
 func sword_attack(a: Dictionary) -> void:
+	emit_audio("sword", a.p)
 	if a.combo_t <= 0: a.combo = 0
 	var hit: int = a.combo
 	a.combo = (a.combo + 1) % 3; a.combo_t = 0.7
@@ -1107,6 +1126,7 @@ func props_in_arc(a: Dictionary, reach: float, damage: float) -> void:
 	for i in hit: damage_obstacle(i, damage)
 
 func melee(a: Dictionary) -> void:
+	emit_audio("melee", a.p)
 	a.slash = 0.65 if a.mech else 0.45
 	var reach := 115.0 if a.mech else 78.0
 	effects.append({"p": a.p, "kind": "slash", "life": 0.18, "dir": a.aim, "reach": reach})
@@ -1223,6 +1243,7 @@ func interact(a: Dictionary) -> void:
 
 func damage_actor(a: Dictionary, amount: float, source_kind: String = "unknown", source_attack: String = "") -> void:
 	if a.hurt > 0 or a.dodge > 0 or a.dead or a.jump > 0 or a.get("transform", 0.0) > 0: return
+	if amount > 0: emit_audio("hit", a.p)
 	var hp_before := float(a.hp)
 	a.last_damage_source = source_kind; a.last_damage_attack = source_attack
 	a.hurt = 0.45 if a.mech else HURT_IFRAMES
@@ -1309,6 +1330,7 @@ func step_enemies(dt: float) -> void:
 
 	for e in enemies:
 		if e.hp > 0: continue
+		emit_audio("enemy_die", e.p)
 		if e.kind == "bomber" and not e.detonated:
 			e.detonated = true
 			add_combat_zone(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, "blast", 0.65, 0.1)
@@ -1361,6 +1383,7 @@ func step_warden(e: Dictionary, target: Dictionary, direction: Vector2, closest:
 		return
 	e.cd -= dt
 	if closest < 560 and e.cd <= 0 and line_of_fire(e.p, target.p):
+		emit_audio("enemy_warden", e.p)
 		e["attack_state"] = "warning"; e.attack_time = 0.55; e["charge_dir"] = direction
 		return
 	var before: Vector2 = e.p
@@ -1387,6 +1410,7 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 	if e.charge > 0:
 		e.charge -= dt
 		if e.charge <= 0:
+			emit_audio("enemy_boss", e.p)
 			e.shot = 0.4
 			add_bullet(e.p + direction * 30, direction, 1, 24, 200, 13, -1, "cannon", 4.0)
 		return
@@ -1394,6 +1418,7 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 		e.spin -= dt; e.cd -= dt
 		if e.cd <= 0:
 			e.cd = 0.11 * enrage_scale(e); e.spin_angle += 0.42
+			emit_audio("enemy_boss", e.p)
 			for k in range(2 if stage == 2 else 3):
 				add_bullet(e.p, Vector2.RIGHT.rotated(e.spin_angle + k * TAU / (2 if stage == 2 else 3)), 1, 10, 165, 6, -1, "orb")
 		return
@@ -1402,6 +1427,7 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 	e.phase += 1
 	match stage:
 		1:
+			emit_audio("enemy_boss", e.p)
 			e.shot = 0.4; e.cd = 1.1 * enrage_scale(e)
 			if e.phase % 2 == 1:
 				for n in range(16): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 16 + e.phase * 0.2), 1, 12, 150, 7, -1, "orb")
@@ -1412,6 +1438,7 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 			else: e.spin = 2.2; e.cd = 0.0
 		3:
 			e.shot = 0.4; e.cd = 0.8 * enrage_scale(e)
+			emit_audio("enemy_boss", e.p)
 			match e.phase % 3:
 				0:
 					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.35), 1, 14, 115, 11, -1, "ink", 4.5)
@@ -1453,6 +1480,7 @@ func hit_bullet_enemy(b: Dictionary, check_wall: bool = false) -> void:
 						hurt_enemy(other, MECH_SHELL.splash_damage); other.hurt = 0.15; other["alerted"] = true
 						pop_dmg(other.p, MECH_SHELL.splash_damage)
 				effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
+				emit_audio("explosion", b.p)
 			effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
 			if b.get("pierce", 0) > 0:
 				b.pierce -= 1; previous_hits.append(e.id); b["hits"] = previous_hits
@@ -1532,6 +1560,7 @@ func collect_pickups() -> void:
 					if bs.hp <= 0: bs.state = "stored"   # bateria reanima um Spectre destruído
 					bs.hp = minf(100.0, bs.hp + BATTERY_PICKUP); say("BATERIA • Spectre recarregado")
 				else: money += 2
+				emit_audio("pickup", pickup.p)
 				pickup["taken"] = true; break
 	pickups = pickups.filter(func(p): return not p.get("taken", false))
 
@@ -1542,6 +1571,7 @@ func equip(id: int, outfit: String, robot: String, armor_type: String = "omega")
 		say("Esse item ainda está bloqueado."); return false
 	var a: Dictionary = actors[id]
 	if a.dead: return false
+	if robot != a.selected_robot and not can_switch_robot(a): return false
 	if a.fused and robot != a.selected_robot:
 		say("Desfaça a fusão antes de trocar de robô."); return false
 	if a.armor and outfit != a.outfit:
@@ -1558,9 +1588,68 @@ func equip(id: int, outfit: String, robot: String, armor_type: String = "omega")
 				if not inventory.equip(entry.id, unlocked): return false
 		if robot == "" and not inventory.unequip("robo"): return false
 		inventory_state = inventory.to_dict()
-	a.outfit = outfit; a.selected_robot = robot
+	a.outfit = outfit
+	if robot != a.selected_robot: store_selected_robot(a); a.selected_robot = robot
 	if not a.armor: a.armor_type = armor_type
 	return true
+
+func robot_module_entry(robot_id: String) -> Dictionary:
+	for entry in InventoryData.valid_items():
+		if entry.get("slot", "") == "robo" and entry.get("loadout_id", "") == robot_id: return entry
+	return {}
+
+func owned_robot_ids(actor_id: int) -> Array[String]:
+	var result: Array[String] = []
+	if actor_id != 0:
+		for robot_id in ["titan", "spectre"]:
+			if is_unlocked(robot_id): result.append(robot_id)
+		return result
+	var inventory := InventoryState.new(inventory_state)
+	for robot_id in ["titan", "spectre"]:
+		var entry := robot_module_entry(robot_id)
+		if is_unlocked(robot_id) and not entry.is_empty() and inventory.quantity(entry.id) > 0: result.append(robot_id)
+	return result
+
+func reconcile_robot_entitlements() -> void:
+	var inventory := InventoryState.new(inventory_state)
+	for robot_id in ["titan", "spectre"]:
+		if not is_unlocked(robot_id): continue
+		var entry := robot_module_entry(robot_id)
+		if not entry.is_empty() and inventory.quantity(entry.id) == 0: inventory.add(entry.id)
+	inventory_state = inventory.to_dict()
+
+func can_switch_robot(a: Dictionary) -> bool:
+	if not a.active or a.dead:
+		say("Não é possível trocar de robô enquanto Marty está caído."); return false
+	if a.mech:
+		say("Saia do Titan antes de trocar de robô."); return false
+	if a.fused:
+		say("Desfaça a fusão antes de trocar de robô."); return false
+	if mech.get("cockpit_t", 0.0) > 0 and mech.get("cockpit_actor", -1) == a.id:
+		say("Espere a entrada ou saída do cockpit terminar."); return false
+	return true
+
+func store_selected_robot(a: Dictionary) -> void:
+	if a.selected_robot == "titan" and mech.get("owner", -1) in [-1, a.id] and mech.get("occupant", -1) == -1 and mech.get("deployed", false):
+		effects.append(SummonFX.recall_effect(a.id, a.p - Vector2(0, 30), mech.p, "titan")); mech.deployed = false
+	elif a.selected_robot == "spectre" and spectres[a.id].state == "following":
+		effects.append(SummonFX.recall_effect(a.id, a.p - Vector2(0, 30), spectres[a.id].p, "spectre")); spectres[a.id].state = "stored"
+
+func select_owned_robot(a: Dictionary, robot_id: String) -> bool:
+	if robot_id == a.selected_robot: return true
+	if robot_id not in owned_robot_ids(a.id): say("Esse módulo de robô não está disponível."); return false
+	if not can_switch_robot(a): return false
+	store_selected_robot(a); a.selected_robot = robot_id
+	say("ROBÔ SELECIONADO • %s" % robot_id.to_upper())
+	return true
+
+func cycle_owned_robot(a: Dictionary) -> bool:
+	if not can_switch_robot(a): return false
+	var owned := owned_robot_ids(a.id)
+	if owned.size() < 2:
+		say("Nenhum robô alternativo disponível."); return false
+	var index := owned.find(str(a.selected_robot))
+	return select_owned_robot(a, owned[(index + 1) % owned.size()] if index >= 0 else owned[0])
 
 func free_summon_position(a: Dictionary, radius: float) -> Vector2:
 	for distance in [100, 145, 190]:
@@ -1630,7 +1719,7 @@ func step_spectres(dt: float) -> void:
 	for s in spectres:
 		if s.state != "following": continue
 		var owner_actor: Dictionary = actors[s.owner]
-		if not owner_actor.active or owner_actor.dead: s.state = "stored"; continue
+		if not owner_actor.active or owner_actor.dead or owner_actor.selected_robot != "spectre": s.state = "stored"; continue
 		var offset: Vector2 = owner_actor.p - s.p
 		s["moving"] = offset.length() > 85
 		if s.moving:
@@ -1646,10 +1735,13 @@ func step_spectres(dt: float) -> void:
 			s.aim = (target.p - s.p).normalized()
 			if s.shot <= 0:
 				add_bullet(s.p + s.aim * 20, s.aim, 0, SPECTRE_SHOT.damage, 600, 4, s.owner)
+				emit_audio("spectre", s.p)
 				s.shot = SPECTRE_SHOT.cooldown
 
 func snapshot() -> Dictionary:
 	var data := {}
+	data["audio_events"] = audio_events.duplicate(true)
+	data["audio_sequence"] = audio_sequence
 	data["spectres"] = spectres
 	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t", "run_stats", "last_run_summary", "summary_seq"]:
 		data[name] = get(name)
@@ -1658,7 +1750,22 @@ func snapshot() -> Dictionary:
 func apply_snapshot(data: Dictionary) -> void:
 	var allowed := snapshot().keys()
 	for name in data:
-		if name in allowed and name != "inventory_state": set(name, data[name])
+		if name in allowed and name not in ["inventory_state", "audio_events", "audio_sequence"]: set(name, data[name])
+	# Replicas adopt the host's sequence, including a new host with lower IDs.
+	# Legacy saves have no cues and preserve the local sequence.
+	audio_events.clear()
+	var incoming_sequence: Variant = data.get("audio_sequence")
+	if incoming_sequence is int: audio_sequence = maxi(0, incoming_sequence)
+	var incoming_events: Variant = data.get("audio_events", [])
+	if incoming_events is Array:
+		for event in incoming_events:
+			if not event is Dictionary: continue
+			if not event.get("id") is int or not event.get("key") is String or not event.get("p") is Vector2: continue
+			if not (event.get("time") is float or event.get("time") is int): continue
+			if event.id <= 0: continue
+			audio_events.append(event.duplicate(true))
+			audio_sequence = maxi(audio_sequence, event.id)
+			if audio_events.size() > MAX_AUDIO_EVENTS: audio_events.pop_front()
 	# Saves de expedições antigas podem carregar uma lista anterior de desbloqueios.
 	# A Ômega agora é inicial; migre somente ela sem alterar a progressão dos outros itens.
 	if not unlocked is Dictionary: unlocked = {}
@@ -1728,6 +1835,7 @@ func set_unlocks(ids: Array) -> void:
 		if not is_unlocked(a.outfit): a.outfit = "padrao"
 		if not is_unlocked(a.selected_robot): a.selected_robot = default_robot()
 	apply_unlock_state()
+	reconcile_robot_entitlements()
 
 func unlock(id: String) -> bool:
 	if is_unlocked(id) or EquipmentData.item(id).is_empty(): return false
@@ -1909,6 +2017,7 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 		e.face = (e.locked - e.p).normalized()
 		if e.combat_t <= 0:
 			e.combat = "attack"; e.combat_t = GUARD_ATTACK_TIME if e.kind == "guard" else 0.7
+			if e.kind in ["crawler", "crawler_small"]: emit_audio("enemy_crawler", e.p)
 			e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
 		return
 	if e.combat == "attack":
@@ -1919,11 +2028,13 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 				# 0.20: rajada cadenciada; durante toda a ofensiva a guarda fica aberta.
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < GUARD_SHOTS:
+					emit_audio("enemy_guard", e.p)
 					add_bullet(e.p, direction, 1, 10 * e.damage_scale, 280, 7, -1, "magenta")
 					e.burst += 1; e.burst_t = GUARD_SHOT_INTERVAL
 			"brute":
 				e.burst_t -= dt
 				if e.burst_t <= 0 and e.burst < 6:
+					emit_audio("enemy_brute", e.p)
 					add_bullet(e.p, direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
 					bullets[-1]["source"] = e.kind; bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
 			"crawler", "crawler_small":
@@ -1939,10 +2050,12 @@ func step_common_enemy(e: Dictionary, target: Dictionary, dt: float) -> void:
 					e.jump_height = 0
 					add_combat_zone(e.p, 58 if e.kind == "crawler" else 32, 12 * e.damage_scale, "acid", 0.15, 2.5)
 			"bomber":
+				emit_audio("enemy_bomber", e.p)
 				e.hp = 0; e.detonated = true
 				combat_blast(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale)
 			_:
 				if e.burst == 0:
+					emit_audio("enemy_fish" if e.kind == "fish" else "enemy_cult", e.p)
 					e.burst = 1
 					add_bullet(e.p, direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
 					bullets[-1]["source"] = e.kind

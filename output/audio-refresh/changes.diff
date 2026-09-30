@@ -1,0 +1,853 @@
+--- a/scripts/main.gd
++++ b/scripts/main.gd
+@@ -5,6 +5,7 @@
+ const View = preload("res://scripts/world_view.gd")
+ const EquipmentData := preload("res://scripts/equipment_data.gd")
+ const InventoryState := preload("res://scripts/inventory_state.gd")
++const GameAudio := preload("res://scripts/game_audio.gd")
+ const PORT := 24871
+ const RUN_SAVE := "user://expedition.save"
+ var sim: Expedition
+@@ -39,9 +40,8 @@
+ var automated := false
+ var automated_snapshot_logged := false
+ var frames := 0
+-var sounds: Dictionary = {}
+-var sound_players: Array = []
+-var last_audio: Array = [0.0, 0.0]
++var soundscape: Node
++var audio_network_primed := false
+ var pref_armor := false
+ var pref_outfit := "padrao"
+ var pref_gun := 0
+@@ -79,9 +79,9 @@
+ 	world = View.new(); world.sim = sim; add_child(world)
+ 	camera = Camera2D.new(); camera.position = Vector2(500, 410); camera.zoom = Vector2(1.05, 1.05); add_child(camera)
+ 	build_ui()
+-	for key in ["shot", "heavy", "jump", "hit"]: sounds[key] = load("res://assets/audio/" + key + ".wav")
+-	for _n in range(6):
+-		var player := AudioStreamPlayer.new(); player.volume_db = -12; add_child(player); sound_players.append(player)
++	soundscape = GameAudio.new()
++	add_child(soundscape)
++	soundscape.discard_history(sim.audio_sequence)
+ 	set_volume(volume_percent)
+ 	multiplayer.peer_connected.connect(peer_connected)
+ 	multiplayer.peer_disconnected.connect(peer_disconnected)
+@@ -256,6 +256,7 @@
+ 		sim.say("P2 desconectou. A IA assumiu o parceiro.")
+ 
+ func connected() -> void:
++	audio_network_primed = false
+ 	playing = true; paused = false; menu.hide(); network_status = "ONLINE • você é P2"
+ 	ui_input_block = 0.2
+ 	print("NETWORK_CLIENT_CONNECTED")
+@@ -321,6 +322,9 @@
+ 	if not decoded is Dictionary: return
+ 	var data: Dictionary = decoded
+ 	sim.apply_snapshot(data)
++	if not audio_network_primed and soundscape != null:
++		soundscape.discard_history(sim.audio_sequence)
++		audio_network_primed = true
+ 	if sim.mode == "run" and sim.last_run_summary.is_empty() and menu.visible and menu.screen == "summary":
+ 		menu.hide(); paused = false; map_open = false; ui_input_block = 0.2
+ 	if automated and not automated_snapshot_logged:
+@@ -491,10 +495,10 @@
+ 		if a.get("fire_flash", 0.0) > 0.06 and sim.weapon_of(a) in ["shotgun", "omega"]: shake = maxf(shake, 2.5)
+ 	camera.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * shake
+ 	world.queue_redraw(); update_hud()
+-	if playing and not paused:
+-		for a in sim.actors:
+-			if a.shot > last_audio[a.id]: play_sound("heavy" if a.mech else "shot")
+-			last_audio[a.id] = a.shot
++	if soundscape != null:
++		var listener: Vector2 = sim.actors[1].p if online and not hosting else sim.actors[0].p
++		if sim.coop == "local": listener = (sim.actors[0].p + sim.actors[1].p) * 0.5
++		soundscape.update(sim, playing, paused, menu.visible, listener, dt / maxf(Engine.time_scale, 0.001))
+ 	if screenshot_mode:
+ 		demo_ticks += 1
+ 		var capture_tick := 90 if "--capture-arena" in OS.get_cmdline_user_args() or "--capture-boss" in OS.get_cmdline_user_args() else 30
+@@ -504,11 +508,6 @@
+ 	if automated and frames > 420:
+ 		if hosting: print("NETWORK_REMOTE_POSITION ", sim.actors[1].p, " MOVED=", sim.actors[1].p.x > 400)
+ 		print("NETWORK_TEST_END ", "host" if hosting else "client"); get_tree().quit()
+-
+-func play_sound(key: String) -> void:
+-	for player in sound_players:
+-		if not player.playing:
+-			player.stream = sounds[key]; player.play(); return
+ 
+ func update_hud() -> void:
+ 	hud_panel.visible = false
+@@ -542,8 +541,7 @@
+ 
+ func set_volume(value: float) -> void:
+ 	volume_percent = clampf(value, 0, 100)
+-	for player in sound_players:
+-		player.volume_db = -80.0 if volume_percent <= 0 else linear_to_db(volume_percent / 100.0) - 8
++	if soundscape != null: soundscape.set_volume(volume_percent)
+ 
+ # 0.18: aplica um novo bind se a tecla não estiver em uso por outra ação; devolve true se aplicou.
+ func rebind_key(action: String, keycode: int) -> bool:
+@@ -632,6 +630,7 @@
+ 	if not saved_spectres is Array or saved_spectres.size() != 2: return false
+ 	disconnect_network()
+ 	sim.apply_snapshot(state)
++	if soundscape != null: soundscape.discard_history(sim.audio_sequence)
+ 	presented_summary_seq = sim.summary_seq
+ 	sim.rng.state = safe_int(data.get("rng_state", sim.rng.state), sim.rng.state)
+ 	sim.arena_wait = safe_float(data.get("arena_wait", 0.0)); sim.uid = safe_int(data.get("uid", 0))
+--- a/scripts/simulation.gd
++++ b/scripts/simulation.gd
+@@ -22,6 +22,10 @@
+ const MAX_COMBAT_ZONES := 64
+ var pickups: Array = []
+ var effects: Array = []
++# Host-authored transient sound cues; presentation never consumes gameplay RNG.
++const MAX_AUDIO_EVENTS := 64
++var audio_events: Array = []
++var audio_sequence := 0
+ var rooms: Array = []
+ var floors: Array = []
+ var obstacles: Array = []
+@@ -95,6 +99,11 @@
+ func _init() -> void:
+ 	make_hub()
+ 
++func emit_audio(key: String, p: Vector2) -> void:
++	audio_sequence += 1
++	audio_events.append({"id": audio_sequence, "key": key, "p": p, "time": tick_time})
++	if audio_events.size() > MAX_AUDIO_EVENTS: audio_events.pop_front()
++
+ func actor(id: int, pos: Vector2) -> Dictionary:
+ 	return {"id": id, "active": id == 0 or coop != "solo", "p": pos, "aim": Vector2.RIGHT, "facing": Vector2.DOWN, "dash_dir": Vector2.RIGHT, "move": Vector2.ZERO, "hp": BASE_HEARTS * HEART, "shield": 0.0, "armor": false,
+ 		"jump": 0.0, "jump_cd": 0.0, "shot": 0.0, "slash": 0.0, "dodge": 0.0, "roll_visual": 0.0, "dodge_cd": 0.0,
+@@ -231,6 +240,7 @@
+ const HUB_TITAN_BAY := Vector2(1140, 548)
+ 
+ func make_hub() -> void:
++	audio_events.clear()
+ 	doors.clear(); gate_blocks.clear(); hazards.clear(); tentacle_gates.clear()
+ 	mode = "hub"
+ 	money = 0; keys = 0  # 0.21: moeda e chaves não atravessam o portal temporal.
+@@ -271,6 +281,7 @@
+ 	return {}
+ 
+ func start_arena() -> void:
++	audio_events.clear()
+ 	mode = "arena"; tick_time = 0; arena_wave = 0; arena_wait = 0
+ 	pending_spawns.clear()
+ 	side_active = false; side_complete = false; side_failed = false; side_time = 0
+@@ -308,6 +319,7 @@
+ 		if not a.dead: heal(a, 1)
+ 
+ func start_run(new_seed: int) -> void:
++	audio_events.clear()
+ 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
+ 	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
+ 	seed_value = new_seed; rng.seed = seed_value
+@@ -790,8 +802,10 @@
+ 	var aim: Vector2 = cmd.get("aim", a.aim)
+ 	if aim.length() > 0.1: a.aim = aim.normalized()
+ 	if cmd.get("jump", false) and a.jump <= 0 and a.jump_cd <= 0 and not a.mech:
++		emit_audio("jump", a.p)
+ 		a.jump = 0.65; a.jump_cd = 0.8; a["jump_from"] = a.p
+ 	if cmd.get("dodge", false) and a.dodge_cd <= 0 and not a.mech:
++		emit_audio("dash", a.p)
+ 		a.dodge = 0.20; a.roll_visual = 0.36; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
+ 		a.dash_dir = moving.normalized() if moving.length() > 0.1 else a.facing.normalized()
+ 	var speed: float = 190.0 if a.mech else (ARMORS[a.armor_type].speed if a.armor else uniform_of(a).speed)
+@@ -878,6 +892,7 @@
+ 	effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.1, "dir": a.aim})
+ 
+ func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: bool = false, credit_player: bool = true) -> void:
++	emit_audio("explosion", p)
+ 	for e in enemies:
+ 		var d: float = e.p.distance_to(p)
+ 		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
+@@ -1031,6 +1046,7 @@
+ 	if weapon == "bazooka":
+ 		var owned: Dictionary = a.run_weapons
+ 		if int(owned.get("bazooka", 0)) <= 0:
++			emit_audio("dry_fire", a.p)
+ 			a.shot = 0.3; say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica"); return
+ 		owned.bazooka = maxi(0, int(owned.bazooka) - 1)
+ 		a.run_weapons = owned
+@@ -1064,6 +1080,7 @@
+ 			hit_bullet_enemy(bullet, true)
+ 			if bullet.life <= 0 or bullet.team != 0: break
+ 	a.shot = cooldown; a["fire_flash"] = 0.09
++	emit_audio(weapon, a.p)
+ 	if weapon == "bazooka" and int(a.run_weapons.bazooka) == 0:
+ 		say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica")
+ 	if a.mech: effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.12, "dir": a.aim}); effects.append({"p": a.p, "kind": "recoil", "life": 0.2, "max": 0.2, "dir": a.aim})
+@@ -1072,6 +1089,7 @@
+ 
+ # Lâmina Ômega: combo de 3 cortes em arco. O 3º é mais largo e solta uma onda perfurante.
+ func sword_attack(a: Dictionary) -> void:
++	emit_audio("sword", a.p)
+ 	if a.combo_t <= 0: a.combo = 0
+ 	var hit: int = a.combo
+ 	a.combo = (a.combo + 1) % 3; a.combo_t = 0.7
+@@ -1108,6 +1126,7 @@
+ 	for i in hit: damage_obstacle(i, damage)
+ 
+ func melee(a: Dictionary) -> void:
++	emit_audio("melee", a.p)
+ 	a.slash = 0.65 if a.mech else 0.45
+ 	var reach := 115.0 if a.mech else 78.0
+ 	effects.append({"p": a.p, "kind": "slash", "life": 0.18, "dir": a.aim, "reach": reach})
+@@ -1224,6 +1243,7 @@
+ 
+ func damage_actor(a: Dictionary, amount: float, source_kind: String = "unknown", source_attack: String = "") -> void:
+ 	if a.hurt > 0 or a.dodge > 0 or a.dead or a.jump > 0 or a.get("transform", 0.0) > 0: return
++	if amount > 0: emit_audio("hit", a.p)
+ 	var hp_before := float(a.hp)
+ 	a.last_damage_source = source_kind; a.last_damage_attack = source_attack
+ 	a.hurt = 0.45 if a.mech else HURT_IFRAMES
+@@ -1310,6 +1330,7 @@
+ 
+ 	for e in enemies:
+ 		if e.hp > 0: continue
++		emit_audio("enemy_die", e.p)
+ 		if e.kind == "bomber" and not e.detonated:
+ 			e.detonated = true
+ 			add_combat_zone(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale, "blast", 0.65, 0.1)
+@@ -1362,6 +1383,7 @@
+ 		return
+ 	e.cd -= dt
+ 	if closest < 560 and e.cd <= 0 and line_of_fire(e.p, target.p):
++		emit_audio("enemy_warden", e.p)
+ 		e["attack_state"] = "warning"; e.attack_time = 0.55; e["charge_dir"] = direction
+ 		return
+ 	var before: Vector2 = e.p
+@@ -1388,6 +1410,7 @@
+ 	if e.charge > 0:
+ 		e.charge -= dt
+ 		if e.charge <= 0:
++			emit_audio("enemy_boss", e.p)
+ 			e.shot = 0.4
+ 			add_bullet(e.p + direction * 30, direction, 1, 24, 200, 13, -1, "cannon", 4.0)
+ 		return
+@@ -1395,6 +1418,7 @@
+ 		e.spin -= dt; e.cd -= dt
+ 		if e.cd <= 0:
+ 			e.cd = 0.11 * enrage_scale(e); e.spin_angle += 0.42
++			emit_audio("enemy_boss", e.p)
+ 			for k in range(2 if stage == 2 else 3):
+ 				add_bullet(e.p, Vector2.RIGHT.rotated(e.spin_angle + k * TAU / (2 if stage == 2 else 3)), 1, 10, 165, 6, -1, "orb")
+ 		return
+@@ -1403,6 +1427,7 @@
+ 	e.phase += 1
+ 	match stage:
+ 		1:
++			emit_audio("enemy_boss", e.p)
+ 			e.shot = 0.4; e.cd = 1.1 * enrage_scale(e)
+ 			if e.phase % 2 == 1:
+ 				for n in range(16): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 16 + e.phase * 0.2), 1, 12, 150, 7, -1, "orb")
+@@ -1413,6 +1438,7 @@
+ 			else: e.spin = 2.2; e.cd = 0.0
+ 		3:
+ 			e.shot = 0.4; e.cd = 0.8 * enrage_scale(e)
++			emit_audio("enemy_boss", e.p)
+ 			match e.phase % 3:
+ 				0:
+ 					for n in range(3): add_bullet(e.p, direction.rotated((n - 1) * 0.35), 1, 14, 115, 11, -1, "ink", 4.5)
+@@ -1454,6 +1480,7 @@
+ 						hurt_enemy(other, MECH_SHELL.splash_damage); other.hurt = 0.15; other["alerted"] = true
+ 						pop_dmg(other.p, MECH_SHELL.splash_damage)
+ 				effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
++				emit_audio("explosion", b.p)
+ 			effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
+ 			if b.get("pierce", 0) > 0:
+ 				b.pierce -= 1; previous_hits.append(e.id); b["hits"] = previous_hits
+@@ -1533,6 +1560,7 @@
+ 					if bs.hp <= 0: bs.state = "stored"   # bateria reanima um Spectre destruído
+ 					bs.hp = minf(100.0, bs.hp + BATTERY_PICKUP); say("BATERIA • Spectre recarregado")
+ 				else: money += 2
++				emit_audio("pickup", pickup.p)
+ 				pickup["taken"] = true; break
+ 	pickups = pickups.filter(func(p): return not p.get("taken", false))
+ 
+@@ -1707,10 +1735,13 @@
+ 			s.aim = (target.p - s.p).normalized()
+ 			if s.shot <= 0:
+ 				add_bullet(s.p + s.aim * 20, s.aim, 0, SPECTRE_SHOT.damage, 600, 4, s.owner)
++				emit_audio("spectre", s.p)
+ 				s.shot = SPECTRE_SHOT.cooldown
+ 
+ func snapshot() -> Dictionary:
+ 	var data := {}
++	data["audio_events"] = audio_events.duplicate(true)
++	data["audio_sequence"] = audio_sequence
+ 	data["spectres"] = spectres
+ 	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t", "run_stats", "last_run_summary", "summary_seq"]:
+ 		data[name] = get(name)
+@@ -1719,7 +1750,22 @@
+ func apply_snapshot(data: Dictionary) -> void:
+ 	var allowed := snapshot().keys()
+ 	for name in data:
+-		if name in allowed and name != "inventory_state": set(name, data[name])
++		if name in allowed and name not in ["inventory_state", "audio_events", "audio_sequence"]: set(name, data[name])
++	# Replicas adopt the host's sequence, including a new host with lower IDs.
++	# Legacy saves have no cues and preserve the local sequence.
++	audio_events.clear()
++	var incoming_sequence: Variant = data.get("audio_sequence")
++	if incoming_sequence is int: audio_sequence = maxi(0, incoming_sequence)
++	var incoming_events: Variant = data.get("audio_events", [])
++	if incoming_events is Array:
++		for event in incoming_events:
++			if not event is Dictionary: continue
++			if not event.get("id") is int or not event.get("key") is String or not event.get("p") is Vector2: continue
++			if not (event.get("time") is float or event.get("time") is int): continue
++			if event.id <= 0: continue
++			audio_events.append(event.duplicate(true))
++			audio_sequence = maxi(audio_sequence, event.id)
++			if audio_events.size() > MAX_AUDIO_EVENTS: audio_events.pop_front()
+ 	# Saves de expedições antigas podem carregar uma lista anterior de desbloqueios.
+ 	# A Ômega agora é inicial; migre somente ela sem alterar a progressão dos outros itens.
+ 	if not unlocked is Dictionary: unlocked = {}
+@@ -1971,6 +2017,7 @@
+ 		e.face = (e.locked - e.p).normalized()
+ 		if e.combat_t <= 0:
+ 			e.combat = "attack"; e.combat_t = GUARD_ATTACK_TIME if e.kind == "guard" else 0.7
++			if e.kind in ["crawler", "crawler_small"]: emit_audio("enemy_crawler", e.p)
+ 			e["burst"] = 0; e["burst_t"] = 0.0; e["launch"] = e.p
+ 		return
+ 	if e.combat == "attack":
+@@ -1981,11 +2028,13 @@
+ 				# 0.20: rajada cadenciada; durante toda a ofensiva a guarda fica aberta.
+ 				e.burst_t -= dt
+ 				if e.burst_t <= 0 and e.burst < GUARD_SHOTS:
++					emit_audio("enemy_guard", e.p)
+ 					add_bullet(e.p, direction, 1, 10 * e.damage_scale, 280, 7, -1, "magenta")
+ 					e.burst += 1; e.burst_t = GUARD_SHOT_INTERVAL
+ 			"brute":
+ 				e.burst_t -= dt
+ 				if e.burst_t <= 0 and e.burst < 6:
++					emit_audio("enemy_brute", e.p)
+ 					add_bullet(e.p, direction.rotated((e.burst - 2.5) * 0.13), 1, 12 * e.damage_scale, 260, 6, -1, "violet")
+ 					bullets[-1]["source"] = e.kind; bullets[-1]["accel"] = 90.0; e.burst += 1; e.burst_t = 0.1
+ 			"crawler", "crawler_small":
+@@ -2001,10 +2050,12 @@
+ 					e.jump_height = 0
+ 					add_combat_zone(e.p, 58 if e.kind == "crawler" else 32, 12 * e.damage_scale, "acid", 0.15, 2.5)
+ 			"bomber":
++				emit_audio("enemy_bomber", e.p)
+ 				e.hp = 0; e.detonated = true
+ 				combat_blast(e.p, BOMBER_BLAST.radius, BOMBER_BLAST.damage * e.damage_scale)
+ 			_:
+ 				if e.burst == 0:
++					emit_audio("enemy_fish" if e.kind == "fish" else "enemy_cult", e.p)
+ 					e.burst = 1
+ 					add_bullet(e.p, direction, 1, (22 if e.kind == "fish" else 12) * e.damage_scale, 560 if e.kind == "fish" else 230, 7, -1, "harpoon" if e.kind == "fish" else "magenta")
+ 					bullets[-1]["source"] = e.kind
+--- a/scripts/terminal_ui.gd
++++ b/scripts/terminal_ui.gd
+@@ -715,7 +715,7 @@
+ 	match options_tab:
+ 		"video": build_video_options(p)
+ 		"audio":
+-			label(p, Rect2(30, 100, 600, 35), "VOLUME DOS EFEITOS", 18)
++			label(p, Rect2(30, 100, 600, 35), "VOLUME GERAL • MÚSICA E EFEITOS", 18)
+ 			var volume := HSlider.new(); volume.position = Vector2(30, 145); volume.size = Vector2(760, 40); volume.min_value = 0; volume.max_value = 100; volume.value = app.volume_percent
+ 			volume.value_changed.connect(func(value): app.set_volume(value)); p.add_child(volume)
+ 		"controls": build_controls_options(p)
+--- /dev/null
++++ b/scripts/game_audio.gd
+@@ -0,0 +1,134 @@
++extends Node
++## Presentation-only audio: does not consume the gameplay RNG or drive combat.
++const ROOT := "res://assets/audio/generated/"
++const SFX_KEYS := ["pistol", "shotgun", "smg", "bazooka", "mech", "sword", "melee", "spectre",
++	"enemy_cult", "enemy_fish", "enemy_crawler", "enemy_brute", "enemy_guard", "enemy_bomber",
++	"enemy_warden", "enemy_boss", "enemy_die", "explosion", "hit", "jump", "dash", "pickup", "dry_fire"]
++const VOICES := 20
++const MAX_DISTANCE := 1300.0
++var samples: Dictionary = {}
++var voices: Array[AudioStreamPlayer] = []
++var music: Dictionary = {}
++var music_gain := {"refuge": 0.0, "expedition": 0.0}
++var master := 0.7
++var duck := 1.0
++var last_sequence := 0
++var recent: Dictionary = {}
++var sounds_started := 0
++var playback_rng := RandomNumberGenerator.new()
++var was_active := false
++
++func _ready() -> void:
++	playback_rng.seed = 19410930
++	ensure_bus("Severence Mix", "Master", true)
++	ensure_bus("Severence SFX", "Severence Mix", false)
++	ensure_bus("Severence Music", "Severence Mix", false)
++	for key in SFX_KEYS:
++		samples[key] = load(ROOT + key + ".wav")
++	for index in range(VOICES):
++		var player := AudioStreamPlayer.new()
++		player.bus = "Severence SFX"
++		add_child(player)
++		voices.append(player)
++	for key in ["refuge", "expedition"]:
++		var player := AudioStreamPlayer.new()
++		var path: String = ROOT + "music_" + key
++		player.stream = load(path + (".ogg" if ResourceLoader.exists(path + ".ogg") else ".wav"))
++		if player.stream is AudioStreamOggVorbis:
++			player.stream.loop = true
++		elif player.stream is AudioStreamWAV:
++			player.stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
++			player.stream.loop_begin = 0
++			player.stream.loop_end = player.stream.data.size() / (4 if player.stream.stereo else 2)
++		player.bus = "Severence Music"
++		player.volume_db = -80.0
++		add_child(player)
++		music[key] = player
++	set_volume(master * 100.0)
++
++func ensure_bus(bus_name: String, send: String, limit: bool) -> void:
++	if AudioServer.get_bus_index(bus_name) >= 0: return
++	AudioServer.add_bus()
++	var index := AudioServer.bus_count - 1
++	AudioServer.set_bus_name(index, bus_name)
++	AudioServer.set_bus_send(index, send)
++	if limit:
++		var limiter := AudioEffectLimiter.new()
++		limiter.ceiling_db = -1.0
++		limiter.threshold_db = -2.0
++		AudioServer.add_bus_effect(index, limiter)
++
++func _exit_tree() -> void:
++	for player in voices:
++		player.stop()
++		player.stream = null
++	for player in music.values():
++		player.stop()
++		player.stream = null
++	samples.clear()
++
++func set_volume(percent: float) -> void:
++	master = clampf(percent / 100.0, 0.0, 1.0)
++	var index := AudioServer.get_bus_index("Severence Mix")
++	if index >= 0:
++		AudioServer.set_bus_mute(index, master <= 0.0)
++		AudioServer.set_bus_volume_db(index, linear_to_db(master) if master > 0 else -80.0)
++
++func discard_history(sequence: int) -> void:
++	last_sequence = sequence
++	recent.clear()
++	for voice in voices: voice.stop()
++
++func update(sim, playing: bool, paused: bool, menu_visible: bool, listener: Vector2, dt: float) -> void:
++	var active := playing and not paused
++	if was_active and not active:
++		for voice in voices: voice.stop()
++	was_active = active
++	# A loaded save or a new host can have a lower sequence. Never replay its log.
++	if sim.audio_sequence < last_sequence: discard_history(sim.audio_sequence)
++	for event in sim.audio_events:
++		if event.id <= last_sequence: continue
++		last_sequence = event.id
++		if active and sim.tick_time - float(event.time) < 0.6:
++			play_effect(event.key, event.p, listener)
++	var track := "expedition" if playing and sim.mode in ["run", "arena"] else "refuge"
++	duck = move_toward(duck, 0.35 if paused or (playing and menu_visible) else 1.0, dt * 2.0)
++	for key in music:
++		var player: AudioStreamPlayer = music[key]
++		music_gain[key] = move_toward(float(music_gain[key]), 1.0 if key == track else 0.0, dt / 1.5)
++		var gain: float = music_gain[key] * duck
++		player.volume_db = -13.0 + linear_to_db(gain) if gain > 0.001 else -80.0
++		if key == track and not player.playing: player.play()
++		elif key != track and gain <= 0.001 and player.playing: player.stop()
++
++func play_effect(key: String, position: Vector2, listener: Vector2) -> bool:
++	if master <= 0.0 or not samples.has(key) or samples[key] == null: return false
++	var distance := position.distance_to(listener)
++	if distance >= MAX_DISTANCE: return false
++	var now := Time.get_ticks_msec()
++	# Coalesce simultaneous pellets/swarm events without losing automatic fire.
++	if now - int(recent.get(key, -10000)) < 40: return false
++	var chosen: AudioStreamPlayer
++	for voice in voices:
++		if not voice.playing:
++			chosen = voice
++			break
++	if chosen == null:
++		# Preserve near/player feedback; discard quieter events when the pool is full.
++		for voice in voices:
++			if chosen == null or voice.volume_db < chosen.volume_db: chosen = voice
++		if chosen.volume_db >= effect_gain(key, distance): return false
++		chosen.stop()
++	recent[key] = now
++	chosen.stream = samples[key]
++	chosen.pitch_scale = playback_rng.randf_range(0.96, 1.04)
++	chosen.volume_db = effect_gain(key, distance)
++	chosen.play()
++	sounds_started += 1
++	return true
++
++func effect_gain(key: String, distance: float) -> float:
++	var gain := -7.0
++	if key.begins_with("enemy_"): gain -= 4.0
++	if key in ["explosion", "mech"]: gain -= 3.0
++	return gain + linear_to_db(maxf(0.025, 1.0 - distance / MAX_DISTANCE))
+--- /dev/null
++++ b/tests/game_audio_test.gd
+@@ -0,0 +1,60 @@
++extends SceneTree
++const Audio := preload("res://scripts/game_audio.gd")
++var failures := 0
++
++func check(ok: bool, description: String) -> void:
++	if ok: print("PASS: ", description)
++	else: failures += 1; push_error(description)
++
++func _init() -> void:
++	call_deferred("run")
++
++func run() -> void:
++	var audio := Audio.new()
++	root.add_child(audio)
++	await create_timer(0.1).timeout
++	var sim := Expedition.new()
++	for key in Audio.SFX_KEYS:
++		check(audio.samples.get(key) is AudioStreamWAV and audio.samples[key].get_length() > 0.02, key + " carrega áudio real")
++	for key in audio.music:
++		check(audio.music[key].stream.get_length() >= 45.0 and audio.music[key].stream.loop, key + " possui trilha longa com loop")
++	audio.discard_history(sim.audio_sequence)
++	var rng_before := sim.rng.state
++	sim.emit_audio("pistol", Vector2.ZERO)
++	audio.update(sim, true, false, false, Vector2.ZERO, 0.016)
++	check(audio.sounds_started == 1, "evento de disparo toca uma vez")
++	audio.update(sim, true, false, false, Vector2.ZERO, 0.016)
++	check(audio.sounds_started == 1, "snapshot repetido não repete o som")
++	check(sim.rng.state == rng_before, "variação de áudio não altera RNG do combate")
++	sim.emit_audio("shotgun", Vector2(2000, 0))
++	audio.update(sim, true, false, false, Vector2.ZERO, 0.016)
++	check(audio.sounds_started == 1, "inimigos distantes não poluem a mixagem")
++	sim.emit_audio("melee", Vector2.ZERO)
++	audio.update(sim, true, true, true, Vector2.ZERO, 0.016)
++	check(not audio.voices.any(func(voice): return voice.playing), "pausa interrompe efeitos ativos")
++	audio.update(sim, true, false, false, Vector2.ZERO, 0.016)
++	check(audio.sounds_started == 1, "retomar não reproduz fila da pausa")
++	audio.set_volume(0)
++	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Severence Mix")), "volume zero silencia efeitos e música")
++	check(not audio.play_effect("sword", Vector2.ZERO, Vector2.ZERO), "efeitos não começam no mudo")
++	audio.set_volume(70)
++	check(not AudioServer.is_bus_mute(AudioServer.get_bus_index("Severence Mix")), "volume restaura a mixagem")
++	sim.mode = "hub"
++	audio.update(sim, true, false, false, Vector2.ZERO, 2.0)
++	check(audio.music.refuge.playing and not audio.music.expedition.playing, "refúgio usa sua música")
++	sim.mode = "run"
++	audio.update(sim, true, false, false, Vector2.ZERO, 2.0)
++	check(audio.music.expedition.playing and not audio.music.refuge.playing, "expedição troca de música")
++	audio.update(sim, true, true, true, Vector2.ZERO, 2.0)
++	check(is_equal_approx(audio.duck, 0.35), "menu reduz suavemente a música")
++	sim.emit_audio("bazooka", Vector2.ZERO)
++	audio.discard_history(sim.audio_sequence)
++	audio.update(sim, true, false, false, Vector2.ZERO, 0.016)
++	check(audio.sounds_started == 1, "carregar sessão descarta efeitos históricos")
++	await create_timer(0.1).timeout
++	audio.queue_free()
++	await process_frame
++	# The mixer releases stream playbacks on its own thread after nodes exit.
++	await create_timer(0.1).timeout
++	print("GAME_AUDIO failures=", failures)
++	quit(failures)
+--- /dev/null
++++ b/tests/simulation_audio_test.gd
+@@ -0,0 +1,65 @@
++extends SceneTree
++
++const Simulation := preload("res://scripts/simulation.gd")
++var failures := 0
++
++func check(ok: bool, label: String) -> void:
++	if ok: print("PASS: ", label)
++	else: failures += 1; push_error(label)
++
++func count_key(sim: RefCounted, key: String) -> int:
++	return sim.audio_events.filter(func(e): return e.key == key).size()
++
++func _init() -> void:
++	var sim := Simulation.new()
++	sim.coop = "solo"; sim.start_arena()
++	sim.enemies.clear(); sim.pending_spawns.clear()
++	var a: Dictionary = sim.actors[0]
++	a.p = Vector2(300, 500)
++	sim.step_actor(a, {"fire": true}, 0.01)
++	check(count_key(sim, "pistol") == 1, "successful shot emits one pistol cue")
++	sim.step_actor(a, {"fire": true}, 0.01)
++	check(count_key(sim, "pistol") == 1, "cooldown does not emit another cue")
++	a.outfit = "mecanico"; a.shot = 0
++	sim.step_actor(a, {"fire": true}, 0.01)
++	check(count_key(sim, "shotgun") == 1, "shotgun emits once for all pellets")
++	sim.grant_run_weapon(a, "bazooka", 1); a.run_weapon = "bazooka"; a.shot = 0
++	sim.step_actor(a, {"fire": true}, 0.01)
++	a.shot = 0
++	var bullet_count: int = sim.bullets.size()
++	sim.step_actor(a, {"fire": true}, 0.01)
++	check(count_key(sim, "bazooka") == 1 and count_key(sim, "dry_fire") == 1 and sim.bullets.size() == bullet_count, "empty bazooka clicks without shot")
++	sim.audio_events.clear(); a.armor = true; a.armor_time = 10; a.shot = 0
++	sim.step_actor(a, {"fire": true}, 0.01)
++	check(sim.audio_events.size() == 1 and count_key(sim, "sword") == 1, "sword input emits only sword cue")
++	sim.audio_events.clear(); a.armor = false; a.hurt = 0
++	sim.damage_actor(a, 10)
++	sim.damage_actor(a, 10)
++	check(count_key(sim, "hit") == 1, "invulnerable damage does not repeat hit cue")
++	sim.spawn_enemy(Vector2(500, 500), "guard")
++	var guard: Dictionary = sim.enemies[0]
++	guard.cd = 0; guard.alerted = true
++	for _i in range(365): sim.step_enemies(0.01)
++	check(count_key(sim, "enemy_guard") == Simulation.GUARD_SHOTS, "guard emits one cue per discrete shot")
++	sim.audio_events.clear()
++	var rng_before: int = sim.rng.state
++	for _i in range(100): sim.emit_audio("pistol", a.p)
++	check(sim.rng.state == rng_before, "audio does not consume gameplay RNG")
++	check(sim.audio_events.size() == 64 and sim.audio_events[-1].id == sim.audio_sequence, "event ring bounded at 64")
++	var saved: Dictionary = sim.snapshot().duplicate(true)
++	var clone := Simulation.new()
++	clone.apply_snapshot(saved)
++	check(clone.audio_events == sim.audio_events and clone.audio_sequence == sim.audio_sequence, "snapshot carries cue IDs and positions")
++	clone.apply_snapshot({"audio_sequence": 2, "audio_events": [{"id": 2, "key": "pistol", "p": Vector2.ZERO, "time": 0.0}]})
++	check(clone.audio_sequence == 2 and clone.audio_events[0].id == 2, "new host replaces higher local sequence")
++	var sequence: int = sim.audio_sequence
++	sim.make_hub()
++	check(sim.audio_events.is_empty() and sim.audio_sequence == sequence, "scene change clears ring without resetting IDs")
++	sim.emit_audio("jump", Vector2.ZERO)
++	saved.erase("audio_events"); saved.erase("audio_sequence")
++	sim.apply_snapshot(saved)
++	check(sim.audio_events.is_empty() and sim.audio_sequence == sequence + 1, "legacy save clears stale cues and preserves IDs")
++	clone.apply_snapshot({"audio_events": [null, {"id": "bad"}], "audio_sequence": "bad"})
++	check(clone.audio_events.is_empty(), "malformed audio snapshot ignored")
++	print("failures=", failures)
++	quit(failures)
+--- /dev/null
++++ b/tools/generate_game_audio.py
+@@ -0,0 +1,228 @@
++"""Original deterministic synthesis for the occult dockyard game.
++
++Requires numpy, scipy, soundfile. Run from any directory with Python 3.
++No sampled recordings, external compositions, voices or generative services.
++"""
++from pathlib import Path
++import hashlib
++import json
++import numpy as np
++from scipy.signal import butter, sosfilt
++import soundfile as sf
++
++ROOT = Path(__file__).resolve().parents[1]
++OUT = ROOT / 'assets/audio/generated'
++SOURCE = ROOT / 'art/source/audio'
++PREVIEW = ROOT / 'output/audio-refresh'
++SR = 44100
++RNG = np.random.default_rng(19410930)
++
++
++def timeline(d):
++    return np.arange(round(d * SR), dtype=np.float64) / SR
++
++
++def noise(t, low=70, high=7000):
++    return sosfilt(butter(2, [low, high], btype='bandpass', fs=SR, output='sos'), RNG.standard_normal(len(t)))
++
++
++def env(t, decay, attack=.001):
++    return (1 - np.exp(-t / attack)) * np.exp(-t / decay)
++
++
++def sweep(t, f, end, decay=.04):
++    phase = end * t + (f - end) * decay * (1 - np.exp(-t / decay))
++    return np.sin(2 * np.pi * phase)
++
++
++def ring(t, freq, decay, count=5):
++    return sum(np.sin(2 * np.pi * freq * r * t) * env(t, decay / (1 + i * .45)) / (1 + i)
++               for i, r in enumerate([1, 1.493, 2.137, 2.891, 4.07][:count]))
++
++
++def finish(x, peak=.78):
++    x = np.nan_to_num(x)
++    x -= x.mean()
++    x = np.tanh(x * 1.15)
++    fade = min(round(.012 * SR), len(x) // 8)
++    x[:80] *= np.linspace(0, 1, 80)
++    x[-fade:] *= np.linspace(1, 0, fade) ** 2
++    return x * (peak / max(np.max(np.abs(x)), 1e-9))
++
++
++def shot(d, weight=1, metal=1700):
++    t = timeline(d)
++    x = 1.1 * noise(t, 400, 12000) * env(t, .012)
++    x += weight * .9 * sweep(t, 170, 48, .017) * env(t, .055)
++    x += .55 * noise(t, 90, 1700) * env(t, .06)
++    x += .24 * ring(t, metal, .029, 3)
++    # Delayed breech mechanism, separate from muzzle transient.
++    q = np.maximum(t - .045, 0)
++    x += .18 * ring(q, metal * .62, .018, 3) * (t >= .045)
++    return x
++
++
++def creature(d, base, wet=1, metal=0, magic=0):
++    t = timeline(d)
++    pitch = base * (1 + .15 * np.sin(2*np.pi*8*t)) * (1 - .3 * t / d)
++    phase = 2*np.pi*np.cumsum(pitch) / SR
++    growl = np.sin(phase + 1.7*np.sin(phase*.51)) + .32*np.sin(phase*2.01)
++    x = .6 * growl * env(t, d / 3, .009)
++    x += wet * noise(t, 200, 2300) * (.4 + .6*np.sin(2*np.pi*29*t)**4) * env(t, d/4, .006)
++    x += metal * ring(t, base*8.3, .18)
++    x += magic * (np.sin(phase*5.013) + .5*np.sin(phase*7.07)) * env(t, d/3, .023)
++    return x
++
++
++def make_sfx():
++    sounds = {}
++    sounds['pistol'] = shot(.25, .85)
++    sounds['shotgun'] = shot(.43, 1.5, 1130)
++    sounds['smg'] = shot(.16, .55, 2370)
++    sounds['mech'] = shot(.32, 1.8, 780)
++    t = timeline(.6)
++    sounds['bazooka'] = .8*sweep(t, 190, 38)*env(t,.16) + noise(t,100,5000)*env(t,.13,.008)
++    t = timeline(.39)
++    sounds['sword'] = noise(t,850,10500)*np.sin(np.pi*np.minimum(t/.24,1))**2*np.exp(-t*8) + .4*ring(t,1270,.09)
++    t = timeline(.27)
++    sounds['melee'] = noise(t,90,2900)*env(t,.035,.003) + .8*sweep(t,120,40)*env(t,.05)
++    t = timeline(.58)
++    sounds['spectre'] = creature(.58,180,.12,0,.7) + .3*noise(t,1800,7000)*env(t,.1)
++    for key, duration, base, wet, metal, magic in [
++        ('enemy_cult',.65,122,.2,0,.8), ('enemy_fish',.48,162,.6,.65,0),
++        ('enemy_crawler',.5,73,1.4,0,0), ('enemy_brute',.72,48,.7,.18,0),
++        ('enemy_guard',.33,97,.05,.9,0), ('enemy_bomber',.48,205,.3,.5,.15),
++        ('enemy_warden',.7,62,.25,.6,.3), ('enemy_boss',1.12,39,1,.2,.5),
++        ('enemy_die',.52,95,.8,0,.08)]:
++        sounds[key] = creature(duration,base,wet,metal,magic)
++    sounds['enemy_guard'] += shot(.33,.8,950)*.9
++    t = timeline(1.15)
++    sounds['explosion'] = 1.4*sweep(t,100,28,.09)*env(t,.24)+noise(t,40,4800)*env(t,.18)+.3*noise(t,150,1300)*env(t,.4,.07)
++    t = timeline(.19)
++    sounds['hit'] = noise(t,100,2400)*env(t,.03)+.8*sweep(t,140,55)*env(t,.033)
++    t = timeline(.25)
++    sounds['jump'] = .4*sweep(t,120,380,.1)*env(t,.08,.005)+noise(t,150,1700)*env(t,.055,.01)
++    t = timeline(.36)
++    sounds['dash'] = noise(t,300,7500)*env(t,.07,.015)+.25*sweep(t,280,60,.09)*env(t,.08,.01)
++    t = timeline(.56)
++    sounds['pickup'] = sum(np.sin(2*np.pi*f*t)*env(t,.14,.003)*a for f,a in [(659.25,.45),(987.77,.3),(1318.51,.2)])
++    t = timeline(.12)
++    sounds['dry_fire'] = ring(t,1850,.015,4)*.3+noise(t,900,9000)*env(t,.006)
++    return {k:finish(v, .62 if k in ['pickup','dry_fire','jump'] else .78) for k,v in sounds.items()}
++
++
++def hz(midi):
++    return 440 * 2**((midi-69)/12)
++
++
++def place(track, sound, at, gain=1, pan=0):
++    indices = (np.arange(len(sound)) + round(at*SR)) % len(track)
++    np.add.at(track[:,0],indices,sound*gain*np.sqrt((1-pan)/2))
++    np.add.at(track[:,1],indices,sound*gain*np.sqrt((1+pan)/2))
++
++
++def note(midi, duration, kind):
++    t = timeline(duration)
++    f = hz(midi)
++    if kind == 'pad':
++        x = sum(np.sin(2*np.pi*f*r*t + .22*np.sin(2*np.pi*.19*t)) * a for r,a in [(1,.65),(1.003,.3),(.998,.3),(2,.12),(3,.045)])
++        e = np.sin(np.pi*t/duration)**1.6
++    elif kind == 'bass':
++        x = np.sin(2*np.pi*f*t)+.15*np.sin(4*np.pi*f*t)
++        e = env(t,duration*.35,.014) * np.minimum((duration-t)/.1,1)
++    else:
++        x = np.sin(2*np.pi*f*t)+.27*np.sin(2*np.pi*f*2.001*t)+.08*np.sin(2*np.pi*f*3.998*t)
++        e = env(t,.8 if kind == 'bell' else .24,.003)
++        e *= np.minimum((duration-t)/.12,1)
++    return x*e
++
++
++def music(expedition):
++    beat = .8 if expedition else 1.
++    duration = beat*64
++    track = np.zeros((round(duration*SR),2))
++    # Original sixteen-bar D-minor progression; suspended colors leave room for effects.
++    chords = [[50,57,60,64],[46,53,57,60],[53,60,64,67],[48,55,58,62],
++              [50,57,60,65],[46,53,57,62],[43,50,58,62],[45,52,57,61]]
++    motif = [74,None,72,69,65,None,69,72,74,77,None,76,72,69,65,69]
++    for bar in range(16):
++        chord = chords[bar//2]
++        for j,m in enumerate(chord):
++            place(track,note(m,beat*6,'pad'),bar*beat*4,.052, (j-1.5)*.42)
++        for b in range(4):
++            place(track,note(chord[0]-12,beat*1.5,'bass'),(bar*4+b)*beat,.115 if expedition else .055)
++        for b in range(4 if expedition else 2):
++            m = chord[(b+bar)%4]+12
++            place(track,note(m,beat*2,'pluck'),(bar*4+b*(1 if expedition else 2)+.5)*beat,.035 if expedition else .025,np.sin(bar+b)*.65)
++        # Sparse glass/electric-piano phrase, never a continuous alarm tone.
++        if bar % 2 == 0:
++            for b in range(4):
++                m = motif[(bar*2+b)%len(motif)]
++                if m is not None:
++                    place(track,note(m,beat*3,'bell'),(bar*4+b)*beat,.045,-.2)
++        if expedition:
++            for b in [0,2]:
++                t = timeline(.4)
++                kick = sweep(t,95,39,.026)*env(t,.075)+noise(t,600,3000)*env(t,.006)*.2
++                place(track,kick,(bar*4+b)*beat,.15)
++            for b in [1,3]:
++                t = timeline(.33)
++                snare = noise(t,650,6000)*env(t,.055)+ring(t,410,.06)*.3
++                place(track,snare,(bar*4+b)*beat,.064,.12)
++            for b in range(8):
++                t = timeline(.12)
++                hat = noise(t,5000,14000)*env(t,.012 if b%2 else .022)
++                place(track,hat,(bar*4+b*.5)*beat,.034,-.35 if b%2 else .35)
++    # A genuinely circular room response: reflections from the end continue at start.
++    dry = track.copy()
++    for delay, gain in [(.117,.12),(.239,.1),(.431,.075),(.683,.055),(.947,.033),(1.331,.018)]:
++        track += np.roll(dry[:,::-1],round(delay*SR),axis=0)*gain
++    track -= track.mean(axis=0)
++    track = np.tanh(track*.95)
++    track *= .66 / np.max(np.abs(track))
++    return track
++
++
++def metrics(x):
++    return {'duration_seconds':round(len(x)/SR,5), 'peak_dbfs':round(float(20*np.log10(np.max(np.abs(x))+1e-12)),2),
++            'rms_dbfs':round(float(20*np.log10(np.sqrt(np.mean(x*x))+1e-12)),2),
++            'boundary_sample_delta':round(float(np.max(np.abs(x[0]-x[-1]))),7)}
++
++
++def main():
++    for p in (OUT,SOURCE,PREVIEW): p.mkdir(parents=True,exist_ok=True)
++    sounds = make_sfx()
++    manifest = {'version':1,'method':'Original deterministic procedural sound design and composition; no external samples or AI service',
++                'seed':19410930,'sample_rate':SR,'rights':'Original project assets, unrestricted use within this project and its releases.',
++                'generator':'tools/generate_game_audio.py','dependencies':['numpy','scipy','soundfile'],'assets':{}}
++    for key,x in sounds.items():
++        path = OUT / (key+'.wav')
++        sf.write(path,x,SR,subtype='PCM_16')
++        manifest['assets'][key] = {'file':path.relative_to(ROOT).as_posix(),'format':'WAV PCM16 mono',**metrics(x)}
++    for key,exp in [('music_refuge',False),('music_expedition',True)]:
++        x = music(exp)
++        path = OUT / (key+'.ogg')
++        # Bounded writes also avoid libsndfile/Vorbis large-buffer failures on Windows.
++        with sf.SoundFile(path,'w',samplerate=SR,channels=2,format='OGG',subtype='VORBIS') as target:
++            for start in range(0,len(x),SR):
++                target.write(x[start:start+SR].astype(np.float32))
++        decoded,rate = sf.read(path)
++        assert rate == SR and len(decoded) == len(x)
++        manifest['assets'][key] = {'file':path.relative_to(ROOT).as_posix(),'format':'Ogg Vorbis stereo','loop':True,**metrics(decoded)}
++        if exp: bed = decoded
++    preview = bed[:SR*24].copy()*.52
++    for i,key in enumerate(['pistol','shotgun','smg','bazooka','mech','sword','spectre','enemy_cult','enemy_fish','enemy_crawler','enemy_guard','enemy_boss','explosion','pickup']):
++        x = sounds[key]
++        place(preview,x,1+i*1.5,.28,np.sin(i)*.35)
++    preview[:SR//2] *= np.linspace(0,1,SR//2)[:,None]
++    preview[-SR:] *= np.linspace(1,0,SR)[:,None]
++    sf.write(PREVIEW/'preview.wav',preview,SR,subtype='PCM_16')
++    for item in manifest['assets'].values():
++        item['sha256'] = hashlib.sha256((ROOT/item['file']).read_bytes()).hexdigest()
++    (SOURCE/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
++    (SOURCE/'README.md').write_text('# Original game audio\n\nGenerated with `python tools/generate_game_audio.py` (NumPy, SciPy, SoundFile). All 23 effects are mono 44.1 kHz PCM16 WAV. Two original stereo Ogg Vorbis scores: refuge 64 seconds; expedition 51.2 seconds. Music uses circular placement and wrapped room reflections for continuous full-file looping. No sampled material, voices, third-party music, Higgsfield or other AI audio service was used.\n\nThe deterministic seed and per-file measurements/hashes are recorded in manifest.json. The score uses an original D-minor progression, suspended pads, glass/electric-piano motif, bass and restrained dockyard percussion. The preview in output/audio-refresh/preview.wav demonstrates the score with selected effects.\n',encoding='utf-8')
++    print(json.dumps(manifest,indent=2))
++
++
++if __name__ == '__main__':
++    main()

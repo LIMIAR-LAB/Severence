@@ -6,6 +6,11 @@ const EquipmentScreen = preload("res://scripts/equipment_screen.gd")
 const CharacterSilhouette = preload("res://scripts/character_silhouette.gd")
 const EncyclopediaScreen = preload("res://scripts/encyclopedia_screen.gd")
 const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png"
+const TITLE_CONCEPT := "res://art/concept/tela-inicial-conceito-v3-severence.png"
+const CHARACTER_CONCEPT := "res://art/concept/selecao-personagem-conceito-v3.png"
+const CHARACTER_COOP_CONCEPT := "res://art/concept/selecao-personagem-coop-conceito-v3.png"
+const ADVENTURE_CONCEPT := "res://art/concept/selecao-aventura-conceito-v2.png"
+const TITLE_CONCEPT_SHADER := preload("res://shaders/title_concept_overlay.gdshader")
 const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 const RUN_SUMMARY_FRAME := "res://assets/ui/run_summary/frame_main.png"
 const RUN_SUMMARY_DIR := "res://assets/ui/run_summary/"
@@ -52,13 +57,10 @@ func _ready() -> void:
 func center_stage() -> void:
 	if stage == null: return
 	var vp := get_viewport_rect().size
-	var fit := minf(vp.x/1280.0,vp.y/800.0)
-	stage.scale = Vector2(1280.0/1344,800.0/752)*fit
-	stage.position = ((vp - Vector2(1280, 800)*fit) * 0.5).floor()
-	if screen == "main" and content != null:
-		var title_scene := content.find_child("TitleSceneCrop", false, false) as Control
-		if title_scene != null: fit_title_background(title_scene)
-	elif content != null:
+	var fit := minf(vp.x / 1344.0, vp.y / 752.0)
+	stage.scale = Vector2.ONE * fit
+	stage.position = ((vp - stage.size * fit) * 0.5).floor()
+	if screen != "main" and content != null:
 		var secondary_scene := content.find_child("SecondaryMenuScene", true, false) as Control
 		if secondary_scene != null: fit_title_background(secondary_scene)
 		var archive_scene := content.find_child("ArchiveBackdropScene", true, false) as Control
@@ -132,7 +134,11 @@ func show_screen(next: String) -> void:
 	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
 	if next not in ["pause", "summary"]:
 		if next == "main":
-			var title_scene := title_background(); content.add_child(title_scene); fit_title_background(title_scene)
+			var title_scene := title_background(); content.add_child(title_scene)
+		elif next in ["characters", "characters_coop", "play"]:
+			var concept_path := CHARACTER_CONCEPT if next == "characters" else (CHARACTER_COOP_CONCEPT if next == "characters_coop" else ADVENTURE_CONCEPT)
+			var concept := concept_art(concept_path, "MenuConceptArt")
+			content.add_child(concept)
 		else:
 			if next == "online":
 				var bg := TextureRect.new(); bg.name = "SecondaryMenuBackdrop"; bg.texture = load("res://assets/ui/online.png")
@@ -144,6 +150,7 @@ func show_screen(next: String) -> void:
 	match next:
 		"main": build_main()
 		"characters": build_characters()
+		"characters_coop": build_characters_coop()
 		"online": build_online()
 		"play": build_play()
 		"pause": build_pause()
@@ -239,43 +246,81 @@ func title_button(parent: Control, i: int, rect: Rect2, caption: String, callbac
 		if not b.disabled: b.grab_focus())
 	b.pressed.connect(callback); parent.add_child(b); return b
 
+func concept_art(path: String, art_name: String) -> TextureRect:
+	var art := TextureRect.new(); art.name = art_name
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_SCALE
+	art.texture = load(path)
+	art.size = Vector2(1344, 752)
+	art.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return art
+
+func concept_button(parent: Control, button_name: String, rect: Rect2, callback: Callable, disabled: bool = false) -> Button:
+	var hit := Button.new(); hit.name = button_name; hit.position = rect.position; hit.size = rect.size
+	hit.text = ""; hit.focus_mode = Control.FOCUS_ALL; hit.disabled = disabled
+	var normal := StyleBoxFlat.new(); normal.bg_color = Color.TRANSPARENT
+	var hover := StyleBoxFlat.new(); hover.bg_color = Color(0.16, 0.95, 1.0, 0.11)
+	hover.border_color = CYAN; hover.set_border_width_all(3); hover.set_corner_radius_all(7)
+	var pressed := hover.duplicate() as StyleBoxFlat; pressed.border_color = GOLD
+	var inactive := normal.duplicate() as StyleBoxFlat
+	hit.add_theme_stylebox_override("normal", normal)
+	hit.add_theme_stylebox_override("hover", hover)
+	hit.add_theme_stylebox_override("focus", hover)
+	hit.add_theme_stylebox_override("pressed", pressed)
+	hit.add_theme_stylebox_override("disabled", inactive)
+	hit.mouse_entered.connect(func():
+		if not hit.disabled: hit.grab_focus())
+	hit.pressed.connect(callback); parent.add_child(hit)
+	return hit
+
 func continue_title() -> void:
 	if app.playing: close()
 	elif app.has_saved_game(): app.load_game()
 
 func build_main() -> void:
-	var lockup := Control.new(); lockup.name = "TitleLockup"; lockup.position = Vector2(45, 34); lockup.size = Vector2(455, 185); lockup.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(lockup)
-	var title_top := label(lockup, Rect2(0, 0, 455, 62), "SEVERENCE", 48, Color("e1a84f")); title_top.name = "TitlePrimary"
-	var title_bottom := label(lockup, Rect2(0, 55, 455, 62), "ECOS DO TEMPO", 40, Color("e9ecea")); title_bottom.name = "TitleSubtitle"
-	for title_line in [title_top, title_bottom]:
-		title_line.add_theme_color_override("font_outline_color", Color("10171a")); title_line.add_theme_constant_override("outline_size", 9)
-	var bolt := ColorRect.new(); bolt.position = Vector2(422, 7); bolt.size = Vector2(7, 112); bolt.rotation = 0.08; bolt.color = Color("57f1f5"); bolt.mouse_filter = Control.MOUSE_FILTER_IGNORE; lockup.add_child(bolt)
-	var era := label(lockup, Rect2(7, 137, 305, 26), "DOCAS DE 1941", 14, Color("f0d48b")); era.add_theme_color_override("font_outline_color", Color("10171a")); era.add_theme_constant_override("outline_size", 5)
-
-	var deck := panel(content, Rect2(28, 565, 1288, 165), Color("111813e8"), Color("b28b43")); deck.name = "TitleCommandDeck"
-	deck.add_theme_stylebox_override("panel", title_style(Color("111813e8"), Color("b28b43"), 4, 9))
+	var art := concept_art(TITLE_CONCEPT, "TitleConceptArt")
+	var ink := ShaderMaterial.new(); ink.shader = TITLE_CONCEPT_SHADER; art.material = ink
+	content.add_child(art)
+	var lockup := Control.new(); lockup.name = "TitleLockup"; lockup.position = Vector2(25, 85)
+	lockup.size = Vector2(485, 230); lockup.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(lockup)
+	var title_top := label(lockup, Rect2(0, 0, 470, 58), "SEVERENCE", 42, Color.TRANSPARENT); title_top.name = "TitlePrimary"
+	var title_bottom := label(lockup, Rect2(0, 62, 470, 58), "ECOS DO TEMPO", 38, Color.TRANSPARENT); title_bottom.name = "TitleSubtitle"
+	var deck := Panel.new(); deck.name = "TitleCommandDeck"; deck.size = Vector2(1344, 752)
+	var empty := StyleBoxEmpty.new(); deck.add_theme_stylebox_override("panel", empty)
+	deck.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(deck)
 	var callbacks: Dictionary = {
 		"new": func(): show_screen("characters"), "online": func(): show_screen("online"),
 		"options": func(): show_screen("options"),
 		"exit": func(): app.save_progress(); app.get_tree().quit(),
 	}
 	var has_continue: bool = app.playing or app.has_saved_game()
-	var new_run := title_button(deck, 1, Rect2(20, 16, 430, 62), "▶  NOVA EXPEDIÇÃO", callbacks.new, not app.playing)
-	main_resume = title_button(deck, 0, Rect2(464, 16, 330, 62), "CONTINUAR", continue_title, app.playing)
-	main_resume.disabled = not has_continue
+	if app.playing:
+		var unavailable_new := ColorRect.new(); unavailable_new.name = "NewRunUnavailable"
+		unavailable_new.position = Vector2(44, 588); unavailable_new.size = Vector2(477, 84)
+		unavailable_new.color = Color(0.02, 0.03, 0.03, 0.5); unavailable_new.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deck.add_child(unavailable_new)
+	if not has_continue:
+		var unavailable := ColorRect.new(); unavailable.name = "ContinueUnavailable"
+		unavailable.position = Vector2(553, 606); unavailable.size = Vector2(286, 67)
+		unavailable.color = Color(0.02, 0.03, 0.03, 0.52); unavailable.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deck.add_child(unavailable)
+	var new_run := concept_button(deck, "Title_1", Rect2(40, 586, 483, 88), callbacks.new, app.playing)
+	new_run.tooltip_text = "Escolher personagem e iniciar uma nova expedição"
+	main_resume = concept_button(deck, "Title_0", Rect2(547, 607, 299, 68), continue_title, not has_continue)
 	if app.playing: main_resume.tooltip_text = "Voltar para a expedição em andamento"
 	elif app.has_saved_game(): main_resume.tooltip_text = "Carregar a última expedição salva"
 	else: main_resume.tooltip_text = "Nenhuma expedição para continuar"
-	var status_panel := panel(deck, Rect2(808, 16, 460, 62), Color("0d1310"), Color("34443b")); status_panel.name = "TitleStatusPanel"
-	var status_color := Color("79e5e5") if app.network_status != "OFFLINE" else Color("b9a66c")
-	var status := label(status_panel, Rect2(18, 11, 424, 24), "●  " + app.network_status, 14, status_color); status.name = "TitleNetworkStatus"
-	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	label(status_panel, Rect2(18, 35, 424, 17), "COOP LOCAL APÓS ESCOLHER PERSONAGEM", 10, Color("69796e"))
-	var online_button := title_button(deck, 2, Rect2(20, 91, 240, 50), "ONLINE", callbacks.online)
-	var options_button := title_button(deck, 5, Rect2(274, 91, 240, 50), "OPÇÕES", callbacks.options)
-	var exit_button := title_button(deck, 6, Rect2(528, 91, 240, 50), "SAIR", callbacks.exit)
-	var title_footer := label(deck, Rect2(808, 99, 445, 28), "SEVERENCE — ECOS DO TEMPO  •  PROTÓTIPO", 12, Color("78867c")); title_footer.name = "TitleFooter"
-	title_footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var online_button := concept_button(deck, "Title_2", Rect2(43, 680, 261, 58), callbacks.online)
+	var options_button := concept_button(deck, "Title_5", Rect2(311, 680, 245, 58), callbacks.options)
+	var exit_button := concept_button(deck, "Title_6", Rect2(561, 680, 215, 58), callbacks.exit)
+	if app.network_status != "OFFLINE":
+		var status_cover := ColorRect.new(); status_cover.name = "TitleNetworkStatusCover"
+		status_cover.position = Vector2(848, 685); status_cover.size = Vector2(112, 40)
+		status_cover.color = Color("182222"); status_cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deck.add_child(status_cover)
+	var status := label(deck, Rect2(851, 691, 104, 27), app.network_status, 15, Color.TRANSPARENT if app.network_status == "OFFLINE" else CYAN)
+	status.name = "TitleNetworkStatus"; status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var visual_order: Array[Button] = [new_run, main_resume, online_button, options_button, exit_button]
 	var enabled_order: Array[Button] = []
 	for title_action in visual_order:
@@ -297,46 +342,65 @@ func overlay(title: String) -> Panel:
 	return p
 
 func build_characters() -> void:
-	var p := panel(content, Rect2(95, 45, 1154, 660), Color("101f2a"), Color("75b5a2"))
-	label(p, Rect2(36, 20, 1080, 48), "ESCOLHA SEU PERSONAGEM", 30, GOLD)
-	label(p, Rect2(38, 69, 1050, 30), "Marty está pronto. Outros viajantes poderão ser liberados depois.", 17, Color("b3c8c5"))
-	for i in 6:
-		var col := i % 3; var row := i / 3
-		var rect := Rect2(42 + col * 358, 116 + row * 225, 328, 205)
-		var card := panel(p, rect, Color("15343b") if i == 0 else Color("131a21"), CYAN if i == 0 else Color("35434b"))
-		if i == 0:
-			var crop := AtlasTexture.new(); crop.atlas = load(MARTY_PORTRAIT); crop.region = Rect2(65, 48, 225, 260)
-			var portrait := Sprite2D.new(); portrait.texture = crop; portrait.position = Vector2(83, 90.5)
-			portrait.scale = Vector2(130.0 / 225.0, 157.0 / 260.0); portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			card.add_child(portrait)
-			label(card, Rect2(158, 49, 155, 45), "MARTY", 27, GOLD)
-			label(card, Rect2(158, 97, 155, 55), "DISPONÍVEL", 16, CYAN)
-			var pick := button(p, rect, "", func(): show_screen("play"), true); pick.name = "CharacterMarty"
-		else:
-			var shadow := CharacterSilhouette.new(); shadow.variant = i - 1
-			shadow.position = Vector2(18, 11); shadow.size = Vector2(125, 160); shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			shadow.name = "Silhouette%d" % i; card.add_child(shadow)
-			label(card, Rect2(150, 55, 165, 90), "VIAJANTE %d\nBLOQUEADO" % (i + 1), 18, Color("687983"))
-			var locked := button(p, rect, "", func(): pass, true); locked.name = "CharacterLocked%d" % i; locked.disabled = true
-	label(p, Rect2(40, 575, 470, 30), "1 de 6 personagens disponíveis", 17, CYAN)
-	button(p, Rect2(835, 566, 270, 58), "VOLTAR", func(): show_screen("main"))
+	var roster := Control.new(); roster.name = "CharacterRoster"; roster.size = Vector2(1344, 752)
+	roster.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(roster)
+	var pick := concept_button(roster, "CharacterMarty", Rect2(654, 139, 222, 171), func(): show_screen("play"))
+	pick.tooltip_text = "Marty disponível — escolher aventura"
+	var hero_pick := concept_button(roster, "CharacterMartyHero", Rect2(230, 230, 320, 420), func(): show_screen("play"))
+	hero_pick.focus_mode = Control.FOCUS_NONE
+	for state in ["normal", "hover", "pressed", "focus"]: hero_pick.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	hero_pick.tooltip_text = "Escolher Marty"
+	var locked_regions := [Rect2(882, 139, 224, 171), Rect2(654, 316, 222, 171),
+		Rect2(882, 316, 224, 171), Rect2(654, 489, 222, 168), Rect2(882, 489, 224, 168)]
+	for i in locked_regions.size():
+		var locked := concept_button(roster, "CharacterLocked%d" % (i + 1), locked_regions[i], func(): pass, true)
+		locked.tooltip_text = "Viajante ainda bloqueado"
+	var back := concept_button(roster, "CharacterBack", Rect2(790, 661, 310, 62), func(): show_screen("main"))
+	back.tooltip_text = "Voltar ao menu"
+	pick.focus_next = pick.get_path_to(back); back.focus_previous = back.get_path_to(pick)
+
+func build_characters_coop() -> void:
+	var roster := Control.new(); roster.name = "CoopCharacterRoster"; roster.size = Vector2(1344, 752)
+	roster.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(roster)
+	var pick := concept_button(roster, "CharacterMarty", Rect2(451, 224, 136, 182), func(): pass)
+	pick.tooltip_text = "Marty selecionado para os dois jogadores"
+	var locked_regions := [Rect2(591, 224, 151, 182), Rect2(745, 224, 151, 182),
+		Rect2(451, 412, 136, 185), Rect2(591, 412, 151, 185), Rect2(745, 412, 151, 185)]
+	for i in locked_regions.size():
+		concept_button(roster, "CharacterLocked%d" % (i + 1), locked_regions[i], func(): pass, true)
+	var back := concept_button(roster, "CharacterBack", Rect2(614, 647, 250, 65), func(): show_screen("play"))
+	var confirm := concept_button(roster, "ConfirmCharacters", Rect2(868, 647, 290, 65), func(): read_equipment(); show_screen("equipment"))
+	confirm.tooltip_text = "Confirmar Marty para os dois jogadores"
+	back.focus_next = back.get_path_to(confirm); confirm.focus_previous = confirm.get_path_to(back)
 
 func build_play() -> void:
 	if pending_mode not in ["solo", "ai", "local"]: pending_mode = "solo"
-	var choices := Control.new(); choices.size = Vector2(1344, 752); choices.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(choices)
-	for i in range(2):
-		var mode_name: String = "solo" if i == 0 else "ai"
-		var b := button(choices, Rect2(391 + i * 298, 171, 272, 329), "", func(): pending_mode = mode_name; read_equipment(); show_screen("equipment"), true)
-		b.name = "SoloChoice" if i == 0 else "AIChoice"
-		b.tooltip_text = "Apenas Marty" if i == 0 else "Marty com parceiro IA"
-		if pending_mode == mode_name:
-			var selected := b.get_theme_stylebox("normal").duplicate(); selected.border_color = CYAN; selected.set_border_width_all(4); b.add_theme_stylebox_override("normal", selected)
-	var local := button(content, Rect2(391, 517, 570, 68), "COOP LOCAL  •  2 JOGADORES", func(): pending_mode = "local"; read_equipment(); show_screen("equipment"))
-	local.name = "LocalChoice"; local.tooltip_text = "Dois jogadores no mesmo computador"
-	button(content, Rect2(388, 611, 205, 55), "", func(): show_screen("characters"), true).tooltip_text = "Voltar"
-	if pending_mode != "local":
-		panel(content, Rect2(685, 424, 252, 31) if pending_mode == "ai" else Rect2(400,424,250,31), Color("273929"), CYAN)
-		label(content, Rect2(720, 426, 220, 29) if pending_mode == "ai" else Rect2(455,426,180,29), "SOLO + IA  ✓" if pending_mode == "ai" else "SOLO  ✓", 23, GOLD)
+	var choices := Control.new(); choices.name = "AdventureChoices"; choices.size = Vector2(1344, 752)
+	choices.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(choices)
+	var solo := concept_button(choices, "SoloChoice", Rect2(348, 191, 311, 312), func(): pending_mode = "solo"; show_screen("play"))
+	solo.tooltip_text = "Só Marty"
+	var ai := concept_button(choices, "AIChoice", Rect2(682, 191, 312, 312), func(): pending_mode = "ai"; show_screen("play"))
+	ai.tooltip_text = "Marty com parceiro controlado pelo jogo"
+	var local := concept_button(choices, "LocalChoice", Rect2(309, 519, 730, 90), func(): pending_mode = "local"; show_screen("play"))
+	local.tooltip_text = "Dois jogadores no mesmo computador"
+	var back := concept_button(choices, "AdventureBack", Rect2(346, 630, 280, 68), func(): show_screen("characters"))
+	back.tooltip_text = "Voltar aos personagens"
+	var confirm := concept_button(choices, "EquipAndEnter", Rect2(657, 630, 364, 68), func():
+		if pending_mode == "local": show_screen("characters_coop")
+		else: read_equipment(); show_screen("equipment"))
+	confirm.tooltip_text = "Confirmar aventura e abrir equipamento"
+	if pending_mode != "solo":
+		var solo_dimmer := ColorRect.new(); solo_dimmer.name = "UnselectedSoloOverlay"
+		solo_dimmer.position = Vector2(344, 187); solo_dimmer.size = Vector2(318, 317)
+		solo_dimmer.color = Color(0.0, 0.01, 0.02, 0.5); solo_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		choices.add_child(solo_dimmer)
+		var selected_rect := Rect2(682, 191, 312, 312) if pending_mode == "ai" else Rect2(309, 519, 730, 90)
+		var selected := panel(choices, selected_rect, Color.TRANSPARENT, CYAN)
+		selected.name = "ModeSelectionFrame"; selected.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var selected_style := selected.get_theme_stylebox("panel") as StyleBoxFlat
+		selected_style.set_border_width_all(5)
+	solo.focus_next = solo.get_path_to(ai); ai.focus_next = ai.get_path_to(local)
+	local.focus_next = local.get_path_to(confirm); confirm.focus_next = confirm.get_path_to(back)
 
 func build_pause() -> void:
 	var p := panel(content, Rect2(222, 110, 900, 532), Color("11272b"), Color("1c2829"))
@@ -669,7 +733,7 @@ func build_options() -> void:
 	match options_tab:
 		"video": build_video_options(p)
 		"audio":
-			label(p, Rect2(30, 100, 600, 35), "VOLUME DOS EFEITOS", 18)
+			label(p, Rect2(30, 100, 600, 35), "VOLUME GERAL • MÚSICA E EFEITOS", 18)
 			var volume := HSlider.new(); volume.position = Vector2(30, 145); volume.size = Vector2(760, 40); volume.min_value = 0; volume.max_value = 100; volume.value = app.volume_percent
 			volume.value_changed.connect(func(value): app.set_volume(value)); p.add_child(volume)
 		"controls": build_controls_options(p)
@@ -791,6 +855,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "encyclopedia": show_screen(encyclopedia_return_screen); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "characters_coop": show_screen("play"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "summary": app.summary_return_refuge(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
 	var focus := get_viewport().gui_get_focus_owner()
@@ -801,6 +866,13 @@ func focus_first() -> void:
 	# primeiro botão visível da tela recebe o foco (para jogar só com o controle)
 	if screen == "main" and app.playing and main_resume != null and main_resume.visible and not main_resume.disabled:
 		main_resume.grab_focus(); return
+	if screen == "play":
+		var selected_name := "AIChoice" if pending_mode == "ai" else ("LocalChoice" if pending_mode == "local" else "SoloChoice")
+		var selected_choice := content.find_child(selected_name, true, false) as Button
+		if selected_choice != null: selected_choice.grab_focus(); return
+	if screen == "characters_coop":
+		var confirm := content.find_child("ConfirmCharacters", true, false) as Button
+		if confirm != null: confirm.grab_focus(); return
 	var stack: Array = [content]
 	while not stack.is_empty():
 		var n: Node = stack.pop_front()

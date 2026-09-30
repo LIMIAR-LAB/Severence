@@ -1,6 +1,6 @@
 # Marty — Armadura Ômega (PixelLab)
 
-- Personagem PixelLab: `443b4141-fc70-438c-ada1-4f5bfa87cbe5`
+- Personagem PixelLab aprovado: `b41db246-47d5-4914-a111-a6bd644abc2b`
 - Personagem-base: Marty Padrão `812c6637-c0c0-461a-bce5-22da22348ad7`
 - Estado: `Armadura Omega`
 - Tela-base: 96×96, oito direções, perspectiva `low top-down`
@@ -8,11 +8,11 @@
 
 ## Identidade visual
 
-A forma preserva a identidade e as proporções do Marty, acrescentando uma
-exoestrutura de cavaleiro futurista branca/marfim com acabamentos dourados,
-juntas mecânicas escuras, visor e núcleo de energia ciano, ombreiras largas,
-manoplas e botas reforçadas. A capa curta roxa permanece visível nas vistas de
-lado e costas. Armas não fazem parte dos sprites do corpo.
+A forma é uma exoestrutura de cavaleiro futurista agressiva e facetada:
+capacete fechado em cunha, peitoral em V, placas marfim com arestas douradas,
+juntas de grafite, visor e núcleo ciano, ombreiras pontudas e capa curta roxa.
+As oito rotações aprovadas estão em `reference/rotations/`. Rosto, cabelo,
+armas e efeitos não fazem parte dos sprites do corpo.
 
 ## Ações
 

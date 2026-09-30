@@ -74,7 +74,7 @@ Online não pausa ao abrir o menu. Offline pausa ao perder foco. Não há predi�
 - `tools/prepare_art.py`: remove o fundo magenta, detecta as bandas reais da imagem e alinha os pés em células transparentes. Não pressupõe que a IA respeitou a grade pedida.
 - `art/marty-titan-preview.png`: prévia da arte já processada.
 - Terreno e inimigos: arte provisória; cenário desenhado pelo renderizador e piso original gerado por `tools/make_support_assets.py`.
-- Efeitos sonoros: síntese original pelo mesmo script. Sem música nesta versão.
+- Áudio: 23 efeitos originais de armas, criaturas e ações, mais duas trilhas instrumentais em loop (refúgio e expedição). Arquivos em `assets/audio/generated/`, gerados por `tools/generate_game_audio.py`; origem e métricas em `art/source/audio/manifest.json`. OPÇÕES → ÁUDIO controla música e efeitos; a pausa reduz a música e interrompe os efeitos.
 
 Não foram usados sprites ou áudio extraídos de Enter the Gungeon, Metal Warriors ou ROMs. As imagens de referência serviram para orientar a geração dos sprites originais.
 

@@ -32,6 +32,7 @@ var outfit_texture: Texture2D
 var marty_anim: Texture2D
 var marty_padrao_actions: Dictionary = {}
 var marty_omega_actions: Dictionary = {}
+var omega_assembly_texture: Texture2D
 var marty_roll: Dictionary = {}
 var marty_teleport: Dictionary = {}
 var enemy_anim: Texture2D
@@ -63,6 +64,8 @@ const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
 const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
+const PIXELLAB_ENEMY_VERSION := {"guard": "v1", "bomber": "v1", "cult": "v2", "fish": "v2", "crawler": "v2", "brute": "v2"}
+const PIXELLAB_ENEMY_SIZE := {"guard": 84.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
 const CORE_OFFSET := Vector2(548, 232)
@@ -73,7 +76,9 @@ func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	for kind in ["bomber", "guard"]: special_enemy_art[kind] = load("res://assets/enemies/" + kind + ".png")
 	# 0.20: oito direções e quatro passadas por inimigo, pivô nos pés.
-	for kind in ["bomber", "guard"]: pixellab_enemy_art[kind] = load("res://assets/enemies/" + kind + "_pixellab_v1.png")
+	for kind in PIXELLAB_ENEMY_VERSION:
+		var path := "res://assets/enemies/%s_pixellab_%s.png" % [kind, PIXELLAB_ENEMY_VERSION[kind]]
+		if ResourceLoader.exists(path): pixellab_enemy_art[kind] = load(path)
 	marty_texture = load("res://assets/marty/marty-v2.png")
 	mech_texture = load("res://assets/mech/titan.png")
 	action_texture = load("res://assets/marty/actions-v2.png")
@@ -93,6 +98,7 @@ func _ready() -> void:
 	# A Armadura Omega tem celula e escala proprias para preservar seu volume.
 	for action in MARTY_OMEGA_FRAMES:
 		marty_omega_actions[action] = load(MARTY_OMEGA_ROOT + action + ".png")
+	omega_assembly_texture = load("res://assets/characters/marty/omega/assembly/omega_assembly_overlay_v1.png")
 	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
 	for direction in ["side", "front_diag", "back_diag"]:
 		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
@@ -651,8 +657,8 @@ func draw_actor(a: Dictionary) -> void:
 	var outfit_key: String = sim.outfit_of(a)
 	var transforming: float = a.get("transform", 0.0)
 	var charge_t: float = sim.TRANSFORM_TIME - transforming
-	if transforming > 0 and charge_t < 0.65 and int(sim.tick_time * (10 + charge_t * 20)) % 2 == 0:
-		outfit_key = a.get("outfit", "padrao")  # pisca entre a roupa antiga e a Ômega enquanto carrega
+	if transforming > 0:
+		outfit_key = a.get("outfit", "padrao")  # a armadura nova entra como camada progressiva sobre a roupa
 	var row: int = OUTFIT_ROW[outfit_key] * 5 + view
 	var walking: bool = a.move.length() > 0.1
 	var firing: bool = a.get("fire_flash", 0.0) > 0
@@ -702,6 +708,8 @@ func draw_actor(a: Dictionary) -> void:
 		visual_transform(Vector2.ZERO)
 		# A arma é uma camada separada; durante a esquiva as mãos ficam livres.
 		draw_weapon(a, draw_pos)
+	if transforming > 0:
+		draw_omega_assembly_overlay(draw_pos + Vector2(0, bob), 1.0 - transforming / sim.TRANSFORM_TIME)
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
 	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
@@ -830,10 +838,13 @@ func draw_warden(e: Dictionary) -> void:
 func weapon_hand_anchor(a: Dictionary) -> Vector2:
 	return sim.weapon_hand_anchor(a)
 
+func marty_uses_legacy_weapon_hand(a: Dictionary) -> bool:
+	return sim.outfit_of(a) not in ["padrao", "omega"]
+
 func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	# 0.18: dedos da própria arte cobrem a empunhadura, sem braços geométricos.
-	# O novo Padrao ja possui maos completas; nao cola nele um recorte do atlas antigo.
-	if sim.outfit_of(a) == "padrao": return
+	# Padrao e Omega possuem maos completas; nao colar recortes do atlas antigo.
+	if not marty_uses_legacy_weapon_hand(a): return
 	var pose := marty_pose(a.facing)
 	var row: int = OUTFIT_ROW[sim.outfit_of(a)] * 5 + int(pose[0])
 	var anchor := weapon_hand_anchor(a)
@@ -1040,6 +1051,13 @@ func draw_guard_shield_icon(p: Vector2, broken: bool) -> void:
 		draw_line(Vector2(0, -8), Vector2(0, 6), Color("d5ffff"), 2)
 	visual_transform(Vector2.ZERO)
 
+func enemy_art_kind(kind: String) -> String:
+	return "crawler" if kind == "crawler_small" else kind
+
+func enemy_art_scale(kind: String, crouched: bool = false) -> Vector2:
+	var size_scale := 0.6 if kind == "crawler_small" else 1.0
+	return Vector2(size_scale, size_scale * (0.78 if crouched else 1.0))
+
 func draw_enemy(e: Dictionary) -> void:
 	var p: Vector2 = e.p
 	if e.kind == "warden": draw_warden(e); return
@@ -1062,13 +1080,14 @@ func draw_enemy(e: Dictionary) -> void:
 	elif face.y < -0.6: column = 1
 	var tint := Color(1.6, 1.6, 1.6) if e.hurt > 0 else Color.WHITE
 	visual_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale * (0.78 if e.get("crouched", false) else 1.0)))
-	if pixellab_enemy_art.has(e.kind):
-		var new_art: Texture2D = pixellab_enemy_art[e.kind]
+	var art_kind := enemy_art_kind(e.kind)
+	if pixellab_enemy_art.has(art_kind):
+		var new_art: Texture2D = pixellab_enemy_art[art_kind]
 		var octant := enemy_octant(face)
 		var frame := 1 + int(e.step) % 4 if e.moving else 0
-		var size := 84.0 if e.kind == "guard" else 72.0
+		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
 		# O atlas novo já contém as oito direções; não espelhar a silhueta.
-		visual_transform(p + Vector2(0, bob), 0, Vector2(1, 1))
+		visual_transform(p + Vector2(0, bob), 0, enemy_art_scale(e.kind, e.get("crouched", false)))
 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
 			tint = Color(1.5, 0.8, 0.55)
 		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
@@ -1131,9 +1150,13 @@ func draw_corpse(fx: Dictionary) -> void:
 		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
 		return
 	if fx.enemy == "bomber": return  # desaparece na explosão, sem virar o cadáver do Brute
-	if fx.enemy == "guard":
-		visual_transform(fx.p - Vector2(0, 15), PI * 0.5)
-		draw_texture_rect_region(pixellab_enemy_art.guard, Rect2(-42, -75, 84, 84), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
+	var art_kind := enemy_art_kind(fx.enemy)
+	if pixellab_enemy_art.has(art_kind):
+		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
+		# Cadáver mantém a arte e o tamanho do inimigo, inclusive os filhotes.
+		var corpse_scale := enemy_art_scale(fx.enemy) * sim.ACTOR_VISUAL_SCALE
+		draw_set_transform(fx.p - Vector2(0, 15 * corpse_scale.y), PI * 0.5, corpse_scale)
+		draw_texture_rect_region(pixellab_enemy_art[art_kind], Rect2(-size * 0.5, -size * 0.89, size, size), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
 		visual_transform(Vector2.ZERO)
 		return
 	var scale := 0.6 if fx.enemy == "crawler_small" else 1.0
@@ -1326,6 +1349,17 @@ func draw_transform_fx(fx: Dictionary) -> void:
 	visual_transform(Vector2.ZERO)
 	if t > 0.8:
 		text_at(p + Vector2(-58, -118 - (t - 0.8) * 60), "ARMADURA ÔMEGA!", Color(1, 0.9, 0.5, (1 - t) * 5), 16)
+
+func draw_omega_assembly_overlay(foot: Vector2, progress: float) -> void:
+	if omega_assembly_texture == null: return
+	var frames := 8
+	var frame := omega_assembly_frame(progress)
+	var source_size := Vector2(omega_assembly_texture.get_width() / float(frames), omega_assembly_texture.get_height())
+	var draw_size := Vector2(124, 124)
+	draw_texture_rect_region(omega_assembly_texture, Rect2(foot - Vector2(draw_size.x * 0.5, draw_size.y), draw_size), Rect2(frame * source_size.x, 0, source_size.x, source_size.y), Color.WHITE)
+
+func omega_assembly_frame(progress: float) -> int:
+	return clampi(int(clampf(progress, 0.0, 0.9999) * 8), 0, 7)
 
 func draw_chest_burst(fx: Dictionary) -> void:
 	var t: float = 1.0 - fx.life / fx.max

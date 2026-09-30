@@ -17,18 +17,29 @@ func run() -> void:
 	# Exercise the actual solo selection callback, then equipment launch.
 	app.menu.content.find_child("SoloChoice", true, false).pressed.emit()
 	check(app.menu.pending_mode == "solo" and not app.playing, "solo card selects without prematurely starting")
-	check(app.menu.screen == "equipment" and app.menu.pending_mode == "solo", "solo card opens equipment directly")
+	check(app.menu.screen == "play", "solo card remains selected until confirmation")
+	app.menu.content.find_child("EquipAndEnter", true, false).pressed.emit()
+	check(app.menu.screen == "equipment" and app.menu.pending_mode == "solo", "solo confirmation opens equipment")
 	# O teste precisa começar com Titan, sem depender da preferência persistida em user://.
 	app.menu.outfit_choice = "padrao"; app.menu.robot_choice = "titan"
 	app.menu.launch(); app.paused = true
 	var s = app.sim
 	check(s.coop == "solo" and not s.actors[1].active and s.actors[1].dead, "solo starts without active partner")
 	var a: Dictionary = s.actors[0]
+	check(s.owned_robot_ids(0) == ["titan", "spectre"], "unlocked robots reconcile to owned mission modules")
 	var partner_pos: Vector2 = s.actors[1].p
 	s.step(0.1, [{}, {"fire": true, "move": Vector2.RIGHT}])
 	check(s.actors[1].p == partner_pos and s.bullets.filter(func(b): return b.owner == 1).is_empty(), "inactive partner cannot move or shoot")
 	s.enemies.clear()
 	check(s.summon_robot(a), "solo can summon Titan")
+	s.mech.hp = 211; s.mech.fuel = 64; s.spectres[0].hp = 73
+	check(s.cycle_owned_robot(a) and a.selected_robot == "spectre" and not s.mech.deployed, "cycle stores Titan and selects owned Spectre")
+	check(s.mech.hp == 211 and s.mech.fuel == 64 and s.spectres[0].hp == 73, "cycle preserves both robot resources")
+	check(s.cycle_owned_robot(a) and a.selected_robot == "titan", "cycle returns to owned Titan")
+	a.mech = true
+	check(not s.cycle_owned_robot(a) and a.selected_robot == "titan", "robot cycle is blocked while piloting")
+	a.mech = false
+	a.summon_cd = 0; check(s.summon_robot(a) and s.mech.deployed, "selected Titan can deploy again after cycling")
 	s.mech.hp = 123; a.summon_cd = 0
 	check(s.summon_robot(a) and not s.mech.deployed, "Titan recalls")
 	a.summon_cd = 0
@@ -36,6 +47,7 @@ func run() -> void:
 	a.summon_cd = 0; s.mech.occupant = 1
 	check(not s.summon_robot(a), "occupied Titan cannot be summoned away")
 	s.mech.occupant = -1
+	s.spectres[0].hp = 100
 	check(s.equip(0, "padrao", "spectre") and s.summon_robot(a), "solo can summon Spectre")
 	check(s.toggle_fusion(a) and a.fused and s.spectres[0].state == "fused", "fusion consumes follower state")
 	a.hp = 100; a.hurt = 0; s.damage_actor(a, 25)

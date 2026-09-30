@@ -223,7 +223,7 @@ assimétricas. Armas, projéteis e clarões continuam em camadas separadas no jo
 ## Marty — Armadura Ômega
 
 A Armadura Ômega é um estado do mesmo personagem no PixelLab, identificado por
-`443b4141-fc70-438c-ada1-4f5bfa87cbe5`. Ela usa células de produção 112×112 e é
+`b41db246-47d5-4914-a111-a6bd644abc2b`. Ela usa células de produção 112×112 e é
 desenhada um pouco maior no jogo para preservar o peso das ombreiras, manoplas,
 botas e capa. As oito direções são próprias e seguem a mesma ordem do Marty
 Padrão.

@@ -5,6 +5,7 @@ const Sim = preload("res://scripts/simulation.gd")
 const View = preload("res://scripts/world_view.gd")
 const EquipmentData := preload("res://scripts/equipment_data.gd")
 const InventoryState := preload("res://scripts/inventory_state.gd")
+const GameAudio := preload("res://scripts/game_audio.gd")
 const PORT := 24871
 const RUN_SAVE := "user://expedition.save"
 var sim: Expedition
@@ -39,9 +40,8 @@ var demo_ticks := 0
 var automated := false
 var automated_snapshot_logged := false
 var frames := 0
-var sounds: Dictionary = {}
-var sound_players: Array = []
-var last_audio: Array = [0.0, 0.0]
+var soundscape: Node
+var audio_network_primed := false
 var pref_armor := false
 var pref_outfit := "padrao"
 var pref_gun := 0
@@ -52,10 +52,10 @@ var presented_summary_seq := 0
 # 0.18: remapeamento de controles do P1 (teclado/mouse). P2 local e joypad ainda são fixos.
 const KEY_BIND_DEFAULTS := {"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": KEY_D,
 	"melee": KEY_F, "jump": KEY_SPACE, "dash": KEY_SHIFT, "interact": KEY_E, "armor": KEY_R,
-	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G}
+	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G, "robot_switch": KEY_V}
 const KEY_BIND_LABELS := {"up": "ANDAR PRA CIMA", "down": "ANDAR PRA BAIXO", "left": "ANDAR PRA ESQUERDA",
 	"right": "ANDAR PRA DIREITA", "melee": "GOLPE", "jump": "SALTO", "dash": "DASH", "interact": "INTERAGIR",
-	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE"}
+	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE", "robot_switch": "TROCAR ROBÔ"}
 const KEY_BIND_RESERVED := [KEY_ESCAPE, KEY_TAB, KEY_M, KEY_B, KEY_F2]
 var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
@@ -79,9 +79,9 @@ func _ready() -> void:
 	world = View.new(); world.sim = sim; add_child(world)
 	camera = Camera2D.new(); camera.position = Vector2(500, 410); camera.zoom = Vector2(1.05, 1.05); add_child(camera)
 	build_ui()
-	for key in ["shot", "heavy", "jump", "hit"]: sounds[key] = load("res://assets/audio/" + key + ".wav")
-	for _n in range(6):
-		var player := AudioStreamPlayer.new(); player.volume_db = -12; add_child(player); sound_players.append(player)
+	soundscape = GameAudio.new()
+	add_child(soundscape)
+	soundscape.discard_history(sim.audio_sequence)
 	set_volume(volume_percent)
 	multiplayer.peer_connected.connect(peer_connected)
 	multiplayer.peer_disconnected.connect(peer_disconnected)
@@ -146,7 +146,7 @@ func _ready() -> void:
 		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))
 		if arg == "--visit-all":
 			for room in sim.rooms: sim.visited.append(room.id)
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "summary", "encyclopedia"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "characters_coop", "pause", "summary", "encyclopedia"]:
 		if "--capture-ui-" + page in args and page == "options": menu.show_screen("options")
 		if "--capture-ui-" + page in args:
 			screenshot_mode = true
@@ -256,6 +256,7 @@ func peer_disconnected(id: int) -> void:
 		sim.say("P2 desconectou. A IA assumiu o parceiro.")
 
 func connected() -> void:
+	audio_network_primed = false
 	playing = true; paused = false; menu.hide(); network_status = "ONLINE • você é P2"
 	ui_input_block = 0.2
 	print("NETWORK_CLIENT_CONNECTED")
@@ -272,7 +273,7 @@ func submit_input(data: Dictionary) -> void:
 	var clean := {}
 	for key in ["move", "aim"]:
 		if data.get(key) is Vector2 and data[key].is_finite(): clean[key] = data[key].limit_length()
-	for key in ["fire", "melee", "jump", "dodge", "boost", "interact", "armor", "weapon", "summon", "fusion"]:
+	for key in ["fire", "melee", "jump", "dodge", "boost", "interact", "armor", "weapon", "summon", "fusion", "robot_switch"]:
 		clean[key] = data.get(key, false) == true
 	remote_cmd = clean; remote_age = 0
 
@@ -299,13 +300,14 @@ func change_run_weapon(weapon: String) -> void:
 		sim.select_run_weapon(1, weapon)
 
 func request_robot_action(id: int, action: String) -> void:
-	if action not in ["summon", "fusion"]: return
+	if action not in ["summon", "fusion", "switch"]: return
 	if online and not hosting:
 		if id == 1: robot_action.rpc_id(1, action)
 		return
 	if id < 0 or id >= sim.actors.size(): return
 	if action == "summon": sim.summon_robot(sim.actors[id])
-	else: sim.toggle_fusion(sim.actors[id])
+	elif action == "fusion": sim.toggle_fusion(sim.actors[id])
+	else: sim.cycle_owned_robot(sim.actors[id])
 
 @rpc("any_peer", "call_remote", "reliable", 3)
 func robot_action(action: String) -> void:
@@ -320,6 +322,9 @@ func receive_state(packet: PackedByteArray) -> void:
 	if not decoded is Dictionary: return
 	var data: Dictionary = decoded
 	sim.apply_snapshot(data)
+	if not audio_network_primed and soundscape != null:
+		soundscape.discard_history(sim.audio_sequence)
+		audio_network_primed = true
 	if sim.mode == "run" and sim.last_run_summary.is_empty() and menu.visible and menu.screen == "summary":
 		menu.hide(); paused = false; map_open = false; ui_input_block = 0.2
 	if automated and not automated_snapshot_logged:
@@ -352,7 +357,7 @@ func gameplay_joypad(use_primary: bool, devices: Array) -> int:
 
 func player_input(index: int, use_primary: bool = true) -> Dictionary:
 	var a: Dictionary = sim.actors[index]
-	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false}
+	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false, "robot_switch": false}
 	if use_primary:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
 		if not joy_aim.get(index, false): cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
@@ -364,6 +369,7 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.armor = Input.is_physical_key_pressed(key_binds.armor)
 		cmd.weapon = Input.is_physical_key_pressed(key_binds.weapon)
 		cmd.summon = Input.is_physical_key_pressed(key_binds.summon); cmd.fusion = Input.is_physical_key_pressed(key_binds.fusion)
+		cmd.robot_switch = Input.is_physical_key_pressed(key_binds.robot_switch)
 	else:
 		cmd.move = Vector2(float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP))).normalized()
 		var dir := Vector2(float(Input.is_physical_key_pressed(KEY_L)) - float(Input.is_physical_key_pressed(KEY_J)), float(Input.is_physical_key_pressed(KEY_K)) - float(Input.is_physical_key_pressed(KEY_I)))
@@ -372,6 +378,7 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.jump = Input.is_physical_key_pressed(KEY_SLASH); cmd.dodge = Input.is_physical_key_pressed(KEY_COMMA); cmd.boost = cmd.dodge
 		cmd.interact = Input.is_physical_key_pressed(KEY_CTRL); cmd.armor = Input.is_physical_key_pressed(KEY_O); cmd.weapon = Input.is_physical_key_pressed(KEY_U)
 		cmd.summon = Input.is_physical_key_pressed(KEY_N); cmd.fusion = Input.is_physical_key_pressed(KEY_M)
+		cmd.robot_switch = Input.is_physical_key_pressed(KEY_H)
 	var devices := connected_gamepads()
 	var device := gameplay_joypad(use_primary, devices)
 	if device >= 0:
@@ -389,7 +396,8 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 		cmd.armor = cmd.armor or Input.is_joy_button_pressed(device, JOY_BUTTON_LEFT_SHOULDER)
 		cmd.summon = cmd.summon or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_UP)
 		cmd.fusion = cmd.fusion or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_DOWN)
-	for key in ["interact", "armor", "weapon", "dodge", "jump", "summon", "fusion"]: cmd[key] = edge(str(index) + key, cmd[key])
+		cmd.robot_switch = cmd.robot_switch or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_LEFT)
+	for key in ["interact", "armor", "weapon", "dodge", "jump", "summon", "fusion", "robot_switch"]: cmd[key] = edge(str(index) + key, cmd[key])
 	if ui_input_block > 0: cmd.fire = false; cmd.melee = false
 	return cmd
 
@@ -452,7 +460,7 @@ func _physics_process(dt: float) -> void:
 				remote_age += dt
 				secondary = remote_cmd if remote_age < 0.4 and not (menu.visible and menu.screen == "summary") else {}
 			sim.step(dt, [primary, secondary])
-			for key in ["interact", "armor", "weapon", "summon", "fusion", "dodge", "jump"]: remote_cmd[key] = false
+			for key in ["interact", "armor", "weapon", "summon", "fusion", "robot_switch", "dodge", "jump"]: remote_cmd[key] = false
 			if hosting and guest_id > 0:
 				send_timer += dt
 				if send_timer >= 0.05:
@@ -487,10 +495,10 @@ func _physics_process(dt: float) -> void:
 		if a.get("fire_flash", 0.0) > 0.06 and sim.weapon_of(a) in ["shotgun", "omega"]: shake = maxf(shake, 2.5)
 	camera.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * shake
 	world.queue_redraw(); update_hud()
-	if playing and not paused:
-		for a in sim.actors:
-			if a.shot > last_audio[a.id]: play_sound("heavy" if a.mech else "shot")
-			last_audio[a.id] = a.shot
+	if soundscape != null:
+		var listener: Vector2 = sim.actors[1].p if online and not hosting else sim.actors[0].p
+		if sim.coop == "local": listener = (sim.actors[0].p + sim.actors[1].p) * 0.5
+		soundscape.update(sim, playing, paused, menu.visible, listener, dt / maxf(Engine.time_scale, 0.001))
 	if screenshot_mode:
 		demo_ticks += 1
 		var capture_tick := 90 if "--capture-arena" in OS.get_cmdline_user_args() or "--capture-boss" in OS.get_cmdline_user_args() else 30
@@ -500,11 +508,6 @@ func _physics_process(dt: float) -> void:
 	if automated and frames > 420:
 		if hosting: print("NETWORK_REMOTE_POSITION ", sim.actors[1].p, " MOVED=", sim.actors[1].p.x > 400)
 		print("NETWORK_TEST_END ", "host" if hosting else "client"); get_tree().quit()
-
-func play_sound(key: String) -> void:
-	for player in sound_players:
-		if not player.playing:
-			player.stream = sounds[key]; player.play(); return
 
 func update_hud() -> void:
 	hud_panel.visible = false
@@ -538,8 +541,7 @@ func minimap_rect() -> Rect2:
 
 func set_volume(value: float) -> void:
 	volume_percent = clampf(value, 0, 100)
-	for player in sound_players:
-		player.volume_db = -80.0 if volume_percent <= 0 else linear_to_db(volume_percent / 100.0) - 8
+	if soundscape != null: soundscape.set_volume(volume_percent)
 
 # 0.18: aplica um novo bind se a tecla não estiver em uso por outra ação; devolve true se aplicou.
 func rebind_key(action: String, keycode: int) -> bool:
@@ -628,6 +630,7 @@ func load_game() -> bool:
 	if not saved_spectres is Array or saved_spectres.size() != 2: return false
 	disconnect_network()
 	sim.apply_snapshot(state)
+	if soundscape != null: soundscape.discard_history(sim.audio_sequence)
 	presented_summary_seq = sim.summary_seq
 	sim.rng.state = safe_int(data.get("rng_state", sim.rng.state), sim.rng.state)
 	sim.arena_wait = safe_float(data.get("arena_wait", 0.0)); sim.uid = safe_int(data.get("uid", 0))
@@ -643,7 +646,8 @@ func load_game() -> bool:
 func load_progress() -> void:
 	# 0.17: equipamento inicial definido no JSON; Titan e Spectre liberados durante os testes.
 	sim.set_unlocks(EquipmentData.starting_unlocks())
-	if not FileAccess.file_exists("user://progress.json"): sim.make_hub(); return
+	if not FileAccess.file_exists("user://progress.json"):
+		sim.reconcile_robot_entitlements(); sim.make_hub(); return
 	var data = JSON.parse_string(FileAccess.get_file_as_string("user://progress.json"))
 	if not data is Dictionary or safe_int(data.get("version", 0)) not in [1, 2]: return
 	sim.materials = clampi(safe_int(data.get("materials", 0)), 0, 9999)
@@ -658,6 +662,7 @@ func load_progress() -> void:
 	if data.get("inventory") is Dictionary: sim.inventory_state = InventoryState.new(data.inventory).to_dict()
 	else: sim.inventory_state = InventoryState.new().to_dict()
 	sim.check_unlocks()      # saves antigos: libera o que o progresso (chefe, expedições) já garantia
+	sim.reconcile_robot_entitlements()
 	sim.new_unlocks.clear()
 	sim.make_hub()
 
@@ -668,7 +673,7 @@ func capture() -> void:
 	if "--capture-arena" in OS.get_cmdline_user_args(): path = "res://test-output/arena-v06.png"
 	if "--capture-boss" in OS.get_cmdline_user_args(): path = "res://test-output/boss-v06.png"
 	if "--capture-docks-v04" in OS.get_cmdline_user_args(): path = "res://test-output/docks-v04.png"
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "summary", "encyclopedia"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "characters_coop", "pause", "summary", "encyclopedia"]:
 		if "--capture-ui-" + page in OS.get_cmdline_user_args(): path = "res://test-output/ui-" + page + ".png"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-name="): path = "res://test-output/" + arg.trim_prefix("--capture-name=") + ".png"

@@ -1,0 +1,104 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: CAPELA_UNIFICADA_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_static.png; usando cenário legacy.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:137)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_00.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_01.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_02.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_03.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_04.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_05.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_06.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_07.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_08.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_09.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_10.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_OVERLAY_AUSENTE: res://assets/environment/docks12/chapel/unified/chapel_overlay_11.png; quadro ficará estático.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:141)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_PESCADOR_AUSENTE: res://assets/environment/docks12/chapel/unified/fisherman_frame_00.png; usando quadro válido/fallback legacy.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:145)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_PESCADOR_AUSENTE: res://assets/environment/docks12/chapel/unified/fisherman_frame_01.png; usando quadro válido/fallback legacy.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:145)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_PESCADOR_AUSENTE: res://assets/environment/docks12/chapel/unified/fisherman_frame_02.png; usando quadro válido/fallback legacy.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:145)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)
+WARNING: CAPELA_PESCADOR_AUSENTE: res://assets/environment/docks12/chapel/unified/fisherman_frame_03.png; usando quadro válido/fallback legacy.
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _init (res://scripts/dock_scenery.gd:145)
+       [1] _ready (res://scripts/world_view.gd:131)
+       [2] _ready (res://scripts/main.gd:79)

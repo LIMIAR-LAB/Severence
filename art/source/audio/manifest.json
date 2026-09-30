@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "method": "Original deterministic procedural sound design and composition; no external samples or AI service",
+  "seed": 19410930,
+  "sample_rate": 44100,
+  "rights": "Original project assets, unrestricted use within this project and its releases.",
+  "generator": "tools/generate_game_audio.py",
+  "dependencies": [
+    "numpy",
+    "scipy",
+    "soundfile"
+  ],
+  "assets": {
+    "pistol": {
+      "file": "assets/audio/generated/pistol.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.25,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.7,
+      "boundary_sample_delta": 0.0,
+      "sha256": "f74ac1fb7922b55b01f49ec0bf307898c0eea04f2ecdc5c3ab092b3df4e715b5"
+    },
+    "shotgun": {
+      "file": "assets/audio/generated/shotgun.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.43,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.13,
+      "boundary_sample_delta": 0.0,
+      "sha256": "df5396990dd8c0313d40297c8ac35f5f5d36addd803a50052e97ad486a0100b4"
+    },
+    "smg": {
+      "file": "assets/audio/generated/smg.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.16,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.64,
+      "boundary_sample_delta": 0.0,
+      "sha256": "db7856531834231124d6bac1f388fe59bab0899ee7aadb1b9fa52ee38d7fca82"
+    },
+    "mech": {
+      "file": "assets/audio/generated/mech.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.32,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -12.93,
+      "boundary_sample_delta": 0.0,
+      "sha256": "270ba37d690078b558cc95cf0cffde1b7662c0b2c2299213b6b8cbd97686acaf"
+    },
+    "bazooka": {
+      "file": "assets/audio/generated/bazooka.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.6,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.86,
+      "boundary_sample_delta": 0.0,
+      "sha256": "45afdbbcccdafabe6197299b6692371f1f462a636cd5aa86c57ebce2ea04bbc8"
+    },
+    "sword": {
+      "file": "assets/audio/generated/sword.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.39,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.83,
+      "boundary_sample_delta": 0.0,
+      "sha256": "3e60cb1daac6357269f6bebd36517fafaf5cb015398126e0be2b7e96a317d0ed"
+    },
+    "melee": {
+      "file": "assets/audio/generated/melee.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.27,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.78,
+      "boundary_sample_delta": 0.0,
+      "sha256": "973630e3704377a6115057da7e3c07fb26677d771e6b96d72d289ee8aa137291"
+    },
+    "spectre": {
+      "file": "assets/audio/generated/spectre.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.58,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -12.96,
+      "boundary_sample_delta": 0.0,
+      "sha256": "609b4ec3cf162f68df4492b323196859a04e9d889a3bf5890eb878f20d37c69a"
+    },
+    "enemy_cult": {
+      "file": "assets/audio/generated/enemy_cult.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.65,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -12.31,
+      "boundary_sample_delta": 0.0,
+      "sha256": "317aabd7a6a84b092523e239d30493c488b898d8bb890b3f1bd67d61db12a31c"
+    },
+    "enemy_fish": {
+      "file": "assets/audio/generated/enemy_fish.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.48,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.02,
+      "boundary_sample_delta": 0.0,
+      "sha256": "e6432b787f02cbdc261a6a65d3cade4243fc8bce4a748da3c260be364550234d"
+    },
+    "enemy_crawler": {
+      "file": "assets/audio/generated/enemy_crawler.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.5,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -15.08,
+      "boundary_sample_delta": 0.0,
+      "sha256": "d16cf9196797d5c112b024b1c32c8e25dacdd156250279f17868ac16ec05a52c"
+    },
+    "enemy_brute": {
+      "file": "assets/audio/generated/enemy_brute.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.72,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -14.7,
+      "boundary_sample_delta": 0.0,
+      "sha256": "03bffee8f489956d9369d6cf48062a62fb88f27e711a9525ef62c76ed5eb92c6"
+    },
+    "enemy_guard": {
+      "file": "assets/audio/generated/enemy_guard.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.33,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -10.51,
+      "boundary_sample_delta": 0.0,
+      "sha256": "8055edeed0bd76b90bb1308f173930919e497550b197b30df1cffe26922b25a3"
+    },
+    "enemy_bomber": {
+      "file": "assets/audio/generated/enemy_bomber.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.48,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.6,
+      "boundary_sample_delta": 0.0,
+      "sha256": "234866365038d3a84fedd89716ead048174899eff5efc299dfcdda0122ce1a18"
+    },
+    "enemy_warden": {
+      "file": "assets/audio/generated/enemy_warden.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.7,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.63,
+      "boundary_sample_delta": 0.0,
+      "sha256": "cbb8c21aa402974923f983d7dfc7c5e8a40b2f217e311d5bb3c5a49e920ee06e"
+    },
+    "enemy_boss": {
+      "file": "assets/audio/generated/enemy_boss.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 1.12,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.47,
+      "boundary_sample_delta": 0.0,
+      "sha256": "1bd543cac09b2fb25d21e323e7331faacac107aabf62edabca791e098b02b633"
+    },
+    "enemy_die": {
+      "file": "assets/audio/generated/enemy_die.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.52,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -13.92,
+      "boundary_sample_delta": 0.0,
+      "sha256": "531a063a8deb0ab2ccb5db639285f4764d05194a6f49c502819c27525ecee8cf"
+    },
+    "explosion": {
+      "file": "assets/audio/generated/explosion.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 1.15,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -12.64,
+      "boundary_sample_delta": 0.0,
+      "sha256": "cba894af95d632bedfbbcc69354f0a511c5a0c982d67d9defbc1d432312410af"
+    },
+    "hit": {
+      "file": "assets/audio/generated/hit.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.19,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -16.22,
+      "boundary_sample_delta": 0.0,
+      "sha256": "ee0bd0c34d2933322a4ad04680242a107cc4b97ccf3af1af7090145812d832d8"
+    },
+    "jump": {
+      "file": "assets/audio/generated/jump.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.25,
+      "peak_dbfs": -4.15,
+      "rms_dbfs": -17.71,
+      "boundary_sample_delta": 0.0,
+      "sha256": "b588a914a0d2c63bdcc1942bee7103caea03eb7fa4e9e30849c3f6f09090464a"
+    },
+    "dash": {
+      "file": "assets/audio/generated/dash.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.36,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -16.56,
+      "boundary_sample_delta": 0.0,
+      "sha256": "03a68868f912454aadbf8de3e8ac7e5024af55ea134584572602550f2dcd1528"
+    },
+    "pickup": {
+      "file": "assets/audio/generated/pickup.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.56,
+      "peak_dbfs": -4.15,
+      "rms_dbfs": -17.75,
+      "boundary_sample_delta": 0.0,
+      "sha256": "fcae3015e9e7ca16e866d2db1949928bd595cfc416dca3f674d8f85040f8f3e1"
+    },
+    "dry_fire": {
+      "file": "assets/audio/generated/dry_fire.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 0.12,
+      "peak_dbfs": -4.15,
+      "rms_dbfs": -23.36,
+      "boundary_sample_delta": 0.0,
+      "sha256": "f9d716d426f8421b0d7de2d9526e7fd14b3c536c88c0185f55cb4da84e61262b"
+    },
+    "music_refuge": {
+      "file": "assets/audio/generated/music_refuge.ogg",
+      "format": "Ogg Vorbis stereo",
+      "loop": true,
+      "duration_seconds": 64.0,
+      "peak_dbfs": -3.48,
+      "rms_dbfs": -17.05,
+      "boundary_sample_delta": 0.0030956,
+      "sha256": "8ab02792a15562b045e91a09dcd79f414dcba8dfb4083c58778852ff199e9502"
+    },
+    "music_expedition": {
+      "file": "assets/audio/generated/music_expedition.ogg",
+      "format": "Ogg Vorbis stereo",
+      "loop": true,
+      "duration_seconds": 51.2,
+      "peak_dbfs": -3.61,
+      "rms_dbfs": -18.43,
+      "boundary_sample_delta": 0.0035377,
+      "sha256": "7d626446c840d2f64c7aefbf07e9fd8b7caf7512e8b609075d5168a3e44df701"
+    }
+  }
+}

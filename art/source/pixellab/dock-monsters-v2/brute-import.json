@@ -1,0 +1,20 @@
+{
+  "kind": "brute",
+  "size": [
+    480,
+    768
+  ],
+  "scale": 0.9130434782608695,
+  "animated_directions": [],
+  "held_directions": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "near_white_pixels": 0
+}

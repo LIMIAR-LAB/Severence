@@ -25,6 +25,7 @@ func run() -> void:
 	await frames(3)
 
 	check(int(app.key_binds["up"]) == KEY_W and int(app.key_binds["right"]) == KEY_D and int(app.key_binds["fusion"]) == KEY_G, "default binds match WASD/F/G layout")
+	check(int(app.key_binds["robot_switch"]) == KEY_V, "robot switch defaults to V")
 	check(app.rebind_key("up", KEY_I) and int(app.key_binds["up"]) == KEY_I, "rebind up to I applies")
 	check(not app.rebind_key("down", KEY_I), "rebind to a key already in use is rejected")
 	check(not app.rebind_key("jump", KEY_TAB) and int(app.key_binds["jump"]) == KEY_SPACE, "reserved keys are rejected")
@@ -32,6 +33,9 @@ func run() -> void:
 
 	app.start_solo()
 	await frames(60)
+	app.sim.set_unlocks(["padrao", "titan", "spectre"]); app.sim.actors[0].selected_robot = "titan"
+	key(KEY_V, true); await frames(2); key(KEY_V, false); await frames(2)
+	check(app.sim.actors[0].selected_robot == "spectre", "mapped V cycles the live owned robot")
 	var before: Vector2 = app.sim.actors[0].p
 	key(KEY_I, true); await frames(12); key(KEY_I, false)
 	check(app.sim.actors[0].p.y < before.y - 40, "rebound key drives movement in game")

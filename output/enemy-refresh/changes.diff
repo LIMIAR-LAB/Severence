@@ -1,0 +1,254 @@
+--- a/scripts/world_view.gd
++++ b/scripts/world_view.gd
+@@ -64,6 +64,8 @@
+ const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
+ const FUSION_ATLAS_PATH := "res://assets/marty/spectre_fusion_v3.png"
+ const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
++const PIXELLAB_ENEMY_VERSION := {"guard": "v1", "bomber": "v1", "cult": "v2", "fish": "v2", "crawler": "v2", "brute": "v2"}
++const PIXELLAB_ENEMY_SIZE := {"guard": 84.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
+ var refuge_bg: Texture2D
+ var refuge_core: Texture2D
+ const CORE_OFFSET := Vector2(548, 232)
+@@ -74,7 +76,9 @@
+ 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+ 	for kind in ["bomber", "guard"]: special_enemy_art[kind] = load("res://assets/enemies/" + kind + ".png")
+ 	# 0.20: oito direções e quatro passadas por inimigo, pivô nos pés.
+-	for kind in ["bomber", "guard"]: pixellab_enemy_art[kind] = load("res://assets/enemies/" + kind + "_pixellab_v1.png")
++	for kind in PIXELLAB_ENEMY_VERSION:
++		var path := "res://assets/enemies/%s_pixellab_%s.png" % [kind, PIXELLAB_ENEMY_VERSION[kind]]
++		if ResourceLoader.exists(path): pixellab_enemy_art[kind] = load(path)
+ 	marty_texture = load("res://assets/marty/marty-v2.png")
+ 	mech_texture = load("res://assets/mech/titan.png")
+ 	action_texture = load("res://assets/marty/actions-v2.png")
+@@ -1034,6 +1038,13 @@
+ 		draw_line(Vector2(0, -8), Vector2(0, 6), Color("d5ffff"), 2)
+ 	visual_transform(Vector2.ZERO)
+ 
++func enemy_art_kind(kind: String) -> String:
++	return "crawler" if kind == "crawler_small" else kind
++
++func enemy_art_scale(kind: String, crouched: bool = false) -> Vector2:
++	var size_scale := 0.6 if kind == "crawler_small" else 1.0
++	return Vector2(size_scale, size_scale * (0.78 if crouched else 1.0))
++
+ func draw_enemy(e: Dictionary) -> void:
+ 	var p: Vector2 = e.p
+ 	if e.kind == "warden": draw_warden(e); return
+@@ -1056,13 +1067,14 @@
+ 	elif face.y < -0.6: column = 1
+ 	var tint := Color(1.6, 1.6, 1.6) if e.hurt > 0 else Color.WHITE
+ 	visual_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale * (0.78 if e.get("crouched", false) else 1.0)))
+-	if pixellab_enemy_art.has(e.kind):
+-		var new_art: Texture2D = pixellab_enemy_art[e.kind]
++	var art_kind := enemy_art_kind(e.kind)
++	if pixellab_enemy_art.has(art_kind):
++		var new_art: Texture2D = pixellab_enemy_art[art_kind]
+ 		var octant := enemy_octant(face)
+ 		var frame := 1 + int(e.step) % 4 if e.moving else 0
+-		var size := 84.0 if e.kind == "guard" else 72.0
++		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
+ 		# O atlas novo já contém as oito direções; não espelhar a silhueta.
+-		visual_transform(p + Vector2(0, bob), 0, Vector2(1, 1))
++		visual_transform(p + Vector2(0, bob), 0, enemy_art_scale(e.kind, e.get("crouched", false)))
+ 		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
+ 			tint = Color(1.5, 0.8, 0.55)
+ 		if e.kind == "guard" and e.combat == "attack": tint = Color(1.35, 1.1, 0.8)
+@@ -1125,9 +1137,13 @@
+ 		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
+ 		return
+ 	if fx.enemy == "bomber": return  # desaparece na explosão, sem virar o cadáver do Brute
+-	if fx.enemy == "guard":
+-		visual_transform(fx.p - Vector2(0, 15), PI * 0.5)
+-		draw_texture_rect_region(pixellab_enemy_art.guard, Rect2(-42, -75, 84, 84), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
++	var art_kind := enemy_art_kind(fx.enemy)
++	if pixellab_enemy_art.has(art_kind):
++		var size: float = PIXELLAB_ENEMY_SIZE[art_kind]
++		# Cadáver mantém a arte e o tamanho do inimigo, inclusive os filhotes.
++		var corpse_scale := enemy_art_scale(fx.enemy) * sim.ACTOR_VISUAL_SCALE
++		draw_set_transform(fx.p - Vector2(0, 15 * corpse_scale.y), PI * 0.5, corpse_scale)
++		draw_texture_rect_region(pixellab_enemy_art[art_kind], Rect2(-size * 0.5, -size * 0.89, size, size), Rect2(0, 0, 96, 96), Color(0.65, 0.65, 0.75, fade))
+ 		visual_transform(Vector2.ZERO)
+ 		return
+ 	var scale := 0.6 if fx.enemy == "crawler_small" else 1.0
+--- a/tests/enemy_sprite_test.gd
++++ b/tests/enemy_sprite_test.gd
+@@ -7,19 +7,31 @@
+ 	else: failures += 1; push_error(label)
+ 
+ func _init() -> void:
+-	for kind in ["guard", "bomber"]:
+-		var path := "res://assets/enemies/%s_pixellab_v1.png" % kind
++	var view := DockView.new()
++	check(view.enemy_art_kind("crawler_small") == "crawler", "filhote reutiliza a arte nova do crawler")
++	check(view.enemy_art_kind("brute") == "brute", "brute mantém sua própria arte")
++	check(view.enemy_art_scale("crawler_small").is_equal_approx(Vector2(0.6, 0.6)), "filhote mantém escala de 60% vivo e morto")
++	check(view.enemy_art_scale("brute", true).is_equal_approx(Vector2(1.0, 0.78)), "brute agachado mantém compressão vertical")
++	var directions := [Vector2.DOWN, Vector2(1, 1), Vector2.RIGHT, Vector2(1, -1), Vector2.UP, Vector2(-1, -1), Vector2.LEFT, Vector2(-1, 1)]
++	for row in range(8):
++		check(view.enemy_octant(directions[row]) == row, "direção %d usa linha própria sem espelhar" % row)
++	view.free()
++	for kind in DockView.PIXELLAB_ENEMY_VERSION:
++		var path := "res://assets/enemies/%s_pixellab_%s.png" % [kind, DockView.PIXELLAB_ENEMY_VERSION[kind]]
++		check(ResourceLoader.exists(path), "%s: arte PixelLab disponível" % kind)
++		if not ResourceLoader.exists(path): continue
+ 		var texture: Texture2D = load(path)
+ 		var image: Image = texture.get_image() if texture != null else null
+ 		check(image != null and image.get_size() == Vector2i(480, 768), "%s: atlas 5 poses x 8 direções" % kind)
+ 		if image == null: continue
+ 		for row in range(8):
+-			var used := false
+-			for y in range(row * 96, (row + 1) * 96):
+-				for x in range(96):
+-					if image.get_pixel(x, y).a > 0.5: used = true; break
+-				if used: break
+-			check(used, "%s: direção %d contém desenho" % [kind, row])
++			for frame in range(5):
++				var used := false
++				for y in range(row * 96, (row + 1) * 96):
++					for x in range(frame * 96, (frame + 1) * 96):
++						if image.get_pixel(x, y).a > 0.5: used = true; break
++					if used: break
++				check(used, "%s: direção %d pose %d contém desenho" % [kind, row, frame])
+ 	var sim := Expedition.new()
+ 	sim.start_run(1941)
+ 	sim.spawn_enemy(sim.actors[0].p + Vector2(100, 0), "guard")
+--- /dev/null
++++ b/tools/import_dock_monsters.py
+@@ -0,0 +1,95 @@
++"""Pack unmodified PixelLab RGBA frames; keep one scale across each character.
++
++Source layout: art/source/pixellab/dock-monsters-v2/<kind>.zip
++Output: 8 rows x 5 columns (idle, four walk poses), 96px cells.
++Run after dock_walk animations complete in the four cardinal directions.
++Diagonals keep their own idle view, matching the existing guard/bomber convention.
++"""
++from io import BytesIO
++from pathlib import Path
++from zipfile import ZipFile
++import argparse
++import json
++
++from PIL import Image
++
++ROOT = Path(__file__).resolve().parents[1]
++SOURCE = ROOT / "art/source/pixellab/dock-monsters-v2"
++TARGET = ROOT / "assets/enemies"
++DIRECTIONS = ("south", "south-east", "east", "north-east", "north",
++              "north-west", "west", "south-west")
++KINDS = ("crawler", "cult", "fish", "brute")
++ANIMATED_DIRECTIONS = ("south", "east", "north", "west")
++CELL = 96
++
++
++def read_suffix(archive, suffix):
++    matches = [name for name in archive.namelist() if name.endswith(suffix)]
++    if len(matches) != 1:
++        raise ValueError(f"Expected one {suffix}, found {matches}")
++    with Image.open(BytesIO(archive.read(matches[0]))) as source:
++        image = source.convert("RGBA")
++    if not image.getbbox():
++        raise ValueError(f"Empty frame: {suffix}")
++    if image.getextrema()[3][0] != 0:
++        raise ValueError(f"Missing transparency: {suffix}")
++    return image
++
++
++def build(kind, preview=False):
++    with ZipFile(SOURCE / f"{kind}.zip") as archive:
++        rows = []
++        for direction in DIRECTIONS:
++            poses = [read_suffix(archive, f"rotations/{direction}.png")]
++            for index in range(4):
++                suffix = f"animations/dock_walk/{direction}/frame_{index:03}.png"
++                if (preview or direction not in ANIMATED_DIRECTIONS) and not any(n.endswith(suffix) for n in archive.namelist()):
++                    poses.append(poses[0].copy())
++                else:
++                    poses.append(read_suffix(archive, suffix))
++            rows.append(poses)
++
++    # A single scale avoids breathing/pumping introduced by per-pose resizing.
++    boxes = [pose.getbbox() for row in rows for pose in row]
++    ratio = min(1.0, 84 / max(b[2]-b[0] for b in boxes),
++                84 / max(b[3]-b[1] for b in boxes))
++    atlas = Image.new("RGBA", (CELL * 5, CELL * 8))
++    for y, row in enumerate(rows):
++        # Shared origin for an animation's canvas; no per-frame recentering.
++        union = (min(p.getbbox()[0] for p in row),
++                 min(p.getbbox()[1] for p in row),
++                 max(p.getbbox()[2] for p in row),
++                 max(p.getbbox()[3] for p in row))
++        for x, pose in enumerate(row):
++            # PixelLab idle and animation canvases can have different dimensions.
++            # For differing canvases, anchor idle independently, walk as a group.
++            group = row if x == 0 or pose.size == row[0].size else row[1:]
++            bounds = union if group is row else (
++                min(p.getbbox()[0] for p in group), min(p.getbbox()[1] for p in group),
++                max(p.getbbox()[2] for p in group), max(p.getbbox()[3] for p in group))
++            if x == 0 and any(p.size != pose.size for p in row[1:]):
++                bounds = pose.getbbox()
++            sprite = pose.crop(bounds)
++            sprite = sprite.resize((max(1, round(sprite.width * ratio)),
++                                    max(1, round(sprite.height * ratio))), Image.Resampling.NEAREST)
++            if sprite.width > 92 or sprite.height > 92:
++                raise ValueError(f"{kind}: animation motion exceeds cell; adjust uniform scale")
++            atlas.alpha_composite(sprite, (x * CELL + (CELL - sprite.width)//2,
++                                           y * CELL + 92 - sprite.height))
++    TARGET.mkdir(parents=True, exist_ok=True)
++    path = TARGET / f"{kind}_pixellab_v2.png"
++    atlas.save(path)
++    report = {"kind": kind, "size": list(atlas.size), "scale": ratio,
++              "near_white_pixels": sum(1 for r,g,b,a in atlas.getdata()
++                                        if a > 128 and min(r,g,b) > 215)}
++    print(json.dumps(report))
++    return atlas
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--preview", action="store_true", help="Preview idle views before animation exports are ready")
++    parser.add_argument("kinds", nargs="*", default=list(KINDS), choices=KINDS)
++    args = parser.parse_args()
++    for kind in args.kinds:
++        build(kind, preview=args.preview)
+--- /dev/null
++++ b/tests/dock_monsters_preview.gd
+@@ -0,0 +1,39 @@
++extends SceneTree
++
++class Preview extends DockView:
++	func _draw() -> void:
++		draw_rect(Rect2(0, 0, 1280, 800), Color("111924"))
++		text_at(Vector2(36, 40), "DOCAS / NOVOS MONSTROS PIXELLAB", Color("b9c8dd"), 24)
++		for enemy in sim.enemies:
++			visual_origin = enemy.p
++			visual_scale = 1.65
++			visual_transform(Vector2.ZERO)
++			draw_enemy(enemy)
++			visual_scale = 1.0
++			visual_origin = Vector2.ZERO
++			visual_transform(Vector2.ZERO)
++		for row in range(5):
++			text_at(Vector2(15, 135 + row * 137), ["POLVO", "CULTISTA", "ARPOADOR", "SOLDADO", "FILHOTE"][row], Color("b9c8dd"), 14)
++
++func _init() -> void:
++	call_deferred("capture")
++
++func capture() -> void:
++	root.size = Vector2i(1280, 800)
++	var view := Preview.new()
++	view.sim = Expedition.new()
++	view.sim.start_arena()
++	view.sim.enemies.clear()
++	view.sim.pending_spawns.clear()
++	var directions := [Vector2.DOWN, Vector2(1, 1), Vector2.RIGHT, Vector2(1, -1), Vector2.UP, Vector2(-1, -1), Vector2.LEFT, Vector2(-1, 1)]
++	for row in range(5):
++		for col in range(8):
++			view.sim.spawn_enemy(Vector2(195 + col * 142, 192 + row * 137), ["crawler", "cult", "fish", "brute", "crawler_small"][row])
++			var enemy: Dictionary = view.sim.enemies[-1]
++			enemy.face = directions[col]
++			enemy.moving = false
++	root.add_child(view)
++	await process_frame
++	await RenderingServer.frame_post_draw
++	root.get_texture().get_image().save_png("res://test-output/dock-monsters-v2.png")
++	quit()

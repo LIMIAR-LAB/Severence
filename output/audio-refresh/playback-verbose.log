@@ -1,0 +1,153 @@
+WorkerThreadPool: 16 threads, 4 max low-priority.
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 2004498165
+EDITOR API HASH: 1696660745
+Loading resource: res://tests/game_audio_test.gd remapped: res://tests/game_audio_test.gd
+Completed load for: 'res://tests/game_audio_test.gd' remapped 'res://tests/game_audio_test.gd' at thread -1
+SceneTreeFTI: traversal method DEFAULT
+Loaded system CA certificates
+Loading resource: res://assets/audio/generated/pistol.wav remapped: res://assets/audio/generated/pistol.wav
+Loading resource: res://.godot/imported/pistol.wav-cdd5350b36fa336f6088a3dfc967a21d.sample remapped: res://.godot/imported/pistol.wav-cdd5350b36fa336f6088a3dfc967a21d.sample
+Completed load for: 'res://assets/audio/generated/pistol.wav' remapped 'res://assets/audio/generated/pistol.wav' at thread -1
+Loading resource: res://assets/audio/generated/shotgun.wav remapped: res://assets/audio/generated/shotgun.wav
+Loading resource: res://.godot/imported/shotgun.wav-1ed853a40c7daa56ff440ce783198afe.sample remapped: res://.godot/imported/shotgun.wav-1ed853a40c7daa56ff440ce783198afe.sample
+Completed load for: 'res://assets/audio/generated/shotgun.wav' remapped 'res://assets/audio/generated/shotgun.wav' at thread -1
+Loading resource: res://assets/audio/generated/smg.wav remapped: res://assets/audio/generated/smg.wav
+Loading resource: res://.godot/imported/smg.wav-3b308ad9c86ab7195d967697147c4bda.sample remapped: res://.godot/imported/smg.wav-3b308ad9c86ab7195d967697147c4bda.sample
+Completed load for: 'res://assets/audio/generated/smg.wav' remapped 'res://assets/audio/generated/smg.wav' at thread -1
+Loading resource: res://assets/audio/generated/bazooka.wav remapped: res://assets/audio/generated/bazooka.wav
+Loading resource: res://.godot/imported/bazooka.wav-5c95ea8b93e6fac9b5425f2dd2d9d8a4.sample remapped: res://.godot/imported/bazooka.wav-5c95ea8b93e6fac9b5425f2dd2d9d8a4.sample
+Completed load for: 'res://assets/audio/generated/bazooka.wav' remapped 'res://assets/audio/generated/bazooka.wav' at thread -1
+Loading resource: res://assets/audio/generated/mech.wav remapped: res://assets/audio/generated/mech.wav
+Loading resource: res://.godot/imported/mech.wav-203566af4501f231469ce78c54da5a02.sample remapped: res://.godot/imported/mech.wav-203566af4501f231469ce78c54da5a02.sample
+Completed load for: 'res://assets/audio/generated/mech.wav' remapped 'res://assets/audio/generated/mech.wav' at thread -1
+Loading resource: res://assets/audio/generated/sword.wav remapped: res://assets/audio/generated/sword.wav
+Loading resource: res://.godot/imported/sword.wav-7f5fe2605606c5de7b3deac03d43de2b.sample remapped: res://.godot/imported/sword.wav-7f5fe2605606c5de7b3deac03d43de2b.sample
+Completed load for: 'res://assets/audio/generated/sword.wav' remapped 'res://assets/audio/generated/sword.wav' at thread -1
+Loading resource: res://assets/audio/generated/melee.wav remapped: res://assets/audio/generated/melee.wav
+Loading resource: res://.godot/imported/melee.wav-8efac2ecca31363b9f170df2ae8d294e.sample remapped: res://.godot/imported/melee.wav-8efac2ecca31363b9f170df2ae8d294e.sample
+Completed load for: 'res://assets/audio/generated/melee.wav' remapped 'res://assets/audio/generated/melee.wav' at thread -1
+Loading resource: res://assets/audio/generated/spectre.wav remapped: res://assets/audio/generated/spectre.wav
+Loading resource: res://.godot/imported/spectre.wav-259c449feed978179feba7f5456a81cc.sample remapped: res://.godot/imported/spectre.wav-259c449feed978179feba7f5456a81cc.sample
+Completed load for: 'res://assets/audio/generated/spectre.wav' remapped 'res://assets/audio/generated/spectre.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_cult.wav remapped: res://assets/audio/generated/enemy_cult.wav
+Loading resource: res://.godot/imported/enemy_cult.wav-7bd0feabe0b636c3d14411c54e769f34.sample remapped: res://.godot/imported/enemy_cult.wav-7bd0feabe0b636c3d14411c54e769f34.sample
+Completed load for: 'res://assets/audio/generated/enemy_cult.wav' remapped 'res://assets/audio/generated/enemy_cult.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_fish.wav remapped: res://assets/audio/generated/enemy_fish.wav
+Loading resource: res://.godot/imported/enemy_fish.wav-92c108cf17e9e46258e0e408b6052fd9.sample remapped: res://.godot/imported/enemy_fish.wav-92c108cf17e9e46258e0e408b6052fd9.sample
+Completed load for: 'res://assets/audio/generated/enemy_fish.wav' remapped 'res://assets/audio/generated/enemy_fish.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_crawler.wav remapped: res://assets/audio/generated/enemy_crawler.wav
+Loading resource: res://.godot/imported/enemy_crawler.wav-ed4fb5e0b511580114c06a68cf2bfb3c.sample remapped: res://.godot/imported/enemy_crawler.wav-ed4fb5e0b511580114c06a68cf2bfb3c.sample
+Completed load for: 'res://assets/audio/generated/enemy_crawler.wav' remapped 'res://assets/audio/generated/enemy_crawler.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_brute.wav remapped: res://assets/audio/generated/enemy_brute.wav
+Loading resource: res://.godot/imported/enemy_brute.wav-323b38e3180de6795c1b44bf5330972c.sample remapped: res://.godot/imported/enemy_brute.wav-323b38e3180de6795c1b44bf5330972c.sample
+Completed load for: 'res://assets/audio/generated/enemy_brute.wav' remapped 'res://assets/audio/generated/enemy_brute.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_guard.wav remapped: res://assets/audio/generated/enemy_guard.wav
+Loading resource: res://.godot/imported/enemy_guard.wav-45ae76169d4db1a3716312d08c0a0586.sample remapped: res://.godot/imported/enemy_guard.wav-45ae76169d4db1a3716312d08c0a0586.sample
+Completed load for: 'res://assets/audio/generated/enemy_guard.wav' remapped 'res://assets/audio/generated/enemy_guard.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_bomber.wav remapped: res://assets/audio/generated/enemy_bomber.wav
+Loading resource: res://.godot/imported/enemy_bomber.wav-b71ee33f699f93cff7858d83a33014d7.sample remapped: res://.godot/imported/enemy_bomber.wav-b71ee33f699f93cff7858d83a33014d7.sample
+Completed load for: 'res://assets/audio/generated/enemy_bomber.wav' remapped 'res://assets/audio/generated/enemy_bomber.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_warden.wav remapped: res://assets/audio/generated/enemy_warden.wav
+Loading resource: res://.godot/imported/enemy_warden.wav-9fb6168e34ca2a8b32da689b71e62e43.sample remapped: res://.godot/imported/enemy_warden.wav-9fb6168e34ca2a8b32da689b71e62e43.sample
+Completed load for: 'res://assets/audio/generated/enemy_warden.wav' remapped 'res://assets/audio/generated/enemy_warden.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_boss.wav remapped: res://assets/audio/generated/enemy_boss.wav
+Loading resource: res://.godot/imported/enemy_boss.wav-08c99070e2fd86323990d1c288fddc7d.sample remapped: res://.godot/imported/enemy_boss.wav-08c99070e2fd86323990d1c288fddc7d.sample
+Completed load for: 'res://assets/audio/generated/enemy_boss.wav' remapped 'res://assets/audio/generated/enemy_boss.wav' at thread -1
+Loading resource: res://assets/audio/generated/enemy_die.wav remapped: res://assets/audio/generated/enemy_die.wav
+Loading resource: res://.godot/imported/enemy_die.wav-284a2f85cc00df96b01f926ffd51f850.sample remapped: res://.godot/imported/enemy_die.wav-284a2f85cc00df96b01f926ffd51f850.sample
+Completed load for: 'res://assets/audio/generated/enemy_die.wav' remapped 'res://assets/audio/generated/enemy_die.wav' at thread -1
+Loading resource: res://assets/audio/generated/explosion.wav remapped: res://assets/audio/generated/explosion.wav
+Loading resource: res://.godot/imported/explosion.wav-c4a2324af1a7dc6ba62b77c8ff117fdc.sample remapped: res://.godot/imported/explosion.wav-c4a2324af1a7dc6ba62b77c8ff117fdc.sample
+Completed load for: 'res://assets/audio/generated/explosion.wav' remapped 'res://assets/audio/generated/explosion.wav' at thread -1
+Loading resource: res://assets/audio/generated/hit.wav remapped: res://assets/audio/generated/hit.wav
+Loading resource: res://.godot/imported/hit.wav-04d42420430aafdfda89b609671ed8f8.sample remapped: res://.godot/imported/hit.wav-04d42420430aafdfda89b609671ed8f8.sample
+Completed load for: 'res://assets/audio/generated/hit.wav' remapped 'res://assets/audio/generated/hit.wav' at thread -1
+Loading resource: res://assets/audio/generated/jump.wav remapped: res://assets/audio/generated/jump.wav
+Loading resource: res://.godot/imported/jump.wav-6e41f4028da0b710d1f5c56b13815107.sample remapped: res://.godot/imported/jump.wav-6e41f4028da0b710d1f5c56b13815107.sample
+Completed load for: 'res://assets/audio/generated/jump.wav' remapped 'res://assets/audio/generated/jump.wav' at thread -1
+Loading resource: res://assets/audio/generated/dash.wav remapped: res://assets/audio/generated/dash.wav
+Loading resource: res://.godot/imported/dash.wav-453d1341dc99ca2837900c5a6869ec5b.sample remapped: res://.godot/imported/dash.wav-453d1341dc99ca2837900c5a6869ec5b.sample
+Completed load for: 'res://assets/audio/generated/dash.wav' remapped 'res://assets/audio/generated/dash.wav' at thread -1
+Loading resource: res://assets/audio/generated/pickup.wav remapped: res://assets/audio/generated/pickup.wav
+Loading resource: res://.godot/imported/pickup.wav-ae669bdac8a814bf45fe905c97ace7f2.sample remapped: res://.godot/imported/pickup.wav-ae669bdac8a814bf45fe905c97ace7f2.sample
+Completed load for: 'res://assets/audio/generated/pickup.wav' remapped 'res://assets/audio/generated/pickup.wav' at thread -1
+Loading resource: res://assets/audio/generated/dry_fire.wav remapped: res://assets/audio/generated/dry_fire.wav
+Loading resource: res://.godot/imported/dry_fire.wav-95536e649ca6cbd20274166e55d172c5.sample remapped: res://.godot/imported/dry_fire.wav-95536e649ca6cbd20274166e55d172c5.sample
+Completed load for: 'res://assets/audio/generated/dry_fire.wav' remapped 'res://assets/audio/generated/dry_fire.wav' at thread -1
+Loading resource: res://assets/audio/generated/music_refuge.ogg remapped: res://assets/audio/generated/music_refuge.ogg
+Loading resource: res://.godot/imported/music_refuge.ogg-089c9800a0069d1de28754bc59e2549f.oggvorbisstr remapped: res://.godot/imported/music_refuge.ogg-089c9800a0069d1de28754bc59e2549f.oggvorbisstr
+Completed load for: 'res://assets/audio/generated/music_refuge.ogg' remapped 'res://assets/audio/generated/music_refuge.ogg' at thread -1
+Loading resource: res://assets/audio/generated/music_expedition.ogg remapped: res://assets/audio/generated/music_expedition.ogg
+Loading resource: res://.godot/imported/music_expedition.ogg-de67dfdc1083d7e58a6f6323b6bc1a71.oggvorbisstr remapped: res://.godot/imported/music_expedition.ogg-de67dfdc1083d7e58a6f6323b6bc1a71.oggvorbisstr
+Completed load for: 'res://assets/audio/generated/music_expedition.ogg' remapped 'res://assets/audio/generated/music_expedition.ogg' at thread -1
+PASS: pistol carrega áudio real
+PASS: shotgun carrega áudio real
+PASS: smg carrega áudio real
+PASS: bazooka carrega áudio real
+PASS: mech carrega áudio real
+PASS: sword carrega áudio real
+PASS: melee carrega áudio real
+PASS: spectre carrega áudio real
+PASS: enemy_cult carrega áudio real
+PASS: enemy_fish carrega áudio real
+PASS: enemy_crawler carrega áudio real
+PASS: enemy_brute carrega áudio real
+PASS: enemy_guard carrega áudio real
+PASS: enemy_bomber carrega áudio real
+PASS: enemy_warden carrega áudio real
+PASS: enemy_boss carrega áudio real
+PASS: enemy_die carrega áudio real
+PASS: explosion carrega áudio real
+PASS: hit carrega áudio real
+PASS: jump carrega áudio real
+PASS: dash carrega áudio real
+PASS: pickup carrega áudio real
+PASS: dry_fire carrega áudio real
+PASS: refuge possui trilha longa com loop
+PASS: expedition possui trilha longa com loop
+PASS: evento de disparo toca uma vez
+PASS: snapshot repetido não repete o som
+PASS: variação de áudio não altera RNG do combate
+PASS: inimigos distantes não poluem a mixagem
+PASS: pausa interrompe efeitos ativos
+PASS: retomar não reproduz fila da pausa
+PASS: volume zero silencia efeitos e música
+PASS: efeitos não começam no mudo
+PASS: volume restaura a mixagem
+PASS: refúgio usa sua música
+PASS: expedição troca de música
+PASS: menu reduz suavemente a música
+PASS: carregar sessão descarta efeitos históricos
+GAME_AUDIO failures=0
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+Leaked instance: AudioStreamWAV:9223372065829029335 - Reference count: 1
+Leaked instance: OggPacketSequence:9223372070442763800 - Reference count: 3
+Leaked instance: AudioStreamOggVorbis:9223372070459541017 - Reference count: 1
+Leaked instance: OggPacketSequence:9223372070727976476 - Reference count: 3
+Leaked instance: AudioStreamOggVorbis:9223372070744753693 - Reference count: 1
+Leaked instance: AudioStreamPlaybackWAV:9223372070912525856 - Reference count: 1
+Leaked instance: AudioStreamPlaybackOggVorbis:9223372070929303073 - Reference count: 1
+Leaked instance: OggPacketSequencePlayback:9223372070946080290 - Reference count: 1
+Leaked instance: AudioStreamPlaybackOggVorbis:9223372070962857507 - Reference count: 1
+Leaked instance: OggPacketSequencePlayback:9223372070979634724 - Reference count: 1
+WARNING: 10 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 5 resources still in use at exit.
+   at: clear (core/io/resource.cpp:817)
+Hint: Leaked instances typically happen when nodes are removed from the scene tree (with `remove_child()`) but not freed (with `free()` or `queue_free()`).
+Resource still in use: res://assets/audio/generated/pistol.wav (AudioStreamWAV)
+Resource still in use: res://assets/audio/generated/music_refuge.ogg::OggPacketSequence_1o5vy (OggPacketSequence)
+Resource still in use: res://assets/audio/generated/music_refuge.ogg (AudioStreamOggVorbis)
+Resource still in use: res://assets/audio/generated/music_expedition.ogg::OggPacketSequence_hm37p (OggPacketSequence)
+Resource still in use: res://assets/audio/generated/music_expedition.ogg (AudioStreamOggVorbis)
+Orphan StringName: Severence Music (static: 0, total: 2)
+Orphan StringName: Severence SFX (static: 0, total: 1)
+StringName: 2 unclaimed string names at exit.

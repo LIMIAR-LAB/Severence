@@ -29,8 +29,9 @@ func _initialize() -> void:
 	check(title_subtitle != null and title_subtitle.text == "ECOS DO TEMPO", "subtítulo usa o nome oficial")
 	check(title_primary.get_combined_minimum_size().x <= title_primary.size.x and title_primary.get_combined_minimum_size().y <= title_primary.size.y, "glifos da linha principal cabem no lockup")
 	check(title_subtitle.get_combined_minimum_size().x <= title_subtitle.size.x and title_subtitle.get_combined_minimum_size().y <= title_subtitle.size.y, "glifos do subtítulo cabem no lockup")
-	var title_footer := ui.content.find_child("TitleFooter", true, false) as Label
-	check(title_footer != null and title_footer.text == "SEVERENCE — ECOS DO TEMPO  •  PROTÓTIPO", "rodapé usa o nome oficial")
+	var title_art := ui.content.find_child("TitleConceptArt", true, false) as TextureRect
+	check(title_art != null and title_art.texture.resource_path.ends_with("tela-inicial-conceito-v3-severence.png"), "tela inicial usa a arte aprovada com Severence")
+	check(title_art.material is ShaderMaterial, "arte inicial deixa a animação visível no céu")
 	check(ui.content.find_child("TitleCommandDeck", true, false) is Panel, "um único deck concentra toda a navegação")
 	var scene_crop := ui.content.find_child("TitleStillCropped", true, false) as TextureRect
 	check(scene_crop != null and scene_crop.texture is AtlasTexture and scene_crop.texture.region == Rect2(384, 107, 960, 537), "fundo recorta a sidebar na fonte sem distorção não uniforme")
@@ -63,8 +64,9 @@ func _initialize() -> void:
 	app.playing = true; app.fake_save = true; ui.show_screen("main"); await process_frame; await process_frame
 	var active_continue := ui.content.find_child("Title_0", true, false) as Button
 	check(not active_continue.disabled, "CONTINUAR habilitado durante expedição ativa")
+	check(ui.content.find_child("Title_1", true, false).disabled, "nova expedição não substitui uma partida ativa")
 	check(root.get_viewport().gui_get_focus_owner() == active_continue, "expedição ativa prioriza CONTINUAR no foco")
-	check(active_continue.get_theme_stylebox("normal").border_color == Color("56cdd4"), "expedição ativa promove CONTINUAR à ação principal")
+	check(active_continue.tooltip_text.contains("andamento"), "CONTINUAR identifica a expedição ativa")
 	active_continue.pressed.emit(); check(not ui.visible and not app.paused and not app.load_requested, "CONTINUAR prioriza a expedição ativa mesmo quando também existe save")
 	app.playing = false; ui.show(); ui.show_screen("main"); await process_frame
 	var save_app := SaveStateApp.new(); root.add_child(save_app); await process_frame
@@ -79,7 +81,10 @@ func _initialize() -> void:
 		ui.show_screen("main"); await process_frame
 		(ui.content.find_child("Title_%d" % i, true, false) as Button).pressed.emit()
 		check(ui.screen == targets[i], "botão %d abre %s" % [i, targets[i]])
-		if targets[i] != "online":
+		if targets[i] == "characters":
+			var character_art := ui.content.find_child("MenuConceptArt", true, false) as TextureRect
+			check(character_art != null and character_art.texture.resource_path.ends_with("selecao-personagem-conceito-v3.png"), "personagens usam o quadro ilustrado aprovado")
+		elif targets[i] != "online":
 			var secondary_bg := ui.content.find_child("SecondaryMenuBackdrop", true, false) as TextureRect
 			check(secondary_bg != null and secondary_bg.texture is AtlasTexture and secondary_bg.texture.region == Rect2(384, 107, 960, 537), "tela %s usa cenário sem a marca antiga" % targets[i])
 			var secondary_scene := ui.content.find_child("SecondaryMenuScene", true, false) as Control
@@ -93,15 +98,28 @@ func _initialize() -> void:
 	check(is_equal_approx(final_archive_scale.x, final_archive_scale.y), "Arquivo mantém fundo sem distorção")
 	ui.show_screen("characters"); await process_frame
 	check(ui.content.find_child("CharacterMarty", true, false) is Button, "Marty selecionável")
+	check(ui.content.find_child("CharacterRoster", true, false) is Control, "Marty aparece grande à esquerda e também no quadro de seis à direita")
 	for i in range(1, 6):
 		check(ui.content.find_child("CharacterLocked%d" % i, true, false).disabled, "personagem futuro %d bloqueado" % i)
 	ui.content.find_child("CharacterMarty", true, false).pressed.emit()
 	check(ui.screen == "play" and ui.content.find_child("LocalChoice", true, false) is Button, "escolha de Marty abre os três modos")
+	var adventure_art := ui.content.find_child("MenuConceptArt", true, false) as TextureRect
+	check(adventure_art != null and adventure_art.texture.resource_path.ends_with("selecao-aventura-conceito-v2.png"), "aventura usa os cartões ilustrados aprovados")
 	ui.content.find_child("LocalChoice", true, false).pressed.emit()
-	check(ui.screen == "equipment" and ui.pending_mode == "local", "coop local leva à configuração de equipamento")
+	await process_frame
+	check(root.get_viewport().gui_get_focus_owner().name == "LocalChoice", "foco acompanha o modo escolhido")
+	check(ui.screen == "play" and ui.pending_mode == "local", "coop local fica selecionado até confirmar")
+	ui.content.find_child("EquipAndEnter", true, false).pressed.emit(); await process_frame
+	check(ui.screen == "characters_coop", "coop local abre seleção de dois jogadores")
+	var coop_art := ui.content.find_child("MenuConceptArt", true, false) as TextureRect
+	check(coop_art != null and coop_art.texture.resource_path.ends_with("selecao-personagem-coop-conceito-v3.png"), "coop mostra Marty selecionado em ambos os lados")
+	ui.content.find_child("ConfirmCharacters", true, false).pressed.emit(); await process_frame
+	check(ui.screen == "equipment", "confirmação de dois jogadores abre equipamento")
 	ui.content.find_child("Back", true, false).pressed.emit()
 	check(ui.screen == "play", "equipamento volta à escolha do modo")
 	ui.content.find_child("LocalChoice", true, false).pressed.emit()
+	ui.content.find_child("EquipAndEnter", true, false).pressed.emit()
+	ui.content.find_child("ConfirmCharacters", true, false).pressed.emit()
 	ui.content.find_child("Refuge", true, false).pressed.emit()
 	check(app.playing and app.sim.coop == "local" and app.sim.mode == "hub", "coop local inicia no refúgio")
 	print("TITLE_SCREEN_TESTS_DONE failures=%d" % failures)

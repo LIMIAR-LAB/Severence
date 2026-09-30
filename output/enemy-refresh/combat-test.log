@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: limite três e aviso antes do tiro
+PASS: nenhum dano antes de 0,45s
+PASS: três atacantes disparam após aviso
+PASS: vagas circulam durante recuperação
+PASS: alvo morto libera reservas
+PASS: morte cancela reserva
+PASS: morte do alvo em coop cancela ataque sem transferir reserva
+PASS: recuperação inclui percurso até cobertura
+PASS: soldado chega à cobertura e recarrega abaixado
+PASS: curvatura e aceleração
+PASS: divisão em quatro filhos sem recursão
+PASS: filhos não se dividem
+PASS: projétil expirado não causa dano
+PASS: arco não causa dano antecipado
+PASS: pouso ocupa área marcada
+PASS: salto respeita parede e deixa ácido
+PASS: salto tem altura visual
+PASS: perder alvo limpa salto e reserva
+PASS: salto não invade sala segura
+PASS: ácido respeita escala de dano
+PASS: arpão não bloqueia jogador
+PASS: arpão cravado colide
+PASS: arpão expira
+PASS: elite morto anuncia uma única explosão
+PASS: snapshot preserva ameaças
+PASS: refúgio limpa combate temporário
+PASS: seed reproduz composição e modificadores
+PASS: Docas contêm Bomber e Guard
+PASS: salas seguras sem encontros
+PASS: entrada sem elites
+COMBAT_FRAMEWORK failures=0

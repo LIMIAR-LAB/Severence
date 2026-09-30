@@ -90,7 +90,12 @@ func build() -> void:
 	back.add_theme_color_override("font_color", GOLD); launch.add_theme_color_override("font_color", GOLD)
 	build_compatibility_nodes()
 	inventory = InventoryState.new(app.sim.inventory_state)
-	if not mission_mode: sync_entitlements()
+	if mission_mode:
+		# A missão sempre abre a visão completa: um filtro persistido no Refúgio
+		# não pode esconder o outro módulo de robô durante a troca rápida.
+		inventory.set_filter("todos")
+	else:
+		sync_entitlements()
 	focus_id = host.outfit_choice
 	refresh_compat()
 	show_tab(0)
@@ -158,7 +163,9 @@ func carried(entry: Dictionary) -> bool:
 
 func quantity_for(entry: Dictionary) -> int:
 	if not entry.get("transiente", false):
-		if mission_mode: return 1 if carried(entry) else 0
+		if mission_mode:
+			if entry.get("slot", "") == "robo": return inventory.quantity(entry.id)
+			return 1 if carried(entry) else 0
 		return inventory.quantity(entry.id)
 	var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
 	match str(entry.id):

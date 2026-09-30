@@ -23,6 +23,9 @@ func _ready() -> void:
 	art["key_clean"] = load("res://assets/environment/docks/key.png")
 	art["coin_clean"] = load("res://assets/environment/docks/coin.png")
 	art["titan"] = load("res://assets/mech/titan_v2.png")
+	art["portraits"] = load("res://assets/ui/hud/marty_omega_portraits_v1.png")
+	art["robot_titan"] = load("res://assets/ui/equipamento/icones/icon_robo_titan.png")
+	art["robot_spectre"] = load("res://assets/ui/equipamento/icones/icon_robo_spectre.png")
 	art["boss"] = load("res://assets/boss/almirante_idle.png")
 	# 0.16: ícones do mapa (tools/prepare_map_icons.py) — 48x48, mostrados em 1/2 (24) no mapa e 1/3 (16) no minimapa
 	for key in ["boss", "shop", "challenge", "chest", "locked", "exit"]: art["map_" + key] = load("res://assets/ui/map_icons/map_icon_" + key + ".png")
@@ -47,7 +50,10 @@ func _draw() -> void:
 	var s = app.sim
 	var id: int = 1 if app.online and not app.hosting else 0
 	var a: Dictionary = s.actors[id]
-	draw_texture_rect(art.portrait, Rect2(14, 14, 82, 82), false)
+	var portrait_sheet: Texture2D = art.portraits
+	var portrait_cell := Vector2(portrait_sheet.get_width() * 0.5, portrait_sheet.get_height())
+	var portrait_index := 1 if a.armor else 0
+	draw_texture_rect_region(portrait_sheet, Rect2(14, 14, 82, 82), Rect2(portrait_index * portrait_cell.x, 0, portrait_cell.x, portrait_cell.y))
 	# 0.12: vida em corações (1 coração = 10) + corações de escudo Ômega em ciano
 	var hearts: int = int(roundf(s.max_hp() / s.HEART))
 	var shield_hearts: int = int(ceilf(a.get("shield", 0.0) / s.HEART))
@@ -108,19 +114,29 @@ func _draw() -> void:
 	else: draw_set_transform(Vector2(dx, 0))
 	draw_minimap(s, a)
 	draw_set_transform(Vector2(0, dy))
-	frame(Rect2(16,676,218,105))
-	var robot_hp: float = s.mech.hp if a.selected_robot == "titan" else s.spectres[id].hp
-	var robot_max: float = 240 if a.selected_robot == "titan" else 100
-	text(Vector2(30,699), a.selected_robot.to_upper() + (" • FUSÃO" if a.fused else ""), 16, CYAN)
-	draw_rect(Rect2(30,711,188,12), Color("26323a")); draw_rect(Rect2(30,711,188*robot_hp/robot_max,12),Color("89d859"))
-	if a.selected_robot == "titan":
-		# 0.14: barra de gasolina do Titan
-		var fuel: float = s.mech.get("fuel", 0.0) / s.FUEL_MAX
-		draw_rect(Rect2(30,727,140,7), Color("26323a"))
-		draw_rect(Rect2(30,727,140*fuel,7), Color("e8a33d") if fuel > 0.2 else Color("d04430"))
-		text(Vector2(176,734), "GAS", 11, Color("e8a33d"))
-	text(Vector2(30,746), "C • INVOCAR / RECOLHER" if a.summon_cd <= 0 else "RECARGA • %.1fs" % a.summon_cd, 12)
-	text(Vector2(30,768), "G • SEPARAR" if a.fused else "E • PILOTAR   G • FUNDIR", 12, GOLD)
+	frame(Rect2(16,676,284,105))
+	var robot_id: String = a.get("selected_robot", "")
+	if robot_id == "":
+		text(Vector2(30,704), "SEM ROBÔ", 16, Color("87959d"))
+		text(Vector2(30,730), "Nenhum módulo equipado", 12, Color("87959d"))
+		text(Vector2(30,759), "V / ◀ • TROCAR", 12, GOLD)
+	else:
+		var robot_icon: Texture2D = art["robot_" + robot_id]
+		draw_texture_rect(robot_icon, Rect2(27,688,58,54), false)
+		text(Vector2(94,699), robot_id.to_upper() + (" • FUSÃO" if a.fused else ""), 16, CYAN)
+		var robot_hp: float = s.mech.hp if robot_id == "titan" else s.spectres[id].hp
+		var robot_max: float = 240.0 if robot_id == "titan" else 100.0
+		draw_rect(Rect2(94,709,188,9), Color("26323a")); draw_rect(Rect2(94,709,188*clampf(robot_hp/robot_max,0,1),9),Color("89d859"))
+		if robot_id == "titan":
+			var fuel: float = s.mech.get("fuel", 0.0) / s.FUEL_MAX
+			draw_rect(Rect2(94,723,150,6), Color("26323a")); draw_rect(Rect2(94,723,150*fuel,6), Color("e8a33d") if fuel > 0.2 else Color("d04430"))
+			text(Vector2(250,730), "GAS", 10, Color("e8a33d"))
+			text(Vector2(94,746), "C INVOCAR  •  E PILOTAR", 11)
+		else:
+			var spectre_state: String = str(s.spectres[id].state).to_upper()
+			text(Vector2(94,731), "ENERGIA • " + spectre_state, 10, Color("c68cff"))
+			text(Vector2(94,746), "C INVOCAR  •  G FUNDIR", 11)
+		text(Vector2(94,765), "V / ◀ • TROCAR ROBÔ", 11, GOLD)
 	draw_set_transform(Vector2(dx, dy))
 	frame(Rect2(978,721,288,60))
 	for n in range(3):

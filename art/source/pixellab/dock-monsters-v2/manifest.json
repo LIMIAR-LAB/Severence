@@ -1,0 +1,34 @@
+{
+  "provider": "PixelLab MCP",
+  "date": "2026-09-30",
+  "crawler": {
+    "reference_job": "c4b1222d-078f-449a-a281-7380f002a93c",
+    "character_id": "3f47f034-45f9-4f24-9040-b506458908a7",
+    "outer_job": "4cd37e4b-45f7-41c6-a377-08f480d1cc25"
+  },
+  "cult": {
+    "reference_job": "b269478d-dfc2-4af2-b439-db721654fda2",
+    "character_id": "c59afc82-116f-4396-954d-f1774c064b7b",
+    "outer_job": "41309e1c-0e02-427f-acc1-adc0e7653695"
+  },
+  "fish": {
+    "character_id": "9d0d295a-e53c-4955-a33d-063031fd95f3",
+    "outer_job": "6f2f91a0-da2f-44e9-a779-6eebd1c5b540"
+  },
+  "brute": {
+    "character_id": "827924fe-ebc6-496a-8436-5c8c9b56b0d3",
+    "outer_job": "a3801aa9-7092-42a1-8885-f5b6794d287a"
+  },
+  "animation": {
+    "name": "dock_walk",
+    "frames": 4,
+    "crawler_group_id": "64d684ec-1300-4569-8389-c58187ed1c1b",
+    "crawler_completed_directions": ["south", "east", "north"],
+    "remaining_views": "Original directional idle frames plus renderer bob. Additional generation attempts were rejected by the shared concurrency limit. No jobs from this task remain pending."
+  },
+  "audio": {
+    "requested_provider": "Higgsfield",
+    "status": "completed with user-authorized original local synthesis; see art/source/audio/manifest.json",
+    "limitation": "Connected Higgsfield generate_audio supports speech only, explicitly excluding music and sound effects."
+  }
+}

@@ -2,7 +2,8 @@
 title: 'Robot switching and combat identity polish'
 type: 'feature'
 created: '2026-09-29'
-status: 'draft'
+status: 'done'
+baseline_commit: '779af10f763738a0ee29fa6c83b8702a7934cb56'
 context:
   - '{project-root}/docs/SPRITE_POSE_STANDARD.md'
   - '{project-root}/docs/PADRAO_SPRITES_MARTY_0_19.md'
@@ -54,11 +55,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `scripts/simulation.gd`, `scripts/main.gd` -- implement authoritative owned-robot cycling, safe transition guards, remappable V/D-pad Left input, networking, and old-save entitlement reconciliation.
-- [ ] `scripts/equipment_screen.gd` -- expose every owned robot during a mission without disturbing the existing transient bazooka inventory changes.
-- [ ] `scripts/combat_hud.gd` -- redesign the lower-left panel with Titan/Spectre face, contextual bars/prompts and switch hint; use dedicated state-aware Marty/Omega portraits at top-left.
-- [ ] `assets/ui/hud/`, `assets/characters/marty/omega/`, `scripts/world_view.gd` -- create and integrate polished pixel-art HUD portraits and a 6–8-frame feet-anchored armor assembly overlay while retaining the current pillar, ring, shockwave, and 1.4 s mechanics.
-- [ ] `tests/solo_robot_test.gd`, `tests/input_remap_test.gd`, `tests/mission_inventory_ui_test.gd`, `tests/marty_actions_test.gd` -- cover the matrix and prevent regressions.
+- [x] `scripts/simulation.gd`, `scripts/main.gd` -- implement authoritative owned-robot cycling, safe transition guards, remappable V/D-pad Left input, networking, and old-save entitlement reconciliation.
+- [x] `scripts/equipment_screen.gd` -- expose every owned robot during a mission without disturbing the existing transient bazooka inventory changes.
+- [x] `scripts/combat_hud.gd` -- redesign the lower-left panel with Titan/Spectre face, contextual bars/prompts and switch hint; use dedicated state-aware Marty/Omega portraits at top-left.
+- [x] `assets/ui/hud/`, `assets/characters/marty/omega/`, `scripts/world_view.gd` -- create and integrate polished pixel-art HUD portraits and a 6–8-frame feet-anchored armor assembly overlay while retaining the current pillar, ring, shockwave, and 1.4 s mechanics.
+- [x] `tests/solo_robot_test.gd`, `tests/input_remap_test.gd`, `tests/mission_inventory_ui_test.gd`, `tests/marty_actions_test.gd` -- cover the matrix and prevent regressions.
 
 **Acceptance Criteria:**
 - Given both modules are owned, when the player presses the mapped switch control in a safe state, then Titan and Spectre alternate immediately, retain their resources, and never coexist as active units.
@@ -77,3 +78,44 @@ Use the existing equipment icons for robot faces instead of generating redundant
 **Commands:**
 - `Get-ChildItem tests\*_test.gd | ForEach-Object { & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script "tests/$($_.Name)" }` -- expected: every test exits successfully.
 - `& 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path . -- --capture-arena --transform-demo` -- expected: captures show crisp HUD portraits, both robot faces/states, and readable start/mid/lock/final Omega stages at native scale.
+
+**Results (2026-09-30):** Full suite passed 44/44. Gameplay captures at ticks 4, 14, 24, 34, 44, 54, 64, and 74 confirmed the staged assembly, state-aware portrait, contextual Titan panel, and preservation of the existing transformation effects. The focused robot, input, mission inventory, and Marty action tests passed.
+
+Independent review agents could not run because the account usage limit was reached. The user explicitly requested finalization with the implementation and verification evidence already available.
+
+## Suggested Review Order
+
+**Authoritative robot switching**
+
+- Start with the guarded state transition and resource-preserving cycle.
+  [`simulation.gd:1613`](../../scripts/simulation.gd#L1613)
+
+- Follow the command from remappable keyboard, controller, and network input.
+  [`main.gd:360`](../../scripts/main.gd#L360)
+
+**Mission selection and HUD feedback**
+
+- Mission inventory exposes all owned modules without inheriting a hiding filter.
+  [`equipment_screen.gd:96`](../../scripts/equipment_screen.gd#L96)
+
+- Contextual robot faces, resources, and commands replace the text-only panel.
+  [`combat_hud.gd:111`](../../scripts/combat_hud.gd#L111)
+
+**Marty and Omega presentation**
+
+- HUD portrait switches cleanly between Marty and the active Omega armor.
+  [`combat_hud.gd:53`](../../scripts/combat_hud.gd#L53)
+
+- Eight-stage overlay assembles armor while preserving the existing transformation effects.
+  [`world_view.gd:1353`](../../scripts/world_view.gd#L1353)
+
+**Regression coverage**
+
+- Robot cycling verifies mutual exclusion and resource preservation.
+  [`solo_robot_test.gd:36`](../../tests/solo_robot_test.gd#L36)
+
+- Mission UI verifies both modules remain visible and selectable.
+  [`mission_inventory_ui_test.gd:59`](../../tests/mission_inventory_ui_test.gd#L59)
+
+- Asset and frame contracts protect the new portrait and assembly sheets.
+  [`marty_actions_test.gd:43`](../../tests/marty_actions_test.gd#L43)

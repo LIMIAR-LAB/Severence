@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: cult dispara magenta
+PASS: fish dispara harpoon
+PASS: brute dispara violet
+PASS: Soldado Possuído dispara leque de 6
+PASS: Rastejante vira duas bolhas menores
+PASS: morte deixa pose de queda
+PASS: arpão prende o Marty
+PASS: preso pelo arpão anda devagar
+PASS: Espião: cultista a 450px não percebe
+PASS: roupa Padrão: cultista a 450px anuncia ataque
+PASS: Mecânico: golpe corpo a corpo mais forte
+PASS: Almirante tem 600 de vida
+PASS: fase 1: anel radial de 16 orbes
+PASS: fase 2: larga uma arma
+PASS: fase 2: espiral e bala de canhão carregada
+PASS: fúria: tinta, arpão e chamas
+PASS: derrota: afunda e libera a extração
+PASS: Almirante começa sem furor
+PASS: furor ativa após BOSS_ENRAGE_TIME de combate
+PASS: furor encolhe a cadência de ataque da fase 1
+ENEMY_TESTS_DONE failures=0

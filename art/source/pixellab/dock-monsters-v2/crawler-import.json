@@ -1,0 +1,21 @@
+{
+  "kind": "crawler",
+  "size": [
+    480,
+    768
+  ],
+  "scale": 0.8936170212765957,
+  "animated_directions": [
+    "south",
+    "east",
+    "north"
+  ],
+  "held_directions": [
+    "south-east",
+    "north-east",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "near_white_pixels": 52
+}

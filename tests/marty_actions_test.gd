@@ -21,6 +21,28 @@ func run() -> void:
 	for action in omega_frames:
 		var texture := load("res://assets/characters/marty/omega/pixellab/%s.png" % action) as Texture2D
 		check(texture != null and texture.get_size() == Vector2(112 * omega_frames[action], 112 * 8), "Marty Omega %s: 8 direcoes" % action)
+		if texture != null:
+			var image := texture.get_image()
+			var all_cells_present := true
+			var all_cells_clear := true
+			var all_directions_animated := true
+			for row in range(8):
+				var frame_hashes := {}
+				for frame in range(omega_frames[action]):
+					var cell := image.get_region(Rect2i(frame * 112, row * 112, 112, 112))
+					var used := cell.get_used_rect()
+					all_cells_present = all_cells_present and used.has_area()
+					all_cells_clear = all_cells_clear and (not used.has_area() or (used.position.x > 0 and used.position.y > 0 and used.end.x < 112 and used.end.y < 112))
+					frame_hashes[hash(cell.get_data())] = true
+				all_directions_animated = all_directions_animated and frame_hashes.size() > 1
+			check(all_cells_present, "Marty Omega %s: nenhuma celula vazia" % action)
+			check(all_cells_clear, "Marty Omega %s: nenhuma arte toca a borda" % action)
+			check(all_directions_animated, "Marty Omega %s: movimento real nas oito direcoes" % action)
+	var assembly := load("res://assets/characters/marty/omega/assembly/omega_assembly_overlay_v1.png") as Texture2D
+	var portraits := load("res://assets/ui/hud/marty_omega_portraits_v1.png") as Texture2D
+	check(assembly != null and assembly.get_width() > assembly.get_height(), "montagem Omega progressiva carrega como folha horizontal")
+	check(portraits != null and portraits.get_width() > portraits.get_height(), "retratos Marty/Omega carregam como dupla horizontal")
+	check(view.omega_assembly_frame(0.0) == 0 and view.omega_assembly_frame(0.5) == 4 and view.omega_assembly_frame(1.0) == 7, "montagem Omega percorre oito estágios sem ultrapassar a folha")
 	for action in ["idle", "run", "jump", "evade", "melee", "hurt", "defeat"]:
 		check(not view.marty_padrao_shows_weapon(action), "Marty Padrao sem arma em " + action)
 	check(view.marty_padrao_shows_weapon("shoot"), "Marty Padrao exibe arma somente no disparo")
@@ -49,8 +71,11 @@ func run() -> void:
 		check(view.weapon_hand_anchor(a) == padrao_anchors[row], "ancora da arma PixelLab %d" % row)
 	a.outfit = "mecanico"
 	check(view.weapon_hand_anchor(a) == Vector2(20,-27), "roupa legada conserva ancora existente")
+	check(view.marty_uses_legacy_weapon_hand(a), "roupa legada ainda pode usar mao do atlas antigo")
 	a.outfit = "padrao"
+	check(not view.marty_uses_legacy_weapon_hand(a), "Marty Padrao nao usa mao do atlas antigo")
 	a.armor = true
+	check(not view.marty_uses_legacy_weapon_hand(a), "Armadura Omega nao usa mao do atlas antigo")
 	var omega_anchors := [Vector2(20,-40), Vector2(23,-43), Vector2(25,-44), Vector2(20,-47), Vector2(10,-49), Vector2(-20,-47), Vector2(-25,-44), Vector2(-23,-43)]
 	for row in range(directions.size()):
 		a.aim = directions[row]
