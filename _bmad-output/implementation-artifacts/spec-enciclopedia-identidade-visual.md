@@ -3,7 +3,7 @@ title: 'Bring the encyclopedia into the game visual identity'
 type: 'feature'
 created: '2026-09-29'
 status: 'in-progress'
-baseline_commit: '622e963b9192dafcf13c7f764bfca972b3d16e96'
+baseline_commit: '41f296266cf478be895bd5637c8b80a77a279a30'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-enciclopedia-dinamica.md'
   - '{project-root}/docs/EQUIPAMENTO_0_17.md'
