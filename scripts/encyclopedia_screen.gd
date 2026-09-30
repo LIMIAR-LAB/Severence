@@ -30,6 +30,7 @@ var name_label: Label
 var subtitle_label: Label
 var description_label: Label
 var traits_label: Label
+var detail_scroll: ScrollContainer
 var count_label: Label
 var back_button: Button
 
@@ -128,13 +129,14 @@ func build() -> void:
 	var fracture := ColorRect.new()
 	fracture.name = "FractureAccent"; fracture.color = VIOLET; fracture.position = Vector2(289, 121); fracture.size = Vector2(445, 2); fracture.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	detail_panel.add_child(fracture)
-	var text_scroll := ScrollContainer.new()
-	text_scroll.name = "DetailScroll"; text_scroll.position = Vector2(289, 135); text_scroll.size = Vector2(451, 260)
-	text_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	detail_panel.add_child(text_scroll)
+	detail_scroll = ScrollContainer.new()
+	detail_scroll.name = "DetailScroll"; detail_scroll.position = Vector2(289, 135); detail_scroll.size = Vector2(451, 260)
+	detail_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	detail_scroll.focus_mode = Control.FOCUS_ALL
+	detail_panel.add_child(detail_scroll)
 	var text_stack := VBoxContainer.new()
 	text_stack.custom_minimum_size = Vector2(429, 0); text_stack.add_theme_constant_override("separation", 16)
-	text_scroll.add_child(text_stack)
+	detail_scroll.add_child(text_stack)
 	description_label = make_label(text_stack, Rect2(), "", 16, CREAM)
 	description_label.name = "EntryDescription"; description_label.custom_minimum_size = Vector2(429, 114)
 	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -226,6 +228,9 @@ func rebuild_list() -> void:
 	count_label.text = "%02d DOSSIÊS // %s" % [records.size(), category.to_upper()]
 	if records.is_empty():
 		show_entry({})
+		var empty_tab: Button = tabs[category]
+		empty_tab.focus_neighbor_bottom = empty_tab.get_path_to(back_button)
+		back_button.focus_neighbor_top = back_button.get_path_to(empty_tab)
 		back_button.grab_focus.call_deferred()
 		return
 	var wanted := str(selected_ids.get(category, records[0].id))
@@ -249,6 +254,10 @@ func rebuild_list() -> void:
 	entry_buttons[0].focus_neighbor_top = entry_buttons[0].get_path_to(active_tab)
 	entry_buttons[-1].focus_neighbor_bottom = entry_buttons[-1].get_path_to(back_button)
 	back_button.focus_neighbor_top = back_button.get_path_to(entry_buttons[-1])
+	for entry_button in entry_buttons:
+		entry_button.focus_neighbor_right = entry_button.get_path_to(detail_scroll)
+	detail_scroll.focus_neighbor_left = detail_scroll.get_path_to(entry_buttons[selected_index])
+	detail_scroll.focus_neighbor_bottom = detail_scroll.get_path_to(back_button)
 	select_entry(records[selected_index])
 	entry_buttons[selected_index].grab_focus.call_deferred()
 
@@ -273,11 +282,14 @@ func select_entry(entry: Dictionary) -> void:
 		entry_button.add_theme_stylebox_override("focus", focus_style)
 		entry_button.add_theme_color_override("font_color", GOLD if active else CREAM)
 		entry_button.add_theme_color_override("font_focus_color", GOLD if active else CYAN)
+		if active: detail_scroll.focus_neighbor_left = detail_scroll.get_path_to(entry_button)
 
 func show_entry(entry: Dictionary) -> void:
+	if detail_scroll != null: detail_scroll.scroll_vertical = 0
 	if entry.is_empty():
 		portrait.texture = null; portrait.visible = false; fallback.visible = true; fallback_glyph.text = "—"
-		name_label.text = "SEM REGISTROS"; subtitle_label.text = "CANAL TEMPORAL OCIOSO"
+		name_label.text = "SEM REGISTROS"; name_label.tooltip_text = ""
+		subtitle_label.text = "CANAL TEMPORAL OCIOSO"; subtitle_label.tooltip_text = ""
 		description_label.text = "Esta categoria ainda pode receber novos conteúdos."
 		traits_label.text = "SISTEMA\n• Catálogo pronto para sincronização"
 		return
@@ -289,3 +301,15 @@ func show_entry(entry: Dictionary) -> void:
 	portrait.visible = portrait.texture != null
 	fallback.visible = not portrait.visible
 	fallback_glyph.text = entry.nome.substr(0, 1).to_upper()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if detail_scroll == null or not is_visible_in_tree() or not detail_scroll.has_focus(): return
+	if event.is_action_pressed("ui_down"):
+		detail_scroll.scroll_vertical += 48; get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_up"):
+		detail_scroll.scroll_vertical = maxi(0, detail_scroll.scroll_vertical - 48); get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_cancel") and not entry_buttons.is_empty():
+		var selected_id := str(selected_ids.get(category, ""))
+		for entry_button in entry_buttons:
+			if entry_button.name == "Entry_" + selected_id: entry_button.grab_focus(); break
+		get_viewport().set_input_as_handled()

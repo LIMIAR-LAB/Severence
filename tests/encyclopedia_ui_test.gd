@@ -77,6 +77,17 @@ func _initialize() -> void:
 	check(injected.find_child("DetailScroll", true, false) is ScrollContainer, "detalhes extensos possuem rolagem")
 	var detail_scroll := injected.find_child("DetailScroll", true, false) as ScrollContainer
 	check(detail_scroll != null and detail_scroll.get_v_scroll_bar().max_value > detail_scroll.get_v_scroll_bar().page, "conteúdo longo ativa rolagem vertical")
+	if detail_scroll != null:
+		detail_scroll.grab_focus()
+		var scroll_down := InputEventAction.new(); scroll_down.action = "ui_down"; scroll_down.pressed = true
+		injected._unhandled_input(scroll_down); await process_frame
+		check(detail_scroll.scroll_vertical > 0, "teclado/controle percorre o texto longo do dossiê")
+		injected.select_entry(injected.records_override[0]); await process_frame
+		check(detail_scroll.scroll_vertical == 0, "novo dossiê reinicia a leitura no topo")
+	injected.records_override = []; injected.select_category("robos"); await process_frame
+	var empty_tab: Button = injected.tabs.robos
+	check(empty_tab.focus_neighbor_bottom == empty_tab.get_path_to(injected.back_button), "categoria vazia liga aba diretamente ao Voltar")
+	check(injected.name_label.tooltip_text.is_empty() and injected.subtitle_label.tooltip_text.is_empty(), "estado vazio limpa tooltips do dossiê anterior")
 	injected.queue_free(); await process_frame
 
 	var empty = EncyclopediaScreen.new(); empty.host = ui; empty.records_override = []
