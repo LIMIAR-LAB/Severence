@@ -22,7 +22,8 @@ func _initialize() -> void:
 	await process_frame; await process_frame
 	var eq = ui.equipment
 	check(eq != null and ui.content.get_parent() == ui, "tela montada fora do stage (escala inteira)")
-	check(tex_name(eq.get_child(0)) == "equip_moldura.png", "moldura é só o fundo")
+	var inventory_tab: Button = eq.find_child("MenuTab_0", true, false)
+	check(tex_name(eq.get_child(0)) == "refuge_bg.png" and inventory_tab.icon.resource_path.ends_with("tab_inventory.svg"), "cenário contextual fica sob o chrome industrial com navegação iconográfica")
 	for id in ["padrao", "mecanico", "espiao", "omega", "titan", "spectre"]:
 		check(eq.slots.has(id), "slot do item " + id)
 	check(tex_name(eq.slots.padrao.icon) == "icon_uniforme_padrao.png", "Padrão com o ícone dele")

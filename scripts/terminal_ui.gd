@@ -89,7 +89,8 @@ func fit_title_background(title_scene: Control) -> void:
 		(target.y - stage.position.y) / stage.scale.y
 	)
 
-# 0.17: equipamento centralizado com escala proporcional contínua para ocupar a janela.
+# Equipamento usa um canvas lógico próprio e fica acima do palco legado. A escala
+# continua uniforme em qualquer proporção; somente a sobra externa vira letterbox.
 func place_equipment() -> void:
 	if content == null or screen not in ["equipment", "mission_inventory"] or content.get_parent() != self: return
 	var k := get_viewport().get_final_transform().get_scale().x   # lógico -> pixels da janela
@@ -99,6 +100,7 @@ func place_equipment() -> void:
 	var s := fit # 0.17: ocupa a janela também entre escalas inteiras
 	content.scale = Vector2.ONE * (s / k)
 	content.position = ((phys - Vector2(1344, 752) * s) * 0.5).floor() / k
+	content.z_index = 20
 
 func panel(parent: Control, rect: Rect2, bg: Color = Color("0b2430"), outline: Color = Color("3d929f")) -> Panel:
 	var p := Panel.new(); p.position = rect.position; p.size = rect.size; p.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -127,7 +129,8 @@ func show_screen(next: String) -> void:
 	if content != null:
 		content.get_parent().remove_child(content); content.queue_free()
 	content = Control.new(); content.size = RUN_SUMMARY_MASTER_SIZE if next == "summary" else Vector2(1344, 752)
-	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()   # escala inteira, fora do stage
+	content.clip_contents = false
+	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()
 	elif next == "summary": add_child(content); place_summary()
 	else: stage.add_child(content)
 	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null; encyclopedia = null

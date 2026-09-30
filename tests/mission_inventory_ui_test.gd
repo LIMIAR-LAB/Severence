@@ -52,6 +52,7 @@ func run() -> void:
 	check(app.menu.screen == "mission_inventory" and app.menu.visible and app.paused, "B na pausa abre o inventário sem retomar a partida")
 	var eq = app.menu.equipment
 	check(app.menu.screen == "mission_inventory" and eq != null and eq.mission_mode, "abre shell no modo missão")
+	check(eq.find_child("ContextBackdrop", true, false).texture.resource_path.ends_with("desembarque_painted_v1.png"), "missão usa as docas como cenário contextual")
 	check(eq.find_child("InventorySlot_missao_chaves", true, false) is Button, "chaves coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_missao_moedas", true, false) is Button, "moedas coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_missao_bazuca", true, false) is Button, "bazuca aparece no inventário da missão")
@@ -70,6 +71,7 @@ func run() -> void:
 	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and not eq.detail_action.visible, "recurso temporário não oferece ação falsa")
 	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
 	check(not eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
+	check(eq.detail_art.texture != null and eq.detail_bars.get_children().any(func(child): return child is ProgressBar), "vitrine da missão combina arte e valores ao vivo")
 	var live_before_compare: Dictionary = app.sim.actors[0].duplicate(true)
 	eq.show_comparison()
 	var comparison_scroll: ScrollContainer = eq.find_child("InventoryComparisonScroll", true, false)

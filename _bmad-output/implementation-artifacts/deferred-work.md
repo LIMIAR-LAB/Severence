@@ -13,3 +13,7 @@
 ## Save validation feedback
 
 - `has_saved_game()` only checks whether the save file exists. A malformed, truncated, or externally removed save can therefore leave Continue enabled while `load_game()` rejects it without title-screen feedback. Add validation and a visible recovery message in a focused save-resilience change.
+
+## Generated audio fixture recovery
+
+- `tests/game_audio_test.gd` currently reports 30 failures because `assets/audio/generated/*.wav` is absent or has no usable Godot imports in a clean checkout. This predates the Equipment visual change; restore or regenerate the tracked audio fixtures in a focused audio task so the complete suite can return to green.

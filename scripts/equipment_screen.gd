@@ -5,9 +5,12 @@ const DATA := preload("res://scripts/equipment_data.gd")
 const InventoryData := preload("res://scripts/inventory_data.gd")
 const InventoryState := preload("res://scripts/inventory_state.gd")
 const DIR := "res://assets/ui/equipamento/"
+const INDUSTRIAL_DIR := DIR + "industrial/"
 const SIZE := Vector2(1344, 752)
 const TAB_NAMES := ["INVENTÁRIO", "ROBÔS", "ÔMEGA", "EQUIPADOS", "ATRIBUTOS"]
 const FILTERS := [["todos", "TODOS"], ["armas", "UNIFORMES"], ["pecas", "ROBÔS"], ["consumiveis", "ÔMEGA"], ["recursos", "EXPEDIÇÃO"]]
+const TAB_ICONS := ["tab_inventory.svg", "tab_robot.svg", "tab_omega.svg", "tab_equipped.svg", "tab_stats.svg"]
+const FILTER_ICONS := ["filter_all.svg", "filter_uniform.svg", "filter_robot.svg", "filter_omega.svg", "filter_expedition.svg"]
 const TEAL := Color("54e4e7")
 const GOLD := Color("efc56b")
 const TEXT := Color("dce8df")
@@ -44,8 +47,13 @@ var comparison_rich: RichTextLabel
 var detail_action: Button
 var detail_compare: Button
 var detail_reason: Label
+var detail_art: TextureRect
+var detail_bars: Control
 var capacity_label: Label
 var grid_buttons: Array = []
+var filter_buttons: Array = []
+var page_previous: Button
+var page_next: Button
 var inventory_page := 0
 var mission_mode := false
 var mission_signature := ""
@@ -59,7 +67,16 @@ func make_style(bg: Color, border: Color, width := 2, radius := 4) -> StyleBoxFl
 
 func panel(parent: Control, rect: Rect2, bg := PANEL, border := BRASS) -> Panel:
 	var p := Panel.new(); p.position = rect.position; p.size = rect.size; p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_theme_stylebox_override("panel", make_style(bg, border)); parent.add_child(p); return p
+	var frame_texture := tex(INDUSTRIAL_DIR + "chrome_panel.svg")
+	if frame_texture != null:
+		var chrome := StyleBoxTexture.new(); chrome.texture = frame_texture; chrome.modulate_color = Color.WHITE
+		chrome.texture_margin_left = 12; chrome.texture_margin_top = 12; chrome.texture_margin_right = 12; chrome.texture_margin_bottom = 12
+		chrome.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH; chrome.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+		p.add_theme_stylebox_override("panel", chrome)
+		var state_border := Panel.new(); state_border.name = "ChromeStateBorder"; state_border.position = Vector2.ZERO; state_border.size = rect.size
+		state_border.mouse_filter = Control.MOUSE_FILTER_IGNORE; state_border.add_theme_stylebox_override("panel", make_style(Color(0, 0, 0, 0), border, 2, 7)); p.add_child(state_border)
+	else: p.add_theme_stylebox_override("panel", make_style(bg, border))
+	parent.add_child(p); return p
 
 func label(parent: Control, rect: Rect2, caption: String, font_size := 16, color := TEXT) -> Label:
 	var node := Label.new(); node.position = rect.position; node.size = rect.size; node.text = caption
@@ -86,9 +103,11 @@ func image(parent: Control, rect: Rect2, texture: Texture2D) -> TextureRect:
 
 func build() -> void:
 	size = SIZE; mouse_filter = Control.MOUSE_FILTER_PASS
-	var legacy_bg := TextureRect.new(); legacy_bg.texture = load(DIR + "equip_moldura.png"); legacy_bg.size = SIZE
-	legacy_bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; legacy_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(legacy_bg)
-	var veil := ColorRect.new(); veil.color = Color("06110fee"); veil.size = SIZE; veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(veil)
+	var backdrop := TextureRect.new(); backdrop.name = "ContextBackdrop"
+	backdrop.texture = tex("res://assets/environment/docks12/entry/desembarque_painted_v1.png" if mission_mode else "res://assets/environment/refuge/refuge_bg.png")
+	backdrop.size = SIZE; backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
+	var veil := ColorRect.new(); veil.name = "ContextVeil"; veil.color = Color("061713b8"); veil.size = SIZE; veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(veil)
 	build_header()
 	status = label(self, Rect2(455, 707, 625, 25), "", 13, DIM); status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	host.live_status = status
@@ -118,12 +137,13 @@ func go_back() -> void:
 
 func build_header() -> void:
 	panel(self, Rect2(18, 14, 1308, 70), Color("18362b"), BRASS)
-	var title := label(self, Rect2(38, 25, 170 if mission_mode else 285, 48), "MISSÃO" if mission_mode else "EQUIPAMENTO", 30, GOLD)
+	var title := label(self, Rect2(38, 25, 130 if mission_mode else 235, 48), "MISSÃO" if mission_mode else "EQUIPAMENTO", 30, GOLD)
 	title.add_theme_color_override("font_outline_color", Color("5b2e13")); title.add_theme_constant_override("outline_size", 3)
 	if mission_mode and not app.online and app.sim.actors.size() > 1 and app.sim.actors[1].get("active", false):
-		button(self, Rect2(212, 30, 105, 38), "P%d • TROCAR" % (host.gear_actor + 1), toggle_actor, "ActorToggle")
+		button(self, Rect2(176, 31, 102, 36), "P%d TROCAR" % (host.gear_actor + 1), toggle_actor, "ActorToggle")
 	for i in TAB_NAMES.size():
-		var tab := button(self, Rect2(330 + i * 195, 24, 184, 48), TAB_NAMES[i], func(): show_tab(i), "MenuTab_%d" % i)
+		var tab := button(self, Rect2(288 + i * 202, 24, 194, 48), TAB_NAMES[i], func(): show_tab(i), "MenuTab_%d" % i)
+		tab.icon = tex(INDUSTRIAL_DIR + TAB_ICONS[i]); tab.add_theme_constant_override("icon_max_width", 26); tab.expand_icon = true
 		tab.focus_entered.connect(func():
 			if active_tab != i: show_tab(i))
 		tabs.append(tab)
@@ -211,35 +231,46 @@ func item_role(entry: Dictionary) -> String:
 	return "EXPEDIÇÃO"
 
 func build_inventory() -> void:
-	panel(page, Rect2(0, 0, 210, 592), Color("122c25"), BRASS)
-	label(page, Rect2(20, 16, 170, 30), "FILTROS", 19, GOLD)
+	panel(page, Rect2(0, 0, 180, 592), Color("122c25"), BRASS).name = "FilterPanel"
+	label(page, Rect2(18, 16, 144, 30), "FILTROS", 19, GOLD)
+	filter_buttons.clear()
 	for i in FILTERS.size():
 		var filter_id: String = FILTERS[i][0]
-		var b := button(page, Rect2(14, 58 + i * 63, 182, 50), FILTERS[i][1], func(): set_inventory_filter(filter_id), "Filter_%s" % filter_id)
+		var b := button(page, Rect2(12, 58 + i * 63, 156, 50), FILTERS[i][1], func(): set_inventory_filter(filter_id), "Filter_%s" % filter_id)
+		b.icon = tex(INDUSTRIAL_DIR + FILTER_ICONS[i]); b.add_theme_constant_override("icon_max_width", 24); b.expand_icon = true; filter_buttons.append(b)
 		if inventory.filter == filter_id: b.add_theme_stylebox_override("normal", make_style(Color("15534f"), TEAL, 3))
 	var note := "Equipamentos e recursos\ndesta missão.\n\nCombustível e energia\ndo robô ficam na\naba ATRIBUTOS." if mission_mode else "Escolha seu uniforme\ne robô para partir.\n\nArmas e recursos\nencontrados aparecem\ndurante a expedição."
-	label(page, Rect2(18, 395, 176, 150), note, 13, DIM).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	panel(page, Rect2(222, 0, 650, 592), Color("091d1d"), BRASS)
-	label(page, Rect2(244, 14, 380, 32), "INVENTÁRIO DA MISSÃO" if mission_mode else "EQUIPAMENTO", 22, GOLD)
+	label(page, Rect2(16, 395, 148, 150), note, 12, DIM).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	panel(page, Rect2(190, 0, 616, 426), Color("091d1d"), BRASS).name = "InventoryGridPanel"
+	label(page, Rect2(210, 14, 350, 32), "INVENTÁRIO DA MISSÃO" if mission_mode else "EQUIPAMENTO", 22, GOLD)
 	grid_buttons.clear()
 	var all: Array = InventoryData.valid_items().filter(func(entry): return inventory_entry_visible(entry) and matches_filter(entry))
 	all.sort_custom(InventoryData.compare)
-	capacity_label = label(page, Rect2(700, 17, 150, 28), "%d ITENS" % all.size(), 18, TEXT); capacity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var page_count := maxi(1, ceili(all.size() / 20.0)); inventory_page = clampi(inventory_page, 0, page_count - 1)
-	var offset := inventory_page * 20
-	for i in 20:
-		var col := i % 5; var row := i / 5; var rect := Rect2(240 + col * 123, 58 + row * 126, 108, 110)
+	capacity_label = label(page, Rect2(642, 17, 142, 28), "%d ITENS" % all.size(), 18, TEXT); capacity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var page_count := maxi(1, ceili(all.size() / 15.0)); inventory_page = clampi(inventory_page, 0, page_count - 1)
+	# Atualizações ao vivo não podem trocar silenciosamente o item selecionado
+	# quando a ordenação o move para outra página.
+	if inventory.selected_id != "":
+		for i in all.size():
+			if all[i].id == inventory.selected_id:
+				inventory_page = floori(i / 15.0)
+				break
+	var offset := inventory_page * 15
+	var page_items: Array = all.slice(offset, mini(offset + 15, all.size()))
+	for i in 15:
+		var col := i % 5; var row := i / 5; var rect := Rect2(206 + col * 117, 58 + row * 116, 105, 102)
 		if offset + i < all.size(): build_inventory_slot(all[offset + i], rect)
 		else:
 			var empty := panel(page, rect, Color("081716"), Color("334b48")); empty.name = "InventoryEmpty_%d" % i
-	if page_count > 1:
-		var previous := button(page, Rect2(242, 552, 100, 32), "<", func(): inventory_page -= 1; rebuild_current(), "InventoryPrevious")
-		var next := button(page, Rect2(754, 552, 100, 32), ">", func(): inventory_page += 1; rebuild_current(), "InventoryNext")
-		previous.disabled = inventory_page == 0; next.disabled = inventory_page == page_count - 1
-		var page_number := label(page, Rect2(460, 554, 180, 28), "PÁGINA %d / %d" % [inventory_page + 1, page_count], 13, DIM); page_number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	page_previous = button(page, Rect2(208, 391, 72, 28), "<", func(): inventory.selected_id = ""; inventory_page -= 1; rebuild_current(), "InventoryPrevious")
+	page_next = button(page, Rect2(716, 391, 72, 28), ">", func(): inventory.selected_id = ""; inventory_page += 1; rebuild_current(), "InventoryNext")
+	page_previous.disabled = inventory_page == 0; page_next.disabled = inventory_page == page_count - 1
+	var page_number := label(page, Rect2(414, 393, 170, 24), "PÁGINA %d / %d" % [inventory_page + 1, page_count], 12, DIM); page_number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	build_loadout_strip()
 	build_details_panel()
-	if inventory.selected_id == "" or not all.any(func(entry): return entry.id == inventory.selected_id): inventory.selected_id = str(all[0].id) if not all.is_empty() else ""
+	if inventory.selected_id == "" or not page_items.any(func(entry): return entry.id == inventory.selected_id): inventory.selected_id = str(page_items[0].id) if not page_items.is_empty() else ""
 	refresh_inventory_details()
+	configure_inventory_focus()
 
 func build_inventory_slot(entry: Dictionary, rect: Rect2) -> void:
 	var open: bool = entry.get("transiente", false) == true or InventoryData.unlocked(entry, app.sim.unlocked)
@@ -247,10 +278,10 @@ func build_inventory_slot(entry: Dictionary, rect: Rect2) -> void:
 	var selected: bool = inventory.selected_id == entry.id
 	var border: Color = TEAL if selected else RARITY.get(entry.get("raridade", "comum"), DIM)
 	var p := panel(page, rect, Color("0d2525") if open else Color("101617"), border)
-	var icon := image(p, Rect2(10, 7, 88, 68), tex(entry.get("icone", ""))); icon.modulate = Color.WHITE if open and owned else Color(0.25, 0.3, 0.3)
+	var icon := image(p, Rect2(9, 6, 87, 64), tex(entry.get("icone", ""))); icon.modulate = Color.WHITE if open and owned else Color(0.25, 0.3, 0.3)
 	var qty: int = quantity_for(entry)
 	var slot_caption := str(entry.nome).trim_prefix("UNIFORME ") if entry.get("slot", "") == "uniforme" else str(entry.nome)
-	label(p, Rect2(7, 79, 95, 24), slot_caption, 11, TEXT if open else DIM).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label(p, Rect2(7, 75, 92, 22), slot_caption, 10, TEXT if open else DIM).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	if qty > 1:
 		var q := label(p, Rect2(73, 55, 29, 25), str(qty), 15, GOLD); q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	if not open:
@@ -264,27 +295,53 @@ func build_inventory_slot(entry: Dictionary, rect: Rect2) -> void:
 	hit.focus_entered.connect(func(): select_inventory(entry.id)); hit.pressed.connect(func(): select_inventory(entry.id))
 	page.add_child(hit); grid_buttons.append(hit)
 
+func build_loadout_strip() -> void:
+	var strip := panel(page, Rect2(190, 438, 616, 154), Color("0a201e"), BRASS); strip.name = "EquippedLoadout"
+	label(page, Rect2(208, 449, 230, 25), "LOADOUT EQUIPADO", 16, GOLD)
+	var selected := [
+		["UNIFORME", "uniforme", host.outfit_choice],
+		["ROBÔ", "robo", host.robot_choice],
+		["ÔMEGA", "armadura", host.armor_choice]
+	]
+	for i in selected.size():
+		var box := panel(page, Rect2(206 + i * 196, 480, 184, 94), Color("0d2926"), Color("4b6c5d")); box.name = "LoadoutSlot_%s" % selected[i][1]
+		var selected_entry: Dictionary = {}
+		for entry in InventoryData.valid_items():
+			if entry.get("slot", "") == selected[i][1] and entry.get("loadout_id", "") == selected[i][2]: selected_entry = entry; break
+		if selected_entry.is_empty():
+			image(box, Rect2(8, 9, 68, 68), tex(DIR + "icones/icon_slot_vazio.png"))
+			label(box, Rect2(82, 18, 92, 22), selected[i][0], 11, GOLD)
+			label(box, Rect2(82, 42, 92, 35), "NENHUM", 12, DIM)
+		else:
+			image(box, Rect2(8, 8, 70, 70), tex(selected_entry.get("icone", "")))
+			label(box, Rect2(84, 15, 90, 22), selected[i][0], 10, GOLD)
+			var equipped_name := str(selected_entry.nome).trim_prefix("UNIFORME ")
+			var name_label := label(box, Rect2(84, 39, 90, 40), equipped_name, 12, TEXT); name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
 func build_details_panel() -> void:
-	panel(page, Rect2(884, 0, 424, 592), Color("0b2626"), BRASS)
-	detail_title = label(page, Rect2(908, 20, 374, 42), "", 25, GOLD)
-	detail_rarity = label(page, Rect2(908, 61, 374, 28), "", 15, TEAL)
-	detail_description_panel = panel(page, Rect2(906, 98, 380, 158), Color("071b1d"), Color("316b69"))
-	detail_text = label(page, Rect2(922, 112, 348, 130), "", 14, TEXT); detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	detail_stats = label(page, Rect2(910, 276, 368, 142), "", 15, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	comparison_panel = panel(page, Rect2(906, 98, 380, 342), Color("071b1d"), Color("316b69")); comparison_panel.visible = false
+	panel(page, Rect2(818, 0, 490, 592), Color("0b2626"), BRASS).name = "ItemShowcase"
+	panel(page, Rect2(836, 18, 172, 204), Color("071b1d"), Color("316b69"))
+	detail_art = image(page, Rect2(844, 26, 156, 188), null); detail_art.name = "DetailArt"
+	detail_title = label(page, Rect2(1022, 20, 268, 58), "", 23, GOLD); detail_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_rarity = label(page, Rect2(1022, 80, 268, 26), "", 13, TEAL)
+	detail_description_panel = panel(page, Rect2(1014, 104, 276, 120), Color("071b1d"), Color("316b69"))
+	detail_text = label(page, Rect2(1022, 112, 266, 110), "", 13, TEXT); detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_stats = label(page, Rect2(838, 238, 452, 112), "", 13, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_bars = Control.new(); detail_bars.name = "DetailStatBars"; detail_bars.position = Vector2(838, 354); detail_bars.size = Vector2(452, 112); page.add_child(detail_bars)
+	comparison_panel = panel(page, Rect2(836, 18, 454, 448), Color("071b1d"), Color("316b69")); comparison_panel.visible = false
 	comparison_scroll = ScrollContainer.new(); comparison_scroll.name = "InventoryComparisonScroll"
-	comparison_scroll.position = Vector2(916, 108); comparison_scroll.size = Vector2(360, 322)
+	comparison_scroll.position = Vector2(846, 28); comparison_scroll.size = Vector2(434, 428)
 	comparison_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; comparison_scroll.visible = false
 	comparison_scroll.focus_mode = Control.FOCUS_ALL; comparison_scroll.gui_input.connect(handle_comparison_scroll_input)
 	comparison_rich = RichTextLabel.new(); comparison_rich.name = "InventoryComparisonText"
 	comparison_rich.bbcode_enabled = true; comparison_rich.fit_content = true
-	comparison_rich.custom_minimum_size = Vector2(338, 0); comparison_rich.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	comparison_rich.custom_minimum_size = Vector2(412, 0); comparison_rich.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	comparison_rich.add_theme_font_size_override("normal_font_size", 13)
 	comparison_scroll.add_child(comparison_rich); page.add_child(comparison_scroll)
-	detail_action = button(page, Rect2(908, 454, 180, 50), "EQUIPAR", equip_selected_inventory, "InventoryAction")
-	detail_compare = button(page, Rect2(1102, 454, 180, 50), "COMPARAR", show_comparison, "InventoryCompare")
-	detail_reason = label(page, Rect2(908, 516, 374, 55), "", 13, DIM); detail_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	detail_compare.tooltip_text = "Compara com o item equipado."
+	detail_action = button(page, Rect2(838, 482, 216, 50), "EQUIPAR", equip_selected_inventory, "InventoryAction")
+	detail_compare = button(page, Rect2(1074, 482, 216, 50), "COMPARAR", show_comparison, "InventoryCompare")
+	detail_reason = label(page, Rect2(838, 540, 452, 42), "", 12, DIM); detail_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_compare.tooltip_text = "Compara o slot atual usando os dados reais do catálogo."
 	detail_compare.focus_neighbor_top = detail_compare.get_path_to(comparison_scroll)
 	comparison_scroll.focus_neighbor_bottom = comparison_scroll.get_path_to(detail_compare)
 
@@ -303,6 +360,78 @@ func handle_comparison_scroll_input(event: InputEvent) -> void:
 		comparison_scroll.scroll_vertical = target
 	comparison_scroll.accept_event()
 
+func configure_inventory_focus() -> void:
+	var back: Button = find_child("Back", true, false)
+	var refuge: Button = find_child("Refuge", true, false)
+	for i in filter_buttons.size():
+		var current: Button = filter_buttons[i]
+		var up: Control = tabs[0] if i == 0 else filter_buttons[i - 1]
+		var down: Control = find_child("Back", true, false) if i == filter_buttons.size() - 1 else filter_buttons[i + 1]
+		current.focus_neighbor_top = current.get_path_to(up); current.focus_neighbor_bottom = current.get_path_to(down)
+		current.focus_neighbor_right = current.get_path_to(grid_buttons[mini(i * 3, grid_buttons.size() - 1)] if not grid_buttons.is_empty() else detail_compare)
+	for i in grid_buttons.size():
+		var current: Button = grid_buttons[i]; var col := i % 5; var row := i / 5
+		var left: Control = filter_buttons[mini(row, filter_buttons.size() - 1)] if col == 0 else grid_buttons[i - 1]
+		var detail_target: Control = detail_action if detail_action.visible and not detail_action.disabled else detail_compare
+		var right: Control = detail_target if col == 4 or i + 1 >= grid_buttons.size() else grid_buttons[i + 1]
+		var up: Control = tabs[0] if row == 0 else grid_buttons[i - 5]
+		var down_index := i + 5
+		var pager: Control = page_next if not page_next.disabled else (page_previous if not page_previous.disabled else detail_target)
+		var down: Control = pager if down_index >= grid_buttons.size() else grid_buttons[down_index]
+		current.focus_neighbor_left = current.get_path_to(left); current.focus_neighbor_right = current.get_path_to(right)
+		current.focus_neighbor_top = current.get_path_to(up); current.focus_neighbor_bottom = current.get_path_to(down)
+	if page_previous != null and page_next != null:
+		var pager_left_target: Control = page_next if not page_next.disabled else detail_compare
+		var pager_right_target: Control = page_previous if not page_previous.disabled else detail_compare
+		page_previous.focus_neighbor_right = page_previous.get_path_to(pager_left_target); page_next.focus_neighbor_left = page_next.get_path_to(pager_right_target)
+	if not grid_buttons.is_empty():
+		var first: Button = grid_buttons.front(); var last: Button = grid_buttons.back()
+		detail_action.focus_neighbor_left = detail_action.get_path_to(page_next if not page_next.disabled else (page_previous if not page_previous.disabled else last))
+		detail_compare.focus_neighbor_left = detail_compare.get_path_to(detail_action if detail_action.visible and not detail_action.disabled else last)
+		tabs[active_tab].focus_neighbor_bottom = tabs[active_tab].get_path_to(first)
+		detail_action.focus_neighbor_top = detail_action.get_path_to(last); detail_action.focus_neighbor_right = detail_action.get_path_to(detail_compare)
+		detail_compare.focus_neighbor_top = detail_compare.get_path_to(last); detail_compare.focus_neighbor_right = detail_compare.get_path_to(refuge); detail_compare.focus_neighbor_bottom = detail_compare.get_path_to(refuge)
+		page_previous.focus_neighbor_top = page_previous.get_path_to(last); page_next.focus_neighbor_top = page_next.get_path_to(last)
+	else:
+		tabs[active_tab].focus_neighbor_bottom = tabs[active_tab].get_path_to(filter_buttons.front())
+		detail_action.focus_neighbor_left = detail_action.get_path_to(filter_buttons.back())
+		detail_compare.focus_neighbor_left = detail_compare.get_path_to(filter_buttons.back()); detail_compare.focus_neighbor_top = detail_compare.get_path_to(tabs[active_tab])
+		detail_compare.focus_neighbor_right = detail_compare.get_path_to(refuge); detail_compare.focus_neighbor_bottom = detail_compare.get_path_to(refuge)
+	back.focus_neighbor_top = back.get_path_to(filter_buttons.back()); back.focus_neighbor_right = back.get_path_to(refuge)
+	refuge.focus_neighbor_left = refuge.get_path_to(back); refuge.focus_neighbor_top = refuge.get_path_to(detail_compare)
+
+func wire_page_controls(controls: Array) -> void:
+	var enabled: Array = controls.filter(func(control): return control is Button and control.visible and not control.disabled)
+	var back: Button = find_child("Back", true, false); var refuge: Button = find_child("Refuge", true, false)
+	if enabled.is_empty():
+		tabs[active_tab].focus_neighbor_bottom = tabs[active_tab].get_path_to(back)
+		back.focus_neighbor_top = back.get_path_to(tabs[active_tab]); refuge.focus_neighbor_top = refuge.get_path_to(tabs[active_tab])
+	else:
+		for i in enabled.size():
+			var current: Button = enabled[i]
+			current.focus_neighbor_left = current.get_path_to(enabled[(i - 1 + enabled.size()) % enabled.size()])
+			current.focus_neighbor_right = current.get_path_to(enabled[(i + 1) % enabled.size()])
+			current.focus_neighbor_top = current.get_path_to(tabs[active_tab]); current.focus_neighbor_bottom = current.get_path_to(back)
+		tabs[active_tab].focus_neighbor_bottom = tabs[active_tab].get_path_to(enabled.front())
+		back.focus_neighbor_top = back.get_path_to(enabled.front()); refuge.focus_neighbor_top = refuge.get_path_to(enabled.back())
+	back.focus_neighbor_right = back.get_path_to(refuge); refuge.focus_neighbor_left = refuge.get_path_to(back)
+
+func refresh_stat_bars(rows: Array) -> void:
+	if detail_bars == null: return
+	for child in detail_bars.get_children(): child.queue_free()
+	var shown := 0
+	for row in rows:
+		if shown >= 4: break
+		var raw := str(row[1])
+		var value := clampf(float(row[2]) * 100.0, 0.0, 100.0) if row.size() > 2 else raw.to_float()
+		if value <= 0.0: continue
+		var caption := label(detail_bars, Rect2(0, shown * 27, 118, 22), str(row[0]), 10, DIM)
+		var bar := ProgressBar.new(); bar.name = "StatBar_%d" % shown; bar.position = Vector2(122, shown * 27 + 3); bar.size = Vector2(326, 17)
+		bar.max_value = 100.0; bar.value = minf(value, 100.0); bar.show_percentage = false
+		bar.add_theme_stylebox_override("background", make_style(Color("071412"), Color("31504a"), 1, 2))
+		bar.add_theme_stylebox_override("fill", make_style(Color("2aa6a4"), TEAL, 1, 2)); detail_bars.add_child(bar)
+		caption.tooltip_text = raw; shown += 1
+
 func select_inventory(id: String) -> void:
 	inventory.selected_id = id
 	if not mission_mode: app.sim.inventory_state = inventory.to_dict()
@@ -311,19 +440,24 @@ func select_inventory(id: String) -> void:
 func refresh_inventory_details() -> void:
 	if detail_title == null: return
 	reset_comparison_view()
-	detail_stats.position.y = 276; detail_stats.size.y = 142
+	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 112)
 	detail_stats.add_theme_font_size_override("font_size", 13)
 	var entry := InventoryData.item(inventory.selected_id)
 	if entry.is_empty():
-		detail_title.text = "INVENTÁRIO VAZIO"; detail_rarity.text = ""; detail_text.text = "Nenhum item corresponde ao filtro."; detail_stats.text = ""; detail_action.disabled = true; detail_reason.text = "Selecione outro filtro."; return
+		detail_title.text = "INVENTÁRIO VAZIO"; detail_rarity.text = ""; detail_text.text = "Nenhum item corresponde ao filtro."; detail_stats.text = ""; detail_art.texture = null; refresh_stat_bars([]); detail_action.disabled = true; detail_reason.text = "Selecione outro filtro."; return
 	var transient: bool = entry.get("transiente", false) == true
 	var open: bool = transient or InventoryData.unlocked(entry, app.sim.unlocked)
+	var art_path := str(entry.get("arte", entry.get("icone", "")))
+	detail_art.texture = tex(art_path) if tex(art_path) != null else tex(str(entry.get("icone", "")))
+	detail_art.modulate = Color.WHITE if open else Color(0.28, 0.34, 0.33)
 	detail_title.text = entry.nome
 	detail_rarity.text = "%s • %s%s" % [item_role(entry), str(entry.raridade).to_upper(), " • BLOQUEADO" if not open else ""]
 	detail_rarity.add_theme_color_override("font_color", RARITY.get(entry.get("raridade", "comum"), TEXT))
 	detail_text.text = entry.get("descricao", "") if open else "Como desbloquear: " + DATA.item(entry.get("desbloqueio_id", "")).get("desbloqueio", {}).get("texto", "Prossiga na campanha.")
 	var lines: Array[String] = []
+	var bar_rows: Array = []
 	if transient: lines.append("QUANTIDADE  %d" % quantity_for(entry))
+	if transient: bar_rows.append(["QUANTIDADE", quantity_for(entry)])
 	if entry.id == "missao_bazuca":
 		var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
 		lines.append("FOGUETES  %d" % int(mission_actor.get("run_weapons", {}).get("bazooka", 0)))
@@ -336,7 +470,9 @@ func refresh_inventory_details() -> void:
 		for row in reference_rows(kind, loadout_id):
 			if lines.size() >= 7: break
 			lines.append("%s  %s" % [str(row[0]), str(row[1])])
+			bar_rows.append(row)
 	detail_stats.text = "\n".join(lines) if not lines.is_empty() else "SEM ATRIBUTOS ATIVOS"
+	refresh_stat_bars(bar_rows)
 	var usable: bool = not transient and entry.get("equipavel", false) == true and not entry.get("prototipo", false) and quantity_for(entry) > 0 and open
 	if entry.id == "missao_bazuca" and mission_mode and quantity_for(entry) > 0:
 		var actor: Dictionary = app.sim.actors[host.gear_actor]
@@ -396,7 +532,8 @@ func reset_comparison_view() -> void:
 	if comparison_panel == null: return
 	comparison_panel.visible = false; comparison_scroll.visible = false; comparison_rich.text = ""
 	detail_description_panel.visible = true; detail_text.visible = true; detail_stats.visible = true
-	detail_stats.position.y = 276; detail_stats.size.y = 142
+	detail_art.visible = true; detail_bars.visible = true
+	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 112)
 	detail_stats.add_theme_font_size_override("font_size", 13)
 
 func comparison_tone(before: Dictionary, after: Dictionary) -> String:
@@ -433,6 +570,7 @@ func display_comparison(title: String, before: Dictionary, after: Dictionary) ->
 	for key in after:
 		if not keys.has(key): keys.append(key)
 	detail_description_panel.visible = false; detail_text.visible = false; detail_stats.visible = false
+	detail_art.visible = false; detail_bars.visible = false
 	comparison_panel.visible = true; comparison_scroll.visible = true
 	comparison_rich.text = comparison_markup(title, before, after, keys)
 	comparison_scroll.scroll_vertical = 0
@@ -468,7 +606,7 @@ func show_comparison() -> void:
 func build_equipment_category(category: String, title: String, subtitle: String) -> void:
 	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
 	label(page, Rect2(28, 20, 500, 35), title, 25, GOLD); label(page, Rect2(28, 57, 700, 26), subtitle, 15, DIM)
-	var list := DATA.by_category(category)
+	var list := DATA.by_category(category); var category_controls: Array = []
 	for i in list.size():
 		var entry: Dictionary = list[i]; var open := unlocked(entry.id); var selected := equipped(entry.id)
 		var p := panel(page, Rect2(28 + i * 335, 108, 310, 360), Color("102c28"), TEAL if selected else RARITY.get(entry.get("raridade", "comum"), BRASS))
@@ -480,14 +618,15 @@ func build_equipment_category(category: String, title: String, subtitle: String)
 		var hit := Button.new(); hit.flat = true; hit.position = p.position; hit.size = p.size; hit.name = "%sCard_%s" % ["Armaduras" if category == "armadura" else title.capitalize(), entry.id]
 		hit.add_theme_stylebox_override("normal", StyleBoxEmpty.new()); hit.add_theme_stylebox_override("pressed", make_style(Color(0, 0, 0, 0), TEAL, 4))
 		hit.add_theme_stylebox_override("hover", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 3)); hit.add_theme_stylebox_override("focus", make_style(Color(0.1, 0.8, 0.8, 0.05), TEAL, 4))
-		hit.pressed.connect(func(): pick(entry.id)); hit.focus_entered.connect(func(): show_item(entry.id)); page.add_child(hit)
+		hit.pressed.connect(func(): pick(entry.id)); hit.focus_entered.connect(func(): show_item(entry.id)); page.add_child(hit); category_controls.append(hit)
 	var hint := label(page, Rect2(30, 505, 1240, 55), "Selecione para equipar. Itens bloqueados mostram como desbloquear.", 14, DIM)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	wire_page_controls(category_controls)
 
 func build_equipped() -> void:
 	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
 	label(page, Rect2(28, 20, 500, 38), "ITENS EQUIPADOS", 25, GOLD)
-	var rows := [["UNIFORME / ARMA", "uniforme", host.outfit_choice], ["ROBÔ", "robo", host.robot_choice], ["ARMADURA", "armadura", host.armor_choice]]
+	var rows := [["UNIFORME / ARMA", "uniforme", host.outfit_choice], ["ROBÔ", "robo", host.robot_choice], ["ARMADURA", "armadura", host.armor_choice]]; var equipped_controls: Array = []
 	for i in rows.size():
 		var equipment_id: String = rows[i][2]; var entry := DATA.item(equipment_id)
 		var p := panel(page, Rect2(35, 90 + i * 145, 1238, 120), Color("102c28"), TEAL if not entry.is_empty() else Color("46534c"))
@@ -499,6 +638,8 @@ func build_equipped() -> void:
 		var clear := button(p, Rect2(1010, 31, 190, 52), "DESEQUIPAR", func(): unequip_slot(slot_name), "Unequip_%s" % slot_name)
 		clear.disabled = equipment_id == "" or slot_name in ["uniforme", "armadura"]
 		if slot_name == "armadura": clear.text = "PODER FIXO"; clear.tooltip_text = "A Armadura Ômega é um poder desbloqueado e não um slot removível."
+		equipped_controls.append(clear)
+	wire_page_controls(equipped_controls)
 
 func unequip_slot(slot: String) -> void:
 	if slot != "robo": status.text = "Este slot não pode ficar vazio."; return
@@ -550,8 +691,10 @@ func build_status() -> void:
 	status_panel(878, robot.to_upper() if robot != "" else "SEM ROBÔ", "C invoca • E pilota • consome combustível" if robot == "titan" else ("C invoca/recolhe • G funde/separa" if robot == "spectre" else "Selecione um robô na aba ROBÔS."), reference_rows(robot) if robot != "" else [], "RobotReference")
 	if not mission_mode:
 		label(page, Rect2(30, 456, 1240, 65), "PREPARAÇÃO DA EXPEDIÇÃO\nVida, escudo, munição e condição do robô aparecem aqui durante a missão.", 16, DIM)
+		wire_page_controls([])
 		return
 	update_status_condition()
+	wire_page_controls([])
 
 func update_status_condition() -> void:
 	var a: Dictionary = app.sim.actors[host.gear_actor]
@@ -582,12 +725,28 @@ func update_status_condition() -> void:
 func rebuild_current() -> void:
 	var focused := get_viewport().gui_get_focus_owner()
 	var focus_name := str(focused.name) if focused != null and is_ancestor_of(focused) else ""
+	var selected_before: String = str(inventory.selected_id)
 	show_tab(active_tab)
-	if focus_name != "": call_deferred("restore_focus", focus_name)
+	call_deferred("restore_inventory_state", focus_name, selected_before)
+
+func restore_inventory_state(control_name: String, selected_id: String) -> void:
+	# A remoção da página pode transferir foco provisoriamente para outro slot.
+	# Restaure seleção e foco juntos, após a nova árvore estar estabilizada.
+	if active_tab == 0 and selected_id != "" and not InventoryData.item(selected_id).is_empty():
+		inventory.selected_id = selected_id
+		refresh_inventory_details()
+	if control_name != "": restore_focus(control_name)
 
 func restore_focus(control_name: String) -> void:
 	var target := find_child(control_name, true, false)
-	if target is Button and target.visible and not target.disabled: target.grab_focus()
+	if target is Button and target.visible and not target.disabled:
+		target.grab_focus(); return
+	if control_name == "InventoryComparisonScroll" and detail_compare != null and detail_compare.visible and not detail_compare.disabled:
+		detail_compare.grab_focus(); return
+	var fallback_name := "InventoryPrevious" if control_name == "InventoryNext" else ("InventoryNext" if control_name == "InventoryPrevious" else "")
+	var fallback := find_child(fallback_name, true, false) if fallback_name != "" else null
+	if fallback is Button and fallback.visible and not fallback.disabled: fallback.grab_focus()
+	elif not grid_buttons.is_empty(): (grid_buttons.back() as Button).grab_focus()
 
 func owns_loadout(id: String) -> bool:
 	for entry in InventoryData.valid_items():
