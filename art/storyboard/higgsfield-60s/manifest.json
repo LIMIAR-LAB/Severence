@@ -8,6 +8,17 @@
   "model": "gpt_image_2_5",
   "assets": [
     {
+      "index": 0,
+      "media_id": "8a8d6132-a65c-48f5-ab26-ae8c5c224a76",
+      "status": "uploaded",
+      "type": "image",
+      "source": "Logo original fornecida pelo usuário",
+      "file": "00-limiar-studio.png",
+      "time": "00–03",
+      "animation": "Entrada suave 0–0,5s; sustentar até 2,5s; saída suave até 3s",
+      "framing": "Logo integral centralizada sem distorção em fundo azul-marinho, quadro 16:9"
+    },
+    {
       "index": 1,
       "job_id": "82fe2c8f-0dbb-4da2-9283-ee836fc06b68",
       "status": "completed",
@@ -15,14 +26,14 @@
       "model": "gpt_image_2_5",
       "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_82fe2c8f-0dbb-4da2-9283-ee836fc06b68.png",
       "file": "01-nave.png",
-      "time": "00–04"
+      "time": "03–05"
     },
     {
       "index": 2,
       "job_id": "75c3612b-c14f-43ee-9d5b-472226448816",
       "status": "completed",
       "file": "02-equipe.png",
-      "time": "04–08",
+      "time": "05–08",
       "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_011625_75c3612b-c14f-43ee-9d5b-472226448816.png"
     },
     {
