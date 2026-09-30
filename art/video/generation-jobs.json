@@ -1,0 +1,271 @@
+{
+  "title": "Severence — Ecos do Tempo",
+  "jobs": [
+    {
+      "index": 1,
+      "job_id": "28b7805b-11b8-4bc2-9c46-336b695253d6"
+    },
+    {
+      "index": 2,
+      "job_id": "18723e29-eb6e-457e-9167-441f53aadb60"
+    },
+    {
+      "index": 3,
+      "job_id": "fbf61d27-d151-44dd-86fd-86a3c103f019"
+    },
+    {
+      "index": 4,
+      "job_id": "739eecae-ed4e-44c9-ba8e-0391b1502957"
+    },
+    {
+      "index": 5,
+      "job_id": "0d3389e5-5a16-4050-a13a-f5f81aba6127"
+    },
+    {
+      "index": 6,
+      "job_id": "38e1c094-f949-4dde-9a22-f74a20b2bd48"
+    },
+    {
+      "index": 7,
+      "job_id": "2655b925-ef75-47ee-8ba8-6861e2f0239b"
+    },
+    {
+      "index": 8,
+      "job_id": "84ad79df-c21f-4a64-b22d-1ad01ea04dce"
+    },
+    {
+      "index": 9,
+      "job_id": "e7a6f947-13e3-473e-8800-5661b2e24796"
+    },
+    {
+      "index": 10,
+      "job_id": "6ad19038-f7da-484c-aea8-67a7faa79201"
+    },
+    {
+      "index": 11,
+      "job_id": "8d8ff280-b249-44fd-892a-5426d48d1f60"
+    }
+  ],
+  "requests": [
+    {
+      "index": 1,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "82fe2c8f-0dbb-4da2-9283-ee836fc06b68"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Spaceship glides toward rotating cyan violet wormhole, camera slowly tracks ship. Stars distort subtly. Ominous bass engine and electrical hum, no speech."
+      }
+    },
+    {
+      "index": 2,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "75c3612b-c14f-43ee-9d5b-472226448816"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Crew moves naturally aboard ship. Marty, brown-haired man red scarf and cyan forehead goggles, grins and speaks at 0.2s, finishing by 2.8s in Brazilian Portuguese: 'Pronto. Obra de um gênio.' Warm youthful medium-low masculine voice, playful swagger. Subtle ship engine."
+      }
+    },
+    {
+      "index": 3,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 7,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "1a15846a-bfd6-45a3-afd3-528a7df75e08"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Leticia catches a slipping small cargo case and points to its open latch, mildly annoyed but affectionate. Leticia is an adult athletic short woman 150cm, Marty adult180cm, maintain height contrast. At0.5s she says Brazilian Portuguese 'O gênio esqueceu a trava.' At3.2s Marty replies with sheepish smile 'Eu sabia que faltava um detalhe.' Youthful warm medium-low masculine voice; Leticia warm clear adult female voice. Finish speech by6.3s. Camera gentle close-in, mechanical latch click."
+      }
+    },
+    {
+      "index": 4,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 8,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "2065d304-d3f1-4313-95a6-8cba662de0f6"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Ship violently jolts under external attack. Red emergency lights, sparks, cyan wormhole through window; crew braces then runs toward reactor doorway. At0.6s silver-haired Elias shouts in Brazilian Portuguese 'Estão atirando na gente!' At3.0s Marty in red scarf shouts 'Todo mundo para a sala do núcleo!' Marty warm youthful medium-low masculine voice now urgent. Finish by6.6s. Metallic impacts alarms electrical arcing. Restrained camera shake coherent geography."
+      }
+    },
+    {
+      "index": 5,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 8,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "938762d6-61b2-4685-9fea-69a00a216c14"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Emotional game intro climax: Marty and Leticia outstretched hands almost touch, camera pushes between fingers. Cyan violet temporal fracture grows separating them. At2s Leticia cries in Brazilian Portuguese 'Marty!' Fracture pulls them apart, cloth and hair drift, shattered ship fragments float, bright explosion at6.5s to white, sound abruptly drops to silence at7s. No gore. Keep exact adult identities and hand anatomy."
+      }
+    },
+    {
+      "index": 6,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "2750d1ab-855e-454e-baa2-55be5720ff6b"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Vincent, black ponytail man, staggers upright in rainy ancient Japanese village looking bewildered. Rain runs off clothes, lanterns sway, distant samurai silhouette. Slow lateral camera. Rain and distant bell only, no speech."
+      }
+    },
+    {
+      "index": 7,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "8103e032-f2a4-4440-baeb-4072341f205e"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Silver-haired Elias kneels beside damaged olive mech beneath medieval stone castle, villagers approach cautiously with torches. Smoke curls from mech, Elias raises head. Slow low camera push. Wind metal creaking no speech."
+      }
+    },
+    {
+      "index": 8,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "35ed9424-9578-4346-9e1f-0a1009952b89"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Iris adult Black woman short curly auburn hair round glasses trapped behind laboratory glass puts palm on glass. Scientists silhouettes outside. Small brass mechanical octopus Spectre cyan eye pulses beside her. Sterile fluorescent flicker and machine hum, no speech."
+      }
+    },
+    {
+      "index": 9,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 4,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "74d9f085-2cce-4506-b337-773d89f5101d"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Leticia adult short athletic Indigenous-featured woman teal vest ochre trousers in ancient jungle slowly turns toward impossible carved monolith. Leaves sway, fireflies glow cyan, enormous subtle shadow crosses mist. Quiet jungle and ominous distant breath no speech."
+      }
+    },
+    {
+      "index": 10,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 10,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "60c79bd2-ca94-44c1-b9eb-6eba83863a61"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Marty alone in timeless reactor refuge merged with abandoned1941 London underground platform. Floating dust frozen clocks cyan portal. He wakes breathes then touches radio. At1s speaks softly in Brazilian Portuguese 'Pessoal… alguém me escuta?' warm youthful medium-low masculine voice strained. Four lights appear on console. At5.5s neutral female synthetic system voice 'Sinais da tripulação detectados.' His expression gains hope, turns to portal. Slow dolly in, radio static portal hum, all words finish by8.5s."
+      }
+    },
+    {
+      "index": 11,
+      "params": {
+        "model": "seedance_2_5",
+        "mode": "omni_reference",
+        "duration": 7,
+        "resolution": "1080p",
+        "generate_audio": true,
+        "bitrate_mode": "high",
+        "aspect_ratio": "16:9",
+        "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+        "medias": [
+          {
+            "role": "start_image",
+            "value": "54b54683-c584-4c02-af5e-2985cbd3c0eb"
+          }
+        ],
+        "prompt": "Opening cinematic of a narrative action RPG, original 1990s hand-painted cel anime, preserve exact reference character designs, expressive detailed animation, coherent physical motion, cinematic lighting. No subtitles, no captions, no logos, no added text, no background music, sound effects and specified dialogue only. Marty red scarf brown jacket steps out of cyan portal onto wet1941 London docks. He holds small crew photo then pockets it and walks forward with determination. At0.5s Brazilian Portuguese warm youthful medium-low male voice 'Eu vou encontrar vocês. Um por um.' finish by4.5s. Fog rolls, coat/scarf move, subtle impossible tentacled shadow under water at end. Camera tracks from behind slightly low. Footsteps water distant foghorn."
+      }
+    }
+  ]
+}

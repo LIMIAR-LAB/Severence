@@ -1,0 +1,28 @@
+{
+  "title": "Severence — Ecos do Tempo",
+  "duration": 60,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "videoCodec": "h264",
+  "audioCodec": "aac",
+  "localFile": "severence-intro-60s.mp4",
+  "outputs": [
+    {
+      "media_id": "a5d567cc-7bd6-4cf9-a93e-1c248b3983a4",
+      "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/a5d567cc-7bd6-4cf9-a93e-1c248b3983a4.mp4",
+      "content_type": "video/mp4"
+    },
+    {
+      "media_id": "cda02728-ab3f-4318-96c9-1352179b3222",
+      "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/cda02728-ab3f-4318-96c9-1352179b3222.jpg",
+      "content_type": "image/jpeg"
+    },
+    {
+      "media_id": "683dc14b-9995-4b78-9f38-1995acf9dc53",
+      "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/683dc14b-9995-4b78-9f38-1995acf9dc53.zip",
+      "content_type": "application/octet-stream"
+    }
+  ],
+  "verifiedDialogue": "First Marty line cut adjusted from source second1; speech checked by transcription; representative final frames inspected."
+}
