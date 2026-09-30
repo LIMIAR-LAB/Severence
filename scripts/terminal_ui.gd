@@ -447,12 +447,12 @@ func faithful_assets_ready(data: Dictionary, victory: bool) -> bool:
 func faithful_loot(parent: Control, rect: Rect2, icon_name: String, title: String, value: int) -> void:
 	var texture := summary_texture(RUN_SUMMARY_FAITHFUL + "loot/" + icon_name + ".png")
 	if texture != null:
-		var icon := TextureRect.new(); icon.texture = texture; icon.position = rect.position + Vector2(34, 1); icon.size = Vector2(64, 64)
+		var icon := TextureRect.new(); icon.texture = texture; icon.position = rect.position + Vector2(24, 8); icon.size = Vector2(84, 84)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(icon)
-	var loot_title := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 83, rect.size.x, 22), title, 14, Color("f7e6b6"), 2)
+	var loot_title := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 125, rect.size.x, 22), title, 14, Color("f7e6b6"), 2)
 	loot_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var loot_value := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 107, rect.size.x, 34), str(value), 27, CYAN, 3)
+	var loot_value := summary_live_label(parent, Rect2(rect.position.x, rect.position.y + 147, rect.size.x, 34), str(value), 27, CYAN, 3)
 	loot_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 func build_summary_faithful(data: Dictionary, victory: bool) -> void:
@@ -522,11 +522,11 @@ func build_summary_faithful(data: Dictionary, victory: bool) -> void:
 		var perf_value := summary_live_label(root, Rect2(spec[0].position + Vector2(0, 24), Vector2(spec[0].size.x, 43)), spec[2], 28, CYAN, 3)
 		perf_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	var retry := button(root, Rect2(381, 802, 550, 92), "▶  NOVA EXPEDIÇÃO", app.summary_new_run, true)
+	var retry := button(root, Rect2(425, 803, 495, 75), "▶  NOVA EXPEDIÇÃO", app.summary_new_run, true)
 	retry.name = "SummaryNewRun"; retry.add_theme_font_size_override("font_size", 28); retry.add_theme_color_override("font_color", Color("ecffff")); retry.add_theme_constant_override("outline_size", 4); retry.add_theme_color_override("font_outline_color", Color("06343d"))
 	if app.online and not app.hosting:
 		retry.disabled = true; retry.text = "AGUARDANDO ANFITRIÃO"
-	var refuge := button(root, Rect2(1007, 802, 398, 92), "⌂  VOLTAR AO REFÚGIO", app.summary_return_refuge, true)
+	var refuge := button(root, Rect2(975, 803, 440, 75), "⌂  VOLTAR AO REFÚGIO", app.summary_return_refuge, true)
 	refuge.name = "SummaryRefuge"; refuge.add_theme_font_size_override("font_size", 24); refuge.add_theme_color_override("font_color", Color("f7e6b6")); refuge.add_theme_constant_override("outline_size", 4); refuge.add_theme_color_override("font_outline_color", Color("2b1b08"))
 	retry.focus_neighbor_right = retry.get_path_to(refuge); retry.focus_next = retry.get_path_to(refuge)
 	refuge.focus_neighbor_left = refuge.get_path_to(retry); refuge.focus_previous = refuge.get_path_to(retry)
