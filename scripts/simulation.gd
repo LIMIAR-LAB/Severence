@@ -29,7 +29,7 @@ var chests: Array = []
 # 0.17: missão compartilhada pela equipe; salva e sincronizada.
 var story_quest := 0
 var dialogue_queue: Array = []
-const STORY_NPC := Vector2(850, 4400)
+const STORY_NPC := Vector2(1160, 4740)
 var mech: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var seed_value := 1

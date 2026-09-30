@@ -40,7 +40,7 @@ const POINTS := {
 	"spawn": Vector2(850, 6550), "spawn2": Vector2(920, 6590), "key": Vector2(1450, 6560), "shop": Vector2(8950, 6170),
 	"side": Vector2(8950, 4450), "secret_wall": Vector2(6540, 3740), "boss": Vector2(4200, 1200), "extraction": Vector2(4200, 720),
 	"mech": Vector2(9250, 6700), "ammo_center": Vector2(7050, 4350), "warden": Vector2(4850, 4350)}
-const CHESTS := [[850, 3800, false], [8850, 1400, false], [6350, 1150, true], [6100, 6100, false]]
+const CHESTS := [[700, 4470, false], [8850, 1400, false], [6350, 1150, true], [6100, 6100, false]]
 
 # Bordas: top facade|wall|none • bottom wall|quay|none • left/right wall|pier • quay_band = faixa de granito
 const ROOM_STYLE := {
@@ -68,7 +68,6 @@ const WATER := [
 	{"room": "chapel", "r": Rect2(-500, 3400, 700, 1800)},
 	{"room": "drydock", "r": Rect2(-500, 1000, 700, 1900)},
 	{"room": "cellar", "r": Rect2(9100, 1000, 900, 1500)},
-	# Moldura aquática visual da arena; pisos/alas são desenhados por cima e mantêm a colisão original.
 	{"room": "boss", "r": Rect2(500, -1000, 7400, 1500)},
 	{"room": "boss", "r": Rect2(500, 400, 2500, 3200)},
 	{"room": "boss", "r": Rect2(5400, 400, 2500, 3200)},
@@ -141,29 +140,29 @@ const OBSTACLES := [
 	[2557, 4480, 110, 40, "sandbags"], [2669, 4480, 110, 40, "sandbags"], [2282, 4024, 36, 26, "brazier"], [2982, 4024, 36, 26, "brazier"],
 	[1872, 3760, 56, 40, "crate_2"], [1932, 3760, 56, 40, "crate"], [1890, 3802, 64, 42, "crate_net"], [2972, 3760, 56, 40, "crate"],
 	[3027, 3756, 66, 44, "crate_barnacles"], [2996, 3804, 52, 40, "crate_3"], [2678, 4770, 44, 30, "barrel"], [2727, 4776, 42, 30, "barrel_oil"],
-	[2697, 4808, 42, 30, "barrel_toxic"], [2089, 4532, 22, 18, "lamp_post"], [3189, 4532, 22, 18, "lamp_post"], [750, 3860, 200, 90, "altar"],
-	[322, 4000, 210, 44, "pew"], [545, 3998, 190, 44, "pew"], [545, 4055, 190, 42, "pew"], [545, 4110, 190, 42, "pew"],
-	[966, 3998, 190, 44, "pew"], [966, 4055, 190, 42, "pew"], [966, 4110, 190, 42, "pew"], [1168, 4000, 210, 44, "pew"],
-	[375, 3680, 50, 20, "chapel_stained_glass"], [1275, 3680, 50, 20, "chapel_stained_glass"], [628, 3990, 44, 20, "chapel_offering_bowl"], [1028, 3990, 44, 20, "chapel_offering_bowl"],
-	[632, 3754, 36, 26, "brazier"], [1032, 3754, 36, 26, "brazier"], [402, 1440, 96, 60, "crane"], [1402, 2340, 96, 60, "crane"],
-	[1318, 1258, 64, 42, "crate_net"], [1382, 1260, 56, 40, "crate_2"], [1350, 1314, 44, 30, "barrel"], [272, 2410, 56, 40, "crate_2"],
-	[332, 2410, 56, 40, "crate"], [290, 2452, 64, 42, "crate_net"], [1379, 1770, 42, 30, "barrel_explosive"], [1427, 1776, 42, 30, "barrel_oil"],
-	[1397, 1808, 42, 30, "barrel_explosive"], [329, 1970, 42, 30, "barrel_explosive"], [377, 1976, 42, 30, "barrel_oil"], [347, 2008, 42, 30, "barrel_explosive"],
-	[602, 2252, 36, 28, "bollard"], [772, 2252, 36, 28, "bollard"], [942, 2252, 36, 28, "bollard"], [1112, 2252, 36, 28, "bollard"],
-	[549, 1382, 22, 18, "lamp_post"], [1339, 2232, 22, 18, "lamp_post"], [7679, 1320, 42, 30, "barrel_oil"], [7729, 1320, 42, 30, "barrel_oil"],
-	[7779, 1320, 42, 30, "barrel_oil"], [7679, 1520, 42, 30, "barrel_oil"], [7729, 1520, 42, 30, "barrel_oil"], [7779, 1520, 42, 30, "barrel_oil"],
-	[7679, 1720, 42, 30, "barrel_oil"], [7729, 1720, 42, 30, "barrel_oil"], [7779, 1720, 42, 30, "barrel_oil"], [8122, 1260, 56, 40, "crate"],
-	[8177, 1256, 66, 44, "crate_barnacles"], [8146, 1304, 52, 40, "crate_3"], [8167, 1656, 66, 44, "crate_barnacles"], [8239, 1656, 66, 44, "crate_barnacles"],
-	[8479, 1920, 42, 30, "barrel_explosive"], [8527, 1926, 42, 30, "barrel_oil"], [8497, 1958, 42, 30, "barrel_explosive"], [8918, 2010, 64, 40, "crate_broken"],
-	[7672, 2064, 56, 36, "fish_basket"], [8382, 1574, 36, 26, "brazier"], [8989, 1682, 22, 18, "lamp_post"], [3355, 710, 90, 90, "pillar"],
-	[4955, 710, 90, 90, "pillar"], [3355, 1710, 90, 90, "pillar"], [4955, 1710, 90, 90, "pillar"], [3232, 574, 36, 26, "brazier"],
-	[5132, 574, 36, 26, "brazier"], [3232, 2024, 36, 26, "brazier"], [5132, 2024, 36, 26, "brazier"], [3782, 1124, 36, 26, "brazier"],
-	[4582, 1124, 36, 26, "brazier"], [3129, 1270, 42, 30, "barrel_explosive"], [3177, 1276, 42, 30, "barrel_oil"], [3147, 1308, 42, 30, "barrel_explosive"],
-	[5179, 1270, 42, 30, "barrel_explosive"], [5227, 1276, 42, 30, "barrel_oil"], [5197, 1308, 42, 30, "barrel_explosive"], [3589, 982, 22, 18, "lamp_post"],
-	[4789, 982, 22, 18, "lamp_post"], [5952, 940, 56, 40, "crate_2"], [6012, 940, 56, 40, "crate"], [5970, 982, 64, 42, "crate_net"],
-	[6572, 940, 56, 40, "crate"], [6627, 936, 66, 44, "crate_barnacles"], [6596, 984, 52, 40, "crate_3"], [5978, 1370, 44, 30, "barrel"],
-	[6027, 1376, 42, 30, "barrel_oil"], [5997, 1408, 42, 30, "barrel_toxic"], [6614, 1414, 72, 36, "medkit"], [5100, 6000, 90, 650, "maze_wall"],
-	[5680, 6370, 90, 530, "maze_wall"], [6680, 4280, 90, 470, "maze_wall"], [7420, 3900, 90, 430, "maze_wall"]]
+	[2697, 4808, 42, 30, "barrel_toxic"], [2089, 4532, 22, 18, "lamp_post"], [3189, 4532, 22, 18, "lamp_post"], [680, 3888, 340, 62, "altar"],
+	[575, 4138, 165, 36, "pew"], [950, 4138, 165, 36, "pew"], [565, 4228, 175, 38, "pew"], [940, 4228, 175, 38, "pew"],
+	[565, 4318, 180, 40, "pew"], [935, 4318, 185, 40, "pew"], [365, 4510, 275, 112, "chapel_reliquary"], [1055, 4510, 285, 112, "chapel_reliquary"],
+	[200, 3600, 400, 300, "chapel_wall"], [1000, 3600, 500, 300, "chapel_wall"], [200, 3600, 105, 1400, "chapel_wall"], [1395, 3600, 105, 530, "chapel_wall"],
+	[1395, 4470, 105, 530, "chapel_wall"], [200, 4622, 250, 378, "chapel_wall"], [1350, 4622, 150, 378, "chapel_wall"], [402, 1440, 96, 60, "crane"],
+	[1402, 2340, 96, 60, "crane"], [1318, 1258, 64, 42, "crate_net"], [1382, 1260, 56, 40, "crate_2"], [1350, 1314, 44, 30, "barrel"],
+	[272, 2410, 56, 40, "crate_2"], [332, 2410, 56, 40, "crate"], [290, 2452, 64, 42, "crate_net"], [1379, 1770, 42, 30, "barrel_explosive"],
+	[1427, 1776, 42, 30, "barrel_oil"], [1397, 1808, 42, 30, "barrel_explosive"], [329, 1970, 42, 30, "barrel_explosive"], [377, 1976, 42, 30, "barrel_oil"],
+	[347, 2008, 42, 30, "barrel_explosive"], [602, 2252, 36, 28, "bollard"], [772, 2252, 36, 28, "bollard"], [942, 2252, 36, 28, "bollard"],
+	[1112, 2252, 36, 28, "bollard"], [549, 1382, 22, 18, "lamp_post"], [1339, 2232, 22, 18, "lamp_post"], [7679, 1320, 42, 30, "barrel_oil"],
+	[7729, 1320, 42, 30, "barrel_oil"], [7779, 1320, 42, 30, "barrel_oil"], [7679, 1520, 42, 30, "barrel_oil"], [7729, 1520, 42, 30, "barrel_oil"],
+	[7779, 1520, 42, 30, "barrel_oil"], [7679, 1720, 42, 30, "barrel_oil"], [7729, 1720, 42, 30, "barrel_oil"], [7779, 1720, 42, 30, "barrel_oil"],
+	[8122, 1260, 56, 40, "crate"], [8177, 1256, 66, 44, "crate_barnacles"], [8146, 1304, 52, 40, "crate_3"], [8167, 1656, 66, 44, "crate_barnacles"],
+	[8239, 1656, 66, 44, "crate_barnacles"], [8479, 1920, 42, 30, "barrel_explosive"], [8527, 1926, 42, 30, "barrel_oil"], [8497, 1958, 42, 30, "barrel_explosive"],
+	[8918, 2010, 64, 40, "crate_broken"], [7672, 2064, 56, 36, "fish_basket"], [8382, 1574, 36, 26, "brazier"], [8989, 1682, 22, 18, "lamp_post"],
+	[3355, 710, 90, 90, "pillar"], [4955, 710, 90, 90, "pillar"], [3355, 1710, 90, 90, "pillar"], [4955, 1710, 90, 90, "pillar"],
+	[3232, 574, 36, 26, "brazier"], [5132, 574, 36, 26, "brazier"], [3232, 2024, 36, 26, "brazier"], [5132, 2024, 36, 26, "brazier"],
+	[3782, 1124, 36, 26, "brazier"], [4582, 1124, 36, 26, "brazier"], [3129, 1270, 42, 30, "barrel_explosive"], [3177, 1276, 42, 30, "barrel_oil"],
+	[3147, 1308, 42, 30, "barrel_explosive"], [5179, 1270, 42, 30, "barrel_explosive"], [5227, 1276, 42, 30, "barrel_oil"], [5197, 1308, 42, 30, "barrel_explosive"],
+	[3589, 982, 22, 18, "lamp_post"], [4789, 982, 22, 18, "lamp_post"], [5952, 940, 56, 40, "crate_2"], [6012, 940, 56, 40, "crate"],
+	[5970, 982, 64, 42, "crate_net"], [6572, 940, 56, 40, "crate"], [6627, 936, 66, 44, "crate_barnacles"], [6596, 984, 52, 40, "crate_3"],
+	[5978, 1370, 44, 30, "barrel"], [6027, 1376, 42, 30, "barrel_oil"], [5997, 1408, 42, 30, "barrel_toxic"], [6614, 1414, 72, 36, "medkit"],
+	[5100, 6000, 90, 650, "maze_wall"], [5680, 6370, 90, 530, "maze_wall"], [6680, 4280, 90, 470, "maze_wall"], [7420, 3900, 90, 430, "maze_wall"]]
 
 const DECOR := [
 	[3020, 5750, "poster"], [3480, 5802, "iron_door"], [3980, 5750, "poster"], [2650, 5720, "wall_lamp"], [3400, 6250, "rails"],

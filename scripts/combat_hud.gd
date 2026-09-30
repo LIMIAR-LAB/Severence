@@ -8,6 +8,9 @@ var font: Font
 const CYAN := Color("64eef5")
 const GOLD := Color("d6b36c")
 
+static func show_story_marker(story_quest: int) -> bool:
+	return story_quest < 2
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -192,7 +195,7 @@ func draw_map_icons(s, to_screen: Callable, size: float, clip: Rect2) -> void:
 		if room.get("kind", "") == "boss" and not s.boss_dead: icons.append([room.r.get_center() + Vector2(0, 120), "boss", false])
 		if room.get("locked", false): icons.append([room.r.get_center(), "locked", false])
 	var story: Dictionary = s.room_at(s.STORY_NPC)
-	if not story.is_empty() and room_visible(s,story):
+	if show_story_marker(s.story_quest) and not story.is_empty() and room_visible(s,story):
 		var location: Vector2 = to_screen.call(s.STORY_NPC)
 		if clip.has_point(location): draw_string(ThemeDB.fallback_font,location,"!",HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color("ffd36a"))
 	for pk in s.pickups:

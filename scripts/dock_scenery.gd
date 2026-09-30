@@ -11,18 +11,19 @@ const BOSS_SAFE_CENTER := Vector2(4200, 1200)
 const BOSS_SAFE_RADIUS := 360.0
 const ROOM_PLATE_BASE := BASE + "rooms_pixellab/"
 const ROOM_PLATE_IDS := ["cranes", "warehouse", "market", "shop", "generator", "ammo", "rails", "stairs", "chapel", "drydock", "cellar", "secret"]
-const CHAPEL_ANIMATED_BASE := BASE + "chapel/animated/"
+const CHAPEL_ANIMATED_BASE := BASE + "chapel/unified/"
 const CHAPEL_FRAME_COUNT := 12
 const CHAPEL_FRAME_SECONDS := 0.110
 const CHAPEL_ROOM_RECT := Rect2(200, 3600, 1300, 1400)
-# A arte fica em escala nativa. A faixa inferior lateral permanece procedural
-# para não cobrir a conexão leste; o recorte central preserva a saída pintada.
-const CHAPEL_PLATE_RECT := Rect2(178, 3600, 1344, 752)
-const CHAPEL_PLATE_CLIPS := [Rect2(200, 3600, 1300, 600), Rect2(478, 4200, 744, 152)]
+# Uma única placa transparente cobre a capela, relicários e os três corredores
+# em escala nativa. A transparência preserva todas as salas vizinhas.
+const CHAPEL_PLATE_RECT := Rect2(200, 2700, 1600, 3300)
+const CHAPEL_OVERLAY_RECT := Rect2(450, 3600, 800, 900)
+const CHAPEL_CONNECTORS := [Rect2(700, 2700, 200, 900), Rect2(1500, 4200, 300, 200), Rect2(900, 5000, 200, 1000)]
 const CHAPEL_BAKED_KINDS := [
 	"altar", "pew", "chapel_stained_glass", "chapel_offering_bowl",
 	"brazier", "ritual_circle", "symbol_0", "symbol_2", "chapel_candles",
-	"chapel_banner",
+	"chapel_banner", "rug", "tentacle_planks", "chapel_reliquary", "chapel_wall",
 ]
 
 const TILE_NAMES := ["planks_base", "planks_knot", "planks_nails", "planks_crack", "planks_light", "planks_wet", "planks_oil", "planks_hole",
@@ -107,6 +108,8 @@ var corridor_deck: Texture2D
 var corridor_deck_vertical: Texture2D
 var chapel_frames: Array[Texture2D] = []
 var chapel_fallback: Texture2D
+var chapel_fisherman_frames: Array[Texture2D] = []
+var chapel_room_active := false
 var reveal_at := {}     # id da sala -> tick_time em que apareceu
 var lights: Array = []  # poças de luz do quadro atual (desenhadas no LightLayer, modo aditivo)
 
@@ -129,9 +132,17 @@ func _init() -> void:
 	if ResourceLoader.exists(ROOM_PLATE_BASE + "corridor.png"):
 		corridor_deck = load(ROOM_PLATE_BASE + "corridor.png")
 		corridor_deck_vertical = load(ROOM_PLATE_BASE + "corridor_vertical.png")
-	chapel_fallback = load(CHAPEL_ANIMATED_BASE + "chapel_static.png")
+	var static_path := CHAPEL_ANIMATED_BASE + "chapel_static.png"
+	chapel_fallback = load(static_path) if ResourceLoader.exists(static_path) else null
+	if chapel_fallback == null: push_warning("CAPELA_UNIFICADA_AUSENTE: %s; usando cenário legacy." % static_path)
 	for i in CHAPEL_FRAME_COUNT:
-		chapel_frames.append(load(CHAPEL_ANIMATED_BASE + "chapel_frame_%02d.png" % i))
+		var frame_path := CHAPEL_ANIMATED_BASE + "chapel_overlay_%02d.png" % i
+		chapel_frames.append(load(frame_path) if ResourceLoader.exists(frame_path) else null)
+		if chapel_frames[-1] == null: push_warning("CAPELA_OVERLAY_AUSENTE: %s; quadro ficará estático." % frame_path)
+	for i in 4:
+		var npc_path := CHAPEL_ANIMATED_BASE + "fisherman_frame_%02d.png" % i
+		chapel_fisherman_frames.append(load(npc_path) if ResourceLoader.exists(npc_path) else null)
+		if chapel_fisherman_frames[-1] == null: push_warning("CAPELA_PESCADOR_AUSENTE: %s; usando quadro válido/fallback legacy." % npc_path)
 
 static func hash01(ix: int, iy: int, salt: int = 0) -> float:
 	var n: int = (ix * 73856093) ^ (iy * 19349663) ^ (salt * 83492791)
@@ -140,7 +151,7 @@ static func hash01(ix: int, iy: int, salt: int = 0) -> float:
 	return float(n & 0xffff) / 65535.0
 
 func has_prop(kind: String) -> bool:
-	return kind in ["maze_wall", "wall_block"] or props.has(LEGACY.get(kind, kind))
+	return kind in ["maze_wall", "wall_block", "chapel_wall", "chapel_reliquary"] or props.has(LEGACY.get(kind, kind))
 
 # ------------------------------------------------------------------ descoberta (névoa)
 func discovered_rooms(sim) -> Array:
@@ -179,10 +190,11 @@ static func chapel_frame_index(tick_time: float) -> int:
 	return int(floor(tick_time / CHAPEL_FRAME_SECONDS)) % CHAPEL_FRAME_COUNT
 
 func chapel_texture_at(tick_time: float) -> Texture2D:
-	var index := chapel_frame_index(tick_time)
-	if index >= 0 and index < chapel_frames.size() and chapel_frames[index] != null:
-		return chapel_frames[index]
 	return chapel_fallback
+
+func chapel_overlay_at(tick_time: float) -> Texture2D:
+	var index := chapel_frame_index(tick_time)
+	return chapel_frames[index] if index >= 0 and index < chapel_frames.size() else null
 
 func chapel_is_visible(rooms: Array, view: Rect2) -> bool:
 	if not CHAPEL_PLATE_RECT.intersects(view):
@@ -193,27 +205,50 @@ func chapel_is_visible(rooms: Array, view: Rect2) -> bool:
 	return false
 
 func chapel_hides_legacy(kind: String, position: Vector2) -> bool:
-	if chapel_texture_at(0.0) == null or kind not in CHAPEL_BAKED_KINDS:
+	if not chapel_room_active or chapel_fallback == null or kind not in CHAPEL_BAKED_KINDS:
 		return false
-	if kind == "chapel_banner":
-		return CHAPEL_PLATE_RECT.grow(64.0).has_point(position)
-	for clip: Rect2 in CHAPEL_PLATE_CLIPS:
-		if clip.has_point(position):
-			return true
-	return false
+	return CHAPEL_PLATE_RECT.grow(64.0).has_point(position)
+
+func chapel_hides_gate(room_id: String, gate_rect: Rect2 = Rect2()) -> bool:
+	# A placa já contém soleiras, pilares e iluminação próprios nas três saídas.
+	# Suprime também o portão da sala vizinha quando ele encosta na ponta do corredor.
+	# Mantém os portões procedurais quando a arte unificada não está disponível.
+	return chapel_fallback != null and (room_id == "chapel" or (gate_rect.has_area() and CHAPEL_PLATE_RECT.grow(1.0).intersects(gate_rect)))
+
+func chapel_fisherman_texture(tick_time: float) -> Texture2D:
+	if chapel_fisherman_frames.is_empty():
+		return null
+	var index := int(floor(maxf(tick_time, 0.0) / 0.28)) % chapel_fisherman_frames.size()
+	if chapel_fisherman_frames[index] != null: return chapel_fisherman_frames[index]
+	for frame in chapel_fisherman_frames:
+		if frame != null: return frame
+	return null
 
 func draw_chapel_plate(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
-	if not chapel_is_visible(rooms, view):
-		return
-	var texture := chapel_texture_at(sim.tick_time)
-	if texture == null:
-		return
-	for allowed: Rect2 in CHAPEL_PLATE_CLIPS:
-		var clip := allowed.intersection(CHAPEL_ROOM_RECT).intersection(view)
-		if clip.size.x <= 0.0 or clip.size.y <= 0.0:
-			continue
-		var source := Rect2(clip.position - CHAPEL_PLATE_RECT.position, clip.size)
-		ci.draw_texture_rect_region(texture, clip, source)
+	chapel_room_active = false
+	if chapel_fallback == null or not CHAPEL_PLATE_RECT.intersects(view): return
+	var room_seen := rooms.any(func(room): return room.get("id", "") == "chapel")
+	var clips: Array[Rect2] = []
+	if room_seen:
+		clips.append(CHAPEL_PLATE_RECT.intersection(view)); chapel_room_active = true
+	else:
+		for connector: Rect2 in CHAPEL_CONNECTORS:
+			var revealed := false
+			for room in rooms:
+				if room.r.grow(8.0).intersects(connector): revealed = true; break
+			if not revealed:
+				for actor in sim.actors:
+					if actor.active and connector.grow(96.0).has_point(actor.p): revealed = true; break
+			if revealed and connector.intersects(view): clips.append(connector.intersection(view))
+	for clip in clips:
+		if clip.size.x > 0.0 and clip.size.y > 0.0:
+			ci.draw_texture_rect_region(chapel_fallback, clip, Rect2(clip.position - CHAPEL_PLATE_RECT.position, clip.size))
+	if room_seen:
+		var overlay := chapel_overlay_at(sim.tick_time)
+		if overlay != null:
+			var overlay_clip := CHAPEL_OVERLAY_RECT.intersection(view)
+			if overlay_clip.size.x > 0.0 and overlay_clip.size.y > 0.0:
+				ci.draw_texture_rect_region(overlay, overlay_clip, Rect2(overlay_clip.position - CHAPEL_OVERLAY_RECT.position, overlay_clip.size))
 
 static func inside(rects: Array, p: Vector2, margin: float = 0.0) -> bool:
 	for r in rects:
@@ -806,6 +841,7 @@ func draw_pier_edge(ci: CanvasItem, sim, rect: Rect2, side: int) -> void:
 
 # ------------------------------------------------------------------ props
 func prop_size(kind: String) -> Vector2:
+	if kind in ["chapel_wall", "chapel_reliquary"]: return Vector2(96, 96)
 	var k: String = LEGACY.get(kind, kind)
 	return props[k].get_size() * float(PROP_SCALE.get(k, 1.0))
 
@@ -823,6 +859,13 @@ func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
 		return
 	if kind == "maze_wall" or kind == "wall_block":
 		draw_wall_block(ci, box, t); return   # 0.17: parede interna (labirinto/colunas)
+	if kind == "chapel_wall":
+		draw_wall_block(ci, box, t); return
+	if kind == "chapel_reliquary":
+		ci.draw_rect(box, Color("302a2b")); ci.draw_rect(box.grow(-7), Color("66503b"))
+		var relic: Texture2D = props["chapel_stained_glass"]
+		ci.draw_texture_rect(relic, Rect2(box.get_center() - Vector2(minf(60, box.size.x * 0.3), box.size.y - 12), Vector2(minf(120, box.size.x * 0.6), box.size.y - 20)), false)
+		return
 	var size := prop_size("crate" if kind == "crate_row" else kind)
 	var foot := Vector2(box.get_center().x, box.end.y + 4)
 	ci.draw_set_transform(foot + Vector2(0, -2), 0, Vector2(1, 0.32))
