@@ -85,6 +85,54 @@ func draw_omega_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
 		var beam_label := "RAIO ATIVO • %.1fs" % a.beam_time if a.beam_time > 0 else ("RAIO • %.0fs" % ceilf(a.beam_cd) if a.beam_cd > 0 else "%s • SEGURAR RAIO" % special_key)
 		text(Vector2(103, 182), beam_label, 11, CYAN if a.beam_cd <= 0 else Color("8a7a58"))
 
+func draw_robot_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
+	var robot_id: String = a.get("selected_robot", "")
+	var center := Vector2(55, 241)
+	var color := Color("87959d")
+	var ratio := 0.0
+	var state := "NENHUM EQUIPADO"
+	var detail := "ESCOLHA UM ROBÔ"
+	var controls := ""
+	var switch_hint := "← • TROCAR ROBÔ" if ps else "V / ◀ • TROCAR ROBÔ"
+	var robot_icon: Texture2D = null
+	if robot_id == "titan":
+		robot_icon = art.robot_titan
+		color = Color("e8a33d")
+		ratio = clampf(float(s.mech.hp) / 240.0, 0.0, 1.0)
+		state = "PILOTANDO" if a.mech else ("EM CAMPO" if s.mech.deployed else "GUARDADO")
+		if s.mech.hp <= 0.0: state = "SEM INTEGRIDADE"
+		detail = "INTEGRIDADE %d%%  •  GAS %d%%" % [int(roundf(ratio * 100.0)), int(roundf(clampf(float(s.mech.fuel) / s.FUEL_MAX, 0.0, 1.0) * 100.0))]
+		controls = "↑ INVOCAR  •  △ PILOTAR" if ps else "C INVOCAR  •  E PILOTAR"
+	elif robot_id == "spectre":
+		robot_icon = art.robot_spectre
+		color = Color("c68cff")
+		ratio = clampf(float(s.spectres[id].hp) / 100.0, 0.0, 1.0)
+		state = "FUSÃO" if a.fused else ("EM CAMPO" if s.spectres[id].state == "following" else "GUARDADO")
+		if s.spectres[id].hp <= 0.0: state = "SEM ENERGIA"
+		detail = "ENERGIA %d%%" % int(roundf(ratio * 100.0))
+		controls = "↑ INVOCAR  •  ↓ FUNDIR" if ps else "C INVOCAR  •  G FUNDIR"
+	if robot_id != "" and a.summon_cd > 0.0:
+		state += "  •  RECARGA %.1fs" % a.summon_cd
+
+	draw_rect(Rect2(17, 203, 76, 76), Color("081724"))
+	if robot_icon != null:
+		draw_texture_rect(robot_icon, Rect2(29, 215, 52, 52), false, Color.WHITE if ratio > 0.0 else Color(0.45, 0.48, 0.52))
+	else:
+		text(Vector2(47, 252), "–", 26, color)
+	for segment in range(12):
+		var start: float = -PI * 0.5 + TAU * float(segment) / 12.0
+		var end: float = start + TAU * 0.075
+		var segment_color: Color = color if float(segment) < ratio * 12.0 else Color("34404a")
+		draw_arc(center, 35.0, start, end, 3, segment_color, 4.0, true)
+	if ratio >= 1.0 and a.summon_cd <= 0.0:
+		var pulse := 0.65 + 0.35 * sin(Time.get_ticks_msec() * 0.008)
+		draw_arc(center, 39.0, -PI * 0.5, PI * 1.5, 36, Color(color, pulse), 2.0, true)
+	text(Vector2(103, 226), "ROBÔ • " + (robot_id.to_upper() if robot_id != "" else "NENHUM"), 13, GOLD)
+	text(Vector2(103, 247), state, 13, color)
+	text(Vector2(103, 265), detail, 11, Color("b6c8cd"))
+	if controls != "": text(Vector2(103, 283), controls, 11)
+	text(Vector2(103, 301), switch_hint, 11, GOLD)
+
 func _draw() -> void:
 	if app == null or app.sim == null: return
 	var s = app.sim
@@ -113,6 +161,7 @@ func _draw() -> void:
 	text(Vector2(111,80), "UNIFORME: " + s.UNIFORMS[a.outfit].name, 13, GOLD)
 	# A carga da Ômega acompanha o ícone abaixo do retrato.
 	draw_omega_indicator(s, a, ps, id)
+	draw_robot_indicator(s, a, ps, id)
 	var vp: Vector2 = get_viewport_rect().size
 	var dx := vp.x - 1280.0; var dy := vp.y - 800.0   # HUD ancorado nas bordas reais (qualquer proporção)
 	if a.mech:
@@ -146,30 +195,6 @@ func _draw() -> void:
 		draw_set_transform(Vector2(dx, 0))
 	else: draw_set_transform(Vector2(dx, 0))
 	draw_minimap(s, a)
-	draw_set_transform(Vector2(0, dy))
-	frame(Rect2(16,676,284,105))
-	var robot_id: String = a.get("selected_robot", "")
-	if robot_id == "":
-		text(Vector2(30,704), "SEM ROBÔ", 16, Color("87959d"))
-		text(Vector2(30,730), "Nenhum módulo equipado", 12, Color("87959d"))
-		text(Vector2(30,759), "← • TROCAR" if ps else "V / ◀ • TROCAR", 12, GOLD)
-	else:
-		var robot_icon: Texture2D = art["robot_" + robot_id]
-		draw_texture_rect(robot_icon, Rect2(27,688,58,54), false)
-		text(Vector2(94,699), robot_id.to_upper() + (" • FUSÃO" if a.fused else ""), 16, CYAN)
-		var robot_hp: float = s.mech.hp if robot_id == "titan" else s.spectres[id].hp
-		var robot_max: float = 240.0 if robot_id == "titan" else 100.0
-		draw_rect(Rect2(94,709,188,9), Color("26323a")); draw_rect(Rect2(94,709,188*clampf(robot_hp/robot_max,0,1),9),Color("89d859"))
-		if robot_id == "titan":
-			var fuel: float = s.mech.get("fuel", 0.0) / s.FUEL_MAX
-			draw_rect(Rect2(94,723,150,6), Color("26323a")); draw_rect(Rect2(94,723,150*fuel,6), Color("e8a33d") if fuel > 0.2 else Color("d04430"))
-			text(Vector2(250,730), "GAS", 10, Color("e8a33d"))
-			text(Vector2(94,746), "↑ INVOCAR  •  △ PILOTAR" if ps else "C INVOCAR  •  E PILOTAR", 11)
-		else:
-			var spectre_state: String = str(s.spectres[id].state).to_upper()
-			text(Vector2(94,731), "ENERGIA • " + spectre_state, 10, Color("c68cff"))
-			text(Vector2(94,746), "↑ INVOCAR  •  ↓ FUNDIR" if ps else "C INVOCAR  •  G FUNDIR", 11)
-		text(Vector2(94,765), "← • TROCAR ROBÔ" if ps else "V / ◀ • TROCAR ROBÔ", 11, GOLD)
 	draw_set_transform(Vector2(dx, dy))
 	frame(Rect2(978,721,288,60))
 	for n in range(3):
