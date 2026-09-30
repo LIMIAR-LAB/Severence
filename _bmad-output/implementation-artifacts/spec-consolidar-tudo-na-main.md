@@ -47,10 +47,10 @@ context: []
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Repository history -- create a recoverable pre-consolidation reference and commit all current tracked/untracked project work without omission.
-- [ ] `main` -- merge `origin/main`, resolving overlaps as a union of chapel and boss-arena behavior.
-- [ ] `codex/resumo-fiel-conceito` -- integrate its unique completed run-summary commit without duplicating already-applied work.
-- [ ] `scripts/main.gd` and `scripts/simulation.gd` -- confirm resolved syntax and absence of VCS markers; change only if validation exposes a current defect.
+- [x] Repository history -- create a recoverable pre-consolidation reference and commit all current tracked/untracked project work without omission.
+- [x] `main` -- merge `origin/main`, resolving overlaps as a union of chapel and boss-arena behavior.
+- [x] `codex/resumo-fiel-conceito` -- integrate its unique completed run-summary commit without duplicating already-applied work.
+- [x] `scripts/main.gd` and `scripts/simulation.gd` -- confirm resolved syntax and absence of VCS markers; change only if validation exposes a current defect.
 - [ ] Tests and repository -- run marker/whitespace checks and Godot headless suites, then push unified `main` to `origin/main`.
 
 **Acceptance Criteria:**
