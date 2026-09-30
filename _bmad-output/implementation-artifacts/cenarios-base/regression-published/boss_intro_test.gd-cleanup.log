@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS BOSS INTRO: entrada da arena inicia a vinheta uma vez
+PASS BOSS INTRO: combate fica suspenso durante a vinheta
+PASS BOSS INTRO: combate retoma após a vinheta
+PASS BOSS INTRO: nova expedição libera a vinheta novamente
+BOSS_INTRO_TEST failures=0
+

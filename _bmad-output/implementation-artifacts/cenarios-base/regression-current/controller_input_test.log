@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS CONTROLE: DualSense e DualShock usam símbolos PlayStation
+PASS CONTROLE: outro controle não recebe símbolos PlayStation
+PASS CONTROLE: sem PlayStation a legenda não aparece
+CONTROLE conectado: 12 •  • reconhecido=false
+PASS CONTROLE: conexão PlayStation atualiza as instruções abertas
+CONTROLE desconectado: 12
+PASS CONTROLE: desconexão devolve as instruções de teclado
+PASS CONTROLE: solo usa primeiro controle
+PASS CONTROLE: coop teclado + controle preservado
+PASS CONTROLE: coop dois controles separados
+PASS CONTROLE: analógico desloca Marty na cena real
+PASS CONTROLE: mira permanece ao soltar analógico
+PASS CONTROLE: gatilho dispara
+PASS CONTROLE: botão inferior salta
+PASS CONTROLE: perder foco pausa
+PASS CONTROLE: Options/Start retoma sem teclado
+PASS CONTROLE: Options/Start abre pausa
+PASS CONTROLE: inventário destacado recebe o foco inicial da pausa
+PASS CONTROLE: controle alcança inventário e ações da pausa
+PASS CONTROLE: mover mouse devolve mira ao mouse
+PASS CONTROLE: sem controle mantém teclado
+CONTROLLER INPUT TEST failures=0

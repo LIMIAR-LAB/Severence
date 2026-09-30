@@ -51,5 +51,6 @@ func run() -> void:
 		var restore := FileAccess.open(path, FileAccess.WRITE); restore.store_buffer(original); restore.close()
 	else: DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	print("INVENTORY_PERSISTENCE_TESTS_DONE failures=%d" % failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)
 

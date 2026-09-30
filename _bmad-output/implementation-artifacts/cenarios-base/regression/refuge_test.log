@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: spawn do refúgio está em piso livre
+PASS: alcançável a pé: portal
+PASS: alcançável a pé: lost
+PASS: alcançável a pé: core
+PASS: alcançável a pé: bench
+PASS: alcançável a pé: armor
+PASS: alcançável a pé: mural
+PASS: alcançável a pé: hangar
+PASS: Marty alcança o Titan na baia
+PASS: Titan estaciona dentro da baia do hangar
+PASS: pedestal do núcleo bloqueia passagem
+PASS: vazio cósmico não é caminhável
+PASS: interação responde: lost
+PASS: interação responde: core
+PASS: interação responde: mural
+PASS: interação responde: hangar
+PASS: interação responde: bench
+PASS: vitrine consulta o uniforme sem trocá-lo
+PASS: vitrine não veste a armadura (armadura é o R)
+PASS: armadura ativa usa o visual Ômega
+PASS: portal DOCAS / 1941 inicia a expedição
+REFUGE_TESTS_DONE failures=0

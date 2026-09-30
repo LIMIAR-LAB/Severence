@@ -6,6 +6,12 @@ gradual dos atlas antigos.
 
 ## Decisão principal
 
+### Coerência com o jogo existente
+
+O visual já integrado é a referência principal. Imagens externas orientam o conceito, mas não substituem a direção de arte. Antes de criar uma forma, abrir e comparar os sprites atuais: proporção cabeça/corpo, silhueta, tamanho em pixels, contorno, paleta, iluminação e animações. Depois, conferir a forma dentro do jogo, lado a lado com Marty e os inimigos, em escala real. Retratos, ícones e efeitos devem acompanhar o mesmo padrão. Testes de funcionamento não substituem essa inspeção visual.
+
+Para transformações de energia do Marty, preservar seus pivôs, dimensões e poses existentes é preferível a inserir um novo corpo realista. Brilho deve preservar a leitura dos pixels e não esconder o contorno.
+
 Cada personagem jogável deve ter sua própria pasta, sua própria referência visual
 e suas próprias folhas de animação. Personagens diferentes não devem dividir um
 atlas gigante.
@@ -187,7 +193,7 @@ Os atlas atuais foram criados antes deste contrato e permanecem como legado:
 | --- | --- | --- |
 | Marty | Várias roupas ainda compartilham `marty_anim_v3.png` | Separar por roupa e por ação durante a renovação da arte. |
 | Titan | Usa células maiores, adequadas ao seu porte | Manter escala própria e separar as ações futuras. |
-| Spectre | Possui esquema simplificado de quatro direções | Manter enquanto funcional; revisar quando receber animações novas. |
+| Spectre | Usa folhas próprias de oito direções para flutuação e disparo | Manter porte menor que Marty e efeitos em camadas separadas. |
 | Inimigos | Espécies compartilham atlas de produção antiga | O padrão por personagem é obrigatório primeiro para os jogáveis. |
 
 A migração deve ser gradual. Nenhum atlas funcional precisa ser removido apenas por

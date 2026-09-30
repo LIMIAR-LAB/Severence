@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Severence · Direção dos cenários</title>
+<style>
+:root{color-scheme:dark;--bg:#10191e;--ink:#e9e3d6;--dim:#b5bdbe;--line:#3b4b50;--gold:#d8af66;--sea:#8caeae}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:54px 32px 80px}h1,h2,h3{line-height:1.16;font-weight:550}h1{font-family:Georgia,serif;font-size:clamp(38px,6vw,72px);max-width:870px;margin:18px 0 24px}h2{font-family:Georgia,serif;font-size:36px;margin:0 0 22px}h3{font-size:21px}p{max-width:830px}.eyebrow{color:var(--gold);letter-spacing:.16em;font-size:12px;text-transform:uppercase}.lead{font-size:22px;color:var(--dim);max-width:800px}.status{display:inline-block;border:1px solid var(--line);padding:6px 12px;font-size:13px;color:var(--dim)}section{margin-top:64px;padding-top:34px;border-top:1px solid var(--line)}figure{margin:22px 0}img{width:100%;height:auto;display:block;image-rendering:pixelated;background:#0b1115}figcaption{color:var(--dim);font-size:14px;margin-top:12px}.two{display:grid;grid-template-columns:1fr 1fr;gap:30px}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}.num{color:var(--gold);font:28px Georgia,serif}.muted{color:var(--dim)}table{width:100%;border-collapse:collapse;text-align:left;font-size:15px}td,th{padding:15px 14px 15px 0;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.08em}td:first-child{width:22%;font-weight:600}.table-wrap{overflow-x:auto}a{color:var(--gold)}ul,ol{padding-left:24px}li{margin:9px 0}details{border-top:1px solid var(--line);margin-top:25px;padding-top:20px}summary{cursor:pointer;color:var(--gold)}svg{width:100%;height:auto;display:block}.swatches{display:flex;flex-wrap:wrap;gap:24px;margin:30px 0}.swatch{display:flex;align-items:center;gap:10px;font-size:14px}.swatch i{width:30px;height:30px;display:block;border:1px solid #82908c}footer{margin-top:60px;color:var(--dim);font-size:13px}.note{border-left:3px solid var(--gold);padding-left:20px}button{font:inherit;background:transparent;color:var(--ink);border:1px solid var(--line);padding:8px 16px;cursor:pointer;margin-right:8px;margin-bottom:8px}button[aria-pressed=true]{background:var(--gold);color:#10191e;border-color:var(--gold)}button:focus-visible,summary:focus-visible{outline:3px solid var(--sea);outline-offset:4px}.native img{width:min(688px,100%);margin:auto}.native{padding:16px 0;background:#0b1115}.schematic{background:#182329;padding:18px}.check{color:var(--sea)}@media(max-width:720px){main{padding:30px 18px}.two,.principles{grid-template-columns:1fr}h2{font-size:30px}section{margin-top:42px}td{min-width:130px}.lead{font-size:19px}}@media print{body{background:white;color:#182329}main{padding:0}section{break-inside:avoid}.muted,figcaption,.lead{color:#46545b}button{display:none}}
+</style>
+</head>
+<body><main>
+<header>
+<div class="eyebrow">Severence · Ecos do Tempo / Estudo de cenário 01</div>
+<h1>Um porto que faz sentido ao olhar e ao atravessar.</h1>
+<p class="lead">Arquitetura desenhada em conjuntos, chão tranquilo e caminhos claros. O Balcão do Farol estabelece a linguagem para reconstruir as docas.</p>
+<span class="status">Proposta visual · 30 setembro 2026 · Ainda não aplicada ao jogo</span>
+</header>
+<section>
+<div class="eyebrow">01 / Referência visual</div><h2>Balcão do Farol</h2>
+<p>Pedra úmida, ferro envelhecido e luz âmbar. O relevo deve ser percebido pela forma dos degraus, pelas faces do patamar e pelas sombras de contato. O espaço central permanece livre para a ação.</p>
+<div role="group" aria-label="Tamanho do conceito"><button id="fit" type="button" aria-pressed="true">Ver composição</button><button id="native" type="button" aria-pressed="false">Ver pixels na escala original</button></div>
+<figure><div id="concept"><img src="farol-pixellab-v1.png" width="688" height="384" alt="Conceito PixelLab do Balcão do Farol: arquitetura portuária, patamar elevado, escadas e pátio aberto."></div><figcaption>Conceito gerado no PixelLab. Referência de atmosfera e composição; não é uma textura final nem uma promessa de correspondência exata com o mapa. Ampliar esta imagem não produz detalhe adicional.</figcaption></figure>
+<div id="review" class="two"><div><h3>O que aproveitar</h3><p class="muted">Piso central tranquilo, materiais consistentes, iluminação localizada, volumes completos e decoração agrupada nas bordas. Os degraus têm faces e sombras reconhecíveis; deixam de parecer faixas de textura.</p></div><div><h3>O que corrigir na produção</h3><p class="muted">A geração criou escadas em dois lances e uma parede alta demais para as 44 unidades de desnível do jogo. Simplificar para dois lances laterais curtos, um de cada lado, baixar a face frontal e manter a conexão ao norte. A porta iluminada do farol é apenas uma proposta: não pode sugerir uma interação inexistente.</p></div></div>
+<p class="note">Boa referência de linguagem visual; ainda não corresponde à geometria jogável. O esquema abaixo define as conexões e a orientação que a arte de produção deverá seguir.</p>
+<div class="swatches" aria-label="Paleta de direção, sujeita ao ajuste junto dos personagens">
+<span class="swatch"><i style="background:#263a46"></i>Pedra azulada</span><span class="swatch"><i style="background:#705345"></i>Tijolo gasto</span><span class="swatch"><i style="background:#52483c"></i>Madeira úmida</span><span class="swatch"><i style="background:#354846"></i>Ferro oxidado</span><span class="swatch"><i style="background:#d8af66"></i>Luz âmbar</span>
+</div>
+</section>
+<section>
+<div class="eyebrow">02 / Diagnóstico</div><h2>O que precisa mudar</h2>
+<figure><img src="antes.png" width="1600" height="1000" alt="Captura atual do Farol: piso em grade, rampas listradas e pilares de aparência provisória."><figcaption>Captura do jogo feita durante o diagnóstico. As faixas claras são as rampas atuais. A imagem acima é conceito; esta imagem é gameplay.</figcaption></figure>
+<div class="principles"><div><span class="num">01</span><h3>Escada como estrutura</h3><p class="muted">Substituir a faixa repetida por um conjunto com início, degraus, chegada e laterais conectadas ao patamar. Uma subida não pode parecer um tapete sobre o chão.</p></div><div><span class="num">02</span><h3>Menos ruído no piso</h3><p class="muted">Remover desenhos de trilhos e engrenagens espalhados como textura. Concentrar juntas, marcas e pequenas peças perto da arquitetura.</p></div><div><span class="num">03</span><h3>Escala compartilhada</h3><p class="muted">Pilares, caixas, portas e personagens precisam compartilhar proporções e densidade de pixels. Redesenhar estruturas dominantes antes de acrescentar decoração.</p></div></div>
+</section>
+<section>
+<div class="eyebrow">03 / Circulação</div><h2>A arte segue o caminho real</h2>
+<p>As duas subidas existentes são laterais: a esquerda sobe para a direita e a direita sobe para a esquerda. O patamar central é baixo. A conexão ao norte, perto da lateral direita, também deve permanecer reconhecível.</p>
+<div class="schematic"><svg viewBox="0 0 940 650" role="img" aria-labelledby="map-title map-desc"><title id="map-title">Esquema de circulação do Balcão do Farol</title><desc id="map-desc">Sala retangular com duas entradas laterais, conexão ao norte à direita, patamar central e duas escadas que sobem para o centro. Uma rota inferior conecta os lados. Esquema simplificado sem os obstáculos atuais.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#e9bd72"/></marker></defs>
+<rect x="80" y="70" width="765" height="530" fill="#34434a" stroke="#90a7aa" stroke-width="3"/>
+<path d="M770 70V15H815V70M80 270H15V350H80M845 270H925V350H845" fill="#34434a" stroke="#90a7aa" stroke-width="3"/>
+<path d="M770 70H815M80 270V350M845 270V350" stroke="#34434a" stroke-width="5"/>
+<rect x="282" y="193" width="360" height="147" fill="#65716b" stroke="#c5cab4" stroke-width="2"/>
+<rect x="282" y="340" width="360" height="20" fill="#17272e"/>
+<rect x="192" y="193" width="90" height="147" fill="#817f6d"/><rect x="642" y="193" width="90" height="147" fill="#817f6d"/>
+<path d="M207 193V340M222 193V340M237 193V340M252 193V340M267 193V340M657 193V340M672 193V340M687 193V340M702 193V340M717 193V340" stroke="#d0c5a2" stroke-width="3"/>
+<path d="M203 263H271M721 263H653" stroke="#e9bd72" stroke-width="5" marker-end="url(#arrow)"/>
+<path d="M40 315H150V440H787V315H900" fill="none" stroke="#e9bd72" stroke-width="4" stroke-dasharray="9 7" marker-end="url(#arrow)"/>
+<path d="M790 286V100" fill="none" stroke="#e9bd72" stroke-width="4" stroke-dasharray="9 7" marker-end="url(#arrow)"/>
+<g fill="#f0eadb" font-family="system-ui,sans-serif" text-anchor="middle"><text x="460" y="258" font-size="22">PATAMAR BAIXO</text><text x="460" y="286" font-size="16">piso contínuo e pouca decoração</text><text x="237" y="180" font-size="17">sobe →</text><text x="687" y="180" font-size="17">← sobe</text><text x="470" y="485" font-size="21">PÁTIO INFERIOR LIVRE</text><text x="470" y="517" font-size="16">conexão entre as duas entradas</text><text x="158" y="385" font-size="16">Capela</text><text x="788" y="385" font-size="16">Pátio ferroviário</text><text x="680" y="43" font-size="16">conexão ao norte →</text><text x="460" y="635" font-size="14" fill="#b7c5c7">Esquema de intenção · obstáculos e medidas de produção serão reconciliados na implementação</text></g>
+</svg></div>
+<p class="note">A circulação não depende só de cor: bordas, orientação dos degraus e faces verticais precisam comunicar o desnível. Luzes reforçam o caminho sem criar falsas entradas.</p>
+</section>
+<section>
+<div class="eyebrow">04 / Construção</div><h2>Conjuntos maiores, em camadas</h2>
+<div class="two"><div><h3>O que será composição fixa</h3><ul><li>Escadas, laterais e patamar desenhados juntos.</li><li>Fachadas com suas portas, soleiras e sombras.</li><li>Bordas do cais, ancoragens e transições de material.</li><li>Piso composto em áreas grandes, com regiões de descanso visual.</li></ul></div><div><h3>O que continua separado</h3><ul><li>Caixas destrutíveis, barris, portões e objetos interativos.</li><li>Paredes e estruturas que ocultam parcialmente o personagem.</li><li>Água, fumaça, reflexos e luzes animadas.</li><li>Pequenas peças repetíveis de ligação, com bordas compatíveis.</li></ul></div></div>
+<p>Ordem de montagem: fundo e água → chão e degraus → sombras de contato → estruturas e atores ordenados pela posição dos pés → detalhes de primeiro plano → efeitos. A geometria determina o que é atravessável; a imagem precisa expressar essa mesma geometria.</p>
+<p class="muted">A meta é reduzir a repetição percebida, não eliminar todos os tiles. Uma placa pequena esticada sobre a sala inteira repetiria o problema de escala que já existe.</p>
+</section>
+<section>
+<div class="eyebrow">05 / Unidade do mundo</div><h2>Cada área tem um motivo para existir</h2>
+<p>A mesma pedra, madeira, luz e ferragem reaparecem em todo o porto. A função de cada espaço muda sua composição; não exige uma linguagem visual diferente.</p>
+<div class="table-wrap"><table><thead><tr><th>Área</th><th>Âncora visual</th><th>Tratamento e conexão</th></tr></thead><tbody>
+<tr><td>Desembarque</td><td>Cais e chegada temporal</td><td>Reconciliar a pintura existente com a paleta e a escala novas. Madeira leva ao piso mineral do pátio.</td></tr>
+<tr><td>Pátio dos Guindastes</td><td>Um conjunto de guindaste e carga</td><td>Trilhos contínuos e funcionais; carga agrupada nas bordas; centro de combate limpo.</td></tr>
+<tr><td>Armazém 7</td><td>Vigas e passagem de carga</td><td>Tábuas largas, reforços alinhados, soleiras de ferro; vãos com contorno e profundidade claros.</td></tr>
+<tr><td>Mercado de Peixe</td><td>Bancas e drenagem</td><td>Pedra molhada, toldos periféricos e pequenos restos junto às bancas. Mesmo cais do desembarque.</td></tr>
+<tr><td>Oficina</td><td>Bancada e manutenção do Titan</td><td>Ferramentas e luz quente perto da atividade; acesso e espaço de interação desobstruídos.</td></tr>
+<tr><td>Último Gerador</td><td>Máquina central</td><td>Cabos e canaletas conduzem ao gerador; circulação ao redor; iluminação elétrica localizada.</td></tr>
+<tr><td>Depósito de Munição</td><td>Baias de armazenamento</td><td>Coberturas agrupadas e explosivos legíveis; saída e parede secreta preservadas.</td></tr>
+<tr><td>Pátio Ferroviário</td><td>Uma linha férrea que atravessa o espaço</td><td>Trilhos com continuidade, carga lateral e travessias claras; sem trilhos decorativos aleatórios.</td></tr>
+<tr><td>Balcão do Farol</td><td>Patamar e farol</td><td>Conjunto de escadas completo; marco vertical periférico; pátio inferior aberto.</td></tr>
+<tr><td>Capela do Culto</td><td>Altar e arquitetura reaproveitada</td><td>Pedra do porto sob símbolos do culto. Reconciliar a placa existente e seus conectores, evitando emendas de estilo.</td></tr>
+<tr><td>Doque Seco</td><td>Estrutura de reparo naval</td><td>Laterais de pedra e ferro, andaimes periféricos, fossos com bordas contínuas e rotas de contorno.</td></tr>
+<tr><td>Arena do Almirante</td><td>Presença monumental do chefe</td><td>Preservar espaço para ler ataques; avaliar contraste e escala da placa atual contra o novo conjunto.</td></tr>
+<tr><td>Adega Inundada</td><td>Linha da água e passagens secas</td><td>Reutilizar os materiais em versão alagada; água rasa decorativa e queda real com leituras distintas.</td></tr>
+<tr><td>Contrabando</td><td>Carga escondida</td><td>Versão íntima do armazém, luz localizada e acesso coerente com a parede secreta.</td></tr>
+</tbody></table></div>
+</section>
+<section>
+<div class="eyebrow">06 / Produção e verificação</div><h2>Do conceito ao trecho jogável</h2>
+<ol><li><strong>Fixar a referência:</strong> revisar este conceito junto de Marty e dos inimigos na escala de jogo. Definir a densidade de pixels antes de produzir o kit.</li><li><strong>Desenhar sobre o mapa:</strong> alinhar escadas, patamar, entradas e conexão ao norte às regiões caminháveis. Decidir quais pilares deixam de existir e ajustar suas colisões junto da arte.</li><li><strong>Produzir o conjunto no PixelLab:</strong> usar a referência comum em todas as gerações; criar subpeças na escala de uso, com margens de encaixe e pontos de origem definidos.</li><li><strong>Integrar uma área completa:</strong> Farol e os dois encontros com corredores, incluindo sobreposição, sombras e elementos interativos.</li><li><strong>Verificar em movimento:</strong> atravessar ambos os sentidos, subir e descer, usar dash e salto, circular com Titan e parceiro; observar câmera, oclusão, tiros e transições.</li><li><strong>Expandir por grupos conectados:</strong> Farol e conexões → pátios e armazém → mercado e oficina → áreas especiais. Reutilizar materiais aprovados e inspecionar cada encontro entre áreas.</li></ol>
+<h3>Critérios de aceite do primeiro trecho</h3><ul><li>É possível apontar entrada, subida, chegada e saída sem texto de ajuda.</li><li>Todo bloqueio importante tem uma forma visível compatível; nenhuma escada desenhada leva a uma parede invisível.</li><li>Marty, inimigos e projéteis continuam legíveis sobre pisos e sombras.</li><li>Os encontros entre sala e corredor não apresentam costura, mudança de escala ou interrupção de borda.</li><li>O centro tem espaço de combate deliberado; os objetos mantêm função e posição plausíveis.</li><li>Sem crescimento excessivo de memória ou quedas perceptíveis de fluidez após integrar a área; medir no jogo.</li></ul>
+<details><summary>Notas de produção e origem</summary><p>O mapa atual do Farol ocupa 1700 × 1300 unidades. O patamar mede 800 × 360, e cada rampa 200 × 360. A simulação aplica 44 unidades de elevação. O conceito tem 688 × 384 pixels e proporção diferente: não deve ser aplicado diretamente ao retângulo do mapa.</p><p>Há três conexões a preservar: oeste para a Capela, leste para o Pátio Ferroviário e norte próximo ao canto direito. O esquema simplifica os obstáculos atuais. A arte de um farol é uma proposta de marco visual; sua posição final depende dessas conexões.</p><p>Origem: PixelLab Pro, geração <code>168988c6-693c-48ec-b077-4792c72f8ac6</code>. Prompt e rastreabilidade em <a href="manifest.json">manifest.json</a>. Um estudo de escadas retornou vazio; uma segunda tentativa foi descartada por colocar as escadas nas faces norte e sul e repetir o piso em grade. Esses estudos não integram a direção proposta. Registro em <a href="estudo-escadas-manifest.json">estudo-escadas-manifest.json</a>. Nenhum código ou asset de runtime foi substituído nesta etapa.</p></details>
+</section>
+<footer>Direção visual proposta, não arte final aprovada. Critérios de circulação foram comparados com o mapa e a simulação atuais; o conceito ainda exige adaptação para produção.</footer>
+</main><script>
+const concept=document.getElementById('concept');const fit=document.getElementById('fit');const native=document.getElementById('native');
+function setScale(isNative){concept.classList.toggle('native',isNative);fit.setAttribute('aria-pressed',String(!isNative));native.setAttribute('aria-pressed',String(isNative));}
+fit.addEventListener('click',()=>setScale(false));native.addEventListener('click',()=>setScale(true));
+</script></body></html>

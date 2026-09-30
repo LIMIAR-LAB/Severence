@@ -1,0 +1,20 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: tiles e props da arte 0.12 carregam (78 tiles, 77 props)
+PASS: 16 tiles PixelLab carregam em resolução nativa
+PASS: pilar PixelLab carrega
+PASS: paredes PixelLab carregam
+PASS: no início só o Desembarque está descoberto
+PASS: corredor que sai do Desembarque aparece
+PASS: Pátio dos Guindastes fica no escuro
+PASS: entrar no Pátio revela a sala
+PASS: Sala 01 alcançável a pé: chave
+PASS: Sala 01 alcançável a pé: saída para o corredor
+PASS: Sala 01 alcançável a pé: cais de granito
+PASS: Desembarque com inimigos: portões fechados
+PASS: portão fechado bloqueia a passagem
+PASS: sala limpa: portões abrem
+PASS: poça com tentáculo causa dano
+PASS: nova expedição: sala acende de novo (sem registro no futuro)
+PASS: depois de 0,5s nenhuma sala descoberta continua escurecida
+SCENERY_TESTS_DONE failures=0

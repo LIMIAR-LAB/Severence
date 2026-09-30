@@ -1,0 +1,32 @@
+{
+  "sha256": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "1E03B979522C077B0B1CDACA3DA269026A17006FF2A216F24776D45EEB43863F",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\world_view.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "5F22A52DBBEDD1CC86015E4E41403BA69937F16FEED121B1E9A3922F5F72C176",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\tests\\marty_actions_test.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "906F41AE69AF58295DA0F74B94FE51178685F8CA622A47613169B1BA6BC76F46",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\assets\\characters\\marty\\omega\\pixellab\\melee.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "8D7AD2A9816A03F85A46A875764F062200F72B3BA93EA13A3A39DE5AB4B3B4F6",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\.godot\\imported\\melee.png-0a75f57a3ab43572e1029a4833d8e732.ctex"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "9443C477C8C8F30D0EA778B9026ACC8F7E7F6E3545E7145A7F7751355B4DD0F6",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\.godot\\imported\\melee.png-0a75f57a3ab43572e1029a4833d8e732.md5"
+    }
+  ],
+  "head": "2f13b58960828ec8b0ab827dcd4bf3a513023245",
+  "source_md5": "83632C80EAA295B532DE94822B21F82B",
+  "import_metadata": "source_md5=\"852d4506717a1206441f17b41a8e14c4\"\ndest_md5=\"806c56809e746e4c084372f4a1db6169\"\n\n"
+}

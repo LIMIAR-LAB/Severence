@@ -1,0 +1,28 @@
+{
+	"modules": [
+		{
+			"id": "docks.farol.pilot",
+			"neighbor_rules": {
+				"height": {
+					"$type": "int",
+					"value": "0"
+				},
+				"material_family": "docks-stone"
+			},
+			"path": "res://scripts/scenarios/templates/farol.json",
+			"repeat_limit": {
+				"$type": "int",
+				"value": "1"
+			},
+			"sha256": "46088864afc12c521205a747f018574713d496f2636690d54b7b8e7c5c57f14a",
+			"version": {
+				"$type": "int",
+				"value": "1"
+			}
+		}
+	],
+	"schema": {
+		"$type": "int",
+		"value": "1"
+	}
+}

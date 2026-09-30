@@ -1,0 +1,161 @@
+{
+  "reviewed_at": "2026-09-30T10:57:31.879094-03:00",
+  "decision": "accepted_static_art_pilot_with_translation_sampling_caveat",
+  "scope": "Three flat stone joins, Marty and Titan, two origins, isolated workbench; 12 captures visually inspected.",
+  "findings": [
+    "West/east floor continuity retained; no visible empty seam or painted step across the aperture.",
+    "North corner silhouette remains clean; no border spill outside the room/corridor union in these captures.",
+    "No visible foreground strip occludes actor feet at these samples.",
+    "Small floor-detail pixel differences remain between origins: do not claim pixel-exact translation invariance. Cause not diagnosed by Art."
+  ],
+  "origin_comparison": [
+    {
+      "side": "west",
+      "actor": "marty",
+      "different_pixels_below_y80": 16,
+      "max_channel_difference": 14,
+      "exactly_identical": false
+    },
+    {
+      "side": "west",
+      "actor": "titan",
+      "different_pixels_below_y80": 12,
+      "max_channel_difference": 13,
+      "exactly_identical": false
+    },
+    {
+      "side": "east",
+      "actor": "marty",
+      "different_pixels_below_y80": 138,
+      "max_channel_difference": 14,
+      "exactly_identical": false
+    },
+    {
+      "side": "east",
+      "actor": "titan",
+      "different_pixels_below_y80": 137,
+      "max_channel_difference": 14,
+      "exactly_identical": false
+    },
+    {
+      "side": "north",
+      "actor": "marty",
+      "different_pixels_below_y80": 282,
+      "max_channel_difference": 14,
+      "exactly_identical": false
+    },
+    {
+      "side": "north",
+      "actor": "titan",
+      "different_pixels_below_y80": 282,
+      "max_channel_difference": 14,
+      "exactly_identical": false
+    }
+  ],
+  "follow_up": "Base should account for the minor origin-dependent floor sampling during continuous camera/movement validation. No asset repaint requested from these static captures.",
+  "limitations": [
+    "Traversal with radii 11/23 in both directions reported by coordinator; not re-executed by Art.",
+    "Continuous camera/movement and combat not reviewed.",
+    "No full wall/corner assembly acceptance from a floor-only join.",
+    "No shared runtime or catalog acceptance; SCN-03 not released."
+  ],
+  "captures": [
+    {
+      "file": "1800-join-east-marty.png",
+      "sha256": "5a5064a7aaf1f15dcee5571205667ef3cd617cd571502b53234439408e930609",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "1800-join-east-titan.png",
+      "sha256": "d9ef0200b6ba92ec2abd512fef854e84c6ee22db743f6f2332b0eb9777f8a9ca",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "1800-join-north-marty.png",
+      "sha256": "b52dd056a3188d04b88acdef0811eefc25d92dad11a18ee4227c9bb71e7491aa",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "1800-join-north-titan.png",
+      "sha256": "01bb73f71c486302f9bb47bd760620f890bb45f356932cadd978614774065135",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "1800-join-west-marty.png",
+      "sha256": "91b7a6a6b581d54b2839003a3969a2f2a448b38cb026b279d4aa4f38b0155128",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "1800-join-west-titan.png",
+      "sha256": "0ae973ff1ccf22d8e67c238a4c27b50d1ce76686a2d272a4e9be93f25f94c4dd",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-east-marty.png",
+      "sha256": "389d67dc5f59a6e8cbe0f22dbe69c13d313ff7b20b3e60fd3140c348d698d88a",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-east-titan.png",
+      "sha256": "a5fc41ce968a03eccb3e283e08a0dbc97546f30618ed9c5c372c7a76bbcc288a",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-north-marty.png",
+      "sha256": "4837e947485735ee894551ecee23efe75772beca76f5b996d06176d97924fb72",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-north-titan.png",
+      "sha256": "028fae72c02cf57a14b115b9fb87b64f27d7bc2f305f3ade8cbc5956e61fc52c",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-west-marty.png",
+      "sha256": "e1c9ca393d1d7b93d1432e6f7193132fbfc8f6f545f9bdd059bb3107a744c470",
+      "dimensions": [
+        1280,
+        800
+      ]
+    },
+    {
+      "file": "400-join-west-titan.png",
+      "sha256": "7d29d320f50902cc77fdfc7e49d340d19a4ea0e91fada7371592fe9925c469ed",
+      "dimensions": [
+        1280,
+        800
+      ]
+    }
+  ],
+  "connections_sha256": "a020c06d9fe6192dc1bf0d151268597d9e332f3638c22b605df009ad2df18103"
+}

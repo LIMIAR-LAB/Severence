@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: new result opens summary screen
+PASS: summary exposes both actions
+PASS: missing ornamental asset uses functional fallback
+PASS: faithful summary uses its own master canvas
+PASS: faithful summary keeps the approved 1672x941 composition
+PASS: summary canvas scales uniformly without distortion
+PASS: summary fit letterboxes arbitrary aspect ratios
+PASS: 16:10 viewport letterboxes vertically
+PASS: ultrawide viewport pillarboxes horizontally
+PASS: fish death selects editorial monster portrait
+PASS: editorial portrait is present at production resolution
+PASS: real missing-art branch keeps legacy fallback centered and readable
+PASS: fallback keeps both actions operable
+PASS: primary action receives controller focus
+PASS: return action closes report without mutating captured state
+PASS: new expedition starts a fresh run
+PASS: online guest cannot restart run
+PASS: guest summary closes when host starts the next run
+PASS: controller back returns from summary to refuge
+PASS: victory selects dedicated nucleus portrait
+PASS: victory treatment keeps the illustrated portrait slot
+RUN_SUMMARY_UI_TEST failures=0

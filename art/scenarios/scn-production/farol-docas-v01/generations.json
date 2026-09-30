@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0-preproduction",
+  "date": "2026-09-30",
+  "provider": "PixelLab",
+  "terms_url": "https://pixellab.ai/termsofservice",
+  "rights_note": "Generated with the connected account. Source tracked; legal review of distribution rights not performed by this art task.",
+  "runtime_ready": false,
+  "requests": [
+    {
+      "id": "4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8",
+      "tool": "create_building_kit",
+      "params": {
+        "floor_description": "Quiet low contrast large blue grey slate flagstones, weathered English industrial harbor 1941, broad irregular stone slabs, crisp restrained pixel clusters, subtle joints, no checkerboard, no symbols, soft upper left light",
+        "wall_description": "Blue grey aged harbor retaining masonry, broad slate stone blocks, muted charcoal recesses, moss limited to base, understated oxidized iron reinforcement, upper left light, crisp chunky pixel art",
+        "floor2_description": "Weathered desaturated brown dock timber planks, subtle broad grain and dark iron nails, quiet low contrast, same harbor palette",
+        "tile_size": 64,
+        "tile_type": "square_topdown",
+        "layout": "materials",
+        "wall_tiles": 1,
+        "outline_mode": "segmentation",
+        "seed": 440201
+      },
+      "role": "Matched material vocabulary. Review floor, edge and wall first. Automatic doors/pillars are not approved for gameplay."
+    },
+    {
+      "id": "78aaeca8-6702-49e3-8f2b-846c24c0ae54",
+      "asset_id": "98c84c22-8bfc-56f8-8257-5e0e479d9c9b",
+      "tool": "create_image_pro",
+      "params": {
+        "description": "Production study of ONE LOW harbor stone terrace architectural game module. Orthographic top down three quarter camera, north up, all platform edges horizontal or vertical, NOT isometric. Wide rectangular quiet blue grey stone landing. EXACTLY TWO SHORT STAIR FLIGHTS attached WEST and EAST ends; WEST stair ascends from LEFT toward RIGHT; EAST stair ascends from RIGHT toward LEFT. No staircase runs north-south. Both flights only FOUR BROAD TREADS, total vertical face height 44 pixels at native canvas scale, each riser eleven pixels. One shallow continuous front retaining wall 44 pixels high. NO upper extra flight, NO tower, NO door, NO railing blocking path, NO props. Platform top and landing continuous. Stair treads run vertically in screen so walking ascent is horizontal. Stairs have clearly shaded lateral cheek and foot contact, very low broad structure. Same muted blue slate, charcoal shadows, warm restrained upper-left illumination and crisp deliberate chunky pixels as reference; copy materials and rendering ONLY, explicitly remove its monumental multi-flight composition. Centered complete isolated architectural structure with margin, transparent exterior, no text.",
+        "width": 688,
+        "height": 384,
+        "no_background": true,
+        "style_image_url": "https://api.pixellab.ai/mcp/images/168988c6-693c-48ec-b077-4792c72f8ac6/download",
+        "seed": 440202
+      },
+      "role": "Direction study only. Output canvas cannot cover the 1200x360 footprint at native scale. Never stretch this image into a runtime plate."
+    }
+  ]
+}

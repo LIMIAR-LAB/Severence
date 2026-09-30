@@ -1,0 +1,489 @@
+{
+	"branch_count": 8,
+	"cycle_count": 2,
+	"edges": [
+		{
+			"from": "r0000",
+			"id": "e0000",
+			"to": "r0001"
+		},
+		{
+			"from": "r0001",
+			"id": "e0001",
+			"to": "r0002"
+		},
+		{
+			"from": "r0002",
+			"id": "e0002",
+			"to": "r0003"
+		},
+		{
+			"from": "r0003",
+			"id": "e0003",
+			"to": "r0004"
+		},
+		{
+			"from": "r0004",
+			"id": "e0004",
+			"to": "r0005"
+		},
+		{
+			"from": "r0005",
+			"id": "e0005",
+			"to": "r0006"
+		},
+		{
+			"from": "r0006",
+			"id": "e0006",
+			"to": "r0007"
+		},
+		{
+			"from": "r0007",
+			"id": "e0007",
+			"to": "r0008"
+		},
+		{
+			"from": "r0008",
+			"id": "e0008",
+			"to": "r0009"
+		},
+		{
+			"from": "r0001",
+			"id": "e0009",
+			"to": "r0010"
+		},
+		{
+			"from": "r0010",
+			"id": "e0010",
+			"to": "r0011"
+		},
+		{
+			"from": "r0011",
+			"id": "e0011",
+			"to": "r0012"
+		},
+		{
+			"from": "r0004",
+			"id": "e0012",
+			"to": "r0013"
+		},
+		{
+			"from": "r0013",
+			"id": "e0013",
+			"to": "r0014"
+		},
+		{
+			"from": "r0014",
+			"id": "e0014",
+			"to": "r0015"
+		},
+		{
+			"from": "r0007",
+			"id": "e0015",
+			"to": "r0016"
+		},
+		{
+			"from": "r0016",
+			"id": "e0016",
+			"to": "r0017"
+		},
+		{
+			"from": "r0017",
+			"id": "e0017",
+			"to": "r0018"
+		},
+		{
+			"from": "r0001",
+			"id": "e0018",
+			"to": "r0019"
+		},
+		{
+			"from": "r0019",
+			"id": "e0019",
+			"to": "r0020"
+		},
+		{
+			"from": "r0020",
+			"id": "e0020",
+			"to": "r0021"
+		},
+		{
+			"from": "r0004",
+			"id": "e0021",
+			"to": "r0022"
+		},
+		{
+			"from": "r0022",
+			"id": "e0022",
+			"to": "r0023"
+		},
+		{
+			"from": "r0023",
+			"id": "e0023",
+			"to": "r0004"
+		},
+		{
+			"from": "r0007",
+			"id": "e0024",
+			"to": "r0024"
+		},
+		{
+			"from": "r0024",
+			"id": "e0025",
+			"to": "r0025"
+		},
+		{
+			"from": "r0025",
+			"id": "e0026",
+			"to": "r0026"
+		},
+		{
+			"from": "r0001",
+			"id": "e0027",
+			"to": "r0027"
+		},
+		{
+			"from": "r0027",
+			"id": "e0028",
+			"to": "r0028"
+		},
+		{
+			"from": "r0028",
+			"id": "e0029",
+			"to": "r0029"
+		},
+		{
+			"from": "r0029",
+			"id": "e0030",
+			"to": "r0001"
+		},
+		{
+			"from": "r0004",
+			"id": "e0031",
+			"to": "r0030"
+		},
+		{
+			"from": "r0030",
+			"id": "e0032",
+			"to": "r0031"
+		}
+	],
+	"main_path": [
+		"r0000",
+		"r0001",
+		"r0002",
+		"r0003",
+		"r0004",
+		"r0005",
+		"r0006",
+		"r0007",
+		"r0008",
+		"r0009"
+	],
+	"ok": true,
+	"profile": {
+		"attachment": "hub",
+		"branch_length_max": 3.0,
+		"branch_length_min": 2.0,
+		"branches_max": 8.0,
+		"branches_min": 6.0,
+		"cycles_max": 4.0,
+		"cycles_min": 2.0,
+		"id": "portuario",
+		"spine_length": 2.0
+	},
+	"profile_id": "portuario",
+	"rooms": [
+		{
+			"id": "r0000",
+			"preview_cell": [
+				0,
+				0
+			],
+			"role": "entry",
+			"stage": 0
+		},
+		{
+			"id": "r0001",
+			"preview_cell": [
+				1,
+				0
+			],
+			"role": "transit",
+			"stage": 0
+		},
+		{
+			"id": "r0002",
+			"preview_cell": [
+				2,
+				0
+			],
+			"role": "transit",
+			"stage": 0
+		},
+		{
+			"id": "r0003",
+			"preview_cell": [
+				3,
+				0
+			],
+			"role": "clue",
+			"stage": 1
+		},
+		{
+			"id": "r0004",
+			"preview_cell": [
+				4,
+				0
+			],
+			"role": "transit",
+			"stage": 1
+		},
+		{
+			"id": "r0005",
+			"preview_cell": [
+				5,
+				0
+			],
+			"role": "transit",
+			"stage": 1
+		},
+		{
+			"id": "r0006",
+			"preview_cell": [
+				6,
+				0
+			],
+			"role": "miniboss",
+			"stage": 2
+		},
+		{
+			"id": "r0007",
+			"preview_cell": [
+				7,
+				0
+			],
+			"role": "transit",
+			"stage": 2
+		},
+		{
+			"id": "r0008",
+			"preview_cell": [
+				8,
+				0
+			],
+			"role": "transit",
+			"stage": 2
+		},
+		{
+			"id": "r0009",
+			"preview_cell": [
+				9,
+				0
+			],
+			"role": "boss",
+			"stage": 3
+		},
+		{
+			"id": "r0010",
+			"preview_cell": [
+				1,
+				1
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0011",
+			"preview_cell": [
+				2,
+				1
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0012",
+			"preview_cell": [
+				3,
+				1
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0013",
+			"preview_cell": [
+				1,
+				2
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0014",
+			"preview_cell": [
+				2,
+				2
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0015",
+			"preview_cell": [
+				3,
+				2
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0016",
+			"preview_cell": [
+				1,
+				3
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0017",
+			"preview_cell": [
+				2,
+				3
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0018",
+			"preview_cell": [
+				3,
+				3
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0019",
+			"preview_cell": [
+				1,
+				4
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0020",
+			"preview_cell": [
+				2,
+				4
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0021",
+			"preview_cell": [
+				3,
+				4
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0022",
+			"preview_cell": [
+				1,
+				5
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0023",
+			"preview_cell": [
+				2,
+				5
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0024",
+			"preview_cell": [
+				1,
+				6
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0025",
+			"preview_cell": [
+				2,
+				6
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0026",
+			"preview_cell": [
+				3,
+				6
+			],
+			"role": "optional",
+			"stage": 2
+		},
+		{
+			"id": "r0027",
+			"preview_cell": [
+				1,
+				7
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0028",
+			"preview_cell": [
+				2,
+				7
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0029",
+			"preview_cell": [
+				3,
+				7
+			],
+			"role": "optional",
+			"stage": 0
+		},
+		{
+			"id": "r0030",
+			"preview_cell": [
+				1,
+				8
+			],
+			"role": "optional",
+			"stage": 1
+		},
+		{
+			"id": "r0031",
+			"preview_cell": [
+				2,
+				8
+			],
+			"role": "optional",
+			"stage": 1
+		}
+	],
+	"schema": "provisional-graph-only",
+	"seed": "0",
+	"version": "scn-graph-provisional-v1"
+}

@@ -1,0 +1,19 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Marty embarca no Titan com gasolina
+PASS: tanque começa parcial (70%)
+PASS: andar pilotando consome gasolina
+PASS: turbo consome muito mais gasolina
+PASS: canhão pesado gasta gasolina
+PASS: bomba sai com gasolina
+PASS: sem gasolina o Titan não anda
+PASS: sem gasolina o canhão não dispara
+PASS: sem gasolina a bomba não sai
+PASS: piloto desembarca mesmo sem gasolina
+PASS: não embarca com o tanque vazio
+PASS: galão recarrega +40%% de gasolina
+PASS: com gasolina o Titan volta a funcionar
+PASS: bateria reanima o Spectre
+PASS: baú abre
+PASS: baú solta galão e bateria
+TITAN_FUEL_TESTS_DONE failures=0

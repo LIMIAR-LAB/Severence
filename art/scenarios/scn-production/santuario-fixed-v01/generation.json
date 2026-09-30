@@ -1,0 +1,11 @@
+{
+  "provider": "Higgsfield",
+  "model": "gpt_image_2_5",
+  "job_id": "7206bc7b-b78b-42ee-9268-19d9db17819f",
+  "count": 1,
+  "aspect_ratio": "3:4",
+  "quality": "high",
+  "resolution": "2k",
+  "estimated_credits": 2.75,
+  "status": "completed-integrated-awaiting-visual-review"
+}

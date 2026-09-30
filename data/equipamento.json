@@ -54,6 +54,7 @@
 			"desbloqueio": {"tipo": "inicio", "texto": "Disponível desde o início."},
 			"atributos": {"vida": "+3", "velocidade": "=430", "golpe": "=38", "dash": "=0.3"}
 		},
+		{"id": "azul", "categoria": "armadura", "nome": "FORMA AZUL", "subtitulo": "energia luminosa", "arma": "GARRA DO CHÃO", "raridade": "lendario", "descricao_curta": "R transforma. F ou T invoca a garra sob o alvo mais próximo.", "descricao": "Forma luminosa azul: R transforma por 5 minutos, com 3 corações de escudo e velocidade 430. F, botão direito ou T faz uma garra afiada surgir sob o inimigo visível mais próximo a até 520 pixels: 64 de dano, recarga de 1,2 segundo. A transformação recarrega em 60 segundos.", "icone": "res://assets/characters/marty/azul/front.tres", "icone_bloqueado": "", "card": "res://assets/characters/marty/azul/front.tres", "desbloqueado_no_inicio": true, "desbloqueio": {"tipo": "inicio", "texto": "Disponível desde o início."}, "atributos": {"vida": "+3", "velocidade": "=430", "golpe": "=64", "dash": "=0.3"}},
 		{
 			"id": "titan", "categoria": "robo", "nome": "TITAN", "subtitulo": "robô pilotável", "arma": "CANHÃO PESADO", "raridade": "raro",
 			"descricao_curta": "C invoca, E pilota. Canhão e bombas.",

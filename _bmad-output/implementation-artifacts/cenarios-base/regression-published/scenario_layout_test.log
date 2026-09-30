@@ -1,0 +1,36 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: baseline conserva autoria dos pilares
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: pilar fora do módulo preserva colisão autorada
+PASS: somente pilares substituídos pelo módulo são retirados
+PASS: três fossos novos além dos canais existentes
+PASS: fosso bloqueia o chão em (3500.0, 6410.0)
+PASS: fosso não cruza obstáculo em (3500.0, 6410.0)
+PASS: fosso bloqueia o chão em (4740.0, 4430.0)
+PASS: fosso não cruza obstáculo em (4740.0, 4430.0)
+PASS: fosso bloqueia o chão em (6840.0, 4440.0)
+PASS: fosso não cruza obstáculo em (6840.0, 4440.0)
+PASS: rota contorna fosso entre (3200.0, 6480.0) e (3900.0, 6480.0)
+PASS: rota contorna fosso entre (4450.0, 4530.0) e (5200.0, 4530.0)
+PASS: rota contorna fosso entre (6550.0, 4530.0) e (7500.0, 4530.0)
+PASS: inimigos não nascem em fossos
+PASS: acesso livre ao ponto shop
+PASS: acesso livre ao ponto side
+PASS: acesso livre ao ponto ammo_center
+PASS: acesso livre ao ponto warden
+PASS: acesso livre ao ponto mech
+PASS: paredes antigas não atravessam os pilares do depósito
+SCENARIO_LAYOUT_TESTS_DONE failures=0

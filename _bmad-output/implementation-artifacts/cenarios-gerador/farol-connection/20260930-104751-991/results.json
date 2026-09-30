@@ -1,0 +1,132 @@
+{
+  "source_before": "60BD5D93E65D377247F2BAC8F454274768D68A6073D61F5EC2215DDE356AE3D0",
+  "results": [
+    {
+      "case": "valid",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "missing_normal",
+      "script_error": true,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "string_normal",
+      "script_error": true,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "zero_normals",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "diagonal_normals",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "zero_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "negative_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "string_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "infinite_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "string_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "empty_type",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "empty_material",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "missing_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/width: incompatible"
+    },
+    {
+      "case": "mismatch_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/width: incompatible"
+    },
+    {
+      "case": "mismatch_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/height: incompatible"
+    },
+    {
+      "case": "mismatch_type",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/type: incompatible"
+    },
+    {
+      "case": "mismatch_material",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/material_family: incompatible"
+    },
+    {
+      "case": "same_normal",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/normal: must face opposite directions"
+    }
+  ],
+  "source_after": "60BD5D93E65D377247F2BAC8F454274768D68A6073D61F5EC2215DDE356AE3D0"
+}

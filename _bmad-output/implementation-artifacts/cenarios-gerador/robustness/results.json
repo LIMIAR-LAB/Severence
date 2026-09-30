@@ -1,0 +1,237 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "source_hashes_before": {
+    "room_contract.gd": "859DD929D9F3F3006C816CED5DBD6164522ED5450B83FEC956EB43E557B66344",
+    "biome_catalog.gd": "0A256BDAD024DDBF7DB7089DFE0000B3702E60938CBCA257BFF5868AAC060DBC"
+  },
+  "source_hashes_after": {
+    "room_contract.gd": "859DD929D9F3F3006C816CED5DBD6164522ED5450B83FEC956EB43E557B66344",
+    "biome_catalog.gd": "0A256BDAD024DDBF7DB7089DFE0000B3702E60938CBCA257BFF5868AAC060DBC"
+  },
+  "results": [
+    {
+      "case": "room_valid",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_valid",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_footprint_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_connector_scalar",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_width_string",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_spawn_missing_position",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_layer_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_obstacle_missing_rect",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_connector_empty_id",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_connector_bad_height",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_empty_template_id",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_negative_radius",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_bad_depth",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_point_missing_position",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_ramp_missing_rect",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_raised_scalar",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_origin_infinite",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "room_origin_nan",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_materials_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_pool_string",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_fallback_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_rules_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_roles_scalar",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_version_string",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_id_numeric",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_era_empty",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_atmosphere_null",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    },
+    {
+      "case": "biome_negative_width",
+      "exit_code": 0,
+      "script_error": true,
+      "result_present": false,
+      "accepted": null,
+      "errors": null
+    }
+  ]
+}

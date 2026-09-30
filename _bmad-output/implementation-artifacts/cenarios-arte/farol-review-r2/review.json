@@ -1,0 +1,146 @@
+{
+  "reviewed_at": "2026-09-30T10:45:17.715034-03:00",
+  "decision": "authored_geometry_retained_contact_visual_blocked_by_runtime_projection",
+  "capture_count": 16,
+  "files": [
+    {
+      "file": "1800-west-marty.png",
+      "sha256": "e0bdd00e39f4682ffd24d52d5bdacf04e394ab7d472c526727809c4ee3d0d025"
+    },
+    {
+      "file": "400-west-marty.png",
+      "sha256": "5cd322cbb33c6511f27c0cd5f7c2661a759243b98b71eacff611ffc34d351221"
+    },
+    {
+      "file": "1800-west-titan.png",
+      "sha256": "03608ac7ba2ccdc49ef239c1a46da7b0a2ebbad08a2272161fd33e49131d5d8e"
+    },
+    {
+      "file": "400-west-titan.png",
+      "sha256": "e1cb9f865a1f1bbcf60b286b753f9f81c8a0d856d63894debba2e63c26c65ef2"
+    },
+    {
+      "file": "1800-landing-marty.png",
+      "sha256": "786cc198b724819509eb4c1b64234b5b331ce84e39156b8bf59c5fd4895603ad"
+    },
+    {
+      "file": "400-landing-marty.png",
+      "sha256": "db52ee82dc430fc7f98ba38d07c9c7693220f33f0267298fd4da0988d151e9ed"
+    },
+    {
+      "file": "1800-landing-titan.png",
+      "sha256": "5939f4fd28216164ee9ad2e33b55d3a0e22e112f1bda923a3ce5e4f3363d417c"
+    },
+    {
+      "file": "400-landing-titan.png",
+      "sha256": "fe9030449492b3affde63cec66b05db6e7be68e896f3b07b3476396fd62bdccc"
+    },
+    {
+      "file": "1800-east-marty.png",
+      "sha256": "2e56ac30afada6fe425e618ccc093e5ac286920be1e4631f674897980d9f0f4c"
+    },
+    {
+      "file": "400-east-marty.png",
+      "sha256": "8378b0b3dcf6739949c45b28150a77902c08161f611d3e03a04a22690b964fad"
+    },
+    {
+      "file": "1800-east-titan.png",
+      "sha256": "0ffb3cea5ce997c63aa9da2a1e5376eb88f60cbb88ad470e2ceee2284d5f10cc"
+    },
+    {
+      "file": "400-east-titan.png",
+      "sha256": "265fa207b980504ab500a4f9cbfee8fcf2002a8f8cb7dc289fe1e100f5c1dcef"
+    },
+    {
+      "file": "1800-front-marty.png",
+      "sha256": "aef55a693204ba1e11235e9c6afc57ed2daa94d25909f84e470549c47850d9c3"
+    },
+    {
+      "file": "400-front-marty.png",
+      "sha256": "e152cf73ef4cdf7ee29dffa8119bb1afb465a51376928fe3bf167e7c7a1c7997"
+    },
+    {
+      "file": "1800-front-titan.png",
+      "sha256": "409dc991e1a1974177ba248a4a42663d9d10d2cf63859ed8f1f62017bc9e3930"
+    },
+    {
+      "file": "400-front-titan.png",
+      "sha256": "15e1666a4600442a08f8d8e6a17a8f086af4b17b6cab5c80f17d533ce8e1b551"
+    }
+  ],
+  "translation_comparison": [
+    {
+      "probe": "west",
+      "actor": "marty",
+      "identical_scene_below_ui": false,
+      "difference_bbox_relative_to_y80": [
+        274,
+        332,
+        275,
+        333
+      ]
+    },
+    {
+      "probe": "west",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    },
+    {
+      "probe": "landing",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    },
+    {
+      "probe": "landing",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    },
+    {
+      "probe": "east",
+      "actor": "marty",
+      "identical_scene_below_ui": false,
+      "difference_bbox_relative_to_y80": [
+        988,
+        332,
+        989,
+        333
+      ]
+    },
+    {
+      "probe": "east",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    },
+    {
+      "probe": "front",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    },
+    {
+      "probe": "front",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "difference_bbox_relative_to_y80": null
+    }
+  ],
+  "observations": [
+    "First-frame floor omission fixed",
+    "Separate actor probes remove mutual occlusion",
+    "Native shallow face and two lateral flights retained without cut feet at sampled positions",
+    "Marty shadow/selection ring and Titan shadow remain at physical rather than projected position, causing visible floating",
+    "Six of eight origin comparisons exactly match below UI; Marty west/east differ by one pixel each in selection-ring vicinity, not module texture"
+  ],
+  "review_method": "Visual inspection of eight origin1800 probes plus representative400 probes; exact pixel comparison of all eight origin pairs excluding header",
+  "scope_limits": [
+    "Static probes are not full continuous motion review",
+    "No combat acceptance",
+    "No human readability acceptance",
+    "No catalog publication"
+  ],
+  "art_files_changed": false
+}

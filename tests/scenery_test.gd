@@ -18,6 +18,9 @@ func _init() -> void:
 	for n in sc.tiles: if sc.tiles[n] == null: missing += 1
 	for n in sc.props: if sc.props[n] == null: missing += 1
 	check(missing == 0, "tiles e props da arte 0.12 carregam (%d tiles, %d props)" % [sc.tiles.size(), sc.props.size()])
+	check(sc.pixel_floors.size() == 16 and sc.pixel_floors.all(func(tile): return tile != null and tile.get_size() == Vector2(64, 64)), "16 tiles PixelLab carregam em resolução nativa")
+	check(sc.pixel_pillar != null and sc.pixel_pillar.get_size() == Vector2(192, 256), "pilar PixelLab carrega")
+	check(sc.pixel_wall_front != null and sc.pixel_wall_side != null, "paredes PixelLab carregam")
 	for o in DOCKS.OBSTACLES:
 		if not sc.has_prop(o[4]) and o[4] not in ["pillar", "container_red", "container_olive", "generator", "altar", "pew", "ammo", "crate_row"]:
 			check(false, "obstáculo sem arte: " + o[4])

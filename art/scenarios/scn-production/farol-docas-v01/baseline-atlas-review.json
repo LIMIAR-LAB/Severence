@@ -1,0 +1,44 @@
+{
+  "captured_at": "2026-09-30T10:12:05.6425996-03:00",
+  "purpose": "Read-only working-copy baseline for art proposal; not a runtime capture",
+  "git_head": "0f85249e563c69cc189bd17cd26ffac964b4dcac",
+  "files": [
+    {
+      "path": "scripts/world_view.gd",
+      "sha256": "8b25873fdc21b2f864d68eb86039777d7c67c760bc77c7a8faa141ca99a1f0ff"
+    },
+    {
+      "path": "scripts/dock_scenery.gd",
+      "sha256": "fcce32110d5e47f4bf6cb854dc1619080e9987fc0ef7007da78b0f055f36ed2b"
+    },
+    {
+      "path": "scripts/docks_map.gd",
+      "sha256": "80db4051ccb8e044e66fb6dafbadcddd7934755644956e550aee1502d24a3c18"
+    },
+    {
+      "path": "scripts/simulation.gd",
+      "sha256": "5ab88b2cb85298eb26d833a737639aada1e872bc4dfd52d5bc40ae797fc41334"
+    },
+    {
+      "path": "scripts/scenarios/room_contract.gd",
+      "sha256": "2d9abee477d245e58d0876036fde5c7355ee53b69ce6fc00e9792f959c0de424"
+    },
+    {
+      "path": "scripts/scenarios/room_preview.gd",
+      "sha256": "f71234c139df7c510cbdd1bc4b39d3ce244719aa286d95ca7ef442edce6701cc"
+    },
+    {
+      "path": "_bmad-output/implementation-artifacts/cenarios-base/contrato-v1.md",
+      "sha256": "79183a4a2f8593db7d4e91901ab04bfaf5adfb8aca5c0ab03d99363b5102d6b0"
+    }
+  ],
+  "end_check_at": "2026-09-30T10:14:40.331151-03:00",
+  "changed_during_art_review": [
+    {
+      "path": "scripts/scenarios/room_contract.gd",
+      "start_sha256": "2d9abee477d245e58d0876036fde5c7355ee53b69ce6fc00e9792f959c0de424",
+      "end_sha256": "5dda61ba979b410d6c8e027941ae60c097eae317bee4659207748ad94685e14c"
+    }
+  ],
+  "snapshot_note": "Files hashed individually in a shared checkout; this is not an atomic source snapshot or game-capture baseline."
+}

@@ -1,0 +1,30 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: exclusive mech seat for simultaneous requests
+PASS: mech integrity persists across embark/disembark
+PASS: blocked disembark preserves occupant
+PASS: valid exit clears seat
+PASS: golpe pesado tira 1 coração
+PASS: golpe comum tira meio coração
+PASS: escudo Ômega absorve o golpe antes da vida
+PASS: airborne damage rule is consistent
+PASS: diagonal jump moves on both axes
+PASS: same seed reproduces encounters
+PASS: different seed changes encounters
+PASS: locked chest cannot open without key
+PASS: chest consumes exactly one key
+PASS: shop purchase is atomic and stock limited
+PASS: melee cooldown prevents repeated damage per frame
+PASS: fast projectile sweep hits once without tunnelling
+PASS: optional encounter spawns seven guards
+PASS: optional reward granted on completion
+PASS: optional reward cannot repeat
+PASS: secret opens a traversable corridor
+PASS: ramp interpolates elevation
+PASS: raised balcony ledge cannot be walked through
+PASS: ramp allows walking onto raised balcony
+PASS: AI navigation connects arrival to boss
+PASS: partner can revive downed player
+PASS: extraction awards permanent armor and returns to hub
+PASS: network state roundtrip
+SIMULATION_TESTS: 27 checks, 0 failures

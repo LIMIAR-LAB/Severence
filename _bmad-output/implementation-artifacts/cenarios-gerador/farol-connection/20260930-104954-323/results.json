@@ -1,0 +1,132 @@
+{
+  "source_before": "7C89D5BDFF654C070BE54558AFF04C315A2E0A488F40DF7100A3485156DBB208",
+  "source_after": "7C89D5BDFF654C070BE54558AFF04C315A2E0A488F40DF7100A3485156DBB208",
+  "results": [
+    {
+      "case": "valid",
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "error": ""
+    },
+    {
+      "case": "missing_normal",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/normal: expected Vector2"
+    },
+    {
+      "case": "string_normal",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/b/normal: expected Vector2"
+    },
+    {
+      "case": "zero_normals",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/normal: expected cardinal direction"
+    },
+    {
+      "case": "diagonal_normals",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/normal: expected cardinal direction"
+    },
+    {
+      "case": "zero_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/width: must be positive"
+    },
+    {
+      "case": "negative_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/width: must be positive"
+    },
+    {
+      "case": "string_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/width: expected number"
+    },
+    {
+      "case": "infinite_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/height: expected finite number"
+    },
+    {
+      "case": "string_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/height: expected number"
+    },
+    {
+      "case": "empty_type",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/type: expected nonempty string"
+    },
+    {
+      "case": "empty_material",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/material_family: expected nonempty string"
+    },
+    {
+      "case": "missing_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/a/width: expected number"
+    },
+    {
+      "case": "mismatch_width",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/width: incompatible"
+    },
+    {
+      "case": "mismatch_height",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/height: incompatible"
+    },
+    {
+      "case": "mismatch_type",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/type: incompatible"
+    },
+    {
+      "case": "mismatch_material",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/material_family: incompatible"
+    },
+    {
+      "case": "same_normal",
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "error": "connector/normal: must face opposite directions"
+    }
+  ]
+}

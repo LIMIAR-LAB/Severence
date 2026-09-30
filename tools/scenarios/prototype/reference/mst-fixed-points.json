@@ -1,0 +1,59 @@
+{
+	"edges": [
+		[
+			0,
+			1
+		],
+		[
+			1,
+			2
+		],
+		[
+			2,
+			3
+		],
+		[
+			3,
+			4
+		]
+	],
+	"mode": "original_mst_function_fixed_points_no_physics",
+	"rooms": [
+		{
+			"id": 0,
+			"position": [
+				40.0,
+				80.0
+			]
+		},
+		{
+			"id": 1,
+			"position": [
+				0.0,
+				40.0
+			]
+		},
+		{
+			"id": 2,
+			"position": [
+				0.0,
+				0.0
+			]
+		},
+		{
+			"id": 3,
+			"position": [
+				40.0,
+				0.0
+			]
+		},
+		{
+			"id": 4,
+			"position": [
+				80.0,
+				20.0
+			]
+		}
+	],
+	"schema": "reference-observation-v0"
+}

@@ -10,6 +10,8 @@ inputDocuments:
 
 ## Overview
 
+**Atualização de escopo (30/09/2026):** Tsmar revogou macro fixo em favor de fases totalmente procedurais por bioma, com Doca/Desembarque e boss como possíveis composições fixas. O detalhamento está em [epics-cenarios.md](epics-cenarios.md). As formulações antigas de FR7–FR9, NFR2/NFR4/NFR5 e Epic 3 abaixo são histórico do plano original, substituídas pelos contratos SCN e pelo adendo da arquitetura. Run, estado e meta continuam dependências reutilizáveis, não entregas presumidas.
+
 This document provides the complete epic and story breakdown for transforming
 "Severence — Ecos do Tempo" into a roguelike, decomposing the decisions sealed in
 `docs/ARQUITETURA_ROGUELIKE.md` into implementable stories. There is no formal GDD

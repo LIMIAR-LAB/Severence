@@ -125,4 +125,5 @@ func _initialize() -> void:
 	ui.content.find_child("Refuge", true, false).pressed.emit()
 	check(app.playing and app.sim.coop == "local" and app.sim.mode == "hub", "coop local inicia no refúgio")
 	print("TITLE_SCREEN_TESTS_DONE failures=%d" % failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures > 0 else 0)

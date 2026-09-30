@@ -1,0 +1,7272 @@
+{
+	"corridors": [
+		{
+			"$type": "Rect2",
+			"values": [
+				2100.0,
+				6400.0,
+				800.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				900.0,
+				4900.0,
+				200.0,
+				1200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4600.0,
+				6300.0,
+				700.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				5100.0,
+				6300.0,
+				200.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7800.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7800.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4900.0,
+				6300.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				6300.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				6300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				6500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				6700.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				6900.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7100.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4700.0,
+				7700.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6500.0,
+				7800.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6700.0,
+				7800.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				6400.0,
+				700.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				6400.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6700.0,
+				7700.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6700.0,
+				7500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6700.0,
+				7300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6700.0,
+				7100.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6500.0,
+				7100.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				7100.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				6900.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				6700.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6300.0,
+				6500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				8300.0,
+				6400.0,
+				1200.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9850.0,
+				5700.0,
+				200.0,
+				500.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9850.0,
+				5700.0,
+				250.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9350.0,
+				5100.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9300.0,
+				5300.0,
+				250.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9700.0,
+				5700.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9500.0,
+				5700.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9300.0,
+				5700.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9300.0,
+				5500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9300.0,
+				5300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				7300.0,
+				5100.0,
+				200.0,
+				1000.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				8100.0,
+				4500.0,
+				800.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6000.0,
+				4400.0,
+				600.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				4300.0,
+				5100.0,
+				200.0,
+				800.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3700.0,
+				4400.0,
+				600.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1700.0,
+				4400.0,
+				500.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1700.0,
+				4400.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1400.0,
+				4200.0,
+				500.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1700.0,
+				4200.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1700.0,
+				4300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				700.0,
+				2300.0,
+				200.0,
+				1400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				1600.0,
+				1200.0,
+				700.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				2100.0,
+				1200.0,
+				200.0,
+				300.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				2300.0,
+				1500.0,
+				800.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				2300.0,
+				1500.0,
+				200.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				2100.0,
+				1300.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				2300.0,
+				1300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3600.0,
+				3500.0,
+				200.0,
+				500.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3600.0,
+				3500.0,
+				300.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2100.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2300.0,
+				200.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3500.0,
+				3500.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				3500.0,
+				400.0,
+				200.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				3300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				3100.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2900.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2700.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2500.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3300.0,
+				2300.0,
+				200.0,
+				400.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				9300.0,
+				3200.0,
+				200.0,
+				1000.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				6740.0,
+				3400.0,
+				200.0,
+				600.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				3040.0,
+				5136.0,
+				128.0,
+				728.0
+			]
+		},
+		{
+			"$type": "Rect2",
+			"values": [
+				5400.0,
+				5136.0,
+				128.0,
+				2328.0
+			]
+		}
+	],
+	"doors": [
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-00",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-00:entry",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					2200.0,
+					6500.0
+				]
+			},
+			"room": "entry",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-00",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-00:cranes",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					2800.0,
+					6500.0
+				]
+			},
+			"room": "cranes",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-01",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-01:entry",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1000.0,
+					6000.0
+				]
+			},
+			"room": "entry",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-01",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-01:chapel",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1000.0,
+					5000.0
+				]
+			},
+			"room": "chapel",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-02",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-02:cranes",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					4700.0,
+					6400.0
+				]
+			},
+			"room": "cranes",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-02",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-02:warehouse",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					5000.0,
+					7900.0
+				]
+			},
+			"room": "warehouse",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-03",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-03:warehouse",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6600.0,
+					7900.0
+				]
+			},
+			"room": "warehouse",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-03",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-03:market",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6900.0,
+					6500.0
+				]
+			},
+			"room": "market",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-04",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-04:market",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					8400.0,
+					6500.0
+				]
+			},
+			"room": "market",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-04",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-04:shop",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					9400.0,
+					6500.0
+				]
+			},
+			"room": "shop",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-05",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-05:shop",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					9950.0,
+					6100.0
+				]
+			},
+			"room": "shop",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-05",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-05:generator",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					9450.0,
+					5200.0
+				]
+			},
+			"room": "generator",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-06",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-06:market",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					7400.0,
+					6000.0
+				]
+			},
+			"room": "market",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-06",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-06:ammo",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					7400.0,
+					5200.0
+				]
+			},
+			"room": "ammo",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-07",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-07:generator",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					8800.0,
+					4600.0
+				]
+			},
+			"room": "generator",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-07",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-07:ammo",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					8200.0,
+					4600.0
+				]
+			},
+			"room": "ammo",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-08",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-08:ammo",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6500.0,
+					4500.0
+				]
+			},
+			"room": "ammo",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-08",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-08:rails",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6100.0,
+					4500.0
+				]
+			},
+			"room": "rails",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-09",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-09:cranes",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					4400.0,
+					5800.0
+				]
+			},
+			"room": "cranes",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-09",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-09:rails",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					4400.0,
+					5200.0
+				]
+			},
+			"room": "rails",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-10",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-10:rails",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					4200.0,
+					4500.0
+				]
+			},
+			"room": "rails",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-10",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-10:stairs",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3800.0,
+					4500.0
+				]
+			},
+			"room": "stairs",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-11",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-11:stairs",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					2100.0,
+					4500.0
+				]
+			},
+			"room": "stairs",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-11",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-11:chapel",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1500.0,
+					4300.0
+				]
+			},
+			"room": "chapel",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-12",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-12:chapel",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					800.0,
+					3600.0
+				]
+			},
+			"room": "chapel",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-12",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-12:drydock",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					800.0,
+					2400.0
+				]
+			},
+			"room": "drydock",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-13",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-13:drydock",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1700.0,
+					1300.0
+				]
+			},
+			"room": "drydock",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-13",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-13:boss",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3000.0,
+					1600.0
+				]
+			},
+			"room": "boss",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-14",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-14:stairs",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3700.0,
+					3900.0
+				]
+			},
+			"room": "stairs",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-1",
+			"edge_id": "corridor-14",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-14:boss",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3400.0,
+					2200.0
+				]
+			},
+			"room": "boss",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-2",
+			"edge_id": "corridor-15",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-15:generator",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					9400.0,
+					4100.0
+				]
+			},
+			"room": "generator",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "door-0",
+			"edge_id": "corridor-15",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "corridor-15:cellar",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					9400.0,
+					3300.0
+				]
+			},
+			"room": "cellar",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "secret-exit",
+			"edge_id": "secret",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "secret:ammo",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6840.0,
+					3900.0
+				]
+			},
+			"room": "ammo",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "secret-entry",
+			"edge_id": "secret",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "secret:secret",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					6840.0,
+					3500.0
+				]
+			},
+			"room": "secret",
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"connector_id": "shortcut-south",
+			"edge_id": "shortcut-cranes",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "shortcut-cranes:stairs",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3104.0,
+					5200.0
+				]
+			},
+			"room": "stairs",
+			"type": "shortcut",
+			"width": {
+				"$type": "int",
+				"value": "128"
+			}
+		},
+		{
+			"connector_id": "shortcut-north",
+			"edge_id": "shortcut-cranes",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "shortcut-cranes:cranes",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					3104.0,
+					5800.0
+				]
+			},
+			"room": "cranes",
+			"type": "shortcut",
+			"width": {
+				"$type": "int",
+				"value": "128"
+			}
+		},
+		{
+			"connector_id": "shortcut-south",
+			"edge_id": "shortcut-warehouse",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "shortcut-warehouse:rails",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					5464.0,
+					5200.0
+				]
+			},
+			"room": "rails",
+			"type": "shortcut",
+			"width": {
+				"$type": "int",
+				"value": "128"
+			}
+		},
+		{
+			"connector_id": "shortcut-north",
+			"edge_id": "shortcut-warehouse",
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "shortcut-warehouse:warehouse",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					5464.0,
+					7400.0
+				]
+			},
+			"room": "warehouse",
+			"type": "shortcut",
+			"width": {
+				"$type": "int",
+				"value": "128"
+			}
+		}
+	],
+	"errors": [],
+	"manifest": {
+		"attempts": {
+			"$type": "int",
+			"value": "2"
+		},
+		"caps_needed": [],
+		"catalog_fingerprint": "fad62e8412ee905c6d5dee427b4df90d217294bb39677d872ba966a18c30b840",
+		"corridor_width": 200.0,
+		"edges": [
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "0"
+				},
+				"endpoint_width": 200.0,
+				"from": "entry",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						2200.0,
+						6500.0
+					]
+				},
+				"id": "corridor-00",
+				"to": "cranes",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						2800.0,
+						6500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "1"
+				},
+				"endpoint_width": 200.0,
+				"from": "entry",
+				"from_connector": "door-0",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						1000.0,
+						6000.0
+					]
+				},
+				"id": "corridor-01",
+				"to": "chapel",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						1000.0,
+						5000.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "14"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "2"
+				},
+				"endpoint_width": 200.0,
+				"from": "cranes",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						4700.0,
+						6400.0
+					]
+				},
+				"id": "corridor-02",
+				"to": "warehouse",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						5000.0,
+						7900.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "13"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "16"
+				},
+				"endpoint_width": 200.0,
+				"from": "warehouse",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						6600.0,
+						7900.0
+					]
+				},
+				"id": "corridor-03",
+				"to": "market",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						6900.0,
+						6500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "29"
+				},
+				"endpoint_width": 200.0,
+				"from": "market",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						8400.0,
+						6500.0
+					]
+				},
+				"id": "corridor-04",
+				"to": "shop",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						9400.0,
+						6500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "9"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "30"
+				},
+				"endpoint_width": 200.0,
+				"from": "shop",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						9950.0,
+						6100.0
+					]
+				},
+				"id": "corridor-05",
+				"to": "generator",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						9450.0,
+						5200.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "39"
+				},
+				"endpoint_width": 200.0,
+				"from": "market",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						7400.0,
+						6000.0
+					]
+				},
+				"id": "corridor-06",
+				"to": "ammo",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						7400.0,
+						5200.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "40"
+				},
+				"endpoint_width": 200.0,
+				"from": "generator",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						8800.0,
+						4600.0
+					]
+				},
+				"id": "corridor-07",
+				"to": "ammo",
+				"to_connector": "door-1",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						8200.0,
+						4600.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "41"
+				},
+				"endpoint_width": 200.0,
+				"from": "ammo",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						6500.0,
+						4500.0
+					]
+				},
+				"id": "corridor-08",
+				"to": "rails",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						6100.0,
+						4500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "42"
+				},
+				"endpoint_width": 200.0,
+				"from": "cranes",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						4400.0,
+						5800.0
+					]
+				},
+				"id": "corridor-09",
+				"to": "rails",
+				"to_connector": "door-1",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						4400.0,
+						5200.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "43"
+				},
+				"endpoint_width": 200.0,
+				"from": "rails",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						4200.0,
+						4500.0
+					]
+				},
+				"id": "corridor-10",
+				"to": "stairs",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						3800.0,
+						4500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "5"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "44"
+				},
+				"endpoint_width": 200.0,
+				"from": "stairs",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						2100.0,
+						4500.0
+					]
+				},
+				"id": "corridor-11",
+				"to": "chapel",
+				"to_connector": "door-1",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						1500.0,
+						4300.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "49"
+				},
+				"endpoint_width": 200.0,
+				"from": "chapel",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						800.0,
+						3600.0
+					]
+				},
+				"id": "corridor-12",
+				"to": "drydock",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						800.0,
+						2400.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "6"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "50"
+				},
+				"endpoint_width": 200.0,
+				"from": "drydock",
+				"from_connector": "door-1",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						1700.0,
+						1300.0
+					]
+				},
+				"id": "corridor-13",
+				"to": "boss",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						3000.0,
+						1600.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "12"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "56"
+				},
+				"endpoint_width": 200.0,
+				"from": "stairs",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						3700.0,
+						3900.0
+					]
+				},
+				"id": "corridor-14",
+				"to": "boss",
+				"to_connector": "door-1",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						3400.0,
+						2200.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "68"
+				},
+				"endpoint_width": 200.0,
+				"from": "generator",
+				"from_connector": "door-2",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						9400.0,
+						4100.0
+					]
+				},
+				"id": "corridor-15",
+				"to": "cellar",
+				"to_connector": "door-0",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						9400.0,
+						3300.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "69"
+				},
+				"endpoint_width": 200.0,
+				"from": "ammo",
+				"from_connector": "secret-exit",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						6840.0,
+						3900.0
+					]
+				},
+				"hidden": true,
+				"id": "secret",
+				"to": "secret",
+				"to_connector": "secret-entry",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						6840.0,
+						3500.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "70"
+				},
+				"endpoint_width": {
+					"$type": "int",
+					"value": "128"
+				},
+				"from": "stairs",
+				"from_connector": "shortcut-south",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						3104.0,
+						5200.0
+					]
+				},
+				"id": "shortcut-cranes",
+				"shortcut": true,
+				"to": "cranes",
+				"to_connector": "shortcut-north",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						3104.0,
+						5800.0
+					]
+				}
+			},
+			{
+				"corridor_count": {
+					"$type": "int",
+					"value": "1"
+				},
+				"corridor_start": {
+					"$type": "int",
+					"value": "71"
+				},
+				"endpoint_width": {
+					"$type": "int",
+					"value": "128"
+				},
+				"from": "rails",
+				"from_connector": "shortcut-south",
+				"from_position": {
+					"$type": "Vector2",
+					"values": [
+						5464.0,
+						5200.0
+					]
+				},
+				"id": "shortcut-warehouse",
+				"shortcut": true,
+				"to": "warehouse",
+				"to_connector": "shortcut-north",
+				"to_position": {
+					"$type": "Vector2",
+					"values": [
+						5464.0,
+						7400.0
+					]
+				}
+			}
+		],
+		"gates_needed": [
+			{
+				"connector_id": "shortcut-north",
+				"edge_id": "shortcut-warehouse",
+				"kind": "maze_wall",
+				"rect": {
+					"$type": "Rect2",
+					"values": [
+						5400.0,
+						7500.0,
+						90.0,
+						650.0
+					]
+				},
+				"requires_replacement": true,
+				"room": "warehouse"
+			}
+		],
+		"rejections": {
+			"edge:corridor-03": {
+				"$type": "int",
+				"value": "1"
+			},
+			"routing_or_ports": {
+				"$type": "int",
+				"value": "1"
+			}
+		},
+		"reservations": [
+			{
+				"$type": "Rect2",
+				"values": [
+					2552.0,
+					170.0,
+					3196.0,
+					2098.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					200.0,
+					2700.0,
+					1600.0,
+					3300.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					187.0,
+					6000.0,
+					2013.0,
+					1280.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					2752.0,
+					5570.0,
+					2296.0,
+					1598.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					152.0,
+					370.0,
+					1796.0,
+					2098.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					4152.0,
+					3670.0,
+					2296.0,
+					1598.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					6452.0,
+					3670.0,
+					1796.0,
+					1598.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					8752.0,
+					3870.0,
+					1396.0,
+					1398.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					7452.0,
+					1970.0,
+					2196.0,
+					1398.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					6572.0,
+					5770.0,
+					1876.0,
+					1398.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					6152.0,
+					2570.0,
+					996.0,
+					998.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					9352.0,
+					5870.0,
+					1196.0,
+					1198.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					2052.0,
+					3670.0,
+					1796.0,
+					1598.0
+				]
+			},
+			{
+				"$type": "Rect2",
+				"values": [
+					4952.0,
+					7170.0,
+					1696.0,
+					1698.0
+				]
+			}
+		],
+		"rooms": [
+			{
+				"id": "ammo",
+				"role": "fight",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1796.0,
+								1598.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									900.0,
+									1300.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1700.0,
+									700.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "secret-exit",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									340.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1700.0,
+								1300.0
+							]
+						}
+					],
+					"gaps": [
+						{
+							"$type": "Rect2",
+							"values": [
+								640.0,
+								740.0,
+								280.0,
+								200.0
+							]
+						}
+					],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1700.0,
+									1300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									130.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									205.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									280.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1340.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1415.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "ammo",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1490.0,
+									150.0,
+									70.0,
+									50.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_red",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									150.0,
+									1020.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1380.0,
+									1020.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "sandbags",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									140.0,
+									680.0,
+									110.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "sandbags",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1400.0,
+									680.0,
+									110.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									650.0,
+									200.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									698.0,
+									200.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									668.0,
+									236.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									370.0,
+									540.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1290.0,
+									540.0,
+									220.0,
+									160.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "fight",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									400.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.ammo",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"fixed_origin": {
+					"$type": "Vector2",
+					"values": [
+						3000.0,
+						400.0
+					]
+				},
+				"id": "boss",
+				"role": "boss",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								2496.0,
+								2098.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-448.0,
+								70.0,
+								496.0,
+								798.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								2352.0,
+								170.0,
+								396.0,
+								898.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1200.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									400.0,
+									1800.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								2400.0,
+								1800.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-400.0,
+								300.0,
+								400.0,
+								500.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								2400.0,
+								400.0,
+								300.0,
+								600.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									2400.0,
+									1800.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-400.0,
+									300.0,
+									400.0,
+									500.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-2",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2400.0,
+									400.0,
+									300.0,
+									600.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									290.0,
+									275.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1890.0,
+									275.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									290.0,
+									1275.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1890.0,
+									1275.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									232.0,
+									174.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2132.0,
+									174.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									232.0,
+									1624.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2132.0,
+									1624.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									782.0,
+									724.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "brazier",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1582.0,
+									724.0,
+									36.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									129.0,
+									870.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									177.0,
+									876.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									147.0,
+									908.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2179.0,
+									870.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2227.0,
+									876.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									2197.0,
+									908.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "lamp_post",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									589.0,
+									582.0,
+									22.0,
+									18.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "lamp_post",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1789.0,
+									582.0,
+									22.0,
+									18.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "boss",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									40.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.boss",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "cellar",
+				"role": "chest",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1596.0,
+								1398.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-648.0,
+								-30.0,
+								696.0,
+								898.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1300.0,
+									1100.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1500.0,
+								1100.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-600.0,
+								200.0,
+								600.0,
+								600.0
+							]
+						}
+					],
+					"gaps": [
+						{
+							"$type": "Rect2",
+							"values": [
+								350.0,
+								0.0,
+								80.0,
+								700.0
+							]
+						}
+					],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1500.0,
+									1100.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-600.0,
+									200.0,
+									600.0,
+									600.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									80.0,
+									120.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									130.0,
+									120.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									180.0,
+									120.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									80.0,
+									320.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									130.0,
+									320.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									180.0,
+									320.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									80.0,
+									520.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									130.0,
+									520.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									180.0,
+									520.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									550.0,
+									90.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_2",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									610.0,
+									90.0,
+									56.0,
+									40.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "chest",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									40.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.cellar",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"fixed_origin": {
+					"$type": "Vector2",
+					"values": [
+						200.0,
+						3600.0
+					]
+				},
+				"id": "chapel",
+				"role": "story",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								-900.0,
+								1600.0,
+								3300.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									800.0,
+									1400.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1300.0,
+									700.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									600.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1300.0,
+								1400.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								100.0,
+								1400.0,
+								300.0,
+								340.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1000.0,
+								1400.0,
+								300.0,
+								340.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1300.0,
+									1400.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									100.0,
+									1400.0,
+									300.0,
+									340.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-2",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1000.0,
+									1400.0,
+									300.0,
+									340.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "altar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									480.0,
+									288.0,
+									340.0,
+									62.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									375.0,
+									538.0,
+									165.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									750.0,
+									538.0,
+									165.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									365.0,
+									628.0,
+									175.0,
+									38.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									740.0,
+									628.0,
+									175.0,
+									38.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									365.0,
+									718.0,
+									180.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "pew",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									735.0,
+									718.0,
+									185.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_reliquary",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									165.0,
+									910.0,
+									275.0,
+									112.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_reliquary",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									855.0,
+									910.0,
+									285.0,
+									112.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									400.0,
+									300.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									800.0,
+									0.0,
+									500.0,
+									300.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									105.0,
+									1400.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1195.0,
+									0.0,
+									105.0,
+									530.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1195.0,
+									870.0,
+									105.0,
+									530.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									1022.0,
+									250.0,
+									378.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "chapel_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1150.0,
+									1022.0,
+									150.0,
+									378.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "story",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									440.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.chapel",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "cranes",
+				"role": "fight",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1996.0,
+								1598.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1852.0,
+								-230.0,
+								396.0,
+								598.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									700.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1900.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1600.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "shortcut-north",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									304.0,
+									0.0
+								]
+							},
+							"type": "shortcut",
+							"width": 128.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1900.0,
+								1300.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1900.0,
+								0.0,
+								300.0,
+								300.0
+							]
+						}
+					],
+					"gaps": [
+						{
+							"$type": "Rect2",
+							"values": [
+								1000.0,
+								610.0,
+								270.0,
+								180.0
+							]
+						}
+					],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1900.0,
+									1300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1900.0,
+									0.0,
+									300.0,
+									300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									439.0,
+									100.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crane",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									250.0,
+									260.0,
+									96.0,
+									60.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crane",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1540.0,
+									260.0,
+									96.0,
+									60.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_red",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									590.0,
+									120.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_olive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									750.0,
+									120.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_open_red",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1020.0,
+									120.0,
+									150.0,
+									72.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									600.0,
+									1060.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_open_olive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									910.0,
+									1060.0,
+									150.0,
+									72.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									810.0,
+									270.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									858.0,
+									270.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									828.0,
+									306.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bollard",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									200.0,
+									1170.0,
+									36.0,
+									28.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bollard",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									650.0,
+									1170.0,
+									36.0,
+									28.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bollard",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1100.0,
+									1170.0,
+									36.0,
+									28.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bollard",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1550.0,
+									1170.0,
+									36.0,
+									28.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									370.0,
+									490.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1490.0,
+									760.0,
+									220.0,
+									160.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "fight",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									120.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.cranes",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "drydock",
+				"role": "fight",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1596.0,
+								1798.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1152.0,
+								-530.0,
+								596.0,
+								598.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									600.0,
+									1500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1500.0,
+									400.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1500.0,
+								1500.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1200.0,
+								-300.0,
+								500.0,
+								300.0
+							]
+						}
+					],
+					"gaps": [
+						{
+							"$type": "Rect2",
+							"values": [
+								450.0,
+								450.0,
+								600.0,
+								520.0
+							]
+						}
+					],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1500.0,
+									1500.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1200.0,
+									-300.0,
+									500.0,
+									300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "crane",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									200.0,
+									240.0,
+									96.0,
+									60.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crane",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1200.0,
+									1140.0,
+									96.0,
+									60.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1130.0,
+									130.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_2",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1190.0,
+									130.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									80.0,
+									1210.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_2",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									140.0,
+									1210.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1160.0,
+									600.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1208.0,
+									600.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1178.0,
+									636.0,
+									42.0,
+									30.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "fight",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1240.0,
+									-140.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.drydock",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"fixed_origin": {
+					"$type": "Vector2",
+					"values": [
+						600.0,
+						6380.0
+					]
+				},
+				"id": "entry",
+				"role": "entry",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-413.0,
+								-380.0,
+								2013.0,
+								1280.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									400.0,
+									-380.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1600.0,
+									120.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1240.0,
+								540.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								-120.0,
+								1050.0,
+								120.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								300.0,
+								-380.0,
+								200.0,
+								260.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1240.0,
+								20.0,
+								360.0,
+								230.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1000.0,
+								540.0,
+								160.0,
+								65.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1240.0,
+									540.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									-120.0,
+									1050.0,
+									120.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-2",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									300.0,
+									-380.0,
+									200.0,
+									260.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-3",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1240.0,
+									20.0,
+									360.0,
+									230.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-4",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1000.0,
+									540.0,
+									160.0,
+									65.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "entry",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									360.0,
+									-220.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.entry",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "generator",
+				"role": "side",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1396.0,
+								1398.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									650.0,
+									1100.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									600.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1300.0,
+								1100.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1300.0,
+									1100.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									140.0,
+									125.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									940.0,
+									125.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									140.0,
+									775.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									940.0,
+									775.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "generator",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									595.0,
+									360.0,
+									110.0,
+									90.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									80.0,
+									560.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									128.0,
+									560.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									98.0,
+									596.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1080.0,
+									560.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1128.0,
+									560.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1098.0,
+									596.0,
+									42.0,
+									30.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "side",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									400.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.generator",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "market",
+				"role": "fight",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1596.0,
+								1398.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-328.0,
+								-230.0,
+								376.0,
+								558.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1500.0,
+									500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									500.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1500.0,
+								1100.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-280.0,
+								0.0,
+								280.0,
+								260.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1500.0,
+									1100.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-280.0,
+									0.0,
+									280.0,
+									260.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "market_stall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									270.0,
+									200.0,
+									120.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "market_stall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									900.0,
+									200.0,
+									120.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "fish_basket",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									420.0,
+									220.0,
+									56.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "fish_basket",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									480.0,
+									220.0,
+									56.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "fish_basket",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1050.0,
+									220.0,
+									56.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "fish_basket",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1110.0,
+									220.0,
+									56.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bench",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									250.0,
+									880.0,
+									112.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "bench",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1150.0,
+									880.0,
+									112.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									140.0,
+									80.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									188.0,
+									80.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									158.0,
+									116.0,
+									42.0,
+									30.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "fight",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									-160.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.market",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "rails",
+				"role": "fight",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1996.0,
+								1598.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1852.0,
+								-230.0,
+								396.0,
+								618.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1900.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									200.0,
+									1300.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "shortcut-south",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1264.0,
+									1300.0
+								]
+							},
+							"type": "shortcut",
+							"width": 128.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1900.0,
+								1300.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								1900.0,
+								0.0,
+								300.0,
+								320.0
+							]
+						}
+					],
+					"gaps": [
+						{
+							"$type": "Rect2",
+							"values": [
+								840.0,
+								730.0,
+								300.0,
+								220.0
+							]
+						}
+					],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1900.0,
+									1300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1900.0,
+									0.0,
+									300.0,
+									320.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "container_red",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									430.0,
+									350.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_olive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									590.0,
+									350.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_olive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									630.0,
+									960.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_open",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									790.0,
+									960.0,
+									150.0,
+									72.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									980.0,
+									1020.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1028.0,
+									1020.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_explosive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									998.0,
+									1056.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									270.0,
+									460.0,
+									220.0,
+									160.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "stone_pillar",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1420.0,
+									790.0,
+									220.0,
+									160.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "fight",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									120.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.rails",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "secret",
+				"role": "secret",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								996.0,
+								998.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "secret-entry",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									640.0,
+									700.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								900.0,
+								700.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									900.0,
+									700.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "crate_2",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									52.0,
+									40.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									112.0,
+									40.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_net",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									70.0,
+									82.0,
+									64.0,
+									42.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									672.0,
+									40.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_barnacles",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									727.0,
+									36.0,
+									66.0,
+									44.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_3",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									696.0,
+									84.0,
+									52.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									78.0,
+									470.0,
+									44.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_oil",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									127.0,
+									476.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "barrel_toxic",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									97.0,
+									508.0,
+									42.0,
+									30.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "medkit",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									714.0,
+									514.0,
+									72.0,
+									36.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "secret",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									450.0,
+									350.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.secret",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "shop",
+				"role": "shop",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1196.0,
+								1198.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									400.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									550.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1100.0,
+								900.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1100.0,
+									900.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "workshop_bench",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									850.0,
+									60.0,
+									88.0,
+									26.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "workshop_tool_rack",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									70.0,
+									40.0,
+									56.0,
+									20.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "workshop_tool_rack",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									980.0,
+									40.0,
+									56.0,
+									20.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "medkit",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									100.0,
+									120.0,
+									72.0,
+									36.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "radio",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									910.0,
+									150.0,
+									70.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									310.0,
+									720.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									370.0,
+									720.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									430.0,
+									720.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "workshop_parts",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									770.0,
+									720.0,
+									60.0,
+									22.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "workshop_parts",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									835.0,
+									720.0,
+									60.0,
+									22.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "shop",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									200.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.shop",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "stairs",
+				"role": "stairs",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1796.0,
+								1598.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1700.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									600.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-2",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1600.0,
+									0.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "shortcut-south",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1004.0,
+									1300.0
+								]
+							},
+							"type": "shortcut",
+							"width": {
+								"$type": "int",
+								"value": "128"
+							}
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1700.0,
+								1300.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1700.0,
+									1300.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png"
+						},
+						{
+							"depth": "ground",
+							"id": "landing-top",
+							"mode": "plate",
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									450.0,
+									256.0,
+									800.0,
+									360.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-top.png"
+						},
+						{
+							"depth": "ground",
+							"id": "west-flight",
+							"mode": "plate",
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									250.0,
+									256.0,
+									200.0,
+									404.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-west-composed.png"
+						},
+						{
+							"depth": "ground",
+							"id": "east-flight",
+							"mode": "plate",
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1250.0,
+									256.0,
+									200.0,
+									404.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-east-composed.png"
+						},
+						{
+							"depth": "foreground",
+							"id": "landing-face",
+							"mode": "plate",
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									450.0,
+									616.0,
+									800.0,
+									44.0
+								]
+							},
+							"sort_y": 660.0,
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-face44.png"
+						},
+						{
+							"depth": "ground",
+							"id": "wall-north-face",
+							"mode": "plate",
+							"order": 100.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									-68.0,
+									1500.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/north-face.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-northwest-corner",
+							"mode": "plate",
+							"order": 101.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-26.0,
+									-68.0,
+									26.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/northwest-corner.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-west-upper",
+							"mode": "plate",
+							"order": 102.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-26.0,
+									0.0,
+									26.0,
+									500.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-upper.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-west-lower",
+							"mode": "plate",
+							"order": 103.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-26.0,
+									700.0,
+									26.0,
+									600.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-lower.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-east-north-jamb",
+							"mode": "plate",
+							"order": 104.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1700.0,
+									-68.0,
+									26.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-north-jamb.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-east-upper",
+							"mode": "plate",
+							"order": 105.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1700.0,
+									0.0,
+									26.0,
+									500.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-upper.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-east-lower",
+							"mode": "plate",
+							"order": 106.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1700.0,
+									700.0,
+									26.0,
+									600.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-lower.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-south-face-left",
+							"mode": "plate",
+							"order": 107.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									1300.0,
+									940.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-left.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-south-face-right",
+							"mode": "plate",
+							"order": 108.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1068.0,
+									1300.0,
+									632.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-right.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-southwest-corner",
+							"mode": "plate",
+							"order": 109.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									-26.0,
+									1300.0,
+									26.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southwest-corner.png",
+							"world_units_per_pixel": 1.0
+						},
+						{
+							"depth": "ground",
+							"id": "wall-southeast-corner",
+							"mode": "plate",
+							"order": 110.0,
+							"projected": true,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1700.0,
+									1300.0,
+									26.0,
+									68.0
+								]
+							},
+							"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southeast-corner.png",
+							"world_units_per_pixel": 1.0
+						}
+					],
+					"neighbor_rules": {
+						"height": {
+							"$type": "int",
+							"value": "0"
+						},
+						"material_family": "docks-stone"
+					},
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "sandbags",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									645.0,
+									780.0,
+									110.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "sandbags",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									757.0,
+									780.0,
+									110.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "sandbags",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									869.0,
+									780.0,
+									110.0,
+									40.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"publication": "published",
+					"raised": [
+						{
+							"$type": "Rect2",
+							"values": [
+								450.0,
+								300.0,
+								800.0,
+								360.0
+							]
+						}
+					],
+					"ramps": [
+						{
+							"axis": "x",
+							"high": 450.0,
+							"low": 250.0,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									250.0,
+									300.0,
+									200.0,
+									360.0
+								]
+							}
+						},
+						{
+							"axis": "x",
+							"high": 1250.0,
+							"low": 1450.0,
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1250.0,
+									300.0,
+									200.0,
+									360.0
+								]
+							}
+						}
+					],
+					"repeat_limit": {
+						"$type": "int",
+						"value": "1"
+					},
+					"room_role": "stairs",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									190.0,
+									480.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "23"
+							}
+						}
+					],
+					"template_id": "docks.farol.pilot",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			},
+			{
+				"id": "warehouse",
+				"role": "maze",
+				"template": {
+					"allowed_transforms": [
+						"translate"
+					],
+					"art_bounds": [
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								-230.0,
+								1696.0,
+								1398.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								-48.0,
+								870.0,
+								416.0,
+								598.0
+							]
+						}
+					],
+					"biome_id": "docks",
+					"connectors": [
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-0",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									-1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "door-1",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									1.0,
+									0.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									1600.0,
+									500.0
+								]
+							},
+							"type": "walk",
+							"width": 200.0
+						},
+						{
+							"height": {
+								"$type": "int",
+								"value": "0"
+							},
+							"id": "shortcut-north",
+							"material_family": "docks-stone",
+							"normal": {
+								"$type": "Vector2",
+								"values": [
+									0.0,
+									-1.0
+								]
+							},
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									464.0,
+									0.0
+								]
+							},
+							"type": "shortcut",
+							"width": 128.0
+						}
+					],
+					"era_id": "1941",
+					"footprint": [
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								0.0,
+								1600.0,
+								1100.0
+							]
+						},
+						{
+							"$type": "Rect2",
+							"values": [
+								0.0,
+								1100.0,
+								320.0,
+								300.0
+							]
+						}
+					],
+					"gaps": [],
+					"layers": [
+						{
+							"depth": "ground",
+							"id": "floor-0",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									0.0,
+									1600.0,
+									1100.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						},
+						{
+							"depth": "ground",
+							"id": "floor-1",
+							"material": "floor",
+							"mode": "tile",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									0.0,
+									1100.0,
+									320.0,
+									300.0
+								]
+							},
+							"texture": "res://assets/environment/cobble.png"
+						}
+					],
+					"obstacles": [
+						{
+							"baked": false,
+							"kind": "maze_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									400.0,
+									100.0,
+									90.0,
+									650.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "maze_wall",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									980.0,
+									470.0,
+									90.0,
+									530.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container_olive",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									100.0,
+									140.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "container",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									100.0,
+									270.0,
+									140.0,
+									70.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1170.0,
+									870.0,
+									56.0,
+									40.0
+								]
+							}
+						},
+						{
+							"baked": false,
+							"kind": "crate_2",
+							"rect": {
+								"$type": "Rect2",
+								"values": [
+									1230.0,
+									870.0,
+									56.0,
+									40.0
+								]
+							}
+						}
+					],
+					"points_of_interest": [],
+					"provenance": "effective simulation baseline",
+					"raised": [],
+					"ramps": [],
+					"room_role": "maze",
+					"spawns": [
+						{
+							"id": "player",
+							"position": {
+								"$type": "Vector2",
+								"values": [
+									280.0,
+									160.0
+								]
+							},
+							"radius": {
+								"$type": "int",
+								"value": "11"
+							}
+						}
+					],
+					"template_id": "legacy.warehouse",
+					"version": {
+						"$type": "int",
+						"value": "1"
+					}
+				}
+			}
+		],
+		"seed": "1941",
+		"version": "scn-layout-1"
+	},
+	"ok": true,
+	"origins": {
+		"ammo": {
+			"$type": "Vector2",
+			"values": [
+				6500.0,
+				3900.0
+			]
+		},
+		"boss": {
+			"$type": "Vector2",
+			"values": [
+				3000.0,
+				400.0
+			]
+		},
+		"cellar": {
+			"$type": "Vector2",
+			"values": [
+				8100.0,
+				2200.0
+			]
+		},
+		"chapel": {
+			"$type": "Vector2",
+			"values": [
+				200.0,
+				3600.0
+			]
+		},
+		"cranes": {
+			"$type": "Vector2",
+			"values": [
+				2800.0,
+				5800.0
+			]
+		},
+		"drydock": {
+			"$type": "Vector2",
+			"values": [
+				200.0,
+				900.0
+			]
+		},
+		"entry": {
+			"$type": "Vector2",
+			"values": [
+				600.0,
+				6380.0
+			]
+		},
+		"generator": {
+			"$type": "Vector2",
+			"values": [
+				8800.0,
+				4100.0
+			]
+		},
+		"market": {
+			"$type": "Vector2",
+			"values": [
+				6900.0,
+				6000.0
+			]
+		},
+		"rails": {
+			"$type": "Vector2",
+			"values": [
+				4200.0,
+				3900.0
+			]
+		},
+		"secret": {
+			"$type": "Vector2",
+			"values": [
+				6200.0,
+				2800.0
+			]
+		},
+		"shop": {
+			"$type": "Vector2",
+			"values": [
+				9400.0,
+				6100.0
+			]
+		},
+		"stairs": {
+			"$type": "Vector2",
+			"values": [
+				2100.0,
+				3900.0
+			]
+		},
+		"warehouse": {
+			"$type": "Vector2",
+			"values": [
+				5000.0,
+				7400.0
+			]
+		}
+	}
+}

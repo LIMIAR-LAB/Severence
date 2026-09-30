@@ -1,0 +1,220 @@
+{
+  "reviewed_at": "2026-09-30T10:35:20.715492-03:00",
+  "method": "Original PNG inspection and native dimension/alpha audit",
+  "files": [
+    {
+      "file": "face-material-review.png",
+      "size": [
+        768,
+        300
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        768,
+        300
+      ],
+      "sha256": "f7fb3a6cfffec0cb06f2f5f2787e6b503b858a3dd969369081fde45eaace9868"
+    },
+    {
+      "file": "face44-0.png",
+      "size": [
+        64,
+        44
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        64,
+        44
+      ],
+      "sha256": "c0dfb2b4d1b51575f7ef2de4947821c297c4eda5f57a9370a587599a87bd938b"
+    },
+    {
+      "file": "face44-1.png",
+      "size": [
+        64,
+        44
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        64,
+        44
+      ],
+      "sha256": "9c0271254ceba4e0571b2b227ccaa724e5498aad993aba106a348370f22807fe"
+    },
+    {
+      "file": "floor-stone.png",
+      "size": [
+        64,
+        48
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        64,
+        48
+      ],
+      "sha256": "36c5a97d780879ec2ff915535a9654eedcc89f748c2e27b5eb343d2a3e5999d1"
+    },
+    {
+      "file": "landing-face44.png",
+      "size": [
+        800,
+        44
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        800,
+        44
+      ],
+      "sha256": "676ced83f5ac22e01269ee48be0ac9fdafca22ef8d9953ab11c9a86e1ce1566f"
+    },
+    {
+      "file": "landing-top.png",
+      "size": [
+        800,
+        360
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        800,
+        360
+      ],
+      "sha256": "764b96fa3216c0c998feb33da63f859506ef248d25049770b99fc7d0f05cd9d4"
+    },
+    {
+      "file": "module-native-preview.png",
+      "size": [
+        1200,
+        404
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        1200,
+        404
+      ],
+      "sha256": "58855d7569cd2dee10d52dcaab2a3ad96acd7a6a7e6be243faf57bb0c0cb8486"
+    },
+    {
+      "file": "stairs-east-composed.png",
+      "size": [
+        200,
+        404
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        5,
+        200,
+        404
+      ],
+      "sha256": "10868347edf41b25fe630fcb5c60ab61d8b6b8aaeef314ba78540dce8ca6ff2f"
+    },
+    {
+      "file": "stairs-west-composed.png",
+      "size": [
+        200,
+        404
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        5,
+        200,
+        404
+      ],
+      "sha256": "6804c55713a056a3fa246506f947488c57634a36cf78272504498f64b066e545"
+    },
+    {
+      "file": "tread-east.png",
+      "size": [
+        25,
+        360
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        25,
+        360
+      ],
+      "sha256": "cf9883955f2a482e99847c8fd27f1f73825d343f54365dbf88fccdce55026da8"
+    },
+    {
+      "file": "tread-west.png",
+      "size": [
+        25,
+        360
+      ],
+      "alpha_extrema": [
+        255,
+        255
+      ],
+      "visible_bbox": [
+        0,
+        0,
+        25,
+        360
+      ],
+      "sha256": "256446bfebb106eb72a0f9a6c55c7bbaf7b46a77797468b6999dca428b7e55e7"
+    }
+  ],
+  "findings": [
+    "Face44 authorship fits same stone palette and reads as shallow masonry",
+    "West lip strengthened after initial preview; both lateral flights visible",
+    "No extra north/south flight",
+    "Floor remains quiet but repeated; pilot reuse only",
+    "Continuous-vs-discrete height discrepancy still needs game check"
+  ],
+  "game_validation": false,
+  "catalog_approved": false,
+  "latest_game_review": {
+    "report": "_bmad-output/implementation-artifacts/cenarios-arte/farol-review-r3/review.json",
+    "decision": "accepted_static_art_pilot_with_isolated_projection_fix",
+    "shared_runtime_fixed": false,
+    "movement_combat_accepted": false,
+    "catalog_approved": false
+  }
+}

@@ -1,0 +1,1 @@
+{"canvas":[2500,1666.666667],"world_origin":[2200,5600],"uniform_scale_only":true,"main_floor":[2500,5800,1900,1300],"doors":{"west":[2500,6500,200],"east":[4400,6400,200],"north":[4100,5800,200],"shortcut":[2804,5800,128]},"references":["assets/environment/docks12/entry/desembarque_painted_v1.png","assets/environment/docks12/chapel/fixed_v01/sanctuary.png"],"generation_count":1}

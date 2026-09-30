@@ -17,7 +17,9 @@ func run() -> void:
 	for key in Audio.SFX_KEYS:
 		check(audio.samples.get(key) is AudioStreamWAV and audio.samples[key].get_length() > 0.02, key + " carrega áudio real")
 	for key in audio.music:
-		check(audio.music[key].stream.get_length() >= 45.0 and audio.music[key].stream.loop, key + " possui trilha longa com loop")
+		# Current authored scores: sixteen 4-beat bars at120BPM for boss, distinct loops elsewhere.
+		var expected_seconds: float = {"boss":32.0,"refuge":64.0,"expedition":51.2}[key]
+		check(absf(audio.music[key].stream.get_length()-expected_seconds) < 0.02 and audio.music[key].stream.loop, key + " conserva duração autorada e loop")
 	audio.discard_history(sim.audio_sequence)
 	var rng_before := sim.rng.state
 	sim.emit_audio("pistol", Vector2.ZERO)

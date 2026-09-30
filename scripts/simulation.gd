@@ -1,6 +1,22 @@
 class_name Expedition
 extends RefCounted
 const DOCKS := preload("res://scripts/docks_map.gd")  # não depende do cache de class_name
+const ScenarioLayout := preload("res://scripts/scenario_layout.gd")
+const FarolRuntime = preload("res://scripts/scenarios/farol_runtime.gd")
+const ProceduralDocks = preload("res://scripts/scenarios/procedural_docks.gd")
+const SanctuaryFixed = preload("res://scripts/scenarios/sanctuary_fixed.gd")
+const CranesFixed = preload("res://scripts/scenarios/cranes_fixed.gd")
+const WarehouseFixed = preload("res://scripts/scenarios/warehouse_fixed.gd")
+var scenario_modules: Dictionary = {}
+var scenario_module_ids: Array = []
+var procedural_enabled := false # Main game enables it; isolated legacy fixtures remain reproducible.
+var layout_manifest: Dictionary = {}
+var scenario_geometry_revision := 0
+var run_points: Dictionary = DOCKS.POINTS.duplicate()
+var run_corridors: Array = DOCKS.CORRIDORS.duplicate()
+var run_secret_floors: Array = [DOCKS.SECRET_CORRIDOR]
+var room_offsets: Dictionary = {}
+var run_corridor_groups: Array = []
 const SummonFX = preload("res://scripts/summon_fx.gd")
 const EquipmentData := preload("res://scripts/equipment_data.gd")
 const InventoryState := preload("res://scripts/inventory_state.gd")
@@ -19,13 +35,12 @@ const GUARD_WARNING := 0.85
 const GUARD_ATTACK_TIME := 2.05
 const GUARD_SHOT_INTERVAL := 0.42
 const GUARD_SHOTS := 5
-# Offsets from the enemy's feet to the visible barrel tip in the normalized
-# attack atlas. Rows run clockwise from south through east and north.
+# Barrel tips on the canonical PixelLab body, relative to its foot pivot.
 const ENEMY_MUZZLE_OFFSETS := {
-	"cult": [Vector2(24, -38), Vector2(46, -46), Vector2(47, -48), Vector2(42, -59), Vector2(-35, -60), Vector2(-39, -54), Vector2(-50, -45), Vector2(-44, -32)],
-	"fish": [Vector2(62, -40), Vector2(80, -33), Vector2(107, -48), Vector2(78, -74), Vector2(35, -69), Vector2(-72, -76), Vector2(-103, -45), Vector2(-72, -25)],
-	"brute": [Vector2(43, -47), Vector2(56, -50), Vector2(62, -54), Vector2(53, -63), Vector2(-38, -75), Vector2(-62, -60), Vector2(-70, -57), Vector2(-64, -42)],
-	"guard": [Vector2(-48, -36), Vector2(44, -33), Vector2(42, -48), Vector2(38, -50), Vector2(40, -61), Vector2(-38, -57), Vector2(-43, -40), Vector2(-43, -27)],
+	"cult": [Vector2(26, -37), Vector2(30, -39), Vector2(26, -40), Vector2(21, -38), Vector2(-29, -40), Vector2(-31, -39), Vector2(-20, -38), Vector2(-2, -36)],
+	"fish": [Vector2(35, -38), Vector2(31, -44), Vector2(16, -40), Vector2(20, -38), Vector2(-32, -41), Vector2(-31, -38), Vector2(-9, -38), Vector2(27, -37)],
+	"brute": [Vector2(37, -46), Vector2(38, -48), Vector2(26, -50), Vector2(26, -49), Vector2(-30, -49), Vector2(-37, -48), Vector2(-23, -47), Vector2(27, -46)],
+	"guard": [Vector2(-34, -19), Vector2(-13, -16), Vector2(0, -12), Vector2(25, -19), Vector2(33, -24), Vector2(14, -19), Vector2(-4, -24), Vector2(-27, -29)],
 }
 const MAX_COMBAT_ZONES := 64
 var pickups: Array = []
@@ -58,7 +73,7 @@ var clears := 0
 var armor_unlocked := false
 # 0.17: itens de equipamento liberados (id -> true). Sozinha, a simulação é um "sandbox" com tudo
 # liberado (testes, arena); o jogo (main.gd) troca pelo estado do save — jogo novo = só o Padrão.
-var unlocked: Dictionary = {"padrao": true, "mecanico": true, "espiao": true, "omega": true, "titan": true, "spectre": true}
+var unlocked: Dictionary = {"padrao": true, "mecanico": true, "espiao": true, "omega": true, "azul": true, "titan": true, "spectre": true}
 var new_unlocks: Array = []   # desbloqueados nesta sessão ainda não salvos (main.gd salva e limpa)
 var inventory_state: Dictionary = InventoryState.defaults()
 var side_active := false
@@ -67,6 +82,7 @@ var side_time := 0.0
 var side_failed := false
 var shop_bought := false
 var boss_dead := false
+var boss_intro_seen := false
 var secret_open := false
 var tick_time := 0.0
 var uid := 0
@@ -120,7 +136,8 @@ func actor(id: int, pos: Vector2) -> Dictionary:
 		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
 		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
 		"armor_type": "omega", "armor_time": 0.0, "armor_cd": 0.0, "beam_time": 0.0, "beam_cd": 0.0, "beam_end": pos, "bomb_cd": 0.0, "combo": 0, "combo_t": 0.0, "boost": 1.0,
-		"last_damage_source": "unknown", "last_damage_attack": "", "run_weapons": {}, "run_weapon": ""}
+		"last_damage_source": "unknown", "last_damage_attack": "", "run_weapons": {}, "run_weapon": "", "claw_cd": 0.0,
+		"basic_weapon": "shotgun" if id == 1 and is_unlocked("mecanico") else "pistol"}
 
 func fresh_run_stats() -> Dictionary:
 	return {"kills": 0, "kills_by_kind": {}, "damage_dealt": 0.0, "damage_received": 0.0,
@@ -147,9 +164,11 @@ const UNIFORMS := {
 	"espiao": {"name": "ESPIÃO", "weapon": "smg", "weapon_name": "SUBMETRALHADORA", "speed": 385.0, "melee": 20.0, "taken": 1.1, "dash_cd": 0.35,
 		"desc": "MAIS VELOCIDADE.\nSubmetralhadora: rajada rápida (7).\nVelocidade 385 • dash recarrega 2× mais rápido.\nInimigos só o notam de perto.\n+10% de dano recebido."}}
 const ARMORS := {
+	"azul": {"name": "FORMA AZUL", "duration": 300.0, "cooldown": 60.0, "speed": 430.0, "taken": 1.0,
+		"desc": "FORMA LUMINOSA • dura 5 min, recarrega 60s (R).\nF / botão direito ou T: garra afiada emerge sob o inimigo visível mais próximo.\n64 de dano • alcance 520 • recarga 1,2s.\n+3 CORAÇÕES DE ESCUDO • velocidade 430.\nA arma de fogo equipada continua disponível."},
 	"omega": {"name": "ARMADURA ÔMEGA", "duration": 300.0, "cooldown": 60.0, "speed": 430.0, "taken": 1.0,
 		"desc": "LENDÁRIA • dura 5 min, recarrega 60s (R).\nComeça cada expedição carregada; baús recarregam na hora.\nLâmina Ômega: combo de 3 cortes (38/38/64);\no 3º solta uma onda que atravessa inimigos.\nSegure T: raio de luz por até 3s; recarga de 30s.\nAo guardar, luz atinge inimigos próximos visíveis.\n+3 CORAÇÕES DE ESCUDO • MUITO mais rápido (430) • corte reflete tiros.\nUniforme e arma não mudam enquanto ativa."}}
-const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "ESPIÃO", "omega": "ARMADURA ÔMEGA"}
+const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "ESPIÃO", "omega": "ARMADURA ÔMEGA", "azul": "FORMA AZUL"}
 
 # Enrage do Almirante: sem isso a luta podia travar indefinidamente contra um time passivo.
 const BOSS_RADIUS := 58.0
@@ -178,6 +197,12 @@ const OMEGA_BEAM_RANGE := 620.0
 const OMEGA_BEAM_DAMAGE := 90.0
 const OMEGA_RECALL_RANGE := 520.0
 const OMEGA_RECALL_DAMAGE := 40.0
+const BLUE_CLAW_RANGE := 520.0
+const BLUE_CLAW_DAMAGE := 64.0
+const BLUE_CLAW_COOLDOWN := 1.2
+
+func is_blue_form(a: Dictionary) -> bool:
+	return a.get("armor", false) and a.get("armor_type", "omega") == "azul"
 
 func max_hp() -> float:
 	# 0.14: todos começam SEMPRE com 3 corações. As melhorias da bancada estão congeladas até
@@ -214,10 +239,10 @@ func set_armor(a: Dictionary, on: bool) -> void:
 	if on:
 		a.transform = TRANSFORM_TIME; a.hurt = 0.0
 		effects.append({"p": a.p, "kind": "transform", "life": TRANSFORM_TIME, "max": TRANSFORM_TIME, "owner": a.id})
-		say("ARMADURA ÔMEGA ATIVADA!")
+		say("%s ATIVADA!" % ARMORS[a.armor_type].name)
 	else:
 		if a.beam_time > 0: stop_omega_beam(a)
-		recall_light(a)
+		if a.armor_type == "omega": recall_light(a)
 		effects.append({"p": a.p, "kind": "power_down", "life": 0.45, "max": 0.45})
 
 func stop_omega_beam(a: Dictionary) -> void:
@@ -250,7 +275,7 @@ func transform_burst(a: Dictionary) -> void:
 		if b.team == 1 and b.p.distance_to(a.p) < 240: b.life = 0
 
 func outfit_of(a: Dictionary) -> String:
-	return "omega" if a.armor else a.get("outfit", "padrao")
+	return a.get("armor_type", "omega") if a.armor else a.get("outfit", "padrao")
 
 func new_mech(pos: Vector2) -> Dictionary:
 	# 0.14: o Titan consome gasolina enquanto pilotado — começa com tanque parcial.
@@ -282,7 +307,10 @@ func make_hub() -> void:
 	mode = "hub"
 	money = 0; keys = 0  # 0.21: moeda e chaves não atravessam o portal temporal.
 	pending_spawns.clear()   # 0.15: portais atrasados da arena não atravessam para o Refúgio
+	var selected_armors: Array = actors.map(func(a): return a.get("armor_type", "omega"))
 	actors = [actor(0, Vector2(760, 440)), actor(1, Vector2(820, 450))]
+	for a in actors:
+		if a.id < selected_armors.size() and selected_armors[a.id] in ARMORS: a.armor_type = selected_armors[a.id]
 	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); obstacle_hp.clear(); fuses.clear()
 	floors = [
 		Rect2(420, 300, 490, 188),   # piso central (xadrez)
@@ -355,7 +383,17 @@ func spawn_arena_wave() -> void:
 	for a in actors:
 		if not a.dead: heal(a, 1)
 
+func start_new_run() -> void:
+	var chooser := RandomNumberGenerator.new()
+	chooser.randomize()
+	var next_seed := int(chooser.randi() & 0x7fffffff)
+	if next_seed == seed_value: next_seed = (next_seed + 1) & 0x7fffffff
+	start_run(next_seed)
+
 func start_run(new_seed: int) -> void:
+	layout_manifest.clear(); room_offsets.clear()
+	run_corridor_groups.clear()
+	run_points = DOCKS.POINTS.duplicate(); run_corridors = DOCKS.CORRIDORS.duplicate(); run_secret_floors = [DOCKS.SECRET_CORRIDOR]
 	audio_events.clear()
 	# Mapa fixo (scripts/docks_map.gd). A seed só sorteia os tipos de inimigo e pequenos desvios.
 	pending_spawns.clear()   # 0.15: nenhuma onda da arena pode vazar para uma expedição
@@ -364,10 +402,12 @@ func start_run(new_seed: int) -> void:
 	mode = "run"; tick_time = 0; money = 12; keys = 1; run_materials_start = materials
 	streak = 0; streak_t = 0.0; hitstop = 0.0; clutch_t = 0.0; clutch_cd = 0.0
 	side_active = false; side_complete = false; side_failed = false; shop_bought = false
-	boss_dead = false; secret_open = false; reward_claimed = false
+	boss_dead = false; boss_intro_seen = false; secret_open = false; reward_claimed = false
 	var P: Dictionary = DOCKS.POINTS
+	var selected_armors: Array = actors.map(func(a): return a.get("armor_type", "omega"))
 	actors = [actor(0, P.spawn), actor(1, P.spawn2)]
 	for a in actors:
+		if a.id < selected_armors.size() and selected_armors[a.id] in ARMORS: a.armor_type = selected_armors[a.id]
 		a.hp = max_hp(); a.shield = 0.0; a.armor = false; a.armor_cd = 0.0  # começa pronta para vestir
 	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); decor.clear(); visited.clear()
 	rooms = []
@@ -379,24 +419,27 @@ func start_run(new_seed: int) -> void:
 			floors.append_array(room.get("extra", []))   # 0.17: alas/alcovas da sala
 	floors.append_array(DOCKS.EXTRA_FLOORS); floors.append_array(DOCKS.CORRIDORS)
 	for sc in DOCKS.SHORTCUTS: floors.append(sc.r)   # 0.16: atalhos (fechados pela parede rachada)
-	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = DOCKS.GAPS.duplicate()
+	raised = DOCKS.RAISED.duplicate(); ramps = DOCKS.RAMPS.duplicate(true); gaps = ScenarioLayout.composed_gaps(DOCKS.GAPS)
 	jump_gap = gaps[0]
 	build_doors(); hazards = DOCKS.HAZARDS.duplicate(true)
 	obstacle_hp.clear(); fuses.clear()
-	for o in DOCKS.OBSTACLES:
+	for o in ScenarioLayout.composed_obstacles(DOCKS.OBSTACLES, rooms):
 		obstacles.append(Rect2(o[0], o[1], o[2], o[3])); obstacle_kinds.append(o[4]); obstacle_hp.append(DESTRUCTIBLE.get(o[4], -1.0))
 	# 0.16: parede rachada A, B ou C em cada atalho (sorteada pela seed, sem mexer no rng dos inimigos)
 	for i in DOCKS.SHORTCUTS.size():
 		obstacles.append(DOCKS.SHORTCUTS[i].wall); obstacle_kinds.append("wall_crack_" + ["a", "b", "c"][posmod(seed_value * 31 + i * 17, 3)]); obstacle_hp.append(-1.0)
 	tentacle_gates = DOCKS.TENTACLE_GATES.duplicate(true)
 	for g in tentacle_gates: g["sealed"] = false; g["cd"] = 0.0
-	for d in DOCKS.DECOR:
+	for d in ScenarioLayout.composed_decor(DOCKS.DECOR, rooms):
 		var item := {"p": Vector2(d[0], d[1]), "kind": d[2]}
 		if d.size() > 3: item.merge(d[3])
 		decor.append(item)
 	for c in DOCKS.CHESTS: chests.append({"p": Vector2(c[0], c[1]), "open": false, "secret": c[2]})
 	mech = new_mech(P.mech); apply_unlock_state()
 	reset_spectres()
+	FarolRuntime.install_geometry(self)
+	refresh_chapel_geometry()
+	scenario_geometry_revision = 2
 	for sp in DOCKS.SPAWNS:
 
 		var pos := Vector2(sp[0], sp[1]) + Vector2(rng.randf_range(-40, 40), rng.randf_range(-40, 40))
@@ -408,6 +451,23 @@ func start_run(new_seed: int) -> void:
 	pickups.append({"p": P.spawn + Vector2(165, 0), "kind": "weapon", "weapon": "bazooka", "ammo": 6})
 	build_navigation()
 	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. Armadura Ômega pronta.")
+	if procedural_enabled and not CranesFixed.FIXED_PILOT:
+		var generated := ProceduralDocks.generate(self)
+		if not generated.ok:
+			layout_manifest = {"ok":false,"fallback":"legacy","errors":generated.get("errors",[]),"seed":str(seed_value)}
+			push_warning("Procedural layout rejected; legacy fallback: "+str(generated.get("errors",[])))
+			say("Não foi possível montar esta seed. Docas de segurança carregadas; uma nova expedição tentará outro mapa.")
+	if CranesFixed.FIXED_PILOT:
+		layout_manifest={"version":"fixed-art-pilot-v1","seed":str(seed_value),"fixed_rooms":["entry","chapel","cranes","warehouse"]}
+	if scenario_geometry_revision<3:
+		SanctuaryFixed.install(self)
+		build_navigation()
+	if scenario_geometry_revision<4:
+		CranesFixed.install(self)
+		build_navigation()
+	if scenario_geometry_revision<5:
+		WarehouseFixed.install(self)
+		build_navigation()
 
 func run_progress_percent(outcome: String = "") -> int:
 	var discoverable := rooms.filter(func(room): return room.get("kind", "") != "secret")
@@ -481,7 +541,7 @@ func build_doors() -> void:
 		if not room.has("id") or room.kind == "secret": continue
 		# 0.19: saídas também nas alas das salas compostas.
 		for r: Rect2 in [room.r] + room.get("extra", []):
-			for f: Rect2 in DOCKS.CORRIDORS:
+			for f: Rect2 in run_corridors:
 				var side := ""
 				var span_x: bool = f.position.x < r.end.x and f.end.x > r.position.x
 				var span_y: bool = f.position.y < r.end.y and f.end.y > r.position.y
@@ -504,6 +564,18 @@ func room_contains(room: Dictionary, p: Vector2, margin: float = 0.0) -> bool:
 		var inner := rect.grow(margin)
 		if inner.size.x > 0 and inner.size.y > 0 and inner.has_point(p): return true
 	return false
+
+func visible_corridor_rects() -> Dictionary:
+	var visible := {}
+	for group in run_corridor_groups:
+		if group.hidden and not secret_open: continue
+		var discovered: bool = visited.has(group.from) or visited.has(group.to)
+		if not discovered:
+			for actor in actors:
+				if actor.active and group.rects.any(func(rect): return rect.has_point(actor.p)): discovered = true; break
+		if discovered:
+			for rect in group.rects: visible[rect] = true
+	return visible
 
 func room_by_id(id: String) -> Dictionary:
 	for room in rooms:
@@ -817,14 +889,14 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.dead or mech.hp <= 0: mech.cockpit_t = 0.0
 		a.move = Vector2.ZERO
 		return
-	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "beam_cd", "combo_t", "bomb_cd", "roll_visual"]:
+	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "beam_cd", "claw_cd", "combo_t", "bomb_cd", "roll_visual"]:
 		a[timer] = maxf(0, a.get(timer, 0.0) - dt)
 	if a.dead: return
 	if a.armor and a.get("transform", 0.0) <= 0:
 		a.armor_time = maxf(0, a.armor_time - dt)
 		if a.armor_time <= 0:
 			set_armor(a, false); a.armor_cd = ARMORS[a.armor_type].cooldown
-			say("A Armadura Ômega se desfez. Recarga: %ds." % int(a.armor_cd))
+			say("%s se desfez. Recarga: %ds." % [ARMORS[a.armor_type].name, int(a.armor_cd)])
 	if a.get("transform", 0.0) > 0:
 		# Transformação: parado, invulnerável; a onda de choque sai no meio do efeito.
 		var before: float = a.transform + dt
@@ -838,8 +910,9 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	moving = moving.limit_length()
 	var aim: Vector2 = cmd.get("aim", a.aim)
 	if aim.length() > 0.1: a.aim = aim.normalized()
-	if a.beam_time > 0 and (not cmd.get("special", false) or not a.armor or a.mech): stop_omega_beam(a)
-	if cmd.get("special", false) and a.armor and not a.mech and a.beam_cd <= 0 and a.beam_time <= 0:
+	if a.beam_time > 0 and (not cmd.get("special", false) or not a.armor or a.mech or is_blue_form(a)): stop_omega_beam(a)
+	if cmd.get("special", false) and is_blue_form(a): ground_claw(a)
+	if cmd.get("special", false) and a.armor and a.armor_type == "omega" and not a.mech and a.beam_cd <= 0 and a.beam_time <= 0:
 		a.beam_time = OMEGA_BEAM_DURATION
 	if a.beam_time > 0:
 		var beam_dt: float = minf(dt, a.beam_time)
@@ -903,8 +976,13 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
 		if a.move.length() > 0.1: mech["move_dir"] = a.move.normalized()
 	if a.dodge <= 0 and (cmd.get("fire", false) or cmd.get("melee", false) or a.jump > 0): a.roll_visual = 0.0
-	if a.armor and not a.mech:
-		if a.beam_time <= 0 and (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
+	if is_blue_form(a) and not a.mech:
+		if cmd.get("melee", false): ground_claw(a)
+		if cmd.get("fire", false) and a.shot <= 0: fire_actor(a)
+	elif a.armor and not a.mech:
+		if a.beam_time <= 0 and a.shot <= 0:
+			if cmd.get("melee", false): sword_attack(a)
+			elif cmd.get("fire", false): fire_actor(a)
 	else:
 		if cmd.get("fire", false) and a.shot <= 0 and not (a.mech and mech.fuel <= 0): fire_actor(a)
 		if cmd.get("melee", false) and a.slash <= 0: melee(a)
@@ -943,7 +1021,7 @@ func explode(p: Vector2, radius: float, damage: float, big: bool, hurts_all: boo
 	emit_audio("explosion", p)
 	for e in enemies:
 		var d: float = e.p.distance_to(p)
-		if d < radius + (45 if e.kind == "boss" else 19) and line_of_fire(p, e.p):
+		if d < radius + (BOSS_RADIUS if e.kind == "boss" else 19) and line_of_fire(p, e.p):
 			var dealt: float = damage * (1.0 - 0.45 * clampf(d / radius, 0, 1))
 			hurt_enemy(e, dealt, credit_player); e.hurt = 0.2; e["alerted"] = true
 			pop_dmg(e.p, dealt, big)
@@ -983,10 +1061,17 @@ func hit_stop(d: float) -> void:
 
 func weapon_of(a: Dictionary) -> String:
 	if a.mech: return "mech"
-	if a.armor: return "omega_sword"
 	var selected: String = a.get("run_weapon", "")
 	if selected != "" and a.get("run_weapons", {}).has(selected): return selected
-	return uniform_of(a).weapon
+	# Migrate old saves once; a later outfit/form change cannot replace equipment.
+	if not a.has("basic_weapon"): a["basic_weapon"] = uniform_of(a).weapon
+	return a.basic_weapon
+
+func weapon_name(a: Dictionary) -> String:
+	return {"pistol": "BLASTER", "shotgun": "ESCOPETA DE REBITE", "smg": "SUBMETRALHADORA", "bazooka": "BAZUCA", "mech": "CANHÃO PESADO"}.get(weapon_of(a), "ARMA")
+
+func weapon_behind_body(a: Dictionary) -> bool:
+	return a.aim.y < -0.25
 
 func grant_run_weapon(a: Dictionary, name: String, ammo: int) -> void:
 	var owned: Dictionary = a.get("run_weapons", {})
@@ -997,19 +1082,26 @@ func grant_run_weapon(a: Dictionary, name: String, ammo: int) -> void:
 	say("%s • %d foguetes nesta expedição • Q/RB troca arma" % [name.to_upper(), owned[name]])
 
 func toggle_run_weapon(a: Dictionary) -> void:
-	var owned: Dictionary = a.get("run_weapons", {})
-	if a.get("run_weapon", "") != "":
-		a["run_weapon"] = ""; say("ARMA BÁSICA • munição infinita"); return
-	for name in owned:
-		a["run_weapon"] = name; say("%s • %d foguetes" % [str(name).to_upper(), owned[name]]); return
-	say("Nenhuma arma de expedição obtida.")
+	var choices := available_weapons(a)
+	var next: String = choices[(choices.find(weapon_of(a)) + 1) % choices.size()]
+	select_run_weapon(a.id, next)
+	say(weapon_name(a) + (" • %d foguetes" % a.run_weapons.bazooka if next == "bazooka" else " • munição infinita"))
+
+func available_weapons(a: Dictionary) -> Array[String]:
+	var choices: Array[String] = ["pistol"]
+	if is_unlocked("mecanico"): choices.append("shotgun")
+	if is_unlocked("espiao"): choices.append("smg")
+	if a.get("run_weapons", {}).has("bazooka"): choices.append("bazooka")
+	return choices
 
 func select_run_weapon(id: int, weapon: String) -> bool:
 	if id < 0 or id >= actors.size(): return false
 	var a: Dictionary = actors[id]
-	if not a.active or a.dead or a.mech or a.armor: return false
-	if weapon != "" and (weapon != "bazooka" or not a.get("run_weapons", {}).has(weapon)): return false
-	a.run_weapon = weapon
+	if not a.active or a.dead or a.mech: return false
+	if weapon == "": a.run_weapon = ""; return true
+	if weapon not in available_weapons(a): return false
+	if weapon == "bazooka": a.run_weapon = weapon
+	else: a.basic_weapon = weapon; a.run_weapon = ""
 	return true
 
 
@@ -1032,22 +1124,24 @@ const ACTOR_VISUAL_SCALE := 1.12
 # Hand and barrel geometry is shared with WorldView. Height never shifts collision Y.
 func weapon_hand_anchor(a: Dictionary, body_direction: Vector2 = Vector2.ZERO) -> Vector2:
 	var direction: Vector2 = a.get("aim", a.facing) if body_direction == Vector2.ZERO else body_direction
+	if a.get("fused", false):
+		return [Vector2(19,-29), Vector2(19,-31), Vector2(17,-32), Vector2(20,-34), Vector2(19,-34), Vector2(-20,-34), Vector2(-17,-32), Vector2(-19,-31)][weapon_direction_row(direction)]
 	if outfit_of(a) == "omega":
 		var omega_anchors := [
-			Vector2(20, -40), Vector2(23, -43), Vector2(25, -44), Vector2(20, -47),
-			Vector2(10, -49), Vector2(-20, -47), Vector2(-25, -44), Vector2(-23, -43),
+			Vector2(21, -66), Vector2(24, -68), Vector2(24, -68), Vector2(23, -67),
+			Vector2(24, -68), Vector2(-23, -67), Vector2(-24, -68), Vector2(-24, -68),
 		]
 		return omega_anchors[weapon_direction_row(direction)]
-	if outfit_of(a) == "padrao":
+	if outfit_of(a) in ["padrao", "azul"]:
 		# O novo atlas tem oito direcoes e corpo mais alto que o legado.
 		# A ancora segue a mira para manter a empunhadura junto da mao no disparo.
 		var padrao_anchors := [
-			Vector2(10, -35), Vector2(15, -36), Vector2(17, -35), Vector2(14, -38),
-			Vector2(7, -40), Vector2(-14, -38), Vector2(-17, -35), Vector2(-15, -36),
+			Vector2(16, -28), Vector2(14, -30), Vector2(9, -31), Vector2(15, -32),
+			Vector2(15, -32), Vector2(-15, -32), Vector2(-9, -31), Vector2(-14, -30),
 		]
 		return padrao_anchors[weapon_direction_row(direction)]
 	# 0.17: acompanha a mão visível de cada vista, em vez de orbitar o centro do corpo.
-	var pose := weapon_pose(a.facing)
+	var pose := weapon_pose(direction)
 	var anchors := [Vector2(20, -27), Vector2(21, -28), Vector2(18, -26), Vector2(18, -26), Vector2(20, -25)]
 	var hand: Vector2 = anchors[pose[0]]
 	if pose[1]: hand.x = -hand.x
@@ -1137,6 +1231,7 @@ func fire_actor(a: Dictionary) -> void:
 
 # Lâmina Ômega: combo de 3 cortes em arco. O 3º é mais largo e solta uma onda perfurante.
 func sword_attack(a: Dictionary) -> void:
+	if is_blue_form(a): return
 	emit_audio("sword", a.p)
 	if a.combo_t <= 0: a.combo = 0
 	var hit: int = a.combo
@@ -1150,7 +1245,7 @@ func sword_attack(a: Dictionary) -> void:
 	effects.append({"p": a.p, "kind": "sword", "life": 0.26, "max": 0.26, "dir": a.aim, "combo": hit, "owner": a.id})
 	for e in enemies:
 		var offset: Vector2 = e.p - a.p
-		if offset.length() < reach + (30 if e.kind == "boss" else 0) and offset.normalized().dot(a.aim) > -arc:
+		if offset.length() < reach + (BOSS_RADIUS - 15.0 if e.kind == "boss" else 0.0) and offset.normalized().dot(a.aim) > -arc:
 			hurt_enemy(e, damage); e.hurt = 0.18
 			pop_dmg(e.p, damage, finisher)
 			effects.append({"p": e.p, "kind": "impact", "life": 0.2, "max": 0.2, "omega": true})
@@ -1159,7 +1254,7 @@ func sword_attack(a: Dictionary) -> void:
 		if b.team == 1 and a.p.distance_to(b.p) < reach:
 			b.team = 0; b.v = a.aim * 560; b.damage = 18; b.kind = "p_omega"
 	props_in_arc(a, reach, damage)
-	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125: open_secret()
+	if mode == "run" and a.p.distance_to(run_points.secret_wall) < 125: open_secret()
 	if finisher:
 		add_bullet(a.p + a.aim * 40, a.aim, 0, SWORD.wave, 540, 16, a.id, "p_wave", 0.65)
 		bullets[-1]["pierce"] = 5
@@ -1173,7 +1268,32 @@ func props_in_arc(a: Dictionary, reach: float, damage: float) -> void:
 	hit.reverse()
 	for i in hit: damage_obstacle(i, damage)
 
+func ground_claw(a: Dictionary) -> void:
+	if not is_blue_form(a) or a.dead or a.mech or a.fused or a.get("transform", 0.0) > 0 or a.get("claw_cd", 0.0) > 0: return
+	var screen := visible_world_rect if visible_world_rect.has_area() else Rect2(a.p - Vector2(640, 400), Vector2(1280, 800))
+	var target: Dictionary = {}
+	var nearest := BLUE_CLAW_RANGE
+	for e in enemies:
+		var distance: float = a.p.distance_to(e.p)
+		# Online cameras are independent. Range and line of sight are authoritative;
+		# the host's viewport must never reject the guest's nearby target.
+		if e.hp <= 0 or distance > nearest or (coop != "online" and not screen.has_point(e.p)) or not line_of_fire(a.p, e.p): continue
+		if not target.is_empty() and distance == nearest: continue
+		target = e; nearest = distance
+	if target.is_empty(): return
+	a["claw_cd"] = BLUE_CLAW_COOLDOWN
+	a.slash = 0.35
+	var cast_direction: Vector2 = target.p - a.p
+	if cast_direction.length_squared() > 0: a.facing = cast_direction.normalized()
+	effects.append({"kind": "ground_claw", "p": target.p, "life": 0.65, "max": 0.65, "owner": a.id})
+	emit_audio("sword", target.p)
+	hurt_enemy(target, BLUE_CLAW_DAMAGE); target.hurt = 0.2; target.alerted = true
+	pop_dmg(target.p, BLUE_CLAW_DAMAGE, true)
+
 func melee(a: Dictionary) -> void:
+	if is_blue_form(a) and not a.mech:
+		ground_claw(a)
+		return
 	emit_audio("melee", a.p)
 	a.slash = 0.65 if a.mech else 0.45
 	var reach := 115.0 if a.mech else 78.0
@@ -1186,7 +1306,7 @@ func melee(a: Dictionary) -> void:
 			pop_dmg(e.p, mdmg, a.mech)
 	props_in_arc(a, reach, 40.0 if a.mech else float(uniform_of(a).melee))
 	# A clearly hinted crack opens with a close attack, never a consumable key.
-	if mode == "run" and a.p.distance_to(DOCKS.POINTS.secret_wall) < 125:
+	if mode == "run" and a.p.distance_to(run_points.secret_wall) < 125:
 		open_secret()
 	if a.armor:
 		for b in bullets:
@@ -1196,7 +1316,7 @@ func melee(a: Dictionary) -> void:
 func open_secret() -> void:
 	if secret_open: return
 	secret_open = true
-	floors.append(DOCKS.SECRET_CORRIDOR)
+	floors.append_array(run_secret_floors)
 	for room in rooms:
 		if room.kind == "secret": floors.append(room.r)
 	build_navigation()
@@ -1212,7 +1332,7 @@ func begin_cockpit(a: Dictionary, entering: bool, outside: Vector2) -> void:
 	mech["boosting"] = false
 
 func interact(a: Dictionary) -> void:
-	if mode == "run" and a.p.distance_to(STORY_NPC) < 95:
+	if mode == "run" and a.p.distance_to(story_npc_position()) < 95:
 		story_interact(a); return
 	for chest in chests:
 		if chest.get("reward", false) and not chest.open and a.p.distance_to(chest.p) < 85:
@@ -1235,7 +1355,7 @@ func interact(a: Dictionary) -> void:
 		var point := hub_point_near(a.p)
 		match point.get("id", ""):
 			"portal":
-				start_run(int(Time.get_ticks_msec()) % 999999); return
+				start_new_run(); return
 			"lost":
 				say("Anel rachado, preso por correntes. Esta coordenada ainda não pode ser estabilizada."); return
 			"core":
@@ -1267,22 +1387,22 @@ func interact(a: Dictionary) -> void:
 				pickups.append({"p": chest.p + Vector2(-46, 18), "kind": "battery"})
 				if chest.secret: materials += 1
 				say("+10 moedas, +1 coração, ARMADURA (R), galão e bateria" + (" + fragmento!" if chest.secret else ".")); return
-		if a.p.distance_to(DOCKS.POINTS.shop) < 110:
+		if a.p.distance_to(run_points.shop) < 110:
 			if shop_bought: say("Comerciante: estoque esgotado nesta expedição.")
 			elif money >= 15:
 				money -= 15; keys += 1; heal(a, 2); shop_bought = true
 				say("Comprou 1 chave e cura por 15 moedas.")
 			else: say("Comerciante: chave + cura por 15 moedas.")
 			return
-		if a.p.distance_to(DOCKS.POINTS.side) < 110 and not side_active and not side_complete and not side_failed:
+		if a.p.distance_to(run_points.side) < 110 and not side_active and not side_complete and not side_failed:
 			side_active = true; side_time = 55
 			var guards := [Vector2(-450, -300), Vector2(450, -300), Vector2(-500, 150), Vector2(500, 150), Vector2(-250, 380), Vector2(250, 380), Vector2(0, -330)]
 			for n in range(7):
-				var gp: Vector2 = DOCKS.POINTS.side + guards[n]
-				if not clear_at(gp, 14): gp = DOCKS.POINTS.side + guards[n] * 0.7
+				var gp: Vector2 = run_points.side + guards[n]
+				if not clear_at(gp, 14): gp = run_points.side + guards[n] * 0.7
 				spawn_enemy(gp, "cult" if n % 2 == 0 else "brute", true)
 			say("OPCIONAL • Elimine os 7 guardiões em 55s. Recompensa: chaves, cura e fragmento."); return
-		if boss_dead and a.p.distance_to(DOCKS.POINTS.extraction) < 120:
+		if boss_dead and a.p.distance_to(run_points.extraction) < 120:
 			if not reward_claimed:
 				reward_claimed = true; materials += 3; clears += 1; armor_unlocked = true
 				check_unlocks()
@@ -1397,7 +1517,7 @@ func step_enemies(dt: float) -> void:
 		if rng.randf() < KEY_DROP_CHANCE: pickups.append({"p": e.p + Vector2(15, 0), "kind": "key"})
 		if e.kind not in ["crawler_small", "boss"] and rng.randf() < AMMO_DROP_CHANCE:
 			pickups.append({"p": e.p + Vector2(-15, 0), "kind": "ammo", "weapon": "bazooka", "ammo": 2})
-		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 1.2, "max": 2.6 if e.kind == "boss" else 1.2, "face": e.face, "flip": e.face.x < 0})
+		effects.append({"p": e.p, "kind": "corpse", "enemy": e.kind, "life": 2.6 if e.kind == "boss" else 2.0, "max": 2.6 if e.kind == "boss" else 2.0, "face": e.face, "flip": e.face.x < 0})
 		if e.kind == "crawler":
 			for off in [Vector2(-18, 6), Vector2(18, -6)]:
 				if clear_at(e.p + off, 10): spawned.append([e.p + off, e.side])
@@ -1620,6 +1740,8 @@ func equip(id: int, outfit: String, robot: String, armor_type: String = "omega")
 		say("Esse item ainda está bloqueado."); return false
 	var a: Dictionary = actors[id]
 	if a.dead: return false
+	if a.armor and armor_type != a.armor_type:
+		say("Guarde a transformação antes de trocar de forma."); return false
 	if robot != a.selected_robot and not can_switch_robot(a): return false
 	if a.fused and robot != a.selected_robot:
 		say("Desfaça a fusão antes de trocar de robô."); return false
@@ -1789,17 +1911,32 @@ func step_spectres(dt: float) -> void:
 
 func snapshot() -> Dictionary:
 	var data := {}
+	data["scenario_geometry_revision"] = scenario_geometry_revision
+	data["scenario_module_ids"] = scenario_module_ids.duplicate()
+	for field in ["procedural_enabled","layout_manifest","run_points","run_corridors","run_secret_floors","room_offsets","run_corridor_groups"]: data[field] = get(field)
 	data["audio_events"] = audio_events.duplicate(true)
 	data["audio_sequence"] = audio_sequence
 	data["spectres"] = spectres
-	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t", "run_stats", "last_run_summary", "summary_seq"]:
+	for name in ["actors", "enemies", "bullets", "pickups", "effects", "rooms", "floors", "obstacles", "chests", "mech", "seed_value", "mode", "money", "keys", "materials", "run_materials_start", "upgrade", "clears", "armor_unlocked", "unlocked", "inventory_state", "story_quest", "dialogue_queue", "combat_zones", "harpoons", "pending_spawns", "side_active", "side_complete", "side_time", "side_failed", "boss_dead", "boss_intro_seen", "secret_open", "message", "message_time", "coop", "tick_time", "shop_bought", "arena_wave", "obstacle_kinds", "decor", "visited", "ramps", "raised", "gaps", "doors", "gate_blocks", "hazards", "tentacle_gates", "obstacle_hp", "fuses", "hitstop", "clutch_t", "clutch_cd", "streak", "streak_t", "run_stats", "last_run_summary", "summary_seq"]:
 		data[name] = get(name)
 	return data
 
 func apply_snapshot(data: Dictionary) -> void:
+	var previous_layout := layout_manifest
+	if not data.has("layout_manifest"):
+		layout_manifest = {}; room_offsets = {}; run_corridor_groups = []; procedural_enabled = false
+		run_points = DOCKS.POINTS.duplicate(); run_corridors = DOCKS.CORRIDORS.duplicate(); run_secret_floors = [DOCKS.SECRET_CORRIDOR]
 	var allowed := snapshot().keys()
 	for name in data:
 		if name in allowed and name not in ["inventory_state", "audio_events", "audio_sequence"]: set(name, data[name])
+	for a in actors:
+		if not a.has("basic_weapon"): a["basic_weapon"] = uniform_of(a).weapon
+		if not a.has("claw_cd"): a["claw_cd"] = 0.0
+	if mode != "run" or not "docks.farol.pilot" in data.get("scenario_module_ids",[]):
+		scenario_modules.clear(); scenario_module_ids.clear()
+	elif scenario_modules.is_empty() or previous_layout != layout_manifest or scenario_modules.get("stairs",{}).get("origin",Vector2.INF) != room_by_id("stairs").r.position:
+		var module := FarolRuntime.instance_for(self)
+		if not module.is_empty(): scenario_modules["stairs"] = module
 	# Replicas adopt the host's sequence, including a new host with lower IDs.
 	# Legacy saves have no cues and preserve the local sequence.
 	audio_events.clear()
@@ -1819,10 +1956,37 @@ func apply_snapshot(data: Dictionary) -> void:
 	# A Ômega agora é inicial; migre somente ela sem alterar a progressão dos outros itens.
 	if not unlocked is Dictionary: unlocked = {}
 	unlocked["omega"] = true
+	unlocked["azul"] = true
 	if data.get("inventory_state") is Dictionary: inventory_state = InventoryState.new(data.inventory_state).to_dict()
 	else: inventory_state = InventoryState.new(inventory_state).to_dict()
+	var migrated_inventory := InventoryState.new(inventory_state)
+	if migrated_inventory.quantity("forma_azul") == 0:
+		# Initial transformation entitlement must never displace existing inventory items.
+		if migrated_inventory.used_slots() >= migrated_inventory.capacity:
+			migrated_inventory.capacity = mini(120, migrated_inventory.capacity + 1)
+		migrated_inventory.add("forma_azul")
+	inventory_state = migrated_inventory.to_dict()
 	if not run_stats is Dictionary or run_stats.is_empty(): run_stats = fresh_run_stats()
 	if not last_run_summary is Dictionary: last_run_summary = {}
+	if mode=="run" and int(data.get("scenario_geometry_revision",0))<2:
+		FarolRuntime.install_geometry(self)
+		refresh_chapel_geometry()
+		scenario_geometry_revision = 2
+		ob_grid_count = -1
+	if mode=="run" and int(data.get("scenario_geometry_revision",0))<3:
+		SanctuaryFixed.install(self)
+	if mode=="run" and int(data.get("scenario_geometry_revision",0))<4:
+		CranesFixed.install(self)
+	if mode=="run" and int(data.get("scenario_geometry_revision",0))<5:
+		WarehouseFixed.install(self)
+
+func story_npc_position() -> Vector2:
+	return STORY_NPC + room_offsets.get("chapel",Vector2.ZERO)
+
+func refresh_chapel_geometry() -> void:
+	var offset: Vector2 = room_offsets.get("chapel",Vector2.ZERO)
+	for i in obstacles.size():
+		if obstacle_kinds[i]=="altar": obstacles[i]=Rect2(Vector2(1095,3910)+offset,Vector2(210,40))
 
 
 # ── 0.14: números da tela de Equipamento, sempre calculados das mesmas constantes do jogo ──
@@ -1831,6 +1995,15 @@ func loadout_stats(kind: String, outfit: String = "padrao") -> Array:
 	var u: Dictionary = UNIFORMS.get(outfit, UNIFORMS.padrao)
 	var rows: Array = []
 	match kind:
+		"azul":
+			var ar: Dictionary = ARMORS.azul
+			rows = [["CORAÇÕES", "%d + %d escudo" % [BASE_HEARTS, OMEGA_SHIELD_HEARTS], -1.0, "hearts_shield"],
+				["VELOCIDADE", str(int(ar.speed)), ar.speed / 430.0, "cyan"],
+				["GARRA", "%d de dano" % BLUE_CLAW_DAMAGE, BLUE_CLAW_DAMAGE / 70.0, "cyan"],
+				["ALCANCE", "%d" % BLUE_CLAW_RANGE, 1.0, "cyan"],
+				["RECARGA GARRA", "%.1fs" % BLUE_CLAW_COOLDOWN, -1.0, "violet"],
+				["DURAÇÃO", "%ds" % int(ar.duration), 1.0, "green"],
+				["RECARGA", "%ds" % int(ar.cooldown), 0.5, "violet"]]
 		"omega":
 			var ar: Dictionary = ARMORS.omega
 			rows = [["CORAÇÕES", "%d + %d escudo" % [BASE_HEARTS, OMEGA_SHIELD_HEARTS], -1.0, "hearts_shield"],
@@ -2005,7 +2178,7 @@ func boss_motion(e: Dictionary, target: Dictionary, dt: float) -> bool:
 		return true
 	var delta: Vector2 = e.motion_to-e.p
 	e.p=move_body(e.p,delta.normalized()*minf(delta.length(),(570.0 if e.motion_kind == "charge" else 340.0)*dt),BOSS_RADIUS)
-	if e.motion_kind == "charge" and e.p.distance_to(target.p)<70: damage_actor(target,20,"boss","charge")
+	if e.motion_kind == "charge" and e.p.distance_to(target.p)<85: damage_actor(target,20,"boss","charge")
 	if e.motion_t <= 0 or delta.length()<12:
 		e.motion="idle";e.motion_cd=2.4;e.cd=maxf(e.cd,0.4)
 	return true

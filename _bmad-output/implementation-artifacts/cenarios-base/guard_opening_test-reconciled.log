@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: preparação respeita duração declarada
+PASS: contrato atual do Guardião usa aviso de0.85s
+PASS: a preparação não dispara cedo
+PASS: ataque abre a guarda
+PASS: rajada continua durante a abertura
+PASS: Marty básico causa dano frontal durante a rajada
+PASS: escudo volta depois do ataque
+failures=0

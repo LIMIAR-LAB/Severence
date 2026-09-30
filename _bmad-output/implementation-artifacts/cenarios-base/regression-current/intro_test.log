@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: opening is the launch scene
+PASS: Theora opening starts with audio
+PASS: decoder advances playback
+PASS: 16:10 window preserves video proportions
+PASS: held key repeats do not skip
+PASS: keyboard skip stops audio and enters menu once
+PASS: controller opens menu exactly once
+PASS: button opens menu exactly once
+PASS: finished opens menu exactly once
+PASS: missing opens menu exactly once
+PASS: skip reaches the actual menu scene
+PASS: skip press does not start a game or activate a menu action

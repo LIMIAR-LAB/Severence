@@ -1,0 +1,148 @@
+{
+  "reviewed_at": "2026-09-30T10:47:13.744997-03:00",
+  "decision": "accepted_static_art_pilot_with_isolated_projection_fix",
+  "files": [
+    {
+      "file": "1800-west-marty.png",
+      "sha256": "7aec58a82a6c5f176a32c6fc29eb2cd5755b7dde111526da4650fdb9ad9e88f0"
+    },
+    {
+      "file": "400-west-marty.png",
+      "sha256": "8e3b3f2e7e4273f21123a9fc3f36bcb02b4cd92faa286dd7ed6dd178af0dc599"
+    },
+    {
+      "file": "1800-west-titan.png",
+      "sha256": "a04a83635587bc3040dd3faf6dad41786bba765329d132a72ba44e449ef0dd76"
+    },
+    {
+      "file": "400-west-titan.png",
+      "sha256": "3ce46fd1f93a856942a3d107ed3f4c5fcbbf5332d13af2c62d02a1dd67b04d87"
+    },
+    {
+      "file": "1800-landing-marty.png",
+      "sha256": "ceb6afbbcf8bff4f0a17f9f0d23e59d7cb091e75bb3fc6e66fd6521c18b6f43d"
+    },
+    {
+      "file": "400-landing-marty.png",
+      "sha256": "d8e5dab3602b4d65c98aaf90fe9e2242a90b159421080bc9ea45cd739723143d"
+    },
+    {
+      "file": "1800-landing-titan.png",
+      "sha256": "6e61968b362984cf21baf2433b07f8948cfe7a67005db79373762947f8ed0ed1"
+    },
+    {
+      "file": "400-landing-titan.png",
+      "sha256": "ac738b1394406d13857a4ebb6e830be7f4eb9f2ba3ccf9fb7e08ec7423a53a60"
+    },
+    {
+      "file": "1800-east-marty.png",
+      "sha256": "63827b1ae19c0febb6b6069abd311bca80970937dc51a9aadd6a667ea0f3e54a"
+    },
+    {
+      "file": "400-east-marty.png",
+      "sha256": "f2497a7815273c7b04c0752608c2450f4612951360b3ae4d01435d2cf417cd54"
+    },
+    {
+      "file": "1800-east-titan.png",
+      "sha256": "da4b01fda2c1b01950124395b95b26c542db4143b5e7244cc743b62fe6671844"
+    },
+    {
+      "file": "400-east-titan.png",
+      "sha256": "acdccfe3f100620cd9ba92c18624eb1bdf36b2efac638e5130ac10e7d46b8533"
+    },
+    {
+      "file": "1800-front-marty.png",
+      "sha256": "aef55a693204ba1e11235e9c6afc57ed2daa94d25909f84e470549c47850d9c3"
+    },
+    {
+      "file": "400-front-marty.png",
+      "sha256": "e152cf73ef4cdf7ee29dffa8119bb1afb465a51376928fe3bf167e7c7a1c7997"
+    },
+    {
+      "file": "1800-front-titan.png",
+      "sha256": "409dc991e1a1974177ba248a4a42663d9d10d2cf63859ed8f1f62017bc9e3930"
+    },
+    {
+      "file": "400-front-titan.png",
+      "sha256": "15e1666a4600442a08f8d8e6a17a8f086af4b17b6cab5c80f17d533ce8e1b551"
+    }
+  ],
+  "translation_comparison": [
+    {
+      "probe": "west",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "west",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "landing",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "landing",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "east",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "east",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "front",
+      "actor": "marty",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    },
+    {
+      "probe": "front",
+      "actor": "titan",
+      "identical_scene_below_ui": true,
+      "diff_bbox": null
+    }
+  ],
+  "visual_checks": {
+    "two_short_lateral_ascents": true,
+    "shallow_face_consistent_with44": true,
+    "no_monumental_extra_flights": true,
+    "no_observed_texture_stretching": true,
+    "foot_shadow_contact_coherent_at_sampled_positions": true,
+    "marty_titan_separately_visible": true,
+    "initial_floor_visible": true
+  },
+  "basis": "Visual inspection of all eight origin1800 views; exact comparison of all eight translated400 counterparts excluding header",
+  "reservations": [
+    "Subtle stair contrast at camera0.7; no novice human playtest or perception approval",
+    "Quantized treads vs continuous height need movement review at joints",
+    "Titan health bar remains at physical coordinates in inherited code; separate UI issue",
+    "Correction exists only in tools/scenarios/base/farol_preview.gd, not shared runtime"
+  ],
+  "not_accepted": [
+    "combat",
+    "full movement/animation suite by art reviewer",
+    "main game release",
+    "SCN-03 publication"
+  ],
+  "art_changed_since_previous_round": false,
+  "source_hashes": {
+    "tools/scenarios/base/farol_preview.gd": "86b08b3f39ee0376f0f9b92d0c1255463f87357930aee914fff5982b14e82f2e",
+    "scripts/scenarios/farol_module.gd": "60bd5d93e65d377247f2bac8f454274768d68a6073d61f5ec2215dde356ae3d0",
+    "art/scenarios/scn-production/farol-docas-v01/stairs/manifest.json": "c6e47681139f385cfbc526b07cd207312b0237a3485da2c00695b500e9aa5a57"
+  }
+}

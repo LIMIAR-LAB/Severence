@@ -1,0 +1,67 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: fluxo da tela inicial oferece o Arquivo em Opções
+PASS: Arquivo abre pelo fluxo da tela inicial
+PASS: aba de monstros existe
+PASS: aba de itens existe
+PASS: aba de robôs existe
+PASS: lista é gerada pelos dados
+PASS: Arquivo reutiliza atmosfera pixel-art do jogo
+PASS: Arquivo possui chassi industrial próprio
+PASS: índice assume linguagem de dossiê
+PASS: moldura ornamentada enquadra o registro
+PASS: legenda de controles permanece visível
+PASS: fratura violeta integra a identidade temporal
+PASS: dossiê monstro_cultista aparece no índice
+PASS: dossiê monstro_cultista exibe seu portrait
+PASS: dossiê monstro_peixeiro aparece no índice
+PASS: dossiê monstro_peixeiro exibe seu portrait
+PASS: dossiê monstro_rastejante aparece no índice
+PASS: dossiê monstro_rastejante exibe seu portrait
+PASS: dossiê monstro_brutamontes aparece no índice
+PASS: dossiê monstro_brutamontes exibe seu portrait
+PASS: dossiê monstro_bombardeiro aparece no índice
+PASS: dossiê monstro_bombardeiro exibe seu portrait
+PASS: dossiê monstro_guarda aparece no índice
+PASS: dossiê monstro_guarda exibe seu portrait
+PASS: dossiê monstro_vigia aparece no índice
+PASS: dossiê monstro_vigia exibe seu portrait
+PASS: dossiê monstro_almirante aparece no índice
+PASS: dossiê monstro_almirante exibe seu portrait
+PASS: aba de robôs pode receber foco
+PASS: troca de categoria reconstrói a lista
+PASS: seleção atualiza os detalhes
+PASS: arte existente aparece no detalhe
+PASS: teclado/controle percorre as abas pelo foco
+PASS: aceitar pelo foco troca a categoria
+PASS: dossiê item_blaster aparece no índice
+PASS: dossiê item_blaster exibe seu card
+PASS: dossiê item_escopeta_rebite aparece no índice
+PASS: dossiê item_escopeta_rebite exibe seu card
+PASS: dossiê item_smg aparece no índice
+PASS: dossiê item_smg exibe seu card
+PASS: dossiê item_lamina_omega aparece no índice
+PASS: dossiê item_lamina_omega exibe seu card
+PASS: dossiê item_bazuca aparece no índice
+PASS: dossiê item_bazuca exibe seu card
+PASS: dossiê item_fragmento aparece no índice
+PASS: dossiê item_fragmento exibe seu card
+PASS: fallback tem selo intencional quando necessário
+PASS: fundo reutilizado preserva filtragem nearest
+PASS: moldura reutilizada preserva filtragem nearest
+PASS: navegação mantém um botão em foco
+PASS: Voltar retorna a Opções
+PASS: entrada adicionada aparece sem mudança na UI
+PASS: caminho de imagem indisponível usa fallback
+PASS: detalhes extensos possuem rolagem
+PASS: conteúdo longo ativa rolagem vertical
+PASS: teclado/controle percorre o texto longo do dossiê
+PASS: novo dossiê reinicia a leitura no topo
+PASS: categoria vazia liga aba diretamente ao Voltar
+PASS: estado vazio limpa tooltips do dossiê anterior
+PASS: categoria vazia mostra estado explícito
+PASS: categoria vazia mantém Voltar utilizável
+PASS: pausa oferece o Arquivo
+PASS: Esc retorna o Arquivo à pausa sem retomar o jogo
+PASS: Voltar retorna à pausa de origem
+ENCYCLOPEDIA_UI_TESTS_DONE failures=0

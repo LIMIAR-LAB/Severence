@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: id estável e único: arma_blaster
+PASS: id estável e único: arma_rebite
+PASS: id estável e único: arma_smg
+PASS: id estável e único: lamina_omega
+PASS: id estável e único: modulo_titan
+PASS: id estável e único: nucleo_spectre
+PASS: id estável e único: kit_reparo
+PASS: id estável e único: sucata_temporal
+PASS: id estável e único: fragmento_cronal
+PASS: id estável e único: chave_fenda_do_marty
+PASS: id estável e único: missao_chaves
+PASS: id estável e único: missao_moedas
+PASS: id estável e único: missao_fragmentos
+PASS: id estável e único: missao_bazuca
+PASS: id estável e único: missao_foguetes
+PASS: id estável e único: missao_combustivel
+PASS: id estável e único: missao_energia
+PASS: catálogo inicial possui categorias e item especial
+PASS: empilha até o limite
+PASS: rejeita pilha acima do limite
+PASS: capacidade conta pilhas sem mutação parcial
+PASS: item desconhecido degrada com segurança
+PASS: remove pilha completa
+PASS: remoção inválida é segura
+PASS: filtro de armas
+PASS: filtro inválido não altera estado
+PASS: ordenação determinística
+PASS: equipa combinação válida
+PASS: protótipo não cria efeito falso
+PASS: desequipa slot válido
+PASS: migração sanitiza dados inválidos
+INVENTORY_MODEL_TESTS_DONE failures=0

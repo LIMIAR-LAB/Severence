@@ -1,0 +1,285 @@
+{
+  "engine": "4.7.2.stable.official.ed1daf0bf",
+  "source_hashes_before": {
+    "room_contract.gd": "F8D3FC4F71C3AF4BB1C7808A25880A506937A7A4AA6847782E6758444F75D5EA",
+    "biome_catalog.gd": "367B0C7FCAA95F1E3727CBC5C0B863609B7C5F8337B1390CD659F154A98D62E8"
+  },
+  "source_hashes_after": {
+    "room_contract.gd": "F8D3FC4F71C3AF4BB1C7808A25880A506937A7A4AA6847782E6758444F75D5EA",
+    "biome_catalog.gd": "367B0C7FCAA95F1E3727CBC5C0B863609B7C5F8337B1390CD659F154A98D62E8"
+  },
+  "results": [
+    {
+      "case": "room_valid",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "errors": null
+    },
+    {
+      "case": "biome_valid",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": true,
+      "errors": null
+    },
+    {
+      "case": "room_footprint_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/footprint: expected array"
+    },
+    {
+      "case": "room_connector_scalar",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/connectors/0: expected object"
+    },
+    {
+      "case": "room_width_string",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/connectors/0/width: expected finite number"
+    },
+    {
+      "case": "room_spawn_missing_position",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/spawns/0/position: missing or invalid type"
+    },
+    {
+      "case": "room_layer_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/layers/0: expected object"
+    },
+    {
+      "case": "room_obstacle_missing_rect",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/obstacles/0/rect: missing or invalid type"
+    },
+    {
+      "case": "room_connector_empty_id",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/connectors/0/id: empty string"
+    },
+    {
+      "case": "room_connector_bad_height",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/connectors/0/height: expected finite number"
+    },
+    {
+      "case": "room_empty_template_id",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates//template_id: expected nonempty string"
+    },
+    {
+      "case": "room_negative_radius",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/spawns/0/radius: must be positive"
+    },
+    {
+      "case": "room_bad_depth",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/layers/0/depth: unsupported"
+    },
+    {
+      "case": "room_point_missing_position",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/points_of_interest/0/position: missing or invalid type"
+    },
+    {
+      "case": "room_ramp_missing_rect",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/ramps/0/rect: missing or invalid type"
+    },
+    {
+      "case": "room_raised_scalar",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/raised: invalid rectangle"
+    },
+    {
+      "case": "room_origin_infinite",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "origin: expected finite coordinates"
+    },
+    {
+      "case": "room_origin_nan",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "origin: expected finite coordinates"
+    },
+    {
+      "case": "biome_materials_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/materials: expected object"
+    },
+    {
+      "case": "biome_pool_string",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/template_pool: expected array"
+    },
+    {
+      "case": "biome_fallback_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/fallback_templates: expected array"
+    },
+    {
+      "case": "biome_rules_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/connector_rules: expected object"
+    },
+    {
+      "case": "biome_roles_scalar",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/room_roles: expected array"
+    },
+    {
+      "case": "biome_version_string",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/version: positive integer required"
+    },
+    {
+      "case": "biome_id_numeric",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/biome_id: expected string"
+    },
+    {
+      "case": "biome_era_empty",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/era_id: empty string"
+    },
+    {
+      "case": "biome_atmosphere_null",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/atmosphere: expected object"
+    },
+    {
+      "case": "biome_negative_width",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/connector_rules/minimum_width: nonnegative finite number required"
+    },
+    {
+      "case": "room_pixel_scale_zero",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/layers/0/world_units_per_pixel: must be positive"
+    },
+    {
+      "case": "room_pixel_scale_negative",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/layers/0/world_units_per_pixel: must be positive"
+    },
+    {
+      "case": "room_version_nan",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "templates/fixture.wing/version: unsupported"
+    },
+    {
+      "case": "biome_version_nan",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/version: positive integer required"
+    },
+    {
+      "case": "biome_empty_pool",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/template_pool: empty pool"
+    },
+    {
+      "case": "biome_empty_id",
+      "exit_code": 0,
+      "script_error": false,
+      "result_present": true,
+      "accepted": false,
+      "errors": "profiles/0/biome_id: empty string"
+    }
+  ]
+}

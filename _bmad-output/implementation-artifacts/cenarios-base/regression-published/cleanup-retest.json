@@ -1,0 +1,62 @@
+[
+  {
+    "test": "boss_intro_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "boss_music_test.gd",
+    "ok": false,
+    "exit": 0
+  },
+  {
+    "test": "controller_input_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "equipment_ui_test.gd",
+    "ok": false,
+    "exit": 0
+  },
+  {
+    "test": "input_remap_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "intro_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "inventory_persistence_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "inventory_ui_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "mission_inventory_ui_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "save_game_flow_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "solo_robot_test.gd",
+    "ok": true,
+    "exit": 0
+  },
+  {
+    "test": "title_screen_test.gd",
+    "ok": false,
+    "exit": 0
+  }
+]

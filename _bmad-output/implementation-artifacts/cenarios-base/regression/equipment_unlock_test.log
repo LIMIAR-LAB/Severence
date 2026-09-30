@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: 6 itens e 6 atributos no JSON
+PASS: Padrão, Ômega, Titan e Spectre liberados desde o início
+PASS: Armadura Ômega disponível desde o início
+PASS: robôs disponíveis no Refúgio
+PASS: Titan pode ser equipado desde o início
+PASS: Spectre pode ser equipado desde o início
+PASS: padrao: velocidade/golpe/dash iguais ao jogo
+PASS: padrao: defesa e dano/seg iguais ao jogo
+PASS: mecanico: velocidade/golpe/dash iguais ao jogo
+PASS: mecanico: defesa e dano/seg iguais ao jogo
+PASS: espiao: velocidade/golpe/dash iguais ao jogo
+PASS: espiao: defesa e dano/seg iguais ao jogo
+PASS: Ômega soma 3 corações de escudo
+PASS: Titan pilotado anda a 190
+PASS: começa sem robô e sem Titan no mapa
+PASS: R veste a Ômega inicial por 5 minutos
+PASS: C não invoca robô bloqueado
+PASS: uniforme bloqueado não equipa
+PASS: entrar na Oficina libera o Titan
+PASS: desbloqueio marcado para salvar
+PASS: desafio do gerador libera o Spectre
+PASS: extração mantém Ômega e libera Mecânico (1 expedição)
+PASS: 2 expedições liberam o Espião
+EQUIPMENT_UNLOCK_TESTS_DONE failures=0

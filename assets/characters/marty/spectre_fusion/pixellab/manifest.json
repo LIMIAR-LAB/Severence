@@ -12,6 +12,13 @@
     "south-west"
   ],
   "frames": {
-    "idle": 1
+    "idle": 4,
+    "run": 8,
+    "jump": 9,
+    "evade": 6,
+    "shoot": 3,
+    "melee": 6,
+    "hurt": 6,
+    "defeat": 7
   }
 }

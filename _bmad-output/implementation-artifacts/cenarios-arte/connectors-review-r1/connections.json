@@ -1,0 +1,86 @@
+[
+  {
+    "actor": "(1800.0, 4300.0)",
+    "error": 0,
+    "file": "1800-join-west-marty.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(1800.0, 4300.0)",
+    "error": 0,
+    "file": "1800-join-west-titan.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(3500.0, 4300.0)",
+    "error": 0,
+    "file": "1800-join-east-marty.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(3500.0, 4300.0)",
+    "error": 0,
+    "file": "1800-join-east-titan.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(3400.0, 3700.0)",
+    "error": 0,
+    "file": "1800-join-north-marty.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(3400.0, 3700.0)",
+    "error": 0,
+    "file": "1800-join-north-titan.png",
+    "height": 0.0,
+    "origin": "(1800.0, 3700.0)"
+  },
+  {
+    "actor": "(400.0, 100.0)",
+    "error": 0,
+    "file": "400-join-west-marty.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  },
+  {
+    "actor": "(400.0, 100.0)",
+    "error": 0,
+    "file": "400-join-west-titan.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  },
+  {
+    "actor": "(2100.0, 100.0)",
+    "error": 0,
+    "file": "400-join-east-marty.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  },
+  {
+    "actor": "(2100.0, 100.0)",
+    "error": 0,
+    "file": "400-join-east-titan.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  },
+  {
+    "actor": "(2000.0, -500.0)",
+    "error": 0,
+    "file": "400-join-north-marty.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  },
+  {
+    "actor": "(2000.0, -500.0)",
+    "error": 0,
+    "file": "400-join-north-titan.png",
+    "height": 0.0,
+    "origin": "(400.0, -500.0)"
+  }
+]

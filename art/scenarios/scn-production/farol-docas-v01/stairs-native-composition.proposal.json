@@ -1,0 +1,362 @@
+{
+  "status": "geometry_only_not_final_art_not_game_validated",
+  "origin_world": [
+    2050,
+    4000
+  ],
+  "allowed_transforms": [
+    "translate"
+  ],
+  "physical_footprint": [
+    1200,
+    360
+  ],
+  "height": 44,
+  "native_canvas": [
+    1200,
+    404
+  ],
+  "canvas_origin_relative_to_physical": [
+    0,
+    -44
+  ],
+  "coordinates": "physical origin; add (0,44) to rects when composing inside native canvas",
+  "landing_top": [
+    200,
+    -44,
+    800,
+    360
+  ],
+  "front_face": [
+    200,
+    316,
+    800,
+    44
+  ],
+  "flights": [
+    {
+      "side": "west",
+      "ascends": "right",
+      "strips": [
+        {
+          "id": "west-tread-0",
+          "top_rect": [
+            0,
+            0,
+            25,
+            360
+          ],
+          "height": 0,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": null
+        },
+        {
+          "id": "west-tread-1",
+          "top_rect": [
+            25,
+            -6,
+            25,
+            360
+          ],
+          "height": 6,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            25,
+            354,
+            25,
+            6
+          ]
+        },
+        {
+          "id": "west-tread-2",
+          "top_rect": [
+            50,
+            -11,
+            25,
+            360
+          ],
+          "height": 11,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            50,
+            349,
+            25,
+            11
+          ]
+        },
+        {
+          "id": "west-tread-3",
+          "top_rect": [
+            75,
+            -17,
+            25,
+            360
+          ],
+          "height": 17,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            75,
+            343,
+            25,
+            17
+          ]
+        },
+        {
+          "id": "west-tread-4",
+          "top_rect": [
+            100,
+            -22,
+            25,
+            360
+          ],
+          "height": 22,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            100,
+            338,
+            25,
+            22
+          ]
+        },
+        {
+          "id": "west-tread-5",
+          "top_rect": [
+            125,
+            -28,
+            25,
+            360
+          ],
+          "height": 28,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            125,
+            332,
+            25,
+            28
+          ]
+        },
+        {
+          "id": "west-tread-6",
+          "top_rect": [
+            150,
+            -33,
+            25,
+            360
+          ],
+          "height": 33,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            150,
+            327,
+            25,
+            33
+          ]
+        },
+        {
+          "id": "west-tread-7",
+          "top_rect": [
+            175,
+            -39,
+            25,
+            360
+          ],
+          "height": 39,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            175,
+            321,
+            25,
+            39
+          ]
+        }
+      ],
+      "riser_heights": [
+        6,
+        5,
+        6,
+        5,
+        6,
+        5,
+        6,
+        5
+      ]
+    },
+    {
+      "side": "east",
+      "ascends": "left",
+      "strips": [
+        {
+          "id": "east-tread-0",
+          "top_rect": [
+            1175,
+            0,
+            25,
+            360
+          ],
+          "height": 0,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": null
+        },
+        {
+          "id": "east-tread-1",
+          "top_rect": [
+            1150,
+            -6,
+            25,
+            360
+          ],
+          "height": 6,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1150,
+            354,
+            25,
+            6
+          ]
+        },
+        {
+          "id": "east-tread-2",
+          "top_rect": [
+            1125,
+            -11,
+            25,
+            360
+          ],
+          "height": 11,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1125,
+            349,
+            25,
+            11
+          ]
+        },
+        {
+          "id": "east-tread-3",
+          "top_rect": [
+            1100,
+            -17,
+            25,
+            360
+          ],
+          "height": 17,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1100,
+            343,
+            25,
+            17
+          ]
+        },
+        {
+          "id": "east-tread-4",
+          "top_rect": [
+            1075,
+            -22,
+            25,
+            360
+          ],
+          "height": 22,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1075,
+            338,
+            25,
+            22
+          ]
+        },
+        {
+          "id": "east-tread-5",
+          "top_rect": [
+            1050,
+            -28,
+            25,
+            360
+          ],
+          "height": 28,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1050,
+            332,
+            25,
+            28
+          ]
+        },
+        {
+          "id": "east-tread-6",
+          "top_rect": [
+            1025,
+            -33,
+            25,
+            360
+          ],
+          "height": 33,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1025,
+            327,
+            25,
+            33
+          ]
+        },
+        {
+          "id": "east-tread-7",
+          "top_rect": [
+            1000,
+            -39,
+            25,
+            360
+          ],
+          "height": 39,
+          "source": "atlas/stone-floor.tres",
+          "mapping": "native pixel crop only; 25x48 sections repeated seven times plus last 25x24; no resizing",
+          "south_cheek_rect": [
+            1000,
+            321,
+            25,
+            39
+          ]
+        }
+      ],
+      "riser_heights": [
+        6,
+        5,
+        6,
+        5,
+        6,
+        5,
+        6,
+        5
+      ]
+    }
+  ],
+  "physics": "continuous 44 units / 200 run, unchanged",
+  "visual_error_bound": {
+    "max_units": 6,
+    "condition": "staircase approximation vs continuous height; target to evaluate, not approved tolerance"
+  },
+  "face_authoring": "New native 64x44 masonry face vocabulary with edge variants required. Do not squash 64x68 wall. Existing masonry only supplies palette and block language.",
+  "pending": [
+    "native 44-high face art",
+    "separate east lighting",
+    "crop/repetition visual review",
+    "foot position tests",
+    "north connection full-room test"
+  ],
+  "publishable": false
+}

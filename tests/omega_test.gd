@@ -29,18 +29,18 @@ func _init() -> void:
 	check(s.bullets.all(func(b): return b.team == 0 or b.life <= 0), "onda de choque apaga projéteis inimigos")
 	for n in range(60): s.step_actor(a, {}, 0.016)
 	check(a.transform == 0, "transformação termina")
-	check(s.weapon_of(a) == "omega_sword", "Ômega troca a arma pela Lâmina Ômega")
+	check(s.weapon_of(a) == "pistol", "Ômega preserva arma equipada e reserva espada ao corpo a corpo")
 	check(not s.equip(0, "espiao", "titan") and a.outfit == "padrao", "com armadura ativa não troca uniforme/arma")
 	check(s.ARMORS.omega.speed > s.UNIFORMS.espiao.speed, "Ômega é mais rápida até que o Espião")
 	# combo de espada: 3 cortes, o 3º solta a onda
 	s.enemies.clear(); s.bullets.clear()
 	s.spawn_enemy(a.p + Vector2(60, 0), "brute"); var e: Dictionary = s.enemies[0]
 	a.aim = Vector2.RIGHT; a.shot = 0
-	s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)
+	s.step_actor(a, {"melee": true, "aim": Vector2.RIGHT}, 0.016)
 	check(e.hp == e.max - 38 and s.effects.any(func(fx): return fx.kind == "sword"), "1º corte da espada: 38 e rastro")
 	e.hp = 999; e.max = 999
 	for n in range(2):
-		a.shot = 0; s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)
+		a.shot = 0; s.step_actor(a, {"melee": true, "aim": Vector2.RIGHT}, 0.016)
 	check(s.bullets.any(func(b): return b.kind == "p_wave" and b.pierce == 5), "3º corte solta onda perfurante")
 	check(e.hp == 999 - 38 - 64, "combo: 38 + 64 no finalizador")
 	hp = a.hp; a.hurt = 0
@@ -75,8 +75,8 @@ func _init() -> void:
 	s.set_armor(a, false)
 	check(visible_enemy.hp < visible_hp and outside_enemy.hp == outside_hp, "recolher Ômega atinge somente inimigos próximos na tela")
 	check(s.effects.any(func(fx): return fx.kind == "recall_light"), "descarga de luz desenha feixes até os alvos")
-	a.outfit = "mecanico"; check(s.weapon_of(a) == "shotgun", "Mecânico usa escopeta")
-	a.outfit = "espiao"; check(s.weapon_of(a) == "smg", "Espião usa submetralhadora")
+	a.outfit = "mecanico"; check(s.weapon_of(a) == "pistol", "Mecânico conserva arma equipada")
+	a.outfit = "espiao"; check(s.weapon_of(a) == "pistol", "Espião conserva arma equipada")
 	check(s.UNIFORMS.espiao.speed > s.UNIFORMS.padrao.speed and s.UNIFORMS.mecanico.melee > s.UNIFORMS.padrao.melee, "Espião mais rápido, Mecânico mais forte")
 	# Baú
 	s = Expedition.new(); s.coop = "solo"; s.start_run(1941)

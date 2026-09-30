@@ -35,7 +35,7 @@ func _init() -> void:
 		shot_sim.step_enemies(0.01)
 		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].p.distance_to(shot_sim.enemy_muzzle_position(shooter)) < 0.01, kind + " dispara da ponta do cano")
 		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].get("height", 28.0) == 0.0, kind + " desenha bala na altura do cano")
-		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].p.distance_to(shooter.p) > 25, kind + " não dispara dos pés")
+		check(not shot_sim.bullets.is_empty() and shot_sim.bullets[0].p.y <= shooter.p.y - 8, kind + " não dispara dos pés")
 	var s := arena()
 	s.spawn_enemy(Vector2(700, 500), "brute"); s.enemies[0].cd = 0
 	for frame in range(80): s.step_enemies(0.016)

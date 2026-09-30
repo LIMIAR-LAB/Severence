@@ -1,0 +1,6 @@
+{
+  "probes": "[{ \"id\": \"chapel-east\", \"p\": (650.0, 4800.0) }, { \"id\": \"chapel-altar\", \"p\": (100.0, 4550.0) }, { \"id\": \"chapel-south\", \"p\": (100.0, 5590.0) }, { \"id\": \"farol-south\", \"p\": (2804.0, 5510.0) }, { \"id\": \"farol-west\", \"p\": (1800.0, 4800.0) }, { \"id\": \"farol-center\", \"p\": (2650.0, 4750.0) }, { \"id\": \"chapel-east-titan\", \"p\": (650.0, 4800.0) }, { \"id\": \"farol-west-titan\", \"p\": (1800.0, 4800.0) }]",
+  "save_read_only": true,
+  "seed": 42,
+  "zoom": 1.05
+}

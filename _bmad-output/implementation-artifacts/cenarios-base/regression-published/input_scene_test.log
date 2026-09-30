@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS INPUT: main play button enters live combat
+PASS INPUT: D input moves Marty; body faces the aim
+PASS INPUT: W input moves Marty upward
+PASS INPUT: body turns to follow the mouse aim (up) even while walking, so the weapon never crosses the character
+PASS INPUT: Shift input dashes from standstill
+PASS INPUT: left mouse input fires Marty weapon
+PASS INPUT: Space input starts a jump

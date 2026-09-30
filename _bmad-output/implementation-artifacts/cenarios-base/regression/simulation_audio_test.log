@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: successful shot emits one pistol cue
+PASS: cooldown does not emit another cue
+PASS: shotgun emits once for all pellets
+PASS: empty bazooka clicks without shot
+PASS: sword input emits only sword cue
+PASS: invulnerable damage does not repeat hit cue
+PASS: guard emits one cue per discrete shot
+PASS: audio does not consume gameplay RNG
+PASS: event ring bounded at 64
+PASS: snapshot carries cue IDs and positions
+PASS: new host replaces higher local sequence
+PASS: scene change clears ring without resetting IDs
+PASS: legacy save clears stale cues and preserves IDs
+PASS: malformed audio snapshot ignored
+failures=0

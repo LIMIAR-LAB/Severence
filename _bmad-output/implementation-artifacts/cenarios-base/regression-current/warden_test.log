@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Warden nasce com 420 de vida
+PASS: perto do alvo o Warden telegrafa a carga
+PASS: carga mira na direção do jogador
+PASS: após o aviso o Warden arremete
+PASS: carga termina em recuperação
+PASS: a carga desloca o Warden
+PASS: projétil acerta o Warden no raio ampliado
+WARDEN_TESTS_DONE failures=0

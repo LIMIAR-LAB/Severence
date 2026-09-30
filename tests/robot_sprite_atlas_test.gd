@@ -9,13 +9,15 @@ func check(ok: bool, label: String) -> void:
 
 func _init() -> void:
 	var atlases := [
-		["res://assets/mech/titan_v5.png", Vector2i(1760, 880), "Titan limpo: 10x5 em 176px"],
+		["res://assets/mech/titan_mk2_walk.png", Vector2i(1760, 880), "Titan Mk II: 10x5 em 176px"],
+		["res://assets/mech/titan_mk2_cockpit.png", Vector2i(1056, 176), "Cockpit Mk II: 6x1 em 176px"],
+		["res://assets/mech/marty_board_titan.png", Vector2i(480, 96), "Marty embarcando: 5x1 em 96px"],
 		["res://assets/mech/spectre_octopus_v2.png", Vector2i(512, 512), "Spectre: 4x4 em 128px"],
 		["res://assets/marty/spectre_fusion_v3.png", Vector2i(640, 640), "Fusão: 4x4 em 160px"]]
 	for spec in atlases:
 		var image := Image.load_from_file(ProjectSettings.globalize_path(spec[0]))
 		check(not image.is_empty() and image.get_size() == spec[1], spec[2])
-	var titan := Image.load_from_file(ProjectSettings.globalize_path("res://assets/mech/titan_v5.png"))
+	var titan := Image.load_from_file(ProjectSettings.globalize_path("res://assets/mech/titan_mk2_walk.png"))
 	var fusion := Image.load_from_file(ProjectSettings.globalize_path("res://assets/marty/spectre_fusion_v3.png"))
 	for row in range(4):
 		for col in range(4):

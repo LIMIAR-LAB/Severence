@@ -210,6 +210,12 @@ def main():
         assert rate == SR and len(decoded) == len(x)
         manifest['assets'][key] = {'file':path.relative_to(ROOT).as_posix(),'format':'Ogg Vorbis stereo','loop':True,**metrics(decoded)}
         if exp: bed = decoded
+    boss_path = OUT / 'music_boss.ogg'
+    if boss_path.exists():
+        decoded,rate = sf.read(boss_path)
+        assert rate == SR
+        manifest['assets']['music_boss'] = {'file':boss_path.relative_to(ROOT).as_posix(),'format':'Ogg Vorbis stereo','loop':True,
+                                            'generator':'tools/generate_boss_music.py',**metrics(decoded)}
     preview = bed[:SR*24].copy()*.52
     for i,key in enumerate(['pistol','shotgun','smg','bazooka','mech','sword','spectre','enemy_cult','enemy_fish','enemy_crawler','enemy_guard','enemy_boss','explosion','pickup']):
         x = sounds[key]
@@ -220,7 +226,7 @@ def main():
     for item in manifest['assets'].values():
         item['sha256'] = hashlib.sha256((ROOT/item['file']).read_bytes()).hexdigest()
     (SOURCE/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
-    (SOURCE/'README.md').write_text('# Original game audio\n\nGenerated with `python tools/generate_game_audio.py` (NumPy, SciPy, SoundFile). All 23 effects are mono 44.1 kHz PCM16 WAV. Two original stereo Ogg Vorbis scores: refuge 64 seconds; expedition 51.2 seconds. Music uses circular placement and wrapped room reflections for continuous full-file looping. No sampled material, voices, third-party music, Higgsfield or other AI audio service was used.\n\nThe deterministic seed and per-file measurements/hashes are recorded in manifest.json. The score uses an original D-minor progression, suspended pads, glass/electric-piano motif, bass and restrained dockyard percussion. The preview in output/audio-refresh/preview.wav demonstrates the score with selected effects.\n',encoding='utf-8')
+    (SOURCE/'README.md').write_text('# Original game audio\n\nGenerated with `python tools/generate_game_audio.py` and `python tools/generate_boss_music.py` (NumPy, SciPy, SoundFile). All 23 effects are mono 44.1 kHz PCM16 WAV. Three original stereo Ogg Vorbis scores: refuge 64 seconds; expedition 51.2 seconds; boss 32 seconds. Music uses circular placement and wrapped room reflections for continuous full-file looping. No sampled material, voices, third-party music, Higgsfield or other AI audio service was used.\n\nThe deterministic seed and per-file measurements/hashes are recorded in manifest.json. The scores use original motifs, bass and dockyard percussion. The preview in output/audio-refresh/preview.wav demonstrates the expedition score with selected effects.\n',encoding='utf-8')
     print(json.dumps(manifest,indent=2))
 
 

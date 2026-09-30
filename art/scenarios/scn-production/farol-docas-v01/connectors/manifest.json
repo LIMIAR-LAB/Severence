@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "status": "authored_candidate_not_runtime_validated",
+  "world_units_per_pixel": 1,
+  "height": 0,
+  "material_family": "docks-stone",
+  "allowed_transforms": [
+    "translate"
+  ],
+  "width": 200,
+  "connectors": [
+    {
+      "side": "west",
+      "legacy_id": "door-1",
+      "position": [
+        0,
+        600
+      ],
+      "normal": [
+        -1,
+        0
+      ],
+      "width": 200,
+      "height": 0,
+      "opening_range": [
+        500,
+        700
+      ],
+      "rect": [
+        -48,
+        492,
+        96,
+        216
+      ],
+      "useful_aperture_canvas": [
+        0,
+        8,
+        96,
+        200
+      ],
+      "border_regions_canvas": [
+        [
+          0,
+          0,
+          96,
+          8
+        ],
+        [
+          0,
+          208,
+          96,
+          8
+        ]
+      ],
+      "source_corridor_world": [
+        1500,
+        4200,
+        300,
+        200
+      ],
+      "material_family": "docks-stone",
+      "mode": "plate",
+      "depth": "ground",
+      "textures": {
+        "floor": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/west-floor.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "8a4d004e8fe9a367dc81882bcd4ad13ea1f9f39d71a59d5cf07971a7eec18efc"
+        },
+        "border": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/west-border.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "b84d87b06fbe23a657299c10a7f651e5e914ac08826b66d00b5b0c2d0c0e0c00"
+        },
+        "combined": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/west-combined.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "669fa299b4890b0b29e1253ede9efef7b12fef129eb64cd37f2faf00ef7834e2"
+        }
+      },
+      "floor_phase_at_canvas_origin": [
+        16,
+        12
+      ],
+      "checks": {
+        "border_pixels_inside_aperture": 0,
+        "floor_phase_mismatches": 0,
+        "useful_width": 200
+      }
+    },
+    {
+      "side": "east",
+      "legacy_id": "door-0",
+      "position": [
+        1700,
+        600
+      ],
+      "normal": [
+        1,
+        0
+      ],
+      "width": 200,
+      "height": 0,
+      "opening_range": [
+        500,
+        700
+      ],
+      "rect": [
+        1652,
+        492,
+        96,
+        216
+      ],
+      "useful_aperture_canvas": [
+        0,
+        8,
+        96,
+        200
+      ],
+      "border_regions_canvas": [
+        [
+          0,
+          0,
+          96,
+          8
+        ],
+        [
+          0,
+          208,
+          96,
+          8
+        ]
+      ],
+      "source_corridor_world": [
+        3500,
+        4200,
+        400,
+        200
+      ],
+      "material_family": "docks-stone",
+      "mode": "plate",
+      "depth": "ground",
+      "textures": {
+        "floor": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/east-floor.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "de83cf2cb23852cdbef4cd7cd54d748eff116faeeabfcd26de009738dfdcf99f"
+        },
+        "border": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/east-border.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "b173dee41868cb0de1aa1d8c1733d604a13ce502b92c679a4143ce8844bd7e39"
+        },
+        "combined": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/east-combined.png",
+          "dimensions": [
+            96,
+            216
+          ],
+          "sha256": "c232c850a8130e8357f6fabf94296674aee8b5456e35991f707db40196fe767f"
+        }
+      },
+      "floor_phase_at_canvas_origin": [
+        52,
+        12
+      ],
+      "checks": {
+        "border_pixels_inside_aperture": 0,
+        "floor_phase_mismatches": 0,
+        "useful_width": 200
+      }
+    },
+    {
+      "side": "north",
+      "legacy_id": "door-2",
+      "position": [
+        1600,
+        0
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 200,
+      "height": 0,
+      "opening_range": [
+        1500,
+        1700
+      ],
+      "rect": [
+        1492,
+        -48,
+        216,
+        96
+      ],
+      "useful_aperture_canvas": [
+        8,
+        0,
+        200,
+        96
+      ],
+      "border_regions_canvas": [
+        [
+          0,
+          0,
+          8,
+          96
+        ],
+        [
+          208,
+          0,
+          8,
+          96
+        ]
+      ],
+      "source_corridor_world": [
+        3300,
+        2200,
+        200,
+        1500
+      ],
+      "material_family": "docks-stone",
+      "mode": "plate",
+      "depth": "ground",
+      "textures": {
+        "floor": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/north-floor.png",
+          "dimensions": [
+            216,
+            96
+          ],
+          "sha256": "b6d2f821596bda720207101989fb5d6a75561793c9f21b9e28978ff14aa4a914"
+        },
+        "border": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/north-border.png",
+          "dimensions": [
+            216,
+            96
+          ],
+          "sha256": "15e5abaeed784d1b0644e4b01752fcfdd17574ff38a3a096996594c81347236d"
+        },
+        "combined": {
+          "texture": "res://art/scenarios/scn-production/farol-docas-v01/connectors/north-combined.png",
+          "dimensions": [
+            216,
+            96
+          ],
+          "sha256": "61cdf891231ae26262d6019e1cf56226f9dff2f3a7f496005e5599db3b39c328"
+        }
+      },
+      "floor_phase_at_canvas_origin": [
+        20,
+        0
+      ],
+      "checks": {
+        "border_pixels_inside_aperture": 0,
+        "floor_phase_mismatches": 0,
+        "useful_width": 200
+      }
+    }
+  ],
+  "floor_phase": {
+    "anchor_room_local": [
+      0,
+      0
+    ],
+    "period": [
+      64,
+      48
+    ],
+    "mapping": "texel=(room_local_position-anchor) modulo native period; translate anchor with room",
+    "neighbor_requirement": "Corridor must share room floor anchor at the seam or explicitly convert phase; do not randomize phase independently",
+    "not_automatic_runtime_support": true
+  },
+  "source": {
+    "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png",
+    "source_rect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "dimensions": [
+      64,
+      48
+    ],
+    "sha256": "36c5a97d780879ec2ff915535a9654eedcc89f748c2e27b5eb343d2a3e5999d1",
+    "provider": "PixelLab derived lossless crop",
+    "generation_id": "4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8"
+  },
+  "provenance": "Existing native floor plus authored deterministic flat edging; build_connectors.py. No image generation, resizing, rotation, or mirrored illumination.",
+  "integration": "Use combined alone OR floor+border, never both. Ground only. Existing collision/connectors unchanged.",
+  "notes": [
+    "Width200 is transverse useful passage, not DOOR_DEPTH36",
+    "Canvas border is decorative and creates no collision",
+    "North eastern trim extends outside room at x1700; needs corner/wall clipping review",
+    "Legacy IDs depend on corridor iteration order: rebind by side/position if order changes",
+    "Only ground layer, no raised sill, no gate, no foreground occlusion"
+  ],
+  "source_hashes": {
+    "scripts/docks_map.gd": "80db4051ccb8e044e66fb6dafbadcddd7934755644956e550aee1502d24a3c18",
+    "scripts/simulation.gd": "efc9a6fdfd9a66446fa538a517bb9054c0f59c4b3174ae5cb19837140fd3f58d",
+    "scripts/scenarios/room_contract.gd": "f8d3fc4f71c3af4bb1c7808a25880a506937a7a4aa6847782e6758444f75d5ea",
+    "scripts/scenarios/farol_module.gd": "7c89d5bdff654c070be54558aff04c315a2e0a488f40df7100a3485156dbb208"
+  },
+  "stairs_asset_changes": false,
+  "catalog_publishable": false
+}

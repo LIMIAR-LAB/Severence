@@ -1,0 +1,17 @@
+{
+  "job_id": "2afe695e-5b67-490f-bfc6-2eb6ed6ad9ef",
+  "provider": "PixelLab Pro Flash",
+  "prompt": "One complete coherent low raised harbor terrace architectural module for a premium 2D top-down action game. Orthographic three-quarter overhead view, horizontal rectangular platform, NOT isometric diamond. Long central blue-grey stone landing with visible shallow dark front retaining wall. A short broad flight of SIX STONE STEPS on EACH END: left flight ascends horizontally left to right into platform, right flight ascends horizontally right to left. Entire structure fits canvas with margin; transparent surroundings. Large readable treads, bright stone lips, dark riser faces, shallow height, low side cheeks outside walking surfaces. Broad unobstructed walkable platform top, no railing across entrances, no pillars, no doors, no props, no characters, no text. Deliberate chunky crisp pixel clusters, consistent scale, desaturated slate stone and tiny moss at base only, warm muted top-left light, dark blue cast shadows. Stairs and terrace are one connected structure, clear continuous landing, strong silhouette. This is a small scale visual study, not a full-size gameplay asset.",
+  "status": "rejected_empty_image",
+  "requested_size": [
+    256,
+    128
+  ],
+  "reason": "Returned inline PNG is completely transparent; unusable as visual reference.",
+  "replacement_job_id": "1b0e19f0-a84c-4629-b3b8-36fd196a84df",
+  "replacement_provider": "PixelLab PixFlux",
+  "replacement_prompt": "Complete low stone terrace for a top-down harbor game, front retaining wall and broad empty stone landing. Two short wide stair flights attached to opposite ends, left stairs rise rightward and right stairs rise leftward. Visible stair treads and shaded risers, six broad steps. Rectangular orthographic architecture, horizontal front edge. Blue-grey aged stone, consistent pixel scale, warm upper-left light, dark contact shadows, moss only at bottom edge. No towers, pillars, characters, text, furniture or railing across entrances. Whole structure centered and fully visible on transparent background.",
+  "replacement_status": "rejected_layout_and_style",
+  "replacement_local_image": "estudo-escadas-descartado.png",
+  "replacement_reason": "North/south stair flights instead of west/east; noisy grid paving; opaque output instead of transparency. Excluded from proposed art direction."
+}

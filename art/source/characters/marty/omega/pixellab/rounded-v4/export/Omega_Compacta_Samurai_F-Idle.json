@@ -1,0 +1,45 @@
+{
+  "character": {
+    "id": "036c6e2f-d296-478d-acd5-c3597bdbc3e3",
+    "name": "Idle",
+    "prompt": "Rotate the supplied exact Omega armor sprite into eight directions for the game. Preserve its compact rounded chibi proportions and original game character identity in every view: large enclosed ivory-gold helmet, broad rounded white shoulder pauldrons, compact torso, short sturdy plated arms and legs, dark joints, glowing cyan T visor and chest core, short purple cape. Same armor construction and scale in every direction, no exposed Marty. Hovering boots a few pixels above ground with tiny cyan thruster glints, stable poised upper-body samurai guard, two empty armored hands near upper chest, no walking stride, no sword, no blade, no slash effects, transparent alpha. Hard clean pixel art, small game sprite. Absolutely do not stretch the limbs or create a tall thin robot.",
+    "size": {
+      "width": 96,
+      "height": 96
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Omega_Compacta_Samurai_F-Idle.png",
+    "cell_size": {
+      "width": 96,
+      "height": 96
+    },
+    "sheet_size": {
+      "width": 768,
+      "height": 96
+    },
+    "columns": 8,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-09-30T13:38:09.801629+00:00"
+}

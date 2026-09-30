@@ -1,0 +1,21 @@
+[
+  {
+    "biome_id": "docks", "era_id": "1941", "version": 1, "publication": "baseline_only",
+    "materials": {"floor": "res://assets/environment/cobble.png", "wall": "res://assets/environment/docks12/walls/rail/wall_cap_0.png"},
+    "atmosphere": {"tint": "bdc7f5", "ambient": "harbor"},
+    "room_roles": ["entry", "fight", "stairs", "story", "boss", "shop"],
+    "template_pool": ["legacy.stairs", "legacy.cranes", "legacy.chapel"],
+    "connector_rules": {"types": ["walk"], "minimum_width": 96, "height_step": 44},
+    "fallback_templates": ["legacy.stairs"], "fallback_profile": "",
+    "asset_origin": "Existing project assets; baseline references, no new license claim"
+  },
+  {
+    "biome_id": "rail_test", "era_id": "1941", "version": 1, "publication": "test_only",
+    "materials": {"floor": "res://assets/environment/docks12/drydock/dock_floor_steel.png", "wall": "res://assets/environment/docks12/walls/rail/wall_cap_0.png"},
+    "atmosphere": {"tint": "abb9c2", "ambient": "rail_test"},
+    "room_roles": ["fight"], "template_pool": ["fixture.rail"],
+    "connector_rules": {"types": ["walk"], "minimum_width": 160, "height_step": 0},
+    "fallback_templates": ["fixture.rail"], "fallback_profile": "",
+    "asset_origin": "Existing steel sample for test only; not a published railway biome"
+  }
+]

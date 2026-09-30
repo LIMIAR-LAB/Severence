@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: arma inicial é infinita e equipada
+PASS: bazuca está em piso acessível na chegada
+PASS: encontra bazuca com seis foguetes
+PASS: troca preserva munição
+PASS: troca reequipa arma da RUN
+PASS: arma vazia permanece equipada
+PASS: arma vazia não dispara
+PASS: save preserva seleção vazia sem gerar munição
+PASS: Q reequipa arma vazia
+PASS: seleção recusa arma não possuída
+PASS: foguete atinge alvo e inimigo vizinho
+PASS: foguete cria explosão visível
+PASS: munição rara reativa bazuca
+PASS: salvar a RUN preserva arma e munição
+PASS: ouro e chaves ficam na época; fragmentos retornam
+PASS: nova RUN reinicia o arsenal temporário
+PASS: chaves são mais raras que munição
+PASS: bazuca acerta e explode no inimigo entre ator e cano
+PASS: varredura do cano não acerta inimigo atrás de parede fina
+failures=0

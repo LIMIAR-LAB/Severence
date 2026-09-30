@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Bomber morto anuncia antes de explodir
+PASS: Bomber morto cria explosão após aviso
+PASS: explosão do Bomber acende barril explosivo
+PASS: Guard rebate tiro frontal sem perder vida
+PASS: Guard morre com tiro pelas costas
+PASS: onda aguarda portais antes do spawn
+PASS: onda cria telegraph de portal
+PASS: inimigos não surgem antes de 0,8s
+PASS: onda 5 inclui Warden elite
+PASS: onda aplica escala de vida e dano
+PASS: arena possui spawns aguardando portal
+PASS: spawns da arena não vazam para o Refúgio
+NEW_ENEMIES_TESTS failures=0

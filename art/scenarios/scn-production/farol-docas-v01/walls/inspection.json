@@ -1,0 +1,24 @@
+{
+  "status": "south_shortcut_geometry_and_detail_reviewed_pending_runtime",
+  "layers": 11,
+  "native_dimensions_match": true,
+  "wall_intersections_walkable_union": 0,
+  "protected_pngs_unchanged": 21,
+  "new_obstacles": 0,
+  "limitations": [
+    "Offline composition only; runtime camera, actor occlusion and corridor continuation require integration review."
+  ],
+  "revision": 3,
+  "south_plates_exact_crops_of_previous_face": true,
+  "shortcut_corridor_rect": [
+    940,
+    1300,
+    128,
+    800
+  ],
+  "regular_gates_unchanged": 3,
+  "old_south_face_png": "Retained only as historical crop reference; absent from manifest and layers.",
+  "visual_findings": [
+    "South detail inspected:128-unit floor aperture remains open through entire68-unit exterior face; no wall bridge."
+  ]
+}

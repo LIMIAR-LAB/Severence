@@ -1,0 +1,467 @@
+{
+  "schema_version": 1,
+  "revision": 3,
+  "supersedes": "Initial 1700x900 proposal and continuous south wall withdrawn; preserve legacy south shortcut x940..1068.",
+  "status": "candidate_static_preview_only",
+  "footprint": [
+    [
+      0,
+      0,
+      1700,
+      1300
+    ]
+  ],
+  "origin": [
+    0,
+    0
+  ],
+  "allowed_transforms": [
+    "translate"
+  ],
+  "world_units_per_pixel": 1,
+  "material_family": "docks-stone",
+  "visual_face_height": 68,
+  "lateral_shell_width": 26,
+  "walkable_surface_height": 0,
+  "elevation_policy": "68 is native decorative face height; walls do not create raised surfaces or ramps. South uses exterior cutaway facade, not projected occluding wall.",
+  "layers": [
+    {
+      "id": "north-face",
+      "rect": [
+        0,
+        -68,
+        1500,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/north-face.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 100,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "northwest-corner",
+      "rect": [
+        -26,
+        -68,
+        26,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/northwest-corner.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 101,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "west-upper",
+      "rect": [
+        -26,
+        0,
+        26,
+        500
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-upper.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 102,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "west-lower",
+      "rect": [
+        -26,
+        700,
+        26,
+        600
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-lower.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 103,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "east-north-jamb",
+      "rect": [
+        1700,
+        -68,
+        26,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-north-jamb.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 104,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "east-upper",
+      "rect": [
+        1700,
+        0,
+        26,
+        500
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-upper.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 105,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "east-lower",
+      "rect": [
+        1700,
+        700,
+        26,
+        600
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-lower.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 106,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "south-face-left",
+      "rect": [
+        0,
+        1300,
+        940,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-left.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 107,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "south-face-right",
+      "rect": [
+        1068,
+        1300,
+        632,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-right.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 108,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "southwest-corner",
+      "rect": [
+        -26,
+        1300,
+        26,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southwest-corner.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 109,
+      "world_units_per_pixel": 1
+    },
+    {
+      "id": "southeast-corner",
+      "rect": [
+        1700,
+        1300,
+        26,
+        68
+      ],
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southeast-corner.png",
+      "mode": "plate",
+      "depth": "ground",
+      "order": 110,
+      "world_units_per_pixel": 1
+    }
+  ],
+  "reusable_textures": {
+    "face-north-64x68.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/face-north-64x68.png",
+      "dimensions": [
+        64,
+        68
+      ],
+      "sha256": "73f92385f9ffcd35d60d89ee3a8c10a2ec45f7d8899ed5e07bd195a54fd485e9"
+    },
+    "face-south-64x68.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/face-south-64x68.png",
+      "dimensions": [
+        64,
+        68
+      ],
+      "sha256": "e627bd1591dccd7ba6cf9dff2b53c01c066bef6e9c33f217781f1661b6071c37"
+    },
+    "edge-west-26x48.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/edge-west-26x48.png",
+      "dimensions": [
+        26,
+        48
+      ],
+      "sha256": "a105e985c5d110673f616f842a1d7e2a837c41bebb48ef2e1d1dcf9949cc5677"
+    },
+    "edge-east-26x48.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/edge-east-26x48.png",
+      "dimensions": [
+        26,
+        48
+      ],
+      "sha256": "8a5c04c3f66d08d8d54d065d72213ded04f810acea2ad179bdb09a84978e9347"
+    },
+    "corner-nw.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/corner-nw.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "8b9fcf22427f3764dfd959c0718d34395a89c2ff1e346f6647c8c4c5ad3f81c6"
+    },
+    "corner-sw.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/corner-sw.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "f9374d7684b8e510f54805a4866579bbe99a0866e20717a589b28928f1dc0ecc"
+    },
+    "corner-se.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/corner-se.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "0024bce1a4f4c3c850c091685d75e4af99c913d87b805ac56caf4bd2c5d0fde0"
+    },
+    "north-face.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/north-face.png",
+      "dimensions": [
+        1500,
+        68
+      ],
+      "sha256": "ca2b5819ef87b000d101a24f90e899f666986ed90d51ba71d33ee976f1e0c7b5"
+    },
+    "northwest-corner.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/northwest-corner.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "8b9fcf22427f3764dfd959c0718d34395a89c2ff1e346f6647c8c4c5ad3f81c6"
+    },
+    "west-upper.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-upper.png",
+      "dimensions": [
+        26,
+        500
+      ],
+      "sha256": "1c45e102c45815367aafcc385a7916408d2d37babf961c4ff88e486ec869fa3a"
+    },
+    "west-lower.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-lower.png",
+      "dimensions": [
+        26,
+        600
+      ],
+      "sha256": "691ea3bcc782af375a9b73f7a60349a919c23196be6226f61750a315c73d32af"
+    },
+    "east-north-jamb.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-north-jamb.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "423a30fba9fa2c14ceef877631919e9fdea9bc18cc8fb1f013ce00272ce9e2c5"
+    },
+    "east-upper.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-upper.png",
+      "dimensions": [
+        26,
+        500
+      ],
+      "sha256": "1d2b67093ab7fbc5707829e8dee9832282b1f4a4ff6f7227ee4330929b0211b3"
+    },
+    "east-lower.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-lower.png",
+      "dimensions": [
+        26,
+        600
+      ],
+      "sha256": "a2b6114449ae4e5a77c19689a0f5788100b929f0b2ad62c927bad3f473d12760"
+    },
+    "south-face-left.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-left.png",
+      "dimensions": [
+        940,
+        68
+      ],
+      "sha256": "6dd61409ed81584b910dfb48880b83c635b7d3cfee5f1bb54485f0fa279e1537"
+    },
+    "south-face-right.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-right.png",
+      "dimensions": [
+        632,
+        68
+      ],
+      "sha256": "446280fb3f10e7ad87b4bbb1378a4d72704d47db29b36e9c6b3a325d9ac91c77"
+    },
+    "southwest-corner.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southwest-corner.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "f9374d7684b8e510f54805a4866579bbe99a0866e20717a589b28928f1dc0ecc"
+    },
+    "southeast-corner.png": {
+      "texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southeast-corner.png",
+      "dimensions": [
+        26,
+        68
+      ],
+      "sha256": "0024bce1a4f4c3c850c091685d75e4af99c913d87b805ac56caf4bd2c5d0fde0"
+    }
+  },
+  "connectors": [
+    {
+      "side": "west",
+      "position": [
+        0,
+        600
+      ],
+      "normal": [
+        -1,
+        0
+      ],
+      "width": 200,
+      "height": 0
+    },
+    {
+      "side": "east",
+      "position": [
+        1700,
+        600
+      ],
+      "normal": [
+        1,
+        0
+      ],
+      "width": 200,
+      "height": 0
+    },
+    {
+      "side": "north",
+      "position": [
+        1600,
+        0
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 200,
+      "height": 0
+    }
+  ],
+  "collision": {
+    "new_obstacles": [],
+    "policy": "Existing union of room and corridor walkable footprints provides boundary collision; do not add collision for wall pixels. Do not extend footprint to include exterior art. If runtime permits leaving that union, owner must enforce its boundary separately."
+  },
+  "ordering": "Draw ground floor and connectors first, then these exterior ground plates in listed order, then actors and existing depth-sorted stair face. No new foreground strip. Omit material=floor. Do not clip walls to walkable footprint, since all wall art is exterior.",
+  "north_corner": "North horizontal wall stops at x1500. Opening x1500..1700 stays free for every y<0. Exterior east jamb occupies x1700..1726,y-68..0; joins east-upper at y0. No conventional NE corner, lintel, cap, or collision may bridge north aperture. Neighbor corridor owns continuation north of y-68.",
+  "provenance": {
+    "method": "Native crops and deterministic tiling/palette edging; no new generation, image rotation or scaling.",
+    "source_crops": {
+      "tile_1.png": [
+        19,
+        14,
+        64,
+        68
+      ],
+      "tile_3.png": [
+        19,
+        42,
+        64,
+        68
+      ],
+      "tile_4.png": [
+        19,
+        14,
+        26,
+        48
+      ]
+    },
+    "sources": {
+      "tile_1.png": "d1babd02eb5f978c409f3903ac8fe6e6d4e33f560e44dae8e0318e3697ee4691",
+      "tile_3.png": "57312896f587ec53470bb98ed863082a3a2ef9a1318258550a2be25aa8e70f7d",
+      "tile_4.png": "53c708a061130138bf3fcd66ee81f4c9a7b5e0a56cebcaa4047000c10327c1bb"
+    }
+  },
+  "protected_png_hashes": {
+    "stairs\\face-material-review.png": "f7fb3a6cfffec0cb06f2f5f2787e6b503b858a3dd969369081fde45eaace9868",
+    "stairs\\face44-0.png": "c0dfb2b4d1b51575f7ef2de4947821c297c4eda5f57a9370a587599a87bd938b",
+    "stairs\\face44-1.png": "9c0271254ceba4e0571b2b227ccaa724e5498aad993aba106a348370f22807fe",
+    "stairs\\floor-stone.png": "36c5a97d780879ec2ff915535a9654eedcc89f748c2e27b5eb343d2a3e5999d1",
+    "stairs\\landing-face44.png": "676ced83f5ac22e01269ee48be0ac9fdafca22ef8d9953ab11c9a86e1ce1566f",
+    "stairs\\landing-top.png": "764b96fa3216c0c998feb33da63f859506ef248d25049770b99fc7d0f05cd9d4",
+    "stairs\\module-native-preview.png": "58855d7569cd2dee10d52dcaab2a3ad96acd7a6a7e6be243faf57bb0c0cb8486",
+    "stairs\\stairs-east-composed.png": "10868347edf41b25fe630fcb5c60ab61d8b6b8aaeef314ba78540dce8ca6ff2f",
+    "stairs\\stairs-west-composed.png": "6804c55713a056a3fa246506f947488c57634a36cf78272504498f64b066e545",
+    "stairs\\tread-east.png": "cf9883955f2a482e99847c8fd27f1f73825d343f54365dbf88fccdce55026da8",
+    "stairs\\tread-west.png": "256446bfebb106eb72a0f9a6c55c7bbaf7b46a77797468b6999dca428b7e55e7",
+    "connectors\\contact-sheet.png": "f9e7d26e30e8f08573ecf176558b9b1234fc2a6197a86f0ede67bdd35ba26f29",
+    "connectors\\east-border.png": "b173dee41868cb0de1aa1d8c1733d604a13ce502b92c679a4143ce8844bd7e39",
+    "connectors\\east-combined.png": "c232c850a8130e8357f6fabf94296674aee8b5456e35991f707db40196fe767f",
+    "connectors\\east-floor.png": "de83cf2cb23852cdbef4cd7cd54d748eff116faeeabfcd26de009738dfdcf99f",
+    "connectors\\north-border.png": "15e5abaeed784d1b0644e4b01752fcfdd17574ff38a3a096996594c81347236d",
+    "connectors\\north-combined.png": "61cdf891231ae26262d6019e1cf56226f9dff2f3a7f496005e5599db3b39c328",
+    "connectors\\north-floor.png": "b6d2f821596bda720207101989fb5d6a75561793c9f21b9e28978ff14aa4a914",
+    "connectors\\west-border.png": "b84d87b06fbe23a657299c10a7f651e5e914ac08826b66d00b5b0c2d0c0e0c00",
+    "connectors\\west-combined.png": "669fa299b4890b0b29e1253ede9efef7b12fef129eb64cd37f2faf00ef7834e2",
+    "connectors\\west-floor.png": "8a4d004e8fe9a367dc81882bcd4ad13ea1f9f39d71a59d5cf07971a7eec18efc"
+  },
+  "auxiliary_connectors": [
+    {
+      "id": "south-shortcut",
+      "type": "shortcut",
+      "position": [
+        1004,
+        1300
+      ],
+      "normal": [
+        0,
+        1
+      ],
+      "width": 128,
+      "height": 0,
+      "opening_range": [
+        940,
+        1068
+      ],
+      "corridor_rect": [
+        940,
+        1300,
+        128,
+        800
+      ],
+      "source": "DOCKS.SHORTCUTS[0]",
+      "note": "Separate from three regular walk gates; preserve existing functional path."
+    }
+  ],
+  "previews": {
+    "native": "res://art/scenarios/scn-production/farol-docas-v01/walls/perimeter-native-preview.png",
+    "north_detail": "res://art/scenarios/scn-production/farol-docas-v01/walls/north-corner-detail.png",
+    "south_shortcut_detail": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-shortcut-detail.png",
+    "native_preview_local_bounds": [
+      -330,
+      -330,
+      2130,
+      2180
+    ],
+    "note": "Offline native composition, not runtime capture; no actors. Detail is a 1:1 crop."
+  }
+}

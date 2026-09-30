@@ -19,6 +19,8 @@ func run() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
 	app.start_local(); app.sim.start_run(1941)
+	var generated_layout: Dictionary = app.sim.layout_manifest.duplicate(true)
+	check(not generated_layout.is_empty() and not generated_layout.has("fallback"), "nova expedição usa geração procedural")
 	app.sim.actors[0].p = Vector2(978, 1241)
 	app.sim.actors[1].p = Vector2(1020, 1280)
 	app.sim.actors[0].outfit = "espiao"
@@ -48,6 +50,7 @@ func run() -> void:
 	check(loaded.sim.actors[0].p == Vector2(978, 1241) and loaded.sim.actors[1].p == Vector2(1020, 1280), "posições preservadas")
 	check(loaded.sim.actors[0].outfit == "espiao" and loaded.sim.keys == 5 and loaded.sim.money == 47 and loaded.sim.boss_dead, "equipamento e progresso preservados no salvamento de saída")
 	check(loaded.sim.nav.get_point_count() > 0, "navegação reconstruída após carregar")
+	check(loaded.sim.layout_manifest == generated_layout, "Continuar preserva exatamente o layout procedural salvo")
 	loaded.menu.open("equipment")
 	check(loaded.menu.screen == "pause", "equipamento não abre durante a partida")
 	loaded.queue_free(); await process_frame; await process_frame
@@ -70,4 +73,5 @@ func run() -> void:
 		restore.store_buffer(original); restore.close()
 	else: DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	print("SAVE GAME FLOW failures=", failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

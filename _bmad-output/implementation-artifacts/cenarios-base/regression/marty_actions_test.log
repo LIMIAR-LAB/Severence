@@ -1,0 +1,230 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS MARTY: Marty Padrao idle: 8 direcoes
+PASS MARTY: Marty Padrao run: 8 direcoes
+PASS MARTY: Marty Padrao jump: 8 direcoes
+PASS MARTY: Marty Padrao evade: 8 direcoes
+PASS MARTY: Marty Padrao shoot: 8 direcoes
+PASS MARTY: Marty Padrao melee: 8 direcoes
+PASS MARTY: Marty Padrao hurt: 8 direcoes
+PASS MARTY: Marty Padrao defeat: 8 direcoes
+PASS MARTY: Marty Omega idle: 8 direcoes
+PASS MARTY: Marty Omega idle: nenhuma celula vazia
+PASS MARTY: Marty Omega idle: nenhuma arte toca a borda
+PASS MARTY: Marty Omega idle: movimento real nas oito direcoes
+PASS MARTY: Marty Omega run: 8 direcoes
+PASS MARTY: Marty Omega run: nenhuma celula vazia
+PASS MARTY: Marty Omega run: nenhuma arte toca a borda
+PASS MARTY: Marty Omega run: movimento real nas oito direcoes
+PASS MARTY: Marty Omega jump: 8 direcoes
+PASS MARTY: Marty Omega jump: nenhuma celula vazia
+PASS MARTY: Marty Omega jump: nenhuma arte toca a borda
+PASS MARTY: Marty Omega jump: movimento real nas oito direcoes
+PASS MARTY: Marty Omega evade: 8 direcoes
+PASS MARTY: Marty Omega evade: nenhuma celula vazia
+PASS MARTY: Marty Omega evade: nenhuma arte toca a borda
+PASS MARTY: Marty Omega evade: movimento real nas oito direcoes
+PASS MARTY: Marty Omega melee: 8 direcoes
+PASS MARTY: Marty Omega melee: nenhuma celula vazia
+PASS MARTY: Marty Omega melee: nenhuma arte toca a borda
+PASS MARTY: Marty Omega melee: movimento real nas oito direcoes
+PASS MARTY: Marty Omega hurt: 8 direcoes
+PASS MARTY: Marty Omega hurt: nenhuma celula vazia
+PASS MARTY: Marty Omega hurt: nenhuma arte toca a borda
+PASS MARTY: Marty Omega hurt: movimento real nas oito direcoes
+PASS MARTY: Marty Omega defeat: 8 direcoes
+PASS MARTY: Marty Omega defeat: nenhuma celula vazia
+PASS MARTY: Marty Omega defeat: nenhuma arte toca a borda
+PASS MARTY: Marty Omega defeat: movimento real nas oito direcoes
+PASS MARTY: Marty Omega melee preserva linha dos pes de idle/run
+PASS MARTY: montagem Omega progressiva carrega como folha horizontal
+PASS MARTY: retratos Marty/Omega carregam como dupla horizontal
+PASS MARTY: montagem Omega percorre oito estágios sem ultrapassar a folha
+PASS MARTY: Marty Padrao sem arma em idle
+PASS MARTY: Marty Padrao sem arma em run
+PASS MARTY: Marty Padrao sem arma em jump
+PASS MARTY: Marty Padrao sem arma em evade
+PASS MARTY: Marty Padrao sem arma em melee
+PASS MARTY: Marty Padrao sem arma em hurt
+PASS MARTY: Marty Padrao sem arma em defeat
+PASS MARTY: Marty Padrao exibe arma somente no disparo
+PASS MARTY: transformacao nao mistura arma Omega com sprite Padrao
+PASS MARTY: linha direcional PixelLab 0
+PASS MARTY: linha direcional PixelLab 1
+PASS MARTY: linha direcional PixelLab 2
+PASS MARTY: linha direcional PixelLab 3
+PASS MARTY: linha direcional PixelLab 4
+PASS MARTY: linha direcional PixelLab 5
+PASS MARTY: linha direcional PixelLab 6
+PASS MARTY: linha direcional PixelLab 7
+PASS MARTY: folha comum 4x4: marty_roll_side_v1.png
+PASS MARTY: folha comum 4x4: marty_roll_front_diag_v1.png
+PASS MARTY: folha comum 4x4: marty_roll_back_diag_v1.png
+PASS MARTY: folha Ômega: marty_teleport_side_v1.png
+PASS MARTY: folha Ômega: marty_teleport_diagonal_v1.png
+PASS MARTY: esquiva lateral (1.0, 0.0)
+PASS MARTY: esquiva lateral (-1.0, 0.0)
+PASS MARTY: esquiva frente/diagonal (1.0, 1.0)
+PASS MARTY: esquiva frente/diagonal (-1.0, 1.0)
+PASS MARTY: esquiva frente/diagonal (0.0, 1.0)
+PASS MARTY: esquiva costas/diagonal (1.0, -1.0)
+PASS MARTY: esquiva costas/diagonal (-1.0, -1.0)
+PASS MARTY: esquiva costas/diagonal (0.0, -1.0)
+PASS MARTY: ancora da arma PixelLab 0
+PASS MARTY: ancora da arma PixelLab 1
+PASS MARTY: ancora da arma PixelLab 2
+PASS MARTY: ancora da arma PixelLab 3
+PASS MARTY: ancora da arma PixelLab 4
+PASS MARTY: ancora da arma PixelLab 5
+PASS MARTY: ancora da arma PixelLab 6
+PASS MARTY: ancora da arma PixelLab 7
+PASS MARTY: roupa legada conserva ancora existente
+PASS MARTY: roupa legada ainda pode usar mao do atlas antigo
+PASS MARTY: Marty Padrao nao usa mao do atlas antigo
+PASS MARTY: Armadura Omega nao usa mao do atlas antigo
+PASS MARTY: ancora da espada Omega 0
+PASS MARTY: ancora da espada Omega 1
+PASS MARTY: ancora da espada Omega 2
+PASS MARTY: ancora da espada Omega 3
+PASS MARTY: ancora da espada Omega 4
+PASS MARTY: ancora da espada Omega 5
+PASS MARTY: ancora da espada Omega 6
+PASS MARTY: ancora da espada Omega 7
+PASS MARTY: Omega flutua sem animacao de passos ao mover
+PASS MARTY: espada Omega aparece apenas durante o corte 0
+PASS MARTY: espada Omega aparece apenas durante o corte 1
+PASS MARTY: espada Omega aparece apenas durante o corte 2
+PASS MARTY: espada Omega aparece apenas durante o corte 3
+PASS MARTY: espada Omega aparece apenas durante o corte 4
+PASS MARTY: espada Omega aparece apenas durante o corte 5
+PASS MARTY: espada Omega oculta em repouso
+PASS MARTY: espada Omega respeita profundidade na direcao 0
+PASS MARTY: espada Omega respeita profundidade na direcao 1
+PASS MARTY: espada Omega respeita profundidade na direcao 2
+PASS MARTY: espada Omega respeita profundidade na direcao 3
+PASS MARTY: espada Omega respeita profundidade na direcao 4
+PASS MARTY: espada Omega respeita profundidade na direcao 5
+PASS MARTY: espada Omega respeita profundidade na direcao 6
+PASS MARTY: espada Omega respeita profundidade na direcao 7
+PASS MARTY: corte Omega frontal varre na altura do tronco
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 0 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 1 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 2 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 3 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 4 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 5 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 6 quadro 5
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 0
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 1
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 2
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 3
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 4
+PASS MARTY: ancora melee Omega toca corpo linha 7 quadro 5
+PASS MARTY: dash conserva direção diagonal normalizada
+PASS MARTY: dash diagonal move Marty nos dois eixos
+PASS MARTY: leitura da pose continua depois da proteção
+PASS MARTY: render usa temporização visual independente
+PASS MARTY: pose visual não prolonga invulnerabilidade
+PASS MARTY: origem visual no cano padrao (0.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (0.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (-1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (-1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano padrao (-1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (0.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (0.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (-1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (-1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano mecanico (-1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (0.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (0.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (-1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (-1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano espiao (-1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (0.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (0.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (-1.0, -1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (-1.0, 0.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: origem visual no cano bazooka (-1.0, 1.0)
+PASS MARTY: tiro acompanha direção da arma
+PASS MARTY: cano não gera projétil depois de parede fina
+PASS MARTY: arma em movimento acompanha mão do corpo sem mudar mira
+PASS MARTY: primeiro disparo em movimento oposto nasce no cano da pose de tiro
+MARTY ACTIONS failures=0

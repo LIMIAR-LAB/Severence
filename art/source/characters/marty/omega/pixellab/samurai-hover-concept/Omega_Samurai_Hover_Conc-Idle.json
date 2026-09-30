@@ -1,0 +1,45 @@
+{
+  "character": {
+    "id": "0fc76d25-3668-421c-89e7-c0bac405639f",
+    "name": "Idle",
+    "prompt": "Rotate this exact slim elite Omega samurai armor sprite to eight directions, maintaining its exact silhouette, enclosed ivory gold helmet, cyan visor and chest core, dark joints, short purple cape, narrow athletic human proportions and hovering pose. Preserve feet hovering above the ground, empty hands held high in sword-ready guard, no walking stride, no sword or effects, transparent backgrounds. Keep pixel density and scale consistent in every rotation.",
+    "size": {
+      "width": 96,
+      "height": 96
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Omega_Samurai_Hover_Conc-Idle.png",
+    "cell_size": {
+      "width": 96,
+      "height": 96
+    },
+    "sheet_size": {
+      "width": 768,
+      "height": 96
+    },
+    "columns": 8,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-09-30T12:59:39.700851+00:00"
+}

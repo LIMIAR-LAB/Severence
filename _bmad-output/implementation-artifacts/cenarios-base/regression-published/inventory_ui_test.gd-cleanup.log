@@ -1,0 +1,52 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Inventário abre por padrão com cinco abas
+PASS: preparação usa cenário do Refúgio como camada contextual
+PASS: aba 0 é interativa
+PASS: aba 1 é interativa
+PASS: aba 2 é interativa
+PASS: aba 3 é interativa
+PASS: aba 4 é interativa
+PASS: cinco abas usam pictogramas industriais independentes
+PASS: filtros completos
+PASS: grade possui item real
+PASS: grade industrial reserva exatamente 5×3 posições em três linhas
+PASS: composição compacta expõe o loadout equipado
+PASS: filtro vazio mantém rota determinística entre aba, filtros e rodapé
+PASS: protótipo preservado e oculto: kit_reparo
+PASS: protótipo preservado e oculto: sucata_temporal
+PASS: protótipo preservado e oculto: fragmento_cronal
+PASS: protótipo preservado e oculto: chave_fenda_do_marty
+PASS: contador mostra somente os seis equipamentos disponíveis ou bloqueados
+PASS: slot possui foco visível para teclado/controle
+PASS: seleção alimenta detalhes e ação
+PASS: vitrine usa arte de apresentação do catálogo
+PASS: atributos numéricos geram barras normalizadas data-backed
+PASS: item bloqueado explica a ação indisponível
+PASS: aba Robôs lista estado real
+PASS: cards de equipamento possuem foco visível
+PASS: aba Armaduras lista Ômega
+PASS: aba Equipados possui slots funcionais
+PASS: aba Status usa linhas calculadas
+PASS: controle alterna aba e conteúdo com foco visível
+PASS: clique real troca aba 1
+PASS: clique real troca aba 2
+PASS: clique real troca aba 3
+PASS: clique real troca aba 4
+PASS: clique real troca aba 0
+PASS: clique real aplica filtro
+PASS: clique real seleciona item
+PASS: comparação exibe valores reais em área própria
+PASS: valores iguais permanecem neutros
+PASS: mudança textual sem escore usa estado teal sem inferir qualidade
+PASS: melhorias e regressões recebem cores semânticas pelos escores
+PASS: comparação fica contida acima das ações
+PASS: nova seleção restaura geometria e conteúdo normais
+PASS: comparação longa de robôs permanece rolável e sem largura excedente
+PASS: teclado/controle rola a comparação sem perder o foco
+PASS: clique real executa equipamento
+PASS: inventário denso limita a primeira página a 15 itens
+PASS: paginação expõe e seleciona o item restante sem clipping
+PASS: paginação restaura o foco no controle ainda disponível
+INVENTORY_UI_TESTS_DONE failures=0
+

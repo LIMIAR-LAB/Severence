@@ -1,0 +1,653 @@
+{
+  "chapel_origin": "(200.0, 3600.0)",
+  "checks": [
+    {
+      "label": "chapel bottom radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs right radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs right radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs left radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs left radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel right radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel right radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel top radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel top radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs bottom radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs bottom radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "outside chapel has no invisible floor radius11",
+      "ok": true
+    },
+    {
+      "label": "altar blocks physical approach radius11",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs right radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs right radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs left radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs left radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel right radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel right radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel top radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel top radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs bottom radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs bottom radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "outside chapel has no invisible floor radius23",
+      "ok": true
+    },
+    {
+      "label": "altar blocks physical approach radius23",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 200,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 300,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 400,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 500,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 600,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 700,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 800,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 900,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1000,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1100,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1200,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1300,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1400,1000",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,200",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,300",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,400",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,500",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,600",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,700",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,800",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,900",
+      "ok": true
+    },
+    {
+      "label": "flat Farol terrain 1500,1000",
+      "ok": true
+    },
+    {
+      "label": "story NPC stands on supported accessible floor",
+      "ok": true
+    },
+    {
+      "label": "chapel reward remains accessible",
+      "ok": true
+    },
+    {
+      "label": "user save remains byte-identical",
+      "ok": true
+    }
+  ],
+  "failures": 0,
+  "farol_origin": "(1900.0, 3500.0)",
+  "save_sha256": "2ca681ce3e127d167af9c7df114ad8c731c100277326cac25237358dc904020e",
+  "seed": 72044
+}

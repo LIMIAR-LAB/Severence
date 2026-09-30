@@ -1,0 +1,62 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: tela montada fora do stage (escala inteira)
+PASS: cenário contextual fica sob o chrome industrial com navegação iconográfica
+PASS: slot do item padrao
+PASS: slot do item mecanico
+PASS: slot do item espiao
+PASS: slot do item omega
+PASS: slot do item titan
+PASS: slot do item spectre
+PASS: Padrão com o ícone dele
+PASS: Mecânico bloqueado no início
+PASS: Ômega liberada no início
+PASS: robôs bloqueados no início
+PASS: vagas vazias com icon_slot_vazio
+PASS: Ômega equipada e nenhum robô selecionado
+PASS: painel do robô vazio
+PASS: vitrine mostra o card do Padrão
+PASS: Padrão equipado com frame de seleção
+PASS: item bloqueado: card escurecido + cadeado
+PASS: descrição explica como desbloquear
+PASS: bloqueado não equipa
+PASS: referência Padrão mantém 3 corações e velocidade 320
+PASS: sem botão INICIAR ARENA
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: nenhum botão de arena
+PASS: Mecânico liberado
+PASS: Ômega liberada com frame lendário
+PASS: Ômega usa frame_lendario
+PASS: Ômega e Titan equipados
+PASS: equipar o Mecânico troca o card
+PASS: equipar o Spectre
+PASS: Ômega não altera a referência do Mecânico
+PASS: Spectre não adiciona defesa fictícia ao Mecânico
+PASS: painel visível mantém três corações com Spectre e Ômega
+PASS: escudo temporário separado da vida
+PASS: Titan mantém integridade separada da vida de Marty
+PASS: LB/RB e setas passam pelos itens da vitrine
+EQUIPMENT_UI_TESTS_DONE failures=0

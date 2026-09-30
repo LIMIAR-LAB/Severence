@@ -1,0 +1,15 @@
+ERROR: FAIL: barril explosivo perto da parede rachada
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/scenery_016_test.gd:8)
+       [1] _init (res://tests/scenery_016_test.gd:53)
+ERROR: FAIL: explosão abre o atalho e libera a colisão
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/scenery_016_test.gd:8)
+       [1] _init (res://tests/scenery_016_test.gd:57)
+ERROR: FAIL: sprite troca para a versão _open (wall_crack_a_open)
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/scenery_016_test.gd:8)
+       [1] _init (res://tests/scenery_016_test.gd:58)

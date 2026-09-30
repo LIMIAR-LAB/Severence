@@ -1,0 +1,5 @@
+ERROR: boss possui trilha longa com loop
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] check (res://tests/game_audio_test.gd:7)
+       [1] run (res://tests/game_audio_test.gd:20)

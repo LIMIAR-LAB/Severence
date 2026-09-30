@@ -1,0 +1,247 @@
+{
+	"cases": [
+		{
+			"attempts": 3,
+			"elapsed_ms": 119,
+			"errors": [],
+			"hash": "e24aa29a173ec8dc1f3b83ab806a02fad1e58d1f3ca170938c8bea9ff994b5bb",
+			"ok": true,
+			"seed": 2
+		},
+		{
+			"attempts": 3,
+			"elapsed_ms": 111,
+			"errors": [],
+			"hash": "446d8dcb52dbc061633d554585fa975b0c701e87f10181651e7550338f5ab548",
+			"ok": true,
+			"seed": 3
+		},
+		{
+			"attempts": 8,
+			"elapsed_ms": 254,
+			"errors": [],
+			"hash": "ca090c1b2fad6859376d8e4f75549ce0304d130ecdb38db2f48321a02b85a3e6",
+			"ok": true,
+			"seed": 4
+		},
+		{
+			"attempts": 4,
+			"elapsed_ms": 157,
+			"errors": [],
+			"hash": "59f13f15df1646d21a4fbb0990913a4ca87f0629844d396e3d7368b8ef230c71",
+			"ok": true,
+			"seed": 5
+		},
+		{
+			"attempts": 3,
+			"elapsed_ms": 127,
+			"errors": [],
+			"hash": "ddfc19f277dd96c3a2dc898cae3d1cb4223f498c8dda6fd520fb18b2e8f0d10c",
+			"ok": true,
+			"seed": 6
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 93,
+			"errors": [],
+			"hash": "da27aaaafe281ea8d2fae6faf5efc55669d98e1ccc8819d21c21904a948fea91",
+			"ok": true,
+			"seed": 7
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 61,
+			"errors": [],
+			"hash": "d32ec213fa995db47b6c52294f34359e24368292853d5a3a83b61187e33ffa01",
+			"ok": true,
+			"seed": 8
+		},
+		{
+			"attempts": 3,
+			"elapsed_ms": 112,
+			"errors": [],
+			"hash": "36e5d8057d02a87b37544af702be461d0892be18fbbb883854fb543946471e1a",
+			"ok": true,
+			"seed": 9
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 86,
+			"errors": [],
+			"hash": "e29962b6987bbd5b3b38d7ac72e9aeb5198253f13bca44d91377158f4cd51b9a",
+			"ok": true,
+			"seed": 10
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 90,
+			"errors": [],
+			"hash": "0e914ac9d47fd98e3e69326950d3173763f92350f10e09b9a761f28a816c30e1",
+			"ok": true,
+			"seed": 11
+		},
+		{
+			"attempts": 4,
+			"elapsed_ms": 139,
+			"errors": [],
+			"hash": "656564b9092a9ee0e39baca384f4a005e72df0431da5fcb7781a5d5dcb9cdefa",
+			"ok": true,
+			"seed": 12
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 92,
+			"errors": [],
+			"hash": "06e1035547b7dcef0b761eac7e29a517cb7ba8d99cd73729135caaabd3c6d9b9",
+			"ok": true,
+			"seed": 13
+		},
+		{
+			"attempts": 5,
+			"elapsed_ms": 176,
+			"errors": [],
+			"hash": "5f8ed85050e34a29d4c87239d82de5f3d5184018cef8c1aa8abc30104348371f",
+			"ok": true,
+			"seed": 14
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 64,
+			"errors": [],
+			"hash": "ef1642cbc92fc3dc93cddd826663cc7ee16e07ff9f2bf3864d47b09f6f005edf",
+			"ok": true,
+			"seed": 15
+		},
+		{
+			"attempts": 5,
+			"elapsed_ms": 187,
+			"errors": [],
+			"hash": "4d6f92833446fe85b7eca091f314d9da76425f6917835cde71187022e34247a8",
+			"ok": true,
+			"seed": 16
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 98,
+			"errors": [],
+			"hash": "6f9394753056429d3315b8e48b4d3cff021738a1e03cdf49e10d792e5f9795ce",
+			"ok": true,
+			"seed": 17
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 85,
+			"errors": [],
+			"hash": "7a826211609cb9f4614b754c515b86abcf7621b384c0b272ef0827f4be4ef73e",
+			"ok": true,
+			"seed": 18
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 91,
+			"errors": [],
+			"hash": "536b6e2af230a7a6e20d9eff2fc178566e373f7111f6e64907ecbf359945ddd1",
+			"ok": true,
+			"seed": 19
+		},
+		{
+			"attempts": 5,
+			"elapsed_ms": 156,
+			"errors": [],
+			"hash": "c84e8186daed55ff62dc029a590160a484176399224fbbc39c8d7ac4d0555ad6",
+			"ok": true,
+			"seed": 20
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 57,
+			"errors": [],
+			"hash": "e67960e636d51209366ed24a66da170c3a81bc64617697216fb34f68c2535290",
+			"ok": true,
+			"seed": 21
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 59,
+			"errors": [],
+			"hash": "fd2adbaecbf632bae135eb22003d131f7c15f38accf5609700f12c076af58579",
+			"ok": true,
+			"seed": 22
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 82,
+			"errors": [],
+			"hash": "4a1c563d7cd13a128c3693f9a2517077340b6cf868b1f4dedd57c8f501307989",
+			"ok": true,
+			"seed": 23
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 59,
+			"errors": [],
+			"hash": "7ff839cd237f3af95780c89c02ebc629ca233cef3cd1be09e1227995aa7680de",
+			"ok": true,
+			"seed": 24
+		},
+		{
+			"attempts": 3,
+			"elapsed_ms": 118,
+			"errors": [],
+			"hash": "ed6ef3e8daec01351fb586a0df202d24fe695d7751b64a2c39ce5bdc155b40c2",
+			"ok": true,
+			"seed": 25
+		},
+		{
+			"attempts": 4,
+			"elapsed_ms": 130,
+			"errors": [],
+			"hash": "e4800b03b2e1772fd74156c31fbab601b96370c1c10b0b3dca1d843ce43151db",
+			"ok": true,
+			"seed": 26
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 56,
+			"errors": [],
+			"hash": "c2765af68426564902ffc4a18cd5169e4f77b705874f2178856fcedfab19f7bf",
+			"ok": true,
+			"seed": 27
+		},
+		{
+			"attempts": 3,
+			"elapsed_ms": 110,
+			"errors": [],
+			"hash": "36664ad037dc8256737b9926c7d11283473f4ae63b2499b07da814f35f2ff5ca",
+			"ok": true,
+			"seed": 28
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 82,
+			"errors": [],
+			"hash": "392f5659beb479c3393f73e13f5d00666982371f47f6abec4770a9302e990d2d",
+			"ok": true,
+			"seed": 29
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 56,
+			"errors": [],
+			"hash": "d4a0741f736855d662ccce7fb69a35c17cc10e76acbd382b5d63b162b39aa7c8",
+			"ok": true,
+			"seed": 30
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 59,
+			"errors": [],
+			"hash": "aa3d099eee5f0d751ff2e009aa6b070624a4e41d61854e5bea932e87061e404b",
+			"ok": true,
+			"seed": 31
+		}
+	],
+	"failed_seeds": [],
+	"max_attempts": 12,
+	"unique_origins": 30
+}

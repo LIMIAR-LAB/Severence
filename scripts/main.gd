@@ -4,8 +4,10 @@ const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 const Sim = preload("res://scripts/simulation.gd")
 const View = preload("res://scripts/world_view.gd")
 const EquipmentData := preload("res://scripts/equipment_data.gd")
+const InventoryData := preload("res://scripts/inventory_data.gd")
 const InventoryState := preload("res://scripts/inventory_state.gd")
 const GameAudio := preload("res://scripts/game_audio.gd")
+const BossIntro := preload("res://scripts/boss_intro.gd")
 const PORT := 24871
 const RUN_SAVE := "user://expedition.save"
 var sim: Expedition
@@ -41,6 +43,7 @@ var automated := false
 var automated_snapshot_logged := false
 var frames := 0
 var soundscape: Node
+var boss_intro
 var audio_network_primed := false
 var pref_armor := false
 var pref_outfit := "padrao"
@@ -55,7 +58,7 @@ const KEY_BIND_DEFAULTS := {"up": KEY_W, "down": KEY_S, "left": KEY_A, "right": 
 	"weapon": KEY_Q, "summon": KEY_C, "fusion": KEY_G, "robot_switch": KEY_V, "special": KEY_T}
 const KEY_BIND_LABELS := {"up": "ANDAR PRA CIMA", "down": "ANDAR PRA BAIXO", "left": "ANDAR PRA ESQUERDA",
 	"right": "ANDAR PRA DIREITA", "melee": "GOLPE", "jump": "SALTO", "dash": "DASH", "interact": "INTERAGIR",
-	"armor": "ARMADURA ÔMEGA", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE", "robot_switch": "TROCAR ROBÔ", "special": "RAIO ÔMEGA"}
+	"armor": "TRANSFORMAÇÃO", "weapon": "TROCAR ARMA", "summon": "INVOCAR ROBÔ", "fusion": "FUNDIR SPECTRE", "robot_switch": "TROCAR ROBÔ", "special": "PODER DA FORMA"}
 const KEY_BIND_RESERVED := [KEY_ESCAPE, KEY_TAB, KEY_M, KEY_B, KEY_F2]
 var key_binds: Dictionary = KEY_BIND_DEFAULTS.duplicate()
 var display := DisplaySettingsScript.new()
@@ -74,7 +77,7 @@ func valid_saved_actor(value) -> bool:
 func _ready() -> void:
 	Input.joy_connection_changed.connect(log_joypad)
 	for device in Input.get_connected_joypads(): log_joypad(device, true)
-	sim = Sim.new(); load_progress(); load_settings()
+	sim = Sim.new(); sim.procedural_enabled = true; load_progress(); load_settings()
 	display.apply(get_tree())
 	world = View.new(); world.sim = sim; add_child(world)
 	camera = Camera2D.new(); camera.position = Vector2(500, 410); camera.zoom = Vector2(1.05, 1.05); add_child(camera)
@@ -187,6 +190,28 @@ func build_ui() -> void:
 	status_label = Label.new(); status_label.hide(); root.add_child(status_label)
 	var visual_hud := preload("res://scripts/combat_hud.gd").new(); visual_hud.app = self; canvas.add_child(visual_hud)
 	menu = preload("res://scripts/terminal_ui.gd").new(); menu.app = self; canvas.add_child(menu)
+	boss_intro = BossIntro.new(); canvas.add_child(boss_intro)
+
+func boss_room_entered() -> bool:
+	var player_count := 2 if sim.coop in ["local", "online"] else 1
+	for index in player_count:
+		var actor: Dictionary = sim.actors[index]
+		if actor.active and not actor.dead and sim.room_at(actor.p).get("id", "") == "boss": return true
+	return false
+
+func show_boss_intro() -> bool:
+	sim.boss_intro_seen = true
+	if boss_intro.play_intro(volume_percent):
+		if hosting and guest_id > 0: play_boss_intro.rpc_id(guest_id)
+		ui_input_block = 0.2
+		return true
+	return false
+
+@rpc("authority", "call_remote", "reliable", 3)
+func play_boss_intro() -> void:
+	if not online or hosting: return
+	sim.boss_intro_seen = true
+	boss_intro.play_intro(volume_percent)
 
 func disconnect_network() -> void:
 	if multiplayer.multiplayer_peer != null: multiplayer.multiplayer_peer.close()
@@ -208,7 +233,10 @@ func start_local() -> void:
 	sim.say("P2: setas mover, IJKL mirar, Enter tiro, / saltar, . corpo a corpo, Ctrl interagir. Ou controle.")
 
 func start_seed() -> void:
-	start_solo(); sim.start_run(seed_input.text.to_int() if seed_input.text.is_valid_int() else 1941); apply_preferences(0)
+	start_solo()
+	if seed_input.text.is_valid_int(): sim.start_run(seed_input.text.to_int())
+	else: sim.start_new_run()
+	apply_preferences(0)
 
 func present_summary_if_needed() -> void:
 	if sim.summary_seq <= presented_summary_seq or sim.last_run_summary.is_empty(): return
@@ -218,8 +246,7 @@ func present_summary_if_needed() -> void:
 
 func summary_new_run() -> void:
 	if online and not hosting: return
-	var next_seed := int(Time.get_ticks_msec()) % 999999
-	sim.start_run(next_seed); apply_preferences(0)
+	sim.start_new_run(); apply_preferences(0)
 	paused = false; map_open = false; menu.hide(); ui_input_block = 0.2
 
 func summary_return_refuge() -> void:
@@ -290,7 +317,7 @@ func change_loadout(outfit: String, robot: String, armor_type: String) -> void:
 
 func request_run_weapon(id: int, weapon: String) -> bool:
 	if online and not hosting:
-		if id != 1 or weapon not in ["", "bazooka"]: return false
+		if id != 1 or weapon not in ["", "pistol", "shotgun", "smg", "bazooka"]: return false
 		change_run_weapon.rpc_id(1, weapon); return true
 	return sim.select_run_weapon(id, weapon)
 
@@ -422,6 +449,10 @@ func player_input(index: int, use_primary: bool = true) -> Dictionary:
 func _physics_process(dt: float) -> void:
 	frames += 1
 	ui_input_block = maxf(0, ui_input_block - dt)
+	if boss_intro.visible:
+		Engine.time_scale = 1.0
+		if soundscape != null: soundscape.update(sim, playing, true, false, sim.actors[0].p, dt)
+		return
 	# 0.15: hitstop (micro-pausa em abates) e slow-mo "clutch" (meio coração)
 	if playing and not paused:
 		sim.hitstop = maxf(0, sim.hitstop - dt / maxf(Engine.time_scale, 0.001))
@@ -470,6 +501,8 @@ func _physics_process(dt: float) -> void:
 					command.jump = frames == 100
 				submit_input.rpc_id(1, command)
 		else:
+			if not screenshot_mode and sim.mode == "run" and not sim.boss_intro_seen and not menu.visible and boss_room_entered():
+				if show_boss_intro(): return
 			var primary := {} if menu.visible or screenshot_mode else player_input(0)
 			if screenshot_mode and "--demo-walk" in OS.get_cmdline_user_args():
 				primary = {"move": Vector2(1, 0.25).normalized(), "aim": Vector2(1, -0.15).normalized(), "fire": true}
@@ -527,7 +560,18 @@ func _physics_process(dt: float) -> void:
 		if demo_ticks == capture_tick: capture.call_deferred()
 	if automated and frames > 420:
 		if hosting: print("NETWORK_REMOTE_POSITION ", sim.actors[1].p, " MOVED=", sim.actors[1].p.x > 400)
-		print("NETWORK_TEST_END ", "host" if hosting else "client"); get_tree().quit()
+		print("NETWORK_TEST_END ", "host" if hosting else "client")
+		automated = false
+		finish_network_test.call_deferred()
+
+func finish_network_test() -> void:
+	# Let the audio mixer release playbacks before the automated process exits.
+	set_process(false)
+	await get_tree().create_timer(0.1).timeout
+	if soundscape != null:
+		soundscape.queue_free(); soundscape = null
+	await get_tree().create_timer(0.3).timeout
+	get_tree().quit()
 
 func update_hud() -> void:
 	hud_panel.visible = false
@@ -551,7 +595,13 @@ func apply_preferences(id: int) -> void:
 	# 0.17: só o que estiver desbloqueado; sem robô liberado, o ator fica sem robô
 	var outfit := pref_outfit if pref_outfit in sim.OUTFITS and sim.is_unlocked(pref_outfit) else "padrao"
 	var robot := pref_robot if sim.is_unlocked(pref_robot) else sim.default_robot()
-	sim.equip(id, outfit, robot)
+	sim.equip(id, outfit, robot, selected_armor())
+
+func selected_armor() -> String:
+	var inventory := InventoryState.new(sim.inventory_state)
+	var entry: Dictionary = InventoryData.item(inventory.equipped_in("armadura"))
+	var selected := str(entry.get("loadout_id", "omega"))
+	return selected if selected in sim.ARMORS and sim.is_unlocked(selected) else "omega"
 
 func ui_size() -> Vector2:
 	return get_viewport().get_visible_rect().size
@@ -650,6 +700,8 @@ func load_game() -> bool:
 	if not saved_spectres is Array or saved_spectres.size() != 2: return false
 	disconnect_network()
 	sim.apply_snapshot(state)
+	# Continuing legacy geometry must not disable generation for the next run.
+	sim.procedural_enabled = true
 	if soundscape != null: soundscape.discard_history(sim.audio_sequence)
 	presented_summary_seq = sim.summary_seq
 	sim.rng.state = safe_int(data.get("rng_state", sim.rng.state), sim.rng.state)
@@ -667,7 +719,7 @@ func load_progress() -> void:
 	# 0.17: equipamento inicial definido no JSON; Titan e Spectre liberados durante os testes.
 	sim.set_unlocks(EquipmentData.starting_unlocks())
 	if not FileAccess.file_exists("user://progress.json"):
-		sim.reconcile_robot_entitlements(); sim.make_hub(); return
+		sim.reconcile_robot_entitlements(); grant_starting_form(); sim.make_hub(); return
 	var data = JSON.parse_string(FileAccess.get_file_as_string("user://progress.json"))
 	if not data is Dictionary or safe_int(data.get("version", 0)) not in [1, 2]: return
 	sim.materials = clampi(safe_int(data.get("materials", 0)), 0, 9999)
@@ -681,10 +733,18 @@ func load_progress() -> void:
 			if not EquipmentData.item(str(id)).is_empty(): sim.unlocked[str(id)] = true
 	if data.get("inventory") is Dictionary: sim.inventory_state = InventoryState.new(data.inventory).to_dict()
 	else: sim.inventory_state = InventoryState.new().to_dict()
+	grant_starting_form()
 	sim.check_unlocks()      # saves antigos: libera o que o progresso (chefe, expedições) já garantia
 	sim.reconcile_robot_entitlements()
 	sim.new_unlocks.clear()
 	sim.make_hub()
+
+func grant_starting_form() -> void:
+	if not sim.is_unlocked("azul"): return
+	var inventory := InventoryState.new(sim.inventory_state)
+	if inventory.quantity("forma_azul") > 0: return
+	if inventory.used_slots() >= inventory.capacity: inventory.capacity = mini(120, inventory.capacity + 1)
+	if inventory.add("forma_azul"): sim.inventory_state = inventory.to_dict()
 
 func capture() -> void:
 	await RenderingServer.frame_post_draw
@@ -702,7 +762,7 @@ func capture() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST and sim != null: save_progress()
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and playing and not online:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and playing and not online and not screenshot_mode:
 		paused = true; if_menu_show()
 
 func if_menu_show() -> void:

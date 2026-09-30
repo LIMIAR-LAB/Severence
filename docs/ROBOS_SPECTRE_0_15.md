@@ -1,5 +1,8 @@
 # Titan e Spectre 0.15 — linguagem visual
 
+> Registro histórico da versão 0.15. A arte atual da fusão cobre também a
+> cabeça de Marty; veja [Sprites do Spectre e da fusão](./SPRITES_SPECTRE_FUSION.md).
+
 ## Titan-01
 
 O Titan é uma máquina de guerra temporal, não uma armadura aberta. A cabine foi substituída por uma cabeça blindada fechada: capacete arredondado verde-oliva, viseira escura, dois olhos ciano e uma grade de boca metálica. Ele usa o mesmo desgaste industrial e a energia ciano que aparecem no equipamento de Marty.

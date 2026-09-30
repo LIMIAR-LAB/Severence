@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PROBE_START biome_fallback_null
+PROBE_RESULT {"accepted":false,"case":"biome_fallback_null","errors":["profiles/0/fallback_templates: expected array"]}
+

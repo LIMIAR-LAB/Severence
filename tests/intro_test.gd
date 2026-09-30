@@ -59,4 +59,5 @@ func run() -> void:
 	check(current_scene.menu.screen == "main" and not current_scene.playing, "skip press does not start a game or activate a menu action")
 	current_scene.queue_free()
 	await process_frame
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(failures)

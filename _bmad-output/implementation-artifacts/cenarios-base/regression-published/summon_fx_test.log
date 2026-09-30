@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: invocação cria efeito com duração
+PASS: robô real fica escondido enquanto a cápsula voa/abre
+PASS: robô aparece no fim da materialização
+PASS: efeito do Titan não esconde o Spectre
+PASS: recolher cria efeito próprio
+PASS: silhueta branca gerada a partir do sprite
+PASS: silhueta fica em cache
+SUMMON_FX_TESTS_DONE failures=0

@@ -1,0 +1,164 @@
+[
+  {
+    "file": "kit/tile_0.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      62,
+      83,
+      110
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "e57898b34419336e90ae5bbfef54af1b995e1c66be2edf0fcb6c726e76f8f1a9"
+  },
+  {
+    "file": "kit/tile_1.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      14,
+      83,
+      82
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "d1babd02eb5f978c409f3903ac8fe6e6d4e33f560e44dae8e0318e3697ee4691"
+  },
+  {
+    "file": "kit/tile_3.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      42,
+      83,
+      110
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "57312896f587ec53470bb98ed863082a3a2ef9a1318258550a2be25aa8e70f7d"
+  },
+  {
+    "file": "kit/tile_4.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      14,
+      45,
+      62
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "53c708a061130138bf3fcd66ee81f4c9a7b5e0a56cebcaa4047000c10327c1bb"
+  },
+  {
+    "file": "kit/tile_42.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      38,
+      83,
+      110
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "62e911b006d6246df9d65aab09163926dffb16afb631d58a903acd919fc694c4"
+  },
+  {
+    "file": "kit/tile_43.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      14,
+      83,
+      110
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "102c307f9e0e4c2e95ce7e652d55617fea836b3058fc1fe66dca53c8e249404d"
+  },
+  {
+    "file": "kit/tile_44.png",
+    "canvas": [
+      102,
+      124
+    ],
+    "alpha_bbox": [
+      19,
+      62,
+      83,
+      110
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "067dcbe7898621d45b71d3f72be8a7805d5e04f575812e439b4a2736fd8aa7c3"
+  },
+  {
+    "file": "stair-study-v01-rejected.png",
+    "canvas": [
+      688,
+      384
+    ],
+    "alpha_bbox": [
+      103,
+      54,
+      590,
+      286
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "934302ae3b0f5c7550b1072a5399f33bfb8ef460c94044b5cfdd756b8fafc864"
+  },
+  {
+    "file": "stair-study-v02-rejected.png",
+    "canvas": [
+      256,
+      320
+    ],
+    "alpha_bbox": [
+      19,
+      39,
+      237,
+      281
+    ],
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "sha256": "ea9ed4fe53a01c7ab1d73307e99d91e28ab3f4222e3ad5c160b5b70f90a13d20"
+  }
+]

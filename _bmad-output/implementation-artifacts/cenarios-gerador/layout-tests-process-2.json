@@ -1,0 +1,64 @@
+{
+	"cases": [
+		{
+			"attempts": 2,
+			"elapsed_ms": 82,
+			"errors": [],
+			"ok": true,
+			"seed": 1941
+		},
+		{
+			"attempts": 11,
+			"elapsed_ms": 318,
+			"errors": [],
+			"ok": true,
+			"seed": 1
+		},
+		{
+			"attempts": 2,
+			"elapsed_ms": 85,
+			"errors": [],
+			"ok": true,
+			"seed": 42
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 55,
+			"errors": [],
+			"ok": true,
+			"seed": 2026
+		},
+		{
+			"attempts": 1,
+			"elapsed_ms": 56,
+			"errors": [],
+			"ok": true,
+			"seed": 999999
+		}
+	],
+	"elapsed_ms": [
+		82,
+		318,
+		85,
+		55,
+		56
+	],
+	"engine": "4.7.2-stable (official)",
+	"failures": [],
+	"hashes": [
+		"2301846a51776d1cb46b39089576254872e437231a94ba65de40310b402ae9a3",
+		"8d3c5aee1e85342e5ec1c7bb2e17f6eeec4b9aae8aa671d1ca4ddcc16a911d0f",
+		"a95cc780ca6168b92df761dd1e1c832826a558f9c501dbe68af629f5d568c408",
+		"672024e98f2d4c7d29529ce9aba66e41d5f700f890e9f6ff43bd0add3c153cce",
+		"25e49742b4500dc837f80f36fa1162ae15cc4b695fb8dffce80cd199c4e8d346"
+	],
+	"seeds": [
+		1941,
+		1,
+		42,
+		2026,
+		999999
+	],
+	"unique_origins": 5,
+	"version": "scn-layout-1"
+}

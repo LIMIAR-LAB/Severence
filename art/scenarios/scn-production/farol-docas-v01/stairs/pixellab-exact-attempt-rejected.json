@@ -1,0 +1,116 @@
+{
+  "status": "rejected_before_render",
+  "reason": "Source 102x124 does not fit target64x44; no pixels accepted from attempt",
+  "recipe": {
+    "job": {
+      "canvas": [
+        64,
+        44
+      ],
+      "frame_count": 1,
+      "views": [
+        {
+          "id": "face",
+          "offset": [
+            0,
+            0
+          ]
+        }
+      ],
+      "source_bookends_exact": false,
+      "require_clear_border": false,
+      "overview_scale": 4
+    },
+    "scene": {
+      "layers": [
+        {
+          "id": "stone",
+          "name": "Body - native masonry"
+        }
+      ],
+      "views": {
+        "face": {
+          "parts": {
+            "stone": {}
+          },
+          "nodes": {
+            "masonry": {
+              "layer": "stone",
+              "at": [
+                -19,
+                -64
+              ],
+              "draw": [
+                {
+                  "op": "copy",
+                  "part": "stone",
+                  "region": [
+                    19,
+                    66,
+                    82,
+                    107
+                  ]
+                }
+              ]
+            },
+            "cap": {
+              "layer": "stone",
+              "draw": [
+                {
+                  "op": "rect",
+                  "box": [
+                    0,
+                    0,
+                    63,
+                    0
+                  ],
+                  "color": "#6f7880"
+                },
+                {
+                  "op": "rect",
+                  "box": [
+                    0,
+                    1,
+                    63,
+                    1
+                  ],
+                  "color": "#424951"
+                },
+                {
+                  "op": "rect",
+                  "box": [
+                    0,
+                    42,
+                    63,
+                    43
+                  ],
+                  "color": "#34383c"
+                },
+                {
+                  "op": "pixels",
+                  "pixels": [
+                    [
+                      14,
+                      0,
+                      "#4d555d"
+                    ],
+                    [
+                      15,
+                      0,
+                      "#4d555d"
+                    ],
+                    [
+                      46,
+                      0,
+                      "#4d555d"
+                    ]
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,308 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: filhote reutiliza a arte nova do crawler
+PASS: brute mantém sua própria arte
+PASS: filhote mantém escala de 60% vivo e morto
+PASS: agachar não deforma o corpo
+PASS: direção 0 usa linha própria sem espelhar
+PASS: direção 1 usa linha própria sem espelhar
+PASS: direção 2 usa linha própria sem espelhar
+PASS: direção 3 usa linha própria sem espelhar
+PASS: direção 4 usa linha própria sem espelhar
+PASS: direção 5 usa linha própria sem espelhar
+PASS: direção 6 usa linha própria sem espelhar
+PASS: direção 7 usa linha própria sem espelhar
+PASS: crawler: movimento, tiro, agachamento e queda preservam escala
+PASS: crawler_small: movimento, tiro, agachamento e queda preservam escala
+PASS: cult: movimento, tiro, agachamento e queda preservam escala
+PASS: fish: movimento, tiro, agachamento e queda preservam escala
+PASS: brute: movimento, tiro, agachamento e queda preservam escala
+PASS: guard: movimento, tiro, agachamento e queda preservam escala
+PASS: bomber: movimento, tiro, agachamento e queda preservam escala
+PASS: guard: arte PixelLab disponível
+PASS: guard: atlas 5 poses x 8 direções
+PASS: guard: direção 0 pose 0 contém desenho
+PASS: guard: direção 0 pose 1 contém desenho
+PASS: guard: direção 0 pose 2 contém desenho
+PASS: guard: direção 0 pose 3 contém desenho
+PASS: guard: direção 0 pose 4 contém desenho
+PASS: guard: direção 1 pose 0 contém desenho
+PASS: guard: direção 1 pose 1 contém desenho
+PASS: guard: direção 1 pose 2 contém desenho
+PASS: guard: direção 1 pose 3 contém desenho
+PASS: guard: direção 1 pose 4 contém desenho
+PASS: guard: direção 2 pose 0 contém desenho
+PASS: guard: direção 2 pose 1 contém desenho
+PASS: guard: direção 2 pose 2 contém desenho
+PASS: guard: direção 2 pose 3 contém desenho
+PASS: guard: direção 2 pose 4 contém desenho
+PASS: guard: direção 3 pose 0 contém desenho
+PASS: guard: direção 3 pose 1 contém desenho
+PASS: guard: direção 3 pose 2 contém desenho
+PASS: guard: direção 3 pose 3 contém desenho
+PASS: guard: direção 3 pose 4 contém desenho
+PASS: guard: direção 4 pose 0 contém desenho
+PASS: guard: direção 4 pose 1 contém desenho
+PASS: guard: direção 4 pose 2 contém desenho
+PASS: guard: direção 4 pose 3 contém desenho
+PASS: guard: direção 4 pose 4 contém desenho
+PASS: guard: direção 5 pose 0 contém desenho
+PASS: guard: direção 5 pose 1 contém desenho
+PASS: guard: direção 5 pose 2 contém desenho
+PASS: guard: direção 5 pose 3 contém desenho
+PASS: guard: direção 5 pose 4 contém desenho
+PASS: guard: direção 6 pose 0 contém desenho
+PASS: guard: direção 6 pose 1 contém desenho
+PASS: guard: direção 6 pose 2 contém desenho
+PASS: guard: direção 6 pose 3 contém desenho
+PASS: guard: direção 6 pose 4 contém desenho
+PASS: guard: direção 7 pose 0 contém desenho
+PASS: guard: direção 7 pose 1 contém desenho
+PASS: guard: direção 7 pose 2 contém desenho
+PASS: guard: direção 7 pose 3 contém desenho
+PASS: guard: direção 7 pose 4 contém desenho
+PASS: guard: cano alinhado ao corpo na direção 0
+PASS: guard: cano alinhado ao corpo na direção 1
+PASS: guard: cano alinhado ao corpo na direção 2
+PASS: guard: cano alinhado ao corpo na direção 3
+PASS: guard: cano alinhado ao corpo na direção 4
+PASS: guard: cano alinhado ao corpo na direção 5
+PASS: guard: cano alinhado ao corpo na direção 6
+PASS: guard: cano alinhado ao corpo na direção 7
+PASS: bomber: arte PixelLab disponível
+PASS: bomber: atlas 5 poses x 8 direções
+PASS: bomber: direção 0 pose 0 contém desenho
+PASS: bomber: direção 0 pose 1 contém desenho
+PASS: bomber: direção 0 pose 2 contém desenho
+PASS: bomber: direção 0 pose 3 contém desenho
+PASS: bomber: direção 0 pose 4 contém desenho
+PASS: bomber: direção 1 pose 0 contém desenho
+PASS: bomber: direção 1 pose 1 contém desenho
+PASS: bomber: direção 1 pose 2 contém desenho
+PASS: bomber: direção 1 pose 3 contém desenho
+PASS: bomber: direção 1 pose 4 contém desenho
+PASS: bomber: direção 2 pose 0 contém desenho
+PASS: bomber: direção 2 pose 1 contém desenho
+PASS: bomber: direção 2 pose 2 contém desenho
+PASS: bomber: direção 2 pose 3 contém desenho
+PASS: bomber: direção 2 pose 4 contém desenho
+PASS: bomber: direção 3 pose 0 contém desenho
+PASS: bomber: direção 3 pose 1 contém desenho
+PASS: bomber: direção 3 pose 2 contém desenho
+PASS: bomber: direção 3 pose 3 contém desenho
+PASS: bomber: direção 3 pose 4 contém desenho
+PASS: bomber: direção 4 pose 0 contém desenho
+PASS: bomber: direção 4 pose 1 contém desenho
+PASS: bomber: direção 4 pose 2 contém desenho
+PASS: bomber: direção 4 pose 3 contém desenho
+PASS: bomber: direção 4 pose 4 contém desenho
+PASS: bomber: direção 5 pose 0 contém desenho
+PASS: bomber: direção 5 pose 1 contém desenho
+PASS: bomber: direção 5 pose 2 contém desenho
+PASS: bomber: direção 5 pose 3 contém desenho
+PASS: bomber: direção 5 pose 4 contém desenho
+PASS: bomber: direção 6 pose 0 contém desenho
+PASS: bomber: direção 6 pose 1 contém desenho
+PASS: bomber: direção 6 pose 2 contém desenho
+PASS: bomber: direção 6 pose 3 contém desenho
+PASS: bomber: direção 6 pose 4 contém desenho
+PASS: bomber: direção 7 pose 0 contém desenho
+PASS: bomber: direção 7 pose 1 contém desenho
+PASS: bomber: direção 7 pose 2 contém desenho
+PASS: bomber: direção 7 pose 3 contém desenho
+PASS: bomber: direção 7 pose 4 contém desenho
+PASS: cult: arte PixelLab disponível
+PASS: cult: atlas 5 poses x 8 direções
+PASS: cult: direção 0 pose 0 contém desenho
+PASS: cult: direção 0 pose 1 contém desenho
+PASS: cult: direção 0 pose 2 contém desenho
+PASS: cult: direção 0 pose 3 contém desenho
+PASS: cult: direção 0 pose 4 contém desenho
+PASS: cult: direção 1 pose 0 contém desenho
+PASS: cult: direção 1 pose 1 contém desenho
+PASS: cult: direção 1 pose 2 contém desenho
+PASS: cult: direção 1 pose 3 contém desenho
+PASS: cult: direção 1 pose 4 contém desenho
+PASS: cult: direção 2 pose 0 contém desenho
+PASS: cult: direção 2 pose 1 contém desenho
+PASS: cult: direção 2 pose 2 contém desenho
+PASS: cult: direção 2 pose 3 contém desenho
+PASS: cult: direção 2 pose 4 contém desenho
+PASS: cult: direção 3 pose 0 contém desenho
+PASS: cult: direção 3 pose 1 contém desenho
+PASS: cult: direção 3 pose 2 contém desenho
+PASS: cult: direção 3 pose 3 contém desenho
+PASS: cult: direção 3 pose 4 contém desenho
+PASS: cult: direção 4 pose 0 contém desenho
+PASS: cult: direção 4 pose 1 contém desenho
+PASS: cult: direção 4 pose 2 contém desenho
+PASS: cult: direção 4 pose 3 contém desenho
+PASS: cult: direção 4 pose 4 contém desenho
+PASS: cult: direção 5 pose 0 contém desenho
+PASS: cult: direção 5 pose 1 contém desenho
+PASS: cult: direção 5 pose 2 contém desenho
+PASS: cult: direção 5 pose 3 contém desenho
+PASS: cult: direção 5 pose 4 contém desenho
+PASS: cult: direção 6 pose 0 contém desenho
+PASS: cult: direção 6 pose 1 contém desenho
+PASS: cult: direção 6 pose 2 contém desenho
+PASS: cult: direção 6 pose 3 contém desenho
+PASS: cult: direção 6 pose 4 contém desenho
+PASS: cult: direção 7 pose 0 contém desenho
+PASS: cult: direção 7 pose 1 contém desenho
+PASS: cult: direção 7 pose 2 contém desenho
+PASS: cult: direção 7 pose 3 contém desenho
+PASS: cult: direção 7 pose 4 contém desenho
+PASS: cult: cano alinhado ao corpo na direção 0
+PASS: cult: cano alinhado ao corpo na direção 1
+PASS: cult: cano alinhado ao corpo na direção 2
+PASS: cult: cano alinhado ao corpo na direção 3
+PASS: cult: cano alinhado ao corpo na direção 4
+PASS: cult: cano alinhado ao corpo na direção 5
+PASS: cult: cano alinhado ao corpo na direção 6
+PASS: cult: cano alinhado ao corpo na direção 7
+PASS: fish: arte PixelLab disponível
+PASS: fish: atlas 5 poses x 8 direções
+PASS: fish: direção 0 pose 0 contém desenho
+PASS: fish: direção 0 pose 1 contém desenho
+PASS: fish: direção 0 pose 2 contém desenho
+PASS: fish: direção 0 pose 3 contém desenho
+PASS: fish: direção 0 pose 4 contém desenho
+PASS: fish: direção 1 pose 0 contém desenho
+PASS: fish: direção 1 pose 1 contém desenho
+PASS: fish: direção 1 pose 2 contém desenho
+PASS: fish: direção 1 pose 3 contém desenho
+PASS: fish: direção 1 pose 4 contém desenho
+PASS: fish: direção 2 pose 0 contém desenho
+PASS: fish: direção 2 pose 1 contém desenho
+PASS: fish: direção 2 pose 2 contém desenho
+PASS: fish: direção 2 pose 3 contém desenho
+PASS: fish: direção 2 pose 4 contém desenho
+PASS: fish: direção 3 pose 0 contém desenho
+PASS: fish: direção 3 pose 1 contém desenho
+PASS: fish: direção 3 pose 2 contém desenho
+PASS: fish: direção 3 pose 3 contém desenho
+PASS: fish: direção 3 pose 4 contém desenho
+PASS: fish: direção 4 pose 0 contém desenho
+PASS: fish: direção 4 pose 1 contém desenho
+PASS: fish: direção 4 pose 2 contém desenho
+PASS: fish: direção 4 pose 3 contém desenho
+PASS: fish: direção 4 pose 4 contém desenho
+PASS: fish: direção 5 pose 0 contém desenho
+PASS: fish: direção 5 pose 1 contém desenho
+PASS: fish: direção 5 pose 2 contém desenho
+PASS: fish: direção 5 pose 3 contém desenho
+PASS: fish: direção 5 pose 4 contém desenho
+PASS: fish: direção 6 pose 0 contém desenho
+PASS: fish: direção 6 pose 1 contém desenho
+PASS: fish: direção 6 pose 2 contém desenho
+PASS: fish: direção 6 pose 3 contém desenho
+PASS: fish: direção 6 pose 4 contém desenho
+PASS: fish: direção 7 pose 0 contém desenho
+PASS: fish: direção 7 pose 1 contém desenho
+PASS: fish: direção 7 pose 2 contém desenho
+PASS: fish: direção 7 pose 3 contém desenho
+PASS: fish: direção 7 pose 4 contém desenho
+PASS: fish: cano alinhado ao corpo na direção 0
+PASS: fish: cano alinhado ao corpo na direção 1
+PASS: fish: cano alinhado ao corpo na direção 2
+PASS: fish: cano alinhado ao corpo na direção 3
+PASS: fish: cano alinhado ao corpo na direção 4
+PASS: fish: cano alinhado ao corpo na direção 5
+PASS: fish: cano alinhado ao corpo na direção 6
+PASS: fish: cano alinhado ao corpo na direção 7
+PASS: crawler: arte PixelLab disponível
+PASS: crawler: atlas 5 poses x 8 direções
+PASS: crawler: direção 0 pose 0 contém desenho
+PASS: crawler: direção 0 pose 1 contém desenho
+PASS: crawler: direção 0 pose 2 contém desenho
+PASS: crawler: direção 0 pose 3 contém desenho
+PASS: crawler: direção 0 pose 4 contém desenho
+PASS: crawler: direção 1 pose 0 contém desenho
+PASS: crawler: direção 1 pose 1 contém desenho
+PASS: crawler: direção 1 pose 2 contém desenho
+PASS: crawler: direção 1 pose 3 contém desenho
+PASS: crawler: direção 1 pose 4 contém desenho
+PASS: crawler: direção 2 pose 0 contém desenho
+PASS: crawler: direção 2 pose 1 contém desenho
+PASS: crawler: direção 2 pose 2 contém desenho
+PASS: crawler: direção 2 pose 3 contém desenho
+PASS: crawler: direção 2 pose 4 contém desenho
+PASS: crawler: direção 3 pose 0 contém desenho
+PASS: crawler: direção 3 pose 1 contém desenho
+PASS: crawler: direção 3 pose 2 contém desenho
+PASS: crawler: direção 3 pose 3 contém desenho
+PASS: crawler: direção 3 pose 4 contém desenho
+PASS: crawler: direção 4 pose 0 contém desenho
+PASS: crawler: direção 4 pose 1 contém desenho
+PASS: crawler: direção 4 pose 2 contém desenho
+PASS: crawler: direção 4 pose 3 contém desenho
+PASS: crawler: direção 4 pose 4 contém desenho
+PASS: crawler: direção 5 pose 0 contém desenho
+PASS: crawler: direção 5 pose 1 contém desenho
+PASS: crawler: direção 5 pose 2 contém desenho
+PASS: crawler: direção 5 pose 3 contém desenho
+PASS: crawler: direção 5 pose 4 contém desenho
+PASS: crawler: direção 6 pose 0 contém desenho
+PASS: crawler: direção 6 pose 1 contém desenho
+PASS: crawler: direção 6 pose 2 contém desenho
+PASS: crawler: direção 6 pose 3 contém desenho
+PASS: crawler: direção 6 pose 4 contém desenho
+PASS: crawler: direção 7 pose 0 contém desenho
+PASS: crawler: direção 7 pose 1 contém desenho
+PASS: crawler: direção 7 pose 2 contém desenho
+PASS: crawler: direção 7 pose 3 contém desenho
+PASS: crawler: direção 7 pose 4 contém desenho
+PASS: brute: arte PixelLab disponível
+PASS: brute: atlas 5 poses x 8 direções
+PASS: brute: direção 0 pose 0 contém desenho
+PASS: brute: direção 0 pose 1 contém desenho
+PASS: brute: direção 0 pose 2 contém desenho
+PASS: brute: direção 0 pose 3 contém desenho
+PASS: brute: direção 0 pose 4 contém desenho
+PASS: brute: direção 1 pose 0 contém desenho
+PASS: brute: direção 1 pose 1 contém desenho
+PASS: brute: direção 1 pose 2 contém desenho
+PASS: brute: direção 1 pose 3 contém desenho
+PASS: brute: direção 1 pose 4 contém desenho
+PASS: brute: direção 2 pose 0 contém desenho
+PASS: brute: direção 2 pose 1 contém desenho
+PASS: brute: direção 2 pose 2 contém desenho
+PASS: brute: direção 2 pose 3 contém desenho
+PASS: brute: direção 2 pose 4 contém desenho
+PASS: brute: direção 3 pose 0 contém desenho
+PASS: brute: direção 3 pose 1 contém desenho
+PASS: brute: direção 3 pose 2 contém desenho
+PASS: brute: direção 3 pose 3 contém desenho
+PASS: brute: direção 3 pose 4 contém desenho
+PASS: brute: direção 4 pose 0 contém desenho
+PASS: brute: direção 4 pose 1 contém desenho
+PASS: brute: direção 4 pose 2 contém desenho
+PASS: brute: direção 4 pose 3 contém desenho
+PASS: brute: direção 4 pose 4 contém desenho
+PASS: brute: direção 5 pose 0 contém desenho
+PASS: brute: direção 5 pose 1 contém desenho
+PASS: brute: direção 5 pose 2 contém desenho
+PASS: brute: direção 5 pose 3 contém desenho
+PASS: brute: direção 5 pose 4 contém desenho
+PASS: brute: direção 6 pose 0 contém desenho
+PASS: brute: direção 6 pose 1 contém desenho
+PASS: brute: direção 6 pose 2 contém desenho
+PASS: brute: direção 6 pose 3 contém desenho
+PASS: brute: direção 6 pose 4 contém desenho
+PASS: brute: direção 7 pose 0 contém desenho
+PASS: brute: direção 7 pose 1 contém desenho
+PASS: brute: direção 7 pose 2 contém desenho
+PASS: brute: direção 7 pose 3 contém desenho
+PASS: brute: direção 7 pose 4 contém desenho
+PASS: brute: cano alinhado ao corpo na direção 0
+PASS: brute: cano alinhado ao corpo na direção 1
+PASS: brute: cano alinhado ao corpo na direção 2
+PASS: brute: cano alinhado ao corpo na direção 3
+PASS: brute: cano alinhado ao corpo na direção 4
+PASS: brute: cano alinhado ao corpo na direção 5
+PASS: brute: cano alinhado ao corpo na direção 6
+PASS: brute: cano alinhado ao corpo na direção 7
+PASS: guard pode surgir na partida
+PASS: bomber pode surgir na partida
+failures=0

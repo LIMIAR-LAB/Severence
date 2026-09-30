@@ -237,6 +237,17 @@
       "rms_dbfs": -18.43,
       "boundary_sample_delta": 0.0035377,
       "sha256": "7d626446c840d2f64c7aefbf07e9fd8b7caf7512e8b609075d5168a3e44df701"
+    },
+    "music_boss": {
+      "file": "assets/audio/generated/music_boss.ogg",
+      "format": "Ogg Vorbis stereo",
+      "loop": true,
+      "generator": "tools/generate_boss_music.py",
+      "duration_seconds": 32.0,
+      "peak_dbfs": -2.78,
+      "rms_dbfs": -16.66,
+      "boundary_sample_delta": 0.0060587,
+      "sha256": "8d5243bc1a07b1533b5ac39a232cd1f5569f495ac17c6101721dea40576d961a"
     }
   }
 }

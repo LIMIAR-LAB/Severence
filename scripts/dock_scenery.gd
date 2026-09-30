@@ -4,7 +4,14 @@ extends RefCounted
 # Tudo é desenhado no CanvasItem recebido (world_view), em coordenadas de mundo.
 
 const DOCKS := preload("res://scripts/docks_map.gd")
+const SanctuaryFixed = preload("res://scripts/scenarios/sanctuary_fixed.gd")
+const CorridorArt = preload("res://scripts/scenarios/corridor_art.gd")
+const ScenarioLayout := preload("res://scripts/scenario_layout.gd")
 const BASE := "res://assets/environment/docks12/"
+const PIXEL_FLOOR_BASE := BASE + "pixellab/"
+const PIXEL_PILLAR_PATH := PIXEL_FLOOR_BASE + "pillar_monumental.png"
+const PIXEL_WALL_FRONT_PATH := PIXEL_FLOOR_BASE + "wall_1.png"
+const PIXEL_WALL_SIDE_PATH := PIXEL_FLOOR_BASE + "wall_17.png"
 const BOSS_ARENA_PATH := BASE + "boss/boss_arena_plate.png"
 const BOSS_ARENA_RECT := Rect2(3000, 400, 2400, 1800)
 const BOSS_SAFE_CENTER := Vector2(4200, 1200)
@@ -106,14 +113,24 @@ var boss_arena: Texture2D
 var room_plates: Dictionary = {}
 var corridor_deck: Texture2D
 var corridor_deck_vertical: Texture2D
+var pixel_floors: Array[Texture2D] = []
+var pixel_pillar: Texture2D
+var pixel_wall_front: Texture2D
+var pixel_wall_side: Texture2D
 var chapel_frames: Array[Texture2D] = []
 var chapel_fallback: Texture2D
 var chapel_fisherman_frames: Array[Texture2D] = []
 var chapel_room_active := false
+var sanctuary_texture: Texture2D
+var sanctuary_bounds := Rect2()
 var reveal_at := {}     # id da sala -> tick_time em que apareceu
 var lights: Array = []  # poças de luz do quadro atual (desenhadas no LightLayer, modo aditivo)
 
 func _init() -> void:
+	for i in 16: pixel_floors.append(load(PIXEL_FLOOR_BASE + "floor_%d.png" % i))
+	pixel_pillar = load(PIXEL_PILLAR_PATH)
+	pixel_wall_front = load(PIXEL_WALL_FRONT_PATH)
+	pixel_wall_side = load(PIXEL_WALL_SIDE_PATH)
 	for n in TILE_NAMES: tiles[n] = load(BASE + "tiles/" + n + ".png")
 	for n in PROP_NAMES: props[n] = load(BASE + "props/" + n + ".png")
 	for set_name in SET_PROPS:
@@ -151,7 +168,7 @@ static func hash01(ix: int, iy: int, salt: int = 0) -> float:
 	return float(n & 0xffff) / 65535.0
 
 func has_prop(kind: String) -> bool:
-	return kind in ["maze_wall", "wall_block", "chapel_wall", "chapel_reliquary"] or props.has(LEGACY.get(kind, kind))
+	return kind in ["maze_wall", "wall_block", "chapel_wall", "chapel_reliquary", "stone_pillar"] or props.has(LEGACY.get(kind, kind))
 
 # ------------------------------------------------------------------ descoberta (névoa)
 func discovered_rooms(sim) -> Array:
@@ -182,6 +199,8 @@ func visible_floors(sim, rooms: Array) -> Array:
 		for a in sim.actors:
 			if a.active and f.has_point(a.p): seen = true
 		if seen: out.append(f)
+	for rect in sim.visible_corridor_rects():
+		if rect not in out: out.append(rect)
 	return out
 
 static func chapel_frame_index(tick_time: float) -> int:
@@ -205,15 +224,13 @@ func chapel_is_visible(rooms: Array, view: Rect2) -> bool:
 	return false
 
 func chapel_hides_legacy(kind: String, position: Vector2) -> bool:
-	if not chapel_room_active or chapel_fallback == null or kind not in CHAPEL_BAKED_KINDS:
-		return false
-	return CHAPEL_PLATE_RECT.grow(64.0).has_point(position)
+	return kind in ["cranes_baked","warehouse_baked"] or (sanctuary_texture!=null and sanctuary_bounds.has_point(position))
 
 func chapel_hides_gate(room_id: String, gate_rect: Rect2 = Rect2()) -> bool:
 	# A placa já contém soleiras, pilares e iluminação próprios nas três saídas.
 	# Suprime também o portão da sala vizinha quando ele encosta na ponta do corredor.
 	# Mantém os portões procedurais quando a arte unificada não está disponível.
-	return chapel_fallback != null and (room_id == "chapel" or (gate_rect.has_area() and CHAPEL_PLATE_RECT.grow(1.0).intersects(gate_rect)))
+	return sanctuary_texture!=null and (room_id=="chapel" or sanctuary_bounds.has_point(gate_rect.get_center()))
 
 func chapel_fisherman_texture(tick_time: float) -> Texture2D:
 	if chapel_fisherman_frames.is_empty():
@@ -226,29 +243,23 @@ func chapel_fisherman_texture(tick_time: float) -> Texture2D:
 
 func draw_chapel_plate(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
 	chapel_room_active = false
-	if chapel_fallback == null or not CHAPEL_PLATE_RECT.intersects(view): return
-	var room_seen := rooms.any(func(room): return room.get("id", "") == "chapel")
-	var clips: Array[Rect2] = []
-	if room_seen:
-		clips.append(CHAPEL_PLATE_RECT.intersection(view)); chapel_room_active = true
-	else:
-		for connector: Rect2 in CHAPEL_CONNECTORS:
-			var revealed := false
-			for room in rooms:
-				if room.r.grow(8.0).intersects(connector): revealed = true; break
-			if not revealed:
-				for actor in sim.actors:
-					if actor.active and connector.grow(96.0).has_point(actor.p): revealed = true; break
-			if revealed and connector.intersects(view): clips.append(connector.intersection(view))
-	for clip in clips:
-		if clip.size.x > 0.0 and clip.size.y > 0.0:
-			ci.draw_texture_rect_region(chapel_fallback, clip, Rect2(clip.position - CHAPEL_PLATE_RECT.position, clip.size))
-	if room_seen:
-		var overlay := chapel_overlay_at(sim.tick_time)
-		if overlay != null:
-			var overlay_clip := CHAPEL_OVERLAY_RECT.intersection(view)
-			if overlay_clip.size.x > 0.0 and overlay_clip.size.y > 0.0:
-				ci.draw_texture_rect_region(overlay, overlay_clip, Rect2(overlay_clip.position - CHAPEL_OVERLAY_RECT.position, overlay_clip.size))
+	sanctuary_bounds=SanctuaryFixed.bounds(sim)
+	if sanctuary_texture==null and ResourceLoader.exists(SanctuaryFixed.TEXTURE): sanctuary_texture=load(SanctuaryFixed.TEXTURE)
+	for room in rooms:
+		if room.get("id","")!="chapel" or not sanctuary_bounds.intersects(view): continue
+		if sanctuary_texture!=null:
+			chapel_room_active=true
+			ci.draw_texture_rect(sanctuary_texture,sanctuary_bounds,false)
+			continue
+		# A supported stone nave and a restrained carpet lead to the physical altar.
+		# No baked architecture or imaginary floor is sampled into the corridors.
+		var aisle := Rect2(room.r.position+Vector2(560,480),Vector2(180,790))
+		ci.draw_rect(aisle.intersection(view),Color("3d2538"))
+		for branch in [Rect2(room.r.position+Vector2(560,390),Vector2(530,90)),Rect2(room.r.position+Vector2(910,350),Vector2(180,130))]:
+			if branch.intersects(view): ci.draw_rect(branch.intersection(view),Color("3d2538"))
+		for side in [0,1]:
+			var trim := Rect2(aisle.position+Vector2(side*176,0),Vector2(4,aisle.size.y))
+			if trim.intersects(view): ci.draw_rect(trim.intersection(view),Color("8b7258"))
 
 static func inside(rects: Array, p: Vector2, margin: float = 0.0) -> bool:
 	for r in rects:
@@ -266,6 +277,8 @@ func draw_reveal(ci: CanvasItem, sim, rooms: Array) -> void:
 
 # ------------------------------------------------------------------ piso
 func style_of(room: Dictionary) -> Dictionary:
+	if room.get("id","")=="chapel":
+		return {"top":"facade","bottom":"wall","left":"wall","wall_set":"cult"}
 	return DOCKS.ROOM_STYLE.get(room.get("id", ""), {})
 
 func pick_plank(ix: int, iy: int) -> String:
@@ -281,7 +294,25 @@ func pick_granite(ix: int, iy: int) -> String:
 	var r := hash01(ix, iy, 4)
 	return "granite_moss" if r < 0.5 else "granite_cracked"   # 0.15: sem a poça quadrada (destoava)
 
+func draw_pixel_floor(ci: CanvasItem, rect: Rect2, view: Rect2, material: String, alpha: float = 1.0) -> void:
+	var area := rect.intersection(view)
+	if not area.has_area(): return
+	var start := 12 if material == "wood" else (8 if material == "metal" else 0)
+	for iy in range(int(floorf(area.position.y / 64.0)), int(ceilf(area.end.y / 64.0))):
+		for ix in range(int(floorf(area.position.x / 64.0)), int(ceilf(area.end.x / 64.0))):
+			var cell := Rect2(ix * 64.0, iy * 64.0, 64, 64)
+			var clip := cell.intersection(area)
+			if not clip.has_area(): continue
+			var roll := hash01(ix, iy, 91)
+			var variation := 0 if roll < 0.58 else (1 if roll < 0.87 else (2 if roll < 0.96 else 3))
+			if material == "stone" and roll > 0.985: variation = 4 + int(hash01(ix, iy, 92) * 4.0) % 4
+			var texture: Texture2D = pixel_floors[start + variation]
+			ci.draw_texture_rect_region(texture, clip, Rect2(clip.position - cell.position, clip.size), Color(1, 1, 1, alpha))
+
 func tile_area(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, origin: Vector2 = Vector2.ZERO, tint: Color = Color.WHITE, yellow_row: int = -99) -> void:
+	if pixel_floors.size() == 16:
+		draw_pixel_floor(ci, rect, view, "wood" if kind == "planks" else "stone")
+		return
 	var area := rect.intersection(view)
 	if area.size.x <= 0 or area.size.y <= 0: return
 	var planks := kind == "planks"
@@ -312,6 +343,10 @@ func style_of_rect(sim, rect: Rect2) -> Dictionary:
 
 # 0.16: piso de um microbioma — azulejos 64x64 sorteados pelos pesos de FLOOR_SETS (fixo por célula).
 func set_area(ci: CanvasItem, rect: Rect2, view: Rect2, set_name: String) -> void:
+	if pixel_floors.size() == 16 and set_name != "chapel":
+		var material := "wood" if set_name == "cellar" else ("metal" if set_name in ["depot", "workshop", "drydock"] else "stone")
+		draw_pixel_floor(ci, rect, view, material)
+		return
 	var area := rect.intersection(view)
 	if area.size.x <= 0 or area.size.y <= 0: return
 	var entries: Array = FLOOR_SETS[set_name]
@@ -350,10 +385,16 @@ func draw_boss_arena(ci: CanvasItem, rect: Rect2, view: Rect2) -> void:
 		ci.draw_circle(BOSS_SAFE_CENTER, BOSS_SAFE_RADIUS, Color(0.015, 0.035, 0.065, 0.16))
 
 func room_plate_for_rect(sim, rect: Rect2) -> Dictionary:
-	# Só retângulos pertencentes à sala: corredores e portas mantêm a geometria original.
+	# Placas pequenas ampliadas várias vezes borram o cenário. Salas grandes usam
+	# tiles de 64 px na escala nativa, preservando detalhes nítidos.
 	for room in sim.rooms:
+		if room.get("id","")=="chapel": continue
 		if not room_plates.has(room.get("id", "")): continue
-		if room.r == rect or rect in room.get("extra", []): return room
+		if room.r == rect or rect in room.get("extra", []):
+			var bounds: Rect2 = room.r
+			for wing: Rect2 in room.get("extra", []): bounds = bounds.merge(wing)
+			var native_size: Vector2 = room_plates[room.id].get_size()
+			if maxf(bounds.size.x / native_size.x, bounds.size.y / native_size.y) <= 1.5: return room
 	return {}
 
 func draw_room_plate(ci: CanvasItem, room: Dictionary, rect: Rect2, view: Rect2) -> void:
@@ -368,7 +409,7 @@ func draw_room_plate(ci: CanvasItem, room: Dictionary, rect: Rect2, view: Rect2)
 func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
 	for rect in floors:
 		if not rect.intersects(view): continue
-		if corridor_deck != null and is_corridor(rect):
+		if corridor_deck != null and is_corridor(rect, sim):
 			draw_corridor_surface(ci, rect, rect, view)
 			continue
 		var plate_room := room_plate_for_rect(sim, rect)
@@ -388,7 +429,7 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 			var tint := Color(1.0, 0.93, 0.86) if kind == "cobble" else Color.WHITE
 			tile_area(ci, rect, view, "planks" if kind == "planks" else "granite", Vector2.ZERO, tint)
 			if st.has("floor_patch"): set_area(ci, st.floor_patch, view, st.floor_set)
-		scatter_decals(ci, rect, view, kind, st.get("floor_set", ""))   # 0.17: chão "sujo"
+		if pixel_floors.is_empty(): scatter_decals(ci, rect, view, kind, st.get("floor_set", ""))
 		var amb: Color = AMBIENT.get(st.get("wall_set", ""), Color(0, 0, 0, 0))
 		if amb.a > 0: ci.draw_rect(rect.intersection(view), amb)       # 0.17: tinte ambiente da sala
 	for room in rooms:
@@ -404,15 +445,24 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 		ci.draw_rect(Rect2(quay.position.x, quay.position.y + 3, quay.size.x, 2), Color(0, 0, 0, 0.35))
 	if corridor_deck != null:
 		for rect: Rect2 in floors:
-			if is_corridor(rect): draw_corridor_joins(ci, rect, rooms, view)
+			if is_corridor(rect, sim): draw_corridor_joins(ci, rect, rooms, view)
 
-static func is_corridor(rect: Rect2) -> bool:
+static func is_corridor(rect: Rect2, sim = null) -> bool:
+	if sim != null:
+		if sim.run_corridors.any(func(r):return r.encloses(rect)): return true
+		if sim.run_secret_floors.any(func(r):return r.encloses(rect)): return true
+		if sim.CranesFixed.active(sim) and sim.CranesFixed.apron(sim).encloses(rect): return true
+		if sim.WarehouseFixed.active(sim) and sim.WarehouseFixed.apron().encloses(rect): return true
+	if sim != null and (rect in sim.run_corridors or rect in sim.run_secret_floors): return true
 	if rect in DOCKS.CORRIDORS or rect == DOCKS.SECRET_CORRIDOR: return true
 	for shortcut in DOCKS.SHORTCUTS:
 		if rect == shortcut.r: return true
 	return false
 
 func draw_corridor_surface(ci: CanvasItem, rect: Rect2, area: Rect2, view: Rect2, alpha: float = 1.0) -> void:
+	if CorridorArt.STONE!=null:
+		CorridorArt.floor_surface(ci,area,view,alpha)
+		return
 	var horizontal := rect.size.x > rect.size.y
 	var texture := corridor_deck if horizontal else corridor_deck_vertical
 	var scale_factor := rect.size.y / texture.get_height() if horizontal else rect.size.x / texture.get_width()
@@ -458,16 +508,9 @@ func draw_corridor_edges(ci: CanvasItem, sim, rect: Rect2, view: Rect2) -> void:
 			var p: Vector2 = a + tangent * run.x
 			var q: Vector2 = a + tangent * run.y
 			if not Rect2(p, q - p).abs().grow(40).intersects(view): continue
-			ci.draw_line(p + normal * 9 + Vector2(0, 8), q + normal * 9 + Vector2(0, 8), Color("080e18"), 22)
-			ci.draw_line(p + normal * 8, q + normal * 8, Color("25394a"), 18)
-			ci.draw_line(p + normal * 8, q + normal * 8, Color("66717b"), 3)
-			ci.draw_line(p, q, Color("927047"), 3)
+			CorridorArt.boundary(ci,p,q,normal,view)
 			var length: float = run.y - run.x
-			for offset in range(18, int(length), 96):
-				var bolt := p + tangent * offset + normal * 8
-				ci.draw_rect(Rect2(bolt - Vector2(3, 3), Vector2(6, 6)), Color("14212b"))
-				ci.draw_rect(Rect2(bolt - Vector2(1, 2), Vector2(2, 2)), Color("c0a377"))
-			for offset in range(48, int(length), 320):
+			for offset in range(48, int(length), 640):
 				var lamp := p + tangent * offset + normal * 8
 				ci.draw_rect(Rect2(lamp - Vector2(7, 5), Vector2(14, 10)), Color("101722"))
 				ci.draw_rect(Rect2(lamp - Vector2(4, 2), Vector2(8, 4)), Color("e7b978"))
@@ -479,9 +522,10 @@ func draw_corridor_edges(ci: CanvasItem, sim, rect: Rect2, view: Rect2) -> void:
 # precisar de arte nova. Pula salas com floor_set (market/workshop/chapel) porque a folha delas já
 # tem bastante variedade e virou "poluída" quando testamos (ver docs/CENARIO_0_16.md).
 func draw_floor_grunge(ci: CanvasItem, sim, floors: Array, view: Rect2) -> void:
+	if pixel_floors.size() == 16: return
 	var cell_sz := 64.0
 	for rect: Rect2 in floors:
-		if corridor_deck != null and is_corridor(rect): continue
+		if corridor_deck != null and is_corridor(rect, sim): continue
 		if not room_plate_for_rect(sim, rect).is_empty(): continue
 		var st := style_of_rect(sim, rect)
 		# pula salas com set curado (folha própria) ou pintadas (imagem própria já tem sujeira/luz)
@@ -522,10 +566,22 @@ func draw_water(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
 	var zones: Array = []
 	for z in DOCKS.WATER:
 		for room in rooms:
-			if room.get("id", "") == z.room: zones.append(z.r)
+			if room.get("id", "") == z.room: zones.append(Rect2(z.r.position+sim.room_offsets.get(z.room,Vector2.ZERO),z.r.size))
 	for zone in zones: water_rect(ci, sim, zone, view)
 
 func draw_gap(ci: CanvasItem, sim, gap: Rect2) -> void:
+	if gap in ScenarioLayout.PITS:
+		ci.draw_rect(gap, Color("111622"))
+		if pixel_floors.size() == 16: draw_pixel_floor(ci, gap, gap, "metal")
+		ci.draw_rect(gap.grow(-18), Color("050912"))
+		ci.draw_rect(Rect2(gap.position, Vector2(gap.size.x, 14)), Color("89949a"))
+		ci.draw_rect(Rect2(gap.position + Vector2(0, 14), Vector2(gap.size.x, 10)), Color("353b49"))
+		ci.draw_rect(Rect2(gap.position.x, gap.position.y, 12, gap.size.y), Color("68737a"))
+		ci.draw_rect(Rect2(gap.end.x - 12, gap.position.y, 12, gap.size.y), Color("68737a"))
+		ci.draw_rect(Rect2(gap.position.x, gap.end.y - 12, gap.size.x, 12), Color("303948"))
+		for x in range(int(gap.position.x) + 24, int(gap.end.x) - 16, 48):
+			ci.draw_line(Vector2(x, gap.position.y + 2), Vector2(x + 12, gap.position.y + 12), Color("d3b173"), 3)
+		return
 	water_rect(ci, sim, gap, gap)
 	ci.draw_rect(Rect2(gap.position.x, gap.position.y, gap.size.x, 10), Color(0, 0, 0, 0.45))
 
@@ -606,11 +662,20 @@ func strip(ci: CanvasItem, names: Array, x0: float, x1: float, y: float, h: floa
 		x += w; i += 1
 	return placed
 
+func draw_pixel_wall_run(ci: CanvasItem, x0: float, x1: float, ground_y: float) -> void:
+	var x := x0
+	while x < x1:
+		var width := minf(128.0, x1 - x)
+		ci.draw_texture_rect_region(pixel_wall_front, Rect2(x, ground_y - 232, width, 232), Rect2(19, 14, width * 0.5, 116))
+		x += width
+	ci.draw_rect(Rect2(x0, ground_y - 4, x1 - x0, 4), Color(0.01, 0.02, 0.04, 0.45))
+
 func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
 	var all_floors: Array = sim.floors
 	for rect in floors:
 		if not rect.grow(WALL_H + 60).intersects(view): continue
-		if corridor_deck != null and is_corridor(rect):
+		if CorridorArt.is_authored(sim,rect): continue
+		if corridor_deck != null and is_corridor(rect, sim):
 			draw_corridor_edges(ci, sim, rect, view)
 			continue
 		if style_of_rect(sim, rect).get("painted", false): continue
@@ -624,6 +689,9 @@ func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -
 		if style.get("top", "facade") == "facade":
 			for run in wall_runs(all_floors, tl, Vector2(br.x, tl.y), Vector2.UP):
 				var x0: float = tl.x + run.x; var x1: float = tl.x + run.y
+				if pixel_wall_front != null and not style.get("painted", false):
+					draw_pixel_wall_run(ci, x0, x1, tl.y)
+					continue
 				var y_base := tl.y - 58.0; var y_brick := y_base - 107.0; var y_cap := y_brick - 51.0
 				strip(ci, ["wall_cap_0", "wall_cap_1", "wall_cap_2", "wall_cap_3", "wall_cap_4"], x0, x1, y_cap, 51, int(tl.y), Color.WHITE, wset)
 				var bricks := strip(ci, BRICK_POOL + ["brick_window"], x0, x1, y_brick, 107, int(tl.y) + 1, Color(0.92, 0.9, 0.9), wset)
@@ -718,6 +786,18 @@ func wall_wear(ci: CanvasItem, x0: float, x1: float, y_base: float, wset: String
 		x += 96.0; i += 1
 
 func draw_wall_block(ci: CanvasItem, box: Rect2, t: float) -> void:
+	if pixel_wall_side != null:
+		var top_y := box.position.y - 150.0
+		var y := top_y
+		while y < box.end.y:
+			var height := minf(232.0, box.end.y - y)
+			ci.draw_texture_rect_region(pixel_wall_side, Rect2(box.position.x, y, box.size.x, height), Rect2(19, 28, 45, height * 0.5))
+			y += height
+		ci.draw_rect(Rect2(box.position.x, box.end.y - 7, box.size.x, 7), Color("171f2b"))
+		ci.draw_set_transform(Vector2(box.get_center().x, box.end.y + 4), 0, Vector2(1, 0.3))
+		ci.draw_circle(Vector2.ZERO, box.size.x * 0.75, Color(0, 0, 0, 0.3))
+		ci.draw_set_transform(Vector2.ZERO)
+		return
 	# Parede interna/columna de labirinto: fachada de tijolo vista pelo topo (como wall_crack).
 	var wset := ""
 	for room in DOCKS.ROOMS:
@@ -853,6 +933,13 @@ func draw_prop(ci: CanvasItem, kind: String, foot: Vector2, t: float = 0.0, tint
 	ci.draw_texture_rect(tex, Rect2(foot - Vector2(size.x * 0.5, size.y), size), false, tint)
 
 func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
+	if kind == "stone_pillar":
+		var foot := Vector2(box.get_center().x, box.end.y + 4)
+		ci.draw_set_transform(foot, 0, Vector2(1, 0.35))
+		ci.draw_circle(Vector2.ZERO, 145, Color(0.01, 0.02, 0.04, 0.38))
+		ci.draw_set_transform(Vector2.ZERO)
+		ci.draw_texture_rect_region(pixel_pillar, Rect2(foot - Vector2(115, 420), Vector2(230, 420)), Rect2(46, 29, 95, 198))
+		return
 	if kind.begins_with("wall_crack_"):
 		# 0.16: segmento de fachada (128x216) com a base na borda da sala (box.end.y - 12)
 		ci.draw_texture(tiles[kind], Vector2(box.position.x, box.end.y - 12 - 216))
@@ -860,9 +947,13 @@ func draw_obstacle(ci: CanvasItem, box: Rect2, kind: String, t: float) -> void:
 	if kind == "maze_wall" or kind == "wall_block":
 		draw_wall_block(ci, box, t); return   # 0.17: parede interna (labirinto/colunas)
 	if kind == "chapel_wall":
-		draw_wall_block(ci, box, t); return
+		draw_chapel_wall(ci,box); return
 	if kind == "chapel_reliquary":
-		ci.draw_rect(box, Color("302a2b")); ci.draw_rect(box.grow(-7), Color("66503b"))
+		var tabletop := Rect2(box.position-Vector2(0,24),box.size)
+		tile_area(ci,tabletop,tabletop,"planks")
+		ci.draw_rect(Rect2(box.position.x,box.end.y-24,box.size.x,24),Color("32262b"))
+		ci.draw_line(Vector2(box.position.x,box.end.y-24),Vector2(box.end.x,box.end.y-24),Color("927752"),3)
+		for x in range(int(box.position.x)+12,int(box.end.x),32): ci.draw_line(Vector2(x,box.end.y-21),Vector2(x,box.end.y-3),Color("5b4140"),2)
 		var relic: Texture2D = props["chapel_stained_glass"]
 		ci.draw_texture_rect(relic, Rect2(box.get_center() - Vector2(minf(60, box.size.x * 0.3), box.size.y - 12), Vector2(minf(120, box.size.x * 0.6), box.size.y - 20)), false)
 		return
@@ -1005,9 +1096,20 @@ func draw_lights(ci: CanvasItem, t: float) -> void:
 # ------------------------------------------------------------------ portões (0.12)
 # Portões grandes nas pontas dos corredores: torres de tijolo, luzes, seta dourada no chão quando abertos,
 # grade de ferro descida e luzes vermelhas quando a sala está trancada.
+func draw_chapel_wall(ci: CanvasItem, box: Rect2) -> void:
+	# Native repeated masonry: visible top + face share the collision base.
+	var top := Rect2(box.position-Vector2(0,72),box.size)
+	var tex: Texture2D = tiles.granite_base
+	for y in range(int(top.position.y),int(top.end.y),tex.get_height()):
+		for x in range(int(top.position.x),int(top.end.x),tex.get_width()):
+			var part := Rect2(x,y,tex.get_width(),tex.get_height()).intersection(top)
+			ci.draw_texture_rect_region(tex,part,Rect2(Vector2.ZERO,part.size),Color(0.58,0.56,0.65))
+	strip(ci,["brick_base"],box.position.x,box.end.x,box.end.y-72,72,int(box.position.x),Color(0.7,0.7,0.8),"cult")
+	ci.draw_line(Vector2(box.position.x,box.end.y-72),Vector2(box.end.x,box.end.y-72),Color("8b8898"),4)
+
 func draw_gate(ci: CanvasItem, d: Dictionary, locked: bool, t: float, room_rect: Rect2) -> void:
 	var r: Rect2 = d.r
-	var compact := corridor_deck != null and DOCKS.ROOMS.any(func(room): return room.r == room_rect and room.id in ROOM_PLATE_IDS)
+	var compact: bool = d.room in ROOM_PLATE_IDS
 	var horizontal: bool = d.side == "top" or d.side == "bottom"   # a abertura corre no eixo x
 	var tower: Texture2D = tiles.wall_corner_0
 	var ends: Array = [Vector2(r.position.x, r.end.y), Vector2(r.end.x, r.end.y)] if horizontal else [Vector2(r.get_center().x, r.position.y), Vector2(r.get_center().x, r.end.y)]
@@ -1051,6 +1153,15 @@ func draw_gate(ci: CanvasItem, d: Dictionary, locked: bool, t: float, room_rect:
 			ci.draw_rect(Rect2(x0 - 16, r.position.y, 32, r.size.y), Color(0.9, 0.1, 0.1, 0.12 + 0.08 * sin(t * 6)))
 	# torres (sempre) com lanterna: âmbar = aberto, vermelha piscando = trancado
 	for e in ends:
+		if compact:
+			var outward: Vector2 = Vector2(-1 if e==ends[0] else 1,0) if horizontal else Vector2(0,-1 if e==ends[0] else 1)
+			var foot: Vector2 = e+outward*12
+			ci.draw_rect(Rect2(foot-Vector2(10,56),Vector2(20,56)),Color("303947"))
+			ci.draw_rect(Rect2(foot-Vector2(10,56),Vector2(20,7)),Color("858c98"))
+			ci.draw_line(foot-Vector2(8,48),foot-Vector2(8,4),Color("596878"),3)
+			var lamp: Vector2 = foot-Vector2(0,48)
+			ci.draw_rect(Rect2(lamp-Vector2(3,2),Vector2(6,4)),red if locked else gold)
+			continue
 		var s := 0.46 if compact else 0.82
 		var sz := tower.get_size() * s
 		var foot: Vector2 = e + (Vector2(0, 8) if horizontal else Vector2(0, 14))

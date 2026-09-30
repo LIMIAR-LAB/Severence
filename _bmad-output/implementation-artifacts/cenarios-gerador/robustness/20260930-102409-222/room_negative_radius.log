@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PROBE_START room_negative_radius
+VALIDATE_RESULT {"accepted":false,"errors":["templates/fixture.wing/spawns/0/radius: must be positive"]}
+PROBE_RESULT {"accepted":false,"case":"room_negative_radius","errors":["templates/fixture.wing/spawns/0/radius: must be positive"]}
+

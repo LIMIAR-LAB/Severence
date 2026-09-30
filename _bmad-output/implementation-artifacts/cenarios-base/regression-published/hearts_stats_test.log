@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: começa com 3 corações mesmo com melhorias salvas
+PASS: bancada não compra corações por enquanto
+PASS: cura nunca passa de 3 corações
+PASS: padrao: dano por disparo (16) e cadência batem com o jogo
+PASS: padrao: velocidade e corações
+PASS: mecanico: dano por disparo (6×9) e cadência batem com o jogo
+PASS: mecanico: velocidade e corações
+PASS: espiao: dano por disparo (7) e cadência batem com o jogo
+PASS: espiao: velocidade e corações
+PASS: Titan: integridade e canhão reais
+PASS: Ômega: velocidade e lâmina reais
+PASS: Spectre: energia real
+HEARTS_STATS_TESTS_DONE failures=0

@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PROBE_START room_negative_radius
+VALIDATE_RESULT {"accepted":true,"errors":[]}
+PROBE_RESULT {"accepted":true,"case":"room_negative_radius","errors":[]}
+

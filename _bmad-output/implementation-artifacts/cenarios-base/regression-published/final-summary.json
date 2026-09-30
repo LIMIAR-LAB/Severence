@@ -1,0 +1,309 @@
+[
+  {
+    "test": "arrival_art_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "boss_arena_scenery_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "boss_intro_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false,
+    "final_evidence": "boss_intro_test-cleanup-final.log"
+  },
+  {
+    "test": "boss_music_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "chapel_animated_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "chapel_unified_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "combat_framework_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "combat_regression_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "controller_input_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "dynamic_map_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "encyclopedia_data_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "encyclopedia_ui_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "enemies_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "enemy_sprite_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "equipment_ui_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "equipment_unlock_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "game_audio_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "guard_opening_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "hearts_stats_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "input_remap_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "input_scene_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "intro_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "inventory_model_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "inventory_persistence_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "inventory_ui_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "juice_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "marty_actions_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "marty_sprite_atlas_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "mission_inventory_ui_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "new_enemies_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "omega_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "props_hd_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "refuge_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "robot_sprite_atlas_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "run_summary_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "run_summary_ui_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "run_weapons_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "save_game_flow_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "scenario_layout_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "scenery_016_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "scenery_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "simulation_audio_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "simulation_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "solo_robot_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "summon_fx_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "titan_cockpit_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "titan_fuel_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "titan_weapons_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "title_screen_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "update_017_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "test": "warden_test.gd",
+    "ok": true,
+    "exit": 0,
+    "timeout": false
+  }
+]

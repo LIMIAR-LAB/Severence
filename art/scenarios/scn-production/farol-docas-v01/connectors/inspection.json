@@ -1,0 +1,29 @@
+{
+  "reviewed_at": "2026-09-30T10:51:44.278719-03:00",
+  "decision": "retained_native_connector_candidates_awaiting_join_capture",
+  "visual_observations": [
+    "Flat stone continuity, no elevation/step painted across passage",
+    "Subtle outside trim, consistent upper-left light",
+    "Three authored orientations; no rotated floor pattern"
+  ],
+  "checks": {
+    "all_widths_200": true,
+    "all_heights_zero": true,
+    "border_intrusion_pixels": 0,
+    "floor_phase_mismatches": 0,
+    "stairs_png_hashes_unchanged": true
+  },
+  "limitations": [
+    "No runtime or collision test by art front",
+    "Neighbor corridor must use coordinated tile phase",
+    "North edge reaches east room corner; wall junction needs review",
+    "Generic legacy IDs depend on iteration order, bind by side and coordinate"
+  ],
+  "catalog_publishable": false,
+  "integration_review": {
+    "decision": "accepted_static_art_pilot_with_translation_sampling_caveat",
+    "evidence": "_bmad-output/implementation-artifacts/cenarios-arte/connectors-review-r1/review.json",
+    "capture_count": 12,
+    "pixel_exact_origin_invariance": false
+  }
+}

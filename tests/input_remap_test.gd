@@ -63,4 +63,5 @@ func run() -> void:
 	app.queue_free()
 	await process_frame
 	await process_frame
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

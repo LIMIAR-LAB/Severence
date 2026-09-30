@@ -1,0 +1,64 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: janela do Godot usa o nome oficial
+PASS: lançador do Windows usa UTF-8 e o nome oficial
+PASS: vídeo da tela inicial no projeto (Theora)
+PASS: novo lockup pertence ao cenário
+PASS: linha principal usa o nome oficial
+PASS: subtítulo usa o nome oficial
+PASS: glifos da linha principal cabem no lockup
+PASS: glifos do subtítulo cabem no lockup
+PASS: tela inicial usa a arte aprovada com Severence
+PASS: arte inicial deixa a animação visível no céu
+PASS: um único deck concentra toda a navegação
+PASS: fundo recorta a sidebar na fonte sem distorção não uniforme
+PASS: cenário mantém escala uniforme após o ajuste global
+PASS: vídeo cobre a área após recortar a marca antiga
+PASS: ausência da imagem estática usa fallback sem marca antiga
+PASS: 5 ações do conceito são controles vivos
+PASS: deck contém exatamente cinco ações
+PASS: Expedição Direta foi removida
+PASS: não existe botão separado de Carregar
+PASS: Arquivo permanece fora da tela inicial
+PASS: CONTINUAR desativado sem expedição ou save
+PASS: foco inicial em NOVA EXPEDIÇÃO
+PASS: somente uma ação habilitada inicia em foco
+PASS: não mascara a sidebar antiga com outro painel
+PASS: estado da rede ocupa área própria no rodapé
+PASS: navegação sequencial usa a ordem visual do deck
+PASS: hover transfere o foco e mantém um único destaque
+PASS: CONTINUAR habilitado durante expedição ativa
+PASS: nova expedição não substitui uma partida ativa
+PASS: expedição ativa prioriza CONTINUAR no foco
+PASS: CONTINUAR identifica a expedição ativa
+PASS: CONTINUAR prioriza a expedição ativa mesmo quando também existe save
+PASS: CONTINUAR fica indisponível sem save
+PASS: CONTINUAR fica disponível com save
+PASS: CONTINUAR carrega a expedição salva
+PASS: botão 1 abre characters
+PASS: personagens usam o quadro ilustrado aprovado
+PASS: botão 2 abre online
+PASS: botão 5 abre options
+PASS: tela options usa cenário sem a marca antiga
+PASS: tela options mantém fundo sem distorção
+PASS: Arquivo recorta a marca antiga do cenário
+PASS: Arquivo mantém fundo sem distorção
+PASS: Marty selecionável
+PASS: Marty aparece grande à esquerda e também no quadro de seis à direita
+PASS: personagem futuro 1 bloqueado
+PASS: personagem futuro 2 bloqueado
+PASS: personagem futuro 3 bloqueado
+PASS: personagem futuro 4 bloqueado
+PASS: personagem futuro 5 bloqueado
+PASS: escolha de Marty abre os três modos
+PASS: aventura usa arte sem botão de confirmação
+PASS: aventura não exige botão de confirmação
+PASS: clique em solo abre equipamento
+PASS: clique em solo + IA abre equipamento
+PASS: clique em coop local abre seleção de dois jogadores
+PASS: coop mostra Marty selecionado em ambos os lados
+PASS: confirmação de dois jogadores abre equipamento
+PASS: equipamento volta à escolha do modo
+PASS: coop local inicia no refúgio
+TITLE_SCREEN_TESTS_DONE failures=0
+

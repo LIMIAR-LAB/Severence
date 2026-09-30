@@ -1,0 +1,7 @@
+[
+  {"id":"portuario","attachment":"hub","spine_length":2,"branches_min":6,"branches_max":8,"branch_length_min":2,"branch_length_max":3,"cycles_min":2,"cycles_max":4},
+  {"id":"ferroviario","attachment":"alternating","spine_length":5,"branches_min":3,"branches_max":5,"branch_length_min":2,"branch_length_max":3,"cycles_min":0,"cycles_max":1},
+  {"id":"industrial","attachment":"distributed","spine_length":3,"branches_min":6,"branches_max":9,"branch_length_min":2,"branch_length_max":4,"cycles_min":4,"cycles_max":6},
+  {"id":"alagado","attachment":"outlying","spine_length":4,"branches_min":3,"branches_max":6,"branch_length_min":4,"branch_length_max":6,"cycles_min":0,"cycles_max":0},
+  {"id":"cultista","attachment":"hub","spine_length":1,"branches_min":9,"branches_max":12,"branch_length_min":3,"branch_length_max":3,"cycles_min":6,"cycles_max":9}
+]

@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-30T10:18:19.995082-03:00",
+  "file": "_bmad-output/implementation-artifacts/cenarios-base/captures/pilot-materials.png",
+  "sha256": "efc1808118a7ab565d618486cc59021461cd1d7b6893090aef713c8e0855998b",
+  "size": [
+    1280,
+    800
+  ],
+  "exact_white_pixels": 407318,
+  "decision": "not_evaluable_materials_absent",
+  "visual_observation": "A uniform white rectangle occupies the material patch; Marty is visible. No stone, timber or wall texture can be assessed.",
+  "limits": [
+    "No material scale/perspective/repetition approval",
+    "No Titan in this capture",
+    "Static image does not prove stair motion or collision"
+  ],
+  "runtime_changes_by_art_front": false
+}

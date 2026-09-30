@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "status": "art_candidate_awaiting_game_inspection",
+  "height": 44,
+  "world_units_per_pixel": 1,
+  "allowed_transforms": [
+    "translate"
+  ],
+  "textures": {
+    "face44": "res://art/scenarios/scn-production/farol-docas-v01/stairs/face44-0.png",
+    "face44_variant": "res://art/scenarios/scn-production/farol-docas-v01/stairs/face44-1.png",
+    "floor": "res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png",
+    "west_tread": "res://art/scenarios/scn-production/farol-docas-v01/stairs/tread-west.png",
+    "east_tread": "res://art/scenarios/scn-production/farol-docas-v01/stairs/tread-east.png"
+  },
+  "source": {
+    "floor": "../kit/tile_0.png",
+    "palette": "../kit/tile_3.png",
+    "provider": "PixelLab",
+    "generation_id": "4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8"
+  },
+  "source_rect": [
+    19,
+    62,
+    64,
+    48
+  ],
+  "dimensions": {
+    "face44": [
+      64,
+      44
+    ],
+    "floor": [
+      64,
+      48
+    ],
+    "west_tread": [
+      25,
+      360
+    ],
+    "east_tread": [
+      25,
+      360
+    ]
+  },
+  "provenance": {
+    "floor": "Lossless crop of reviewed generated stone floor",
+    "face44": "Deterministic native pixel authorship, 3 masonry courses, exact observed kit palette; build_assets.py",
+    "treads": "Native floor pixels plus explicit orientation-specific lips; no mirroring or scaling",
+    "permission": "User-authorized modular composition and coordinator explicit deterministic face authorship",
+    "pixellab_exact_draw_attempt": "Rejected before rendering: source canvas exceeded target bounds; no accepted generated result from that call"
+  },
+  "geometry": {
+    "footprint": [
+      1200,
+      360
+    ],
+    "landing": [
+      200,
+      0,
+      800,
+      360
+    ],
+    "west": [
+      0,
+      0,
+      200,
+      360
+    ],
+    "east": [
+      1000,
+      0,
+      200,
+      360
+    ],
+    "tread_heights": [
+      0,
+      6,
+      11,
+      17,
+      22,
+      28,
+      33,
+      39
+    ],
+    "arrival_height": 44,
+    "tread_run": 25,
+    "projection": "visual_y=physical_y-height",
+    "canvas_origin": [
+      0,
+      -44
+    ]
+  },
+  "composed_previews": {
+    "west": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-west-composed.png",
+    "east": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-east-composed.png",
+    "module": "res://art/scenarios/scn-production/farol-docas-v01/stairs/module-native-preview.png",
+    "landing_top": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-top.png",
+    "landing_face": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-face44.png"
+  },
+  "native_preview_note": "Static quantized-tread composition for visual review. Continuous projected feet require game validation. Preview is not final collision geometry.",
+  "palette": {
+    "mortar": "#34383c",
+    "dark": "#424951",
+    "stone": "#4d555d",
+    "lit": "#58606b",
+    "cap": "#6f7880",
+    "moss": "#464f48"
+  },
+  "assets": {
+    "floor": {
+      "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png",
+      "dimensions": [
+        64,
+        48
+      ],
+      "sha256": "36c5a97d780879ec2ff915535a9654eedcc89f748c2e27b5eb343d2a3e5999d1"
+    },
+    "faces": [
+      {
+        "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/face44-0.png",
+        "dimensions": [
+          64,
+          44
+        ],
+        "sha256": "c0dfb2b4d1b51575f7ef2de4947821c297c4eda5f57a9370a587599a87bd938b"
+      },
+      {
+        "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/face44-1.png",
+        "dimensions": [
+          64,
+          44
+        ],
+        "sha256": "9c0271254ceba4e0571b2b227ccaa724e5498aad993aba106a348370f22807fe"
+      }
+    ],
+    "treads": {
+      "west": {
+        "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/tread-west.png",
+        "dimensions": [
+          25,
+          360
+        ],
+        "sha256": "256446bfebb106eb72a0f9a6c55c7bbaf7b46a77797468b6999dca428b7e55e7"
+      },
+      "east": {
+        "path": "res://art/scenarios/scn-production/farol-docas-v01/stairs/tread-east.png",
+        "dimensions": [
+          25,
+          360
+        ],
+        "sha256": "cf9883955f2a482e99847c8fd27f1f73825d343f54365dbf88fccdce55026da8"
+      }
+    }
+  },
+  "runtime_approved": false,
+  "catalog_approved": false,
+  "build_script_sha256": "10eed6339d442a9ff8127070062f760065503659a95e2144130011c8eabed225",
+  "source_hashes": {
+    "tile_0.png": "e57898b34419336e90ae5bbfef54af1b995e1c66be2edf0fcb6c726e76f8f1a9",
+    "tile_3.png": "57312896f587ec53470bb98ed863082a3a2ef9a1318258550a2be25aa8e70f7d"
+  }
+}

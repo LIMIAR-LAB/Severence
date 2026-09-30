@@ -1,0 +1,8 @@
+; Isolated graph experiment. Does not load the game's runtime.
+config_version=5
+
+[application]
+config/name="SCN provisional graph experiment"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"

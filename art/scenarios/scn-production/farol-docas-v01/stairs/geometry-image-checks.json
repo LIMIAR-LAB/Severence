@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "side": "west",
+      "native_size": [
+        200,
+        404
+      ],
+      "columns_with_internal_alpha_gaps": 0,
+      "transparent_pixels_present": true
+    },
+    {
+      "side": "east",
+      "native_size": [
+        200,
+        404
+      ],
+      "columns_with_internal_alpha_gaps": 0,
+      "transparent_pixels_present": true
+    }
+  ],
+  "note": "Image coverage only; no physics or perception acceptance"
+}

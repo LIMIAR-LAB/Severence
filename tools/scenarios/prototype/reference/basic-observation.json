@@ -1,0 +1,132 @@
+{
+	"cells": 1348,
+	"edges": [
+		[
+			0,
+			1
+		],
+		[
+			1,
+			2
+		],
+		[
+			2,
+			3
+		],
+		[
+			3,
+			4
+		],
+		[
+			4,
+			5
+		],
+		[
+			5,
+			6
+		],
+		[
+			6,
+			7
+		],
+		[
+			7,
+			8
+		]
+	],
+	"rooms": [
+		{
+			"id": 0,
+			"organic": false,
+			"rect": [
+				37,
+				50,
+				12,
+				13
+			]
+		},
+		{
+			"id": 1,
+			"organic": true,
+			"rect": [
+				42,
+				4,
+				12,
+				14
+			]
+		},
+		{
+			"id": 2,
+			"organic": true,
+			"rect": [
+				76,
+				5,
+				13,
+				12
+			]
+		},
+		{
+			"id": 3,
+			"organic": true,
+			"rect": [
+				80,
+				35,
+				14,
+				11
+			]
+		},
+		{
+			"id": 4,
+			"organic": false,
+			"rect": [
+				19,
+				58,
+				10,
+				10
+			]
+		},
+		{
+			"id": 5,
+			"organic": true,
+			"rect": [
+				80,
+				47,
+				10,
+				13
+			]
+		},
+		{
+			"id": 6,
+			"organic": false,
+			"rect": [
+				7,
+				63,
+				11,
+				13
+			]
+		},
+		{
+			"id": 7,
+			"organic": false,
+			"rect": [
+				60,
+				54,
+				11,
+				10
+			]
+		},
+		{
+			"id": 8,
+			"organic": false,
+			"rect": [
+				58,
+				15,
+				12,
+				13
+			]
+		}
+	],
+	"schema": "reference-observation-v0",
+	"seed": 4101,
+	"warning": "Organic room internal RNG randomizes independently; not deterministic"
+}

@@ -1,0 +1,6 @@
+{
+  "probes": "[{ \"id\": \"cranes-crane\", \"p\": (3050.0, 6420.0) }, { \"id\": \"cranes-center\", \"p\": (3450.0, 6500.0) }, { \"id\": \"cranes-dock-join\", \"p\": (2250.0, 6500.0) }, { \"id\": \"cranes-north\", \"p\": (3930.0, 5900.0) }, { \"id\": \"cranes-east\", \"p\": (4450.0, 6500.0) }, { \"id\": \"cranes-center-titan\", \"p\": (3450.0, 6500.0) }]",
+  "save_read_only": true,
+  "seed": 42,
+  "zoom": 1.05
+}

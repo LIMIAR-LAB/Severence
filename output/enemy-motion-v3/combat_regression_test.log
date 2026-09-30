@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: shooting in refuge creates a projectile
+PASS: refuge projectile advances through main step (reported freeze)
+PASS: refuge bullets expire or collide, no permanent frozen bullets
+PASS: dash moves more than 150px without holding a direction
+PASS: dash has a cooldown
+PASS: diagonal dash keeps launch direction when keys change
+PASS: body faces the mouse aim while walking (no weapon crossing the character)
+PASS: walking advances the step animation
+PASS: body always faces the aim direction, so the weapon never crosses through the character
+PASS: unarmored movement increased to 320px/s
+PASS: test arena materializes enemies after portal
+PASS: companion AI fires without player attacking
+PASS: companion projectiles damage enemies in actual simulation
+PASS: arena enemies retaliate with moving bullets
+PASS: arena replenishes enemies after wave clear
+COMBAT REGRESSION: 15 checks, 0 failures

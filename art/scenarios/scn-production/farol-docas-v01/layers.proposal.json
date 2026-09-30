@@ -1,0 +1,23 @@
+{
+  "status": "proposal_only_not_registered_not_runtime_validated",
+  "contract": "scripts/scenarios/room_contract.gd version 1",
+  "coordinate_encoding": "JSON rect=[x,y,w,h]; convert explicitly to Godot Rect2; this file is not a RoomTemplate loader",
+  "allowed_transforms": ["translate"],
+  "scope": "Material comparison patch only; not Farol gameplay geometry",
+  "layers": [
+    {"id":"study-stone-floor","rect":[0,0,576,288],"texture":"res://art/scenarios/scn-production/farol-docas-v01/atlas/stone-floor.tres","mode":"tile","depth":"ground"},
+    {"id":"study-wood-floor","rect":[576,0,576,288],"texture":"res://art/scenarios/scn-production/farol-docas-v01/atlas/wood-floor.tres","mode":"tile","depth":"ground"},
+    {"id":"study-north-border","rect":[0,-68,1152,68],"texture":"res://art/scenarios/scn-production/farol-docas-v01/atlas/wall-south.tres","mode":"tile","depth":"ground"}
+  ],
+  "material_field_omitted_intentionally": "room_preview replaces textures tagged material=floor with profile.materials.floor; preserve candidate texture for this study",
+  "native_cell_sizes": {"stone-floor":[64,48],"wood-floor":[64,48],"wall-north":[64,68],"wall-south":[64,68],"wall-west":[26,48]},
+  "farol_future_slots": [
+    {"id":"landing-top","proposed_rect":[200,-44,800,360],"depth":"ground","mode":"tile","status":"projection pending base decision; texture scale not yet accepted"},
+    {"id":"retaining-face","proposed_rect":[200,316,800,44],"depth":"ground","mode":"plate","status":"44-high native artwork absent; 68-high kit wall must not be squashed"},
+    {"id":"west-stair","proposed_rect":[0,-44,200,404],"depth":"ground","mode":"plate","status":"bounding canvas only; geometric coverage is not rectangular; art pending"},
+    {"id":"east-stair","proposed_rect":[1000,-44,200,404],"depth":"ground","mode":"plate","status":"separate authored orientation required"}
+  ],
+  "future_slots_are_not_contract_layers": true,
+  "foreground_policy": "No foreground asset proposed. Contract supports only ground/foreground; no claimed y-sort or foot-depth support.",
+  "collision_policy": "Study layers create no collision. Real template must preserve verified footprints, connectors, obstacles, raised and ramps from base."
+}

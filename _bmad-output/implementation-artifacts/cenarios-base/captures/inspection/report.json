@@ -1,0 +1,373 @@
+{
+	"actor_visual_scale": 1.12,
+	"captures": [
+		{
+			"actual": "(1280, 720)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x720-normal.png",
+			"requested": "(1280, 720)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1280, 720)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x720-neutral.png",
+			"requested": "(1280, 720)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1280, 720)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x720-collision.png",
+			"requested": "(1280, 720)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1280, 800)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x800-normal.png",
+			"requested": "(1280, 800)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1280, 800)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x800-neutral.png",
+			"requested": "(1280, 800)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1280, 800)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1280x800-collision.png",
+			"requested": "(1280, 800)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1366, 768)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1366x768-normal.png",
+			"requested": "(1366, 768)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1366, 768)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1366x768-neutral.png",
+			"requested": "(1366, 768)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1366, 768)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1366x768-collision.png",
+			"requested": "(1366, 768)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1440, 900)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1440x900-normal.png",
+			"requested": "(1440, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1440, 900)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1440x900-neutral.png",
+			"requested": "(1440, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1440, 900)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1440x900-collision.png",
+			"requested": "(1440, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1600, 900)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1600x900-normal.png",
+			"requested": "(1600, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1600, 900)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1600x900-neutral.png",
+			"requested": "(1600, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1600, 900)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1600x900-collision.png",
+			"requested": "(1600, 900)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1680, 1050)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1680x1050-normal.png",
+			"requested": "(1680, 1050)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1680, 1050)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1680x1050-neutral.png",
+			"requested": "(1680, 1050)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1680, 1050)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1680x1050-collision.png",
+			"requested": "(1680, 1050)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1080)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1080-normal.png",
+			"requested": "(1920, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1080)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1080-neutral.png",
+			"requested": "(1920, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1080)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1080-collision.png",
+			"requested": "(1920, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1200)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1200-normal.png",
+			"requested": "(1920, 1200)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1200)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1200-neutral.png",
+			"requested": "(1920, 1200)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(1920, 1200)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/1920x1200-collision.png",
+			"requested": "(1920, 1200)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1080)",
+			"error": 0,
+			"logical_viewport": "(1896.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1080-normal.png",
+			"requested": "(2560, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1080)",
+			"error": 0,
+			"logical_viewport": "(1896.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1080-neutral.png",
+			"requested": "(2560, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1080)",
+			"error": 0,
+			"logical_viewport": "(1896.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1080-collision.png",
+			"requested": "(2560, 1080)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1440)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1440-normal.png",
+			"requested": "(2560, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1440)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1440-neutral.png",
+			"requested": "(2560, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1440)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1440-collision.png",
+			"requested": "(2560, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1600)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1600-normal.png",
+			"requested": "(2560, 1600)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1600)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1600-neutral.png",
+			"requested": "(2560, 1600)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(2560, 1600)",
+			"error": 0,
+			"logical_viewport": "(1280.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/2560x1600-collision.png",
+			"requested": "(2560, 1600)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3440, 1440)",
+			"error": 0,
+			"logical_viewport": "(1911.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3440x1440-normal.png",
+			"requested": "(3440, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3440, 1440)",
+			"error": 0,
+			"logical_viewport": "(1911.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3440x1440-neutral.png",
+			"requested": "(3440, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3440, 1440)",
+			"error": 0,
+			"logical_viewport": "(1911.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3440x1440-collision.png",
+			"requested": "(3440, 1440)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3840, 2160)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3840x2160-normal.png",
+			"requested": "(3840, 2160)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3840, 2160)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "neutral",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3840x2160-neutral.png",
+			"requested": "(3840, 2160)",
+			"zoom": 1.22000002861023
+		},
+		{
+			"actual": "(3840, 2160)",
+			"error": 0,
+			"logical_viewport": "(1422.0, 800.0)",
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/inspection/3840x2160-collision.png",
+			"requested": "(3840, 2160)",
+			"zoom": 1.22000002861023
+		}
+	],
+	"density_example": {
+		"ok": false,
+		"ratio": "(2.47093, 3.385417)",
+		"reason": "density mismatch; no automatic stretching",
+		"uniform": false
+	},
+	"marty_frame": 96,
+	"neutral_limit": "night modulation and additive lights off; baked lighting remains",
+	"scene": "baseline with actor inspection fixtures",
+	"sources": {
+		"res://scripts/dock_scenery.gd": "fcce32110d5e47f4bf6cb854dc1619080e9987fc0ef7007da78b0f055f36ed2b",
+		"res://scripts/docks_map.gd": "80db4051ccb8e044e66fb6dafbadcddd7934755644956e550aee1502d24a3c18",
+		"res://scripts/scenario_layout.gd": "4165a7c417b96c1dea399fcebd0eeb3229d88f2cd37d90b6c83d3b4874cd2599",
+		"res://scripts/simulation.gd": "5ab88b2cb85298eb26d833a737639aada1e872bc4dfd52d5bc40ae797fc41334",
+		"res://scripts/world_view.gd": "8b25873fdc21b2f864d68eb86039777d7c67c760bc77c7a8faa141ca99a1f0ff"
+	},
+	"titan_frame": 176
+}

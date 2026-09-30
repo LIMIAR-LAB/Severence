@@ -9,7 +9,7 @@ const MAX_DISTANCE := 1300.0
 var samples: Dictionary = {}
 var voices: Array[AudioStreamPlayer] = []
 var music: Dictionary = {}
-var music_gain := {"refuge": 0.0, "expedition": 0.0}
+var music_gain := {"refuge": 0.0, "expedition": 0.0, "boss": 0.0}
 var master := 0.7
 var duck := 1.0
 var last_sequence := 0
@@ -30,7 +30,7 @@ func _ready() -> void:
 		player.bus = "Severence SFX"
 		add_child(player)
 		voices.append(player)
-	for key in ["refuge", "expedition"]:
+	for key in ["refuge", "expedition", "boss"]:
 		var player := AudioStreamPlayer.new()
 		var path: String = ROOT + "music_" + key
 		player.stream = load(path + (".ogg" if ResourceLoader.exists(path + ".ogg") else ".wav"))
@@ -92,6 +92,7 @@ func update(sim, playing: bool, paused: bool, menu_visible: bool, listener: Vect
 		if active and sim.tick_time - float(event.time) < 0.6:
 			play_effect(event.key, event.p, listener)
 	var track := "expedition" if playing and sim.mode in ["run", "arena"] else "refuge"
+	if track == "expedition" and boss_fight_active(sim): track = "boss"
 	duck = move_toward(duck, 0.35 if paused or (playing and menu_visible) else 1.0, dt * 2.0)
 	for key in music:
 		var player: AudioStreamPlayer = music[key]
@@ -100,6 +101,13 @@ func update(sim, playing: bool, paused: bool, menu_visible: bool, listener: Vect
 		player.volume_db = -13.0 + linear_to_db(gain) if gain > 0.001 else -80.0
 		if key == track and not player.playing: player.play()
 		elif key != track and gain <= 0.001 and player.playing: player.stop()
+
+func boss_fight_active(sim) -> bool:
+	if sim.mode != "run" or sim.boss_dead: return false
+	if not sim.enemies.any(func(e): return e.kind == "boss" and e.hp > 0): return false
+	for actor in sim.actors:
+		if actor.active and not actor.dead and sim.room_at(actor.p).get("id", "") == "boss": return true
+	return false
 
 func play_effect(key: String, position: Vector2, listener: Vector2) -> bool:
 	if master <= 0.0 or not samples.has(key) or samples[key] == null: return false

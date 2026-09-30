@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PROBE_START biome_version_string
+PROBE_RESULT {"accepted":false,"case":"biome_version_string","errors":["profiles/0/version: positive integer required"]}
+

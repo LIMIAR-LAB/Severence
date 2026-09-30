@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PROBE_START zero_width
+PROBE_RESULT {"accepted":false,"case":"zero_width","error":"connector/a/width: must be positive"}
+

@@ -2,7 +2,7 @@
 title: 'Refazer a arte da Armadura Ômega'
 type: 'bugfix'
 created: '2026-09-30'
-status: 'in-progress'
+status: 'done'
 baseline_commit: b6fd2a7373ae196b7f1f2b9a9386d3da693431d9
 context:
   - '{project-root}/docs/SPRITE_POSE_STANDARD.md'
@@ -47,11 +47,11 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `art/source/characters/marty/omega/omega-reference-v3-pixellab.png` -- apresentar a nova arte-base angular gerada pelo MCP do PixelLab e aguardar aprovação explícita antes de produzir animações.
-- [ ] `art/source/characters/marty/omega/` -- gerar novamente `idle`, `run`, `jump`, `evade`, `melee`, `hurt` e `defeat` a partir da referência aprovada, em lotes por ação.
-- [ ] `tools/import_marty_omega_pixellab.py`, `assets/characters/marty/omega/pixellab/` -- validar e normalizar todas as células, preservando grade, transparência, pivô e contagens atuais.
-- [ ] `scripts/world_view.gd` -- alinhar as oito âncoras da espada às novas poses e impedir o recorte de mão do atlas legado na Ômega.
-- [ ] `tests/marty_actions_test.gd`, `art/source/characters/marty/omega/pixellab/omega-actions-preview.png` -- ampliar as verificações e produzir uma prévia das sete ações para inspeção.
+- [x] `art/source/characters/marty/omega/omega-reference-v3-pixellab.png` -- apresentar a nova arte-base angular gerada pelo MCP do PixelLab e aguardar aprovação explícita antes de produzir animações.
+- [x] `art/source/characters/marty/omega/` -- gerar novamente `idle`, `run`, `jump`, `evade`, `melee`, `hurt` e `defeat` a partir da referência aprovada, em lotes por ação.
+- [x] `tools/import_marty_omega_pixellab.py`, `assets/characters/marty/omega/pixellab/` -- validar e normalizar todas as células, preservando grade, transparência, pivô e contagens atuais.
+- [x] `scripts/world_view.gd` -- alinhar as oito âncoras da espada às novas poses e impedir o recorte de mão do atlas legado na Ômega.
+- [x] `tests/marty_actions_test.gd`, `art/source/characters/marty/omega/pixellab/omega-actions-preview.png` -- ampliar as verificações e produzir uma prévia das sete ações para inspeção.
 
 **Acceptance Criteria:**
 - Given qualquer ação e direção da Ômega, when o quadro é renderizado, then Marty aparece integralmente dentro da mesma armadura, sem rosto, cabelo ou uniforme comum visível.
@@ -62,6 +62,7 @@ context:
 ## Spec Change Log
 
 - 2026-09-30: usuário rejeitou a referência v2 por estar arredondada demais e renegociou a direção para uma Ômega mais agressiva e angular, gerada pelo MCP do PixelLab. A referência v3 foi criada em oito direções e aguarda aprovação.
+- 2026-09-30: usuário aprovou explicitamente a arte-base v3 `omega-reference-v3-pixellab.png` e o personagem PixelLab `b41db246-47d5-4914-a111-a6bd644abc2b`, liberando a produção das sete ações.
 
 ## Design Notes
 
@@ -76,3 +77,32 @@ Manter a paleta e os símbolos centrais da referência anterior, mas endurecer s
 
 **Manual checks:**
 - Inspecionar a prévia consolidada e capturas em escala nativa para todas as ações, com atenção especial ao combo visto de frente, lado, costas e diagonais.
+
+## Suggested Review Order
+
+**Pipeline e proveniência**
+
+- Comece pelos contratos de identidade, grupos aprovados, alpha e normalização 112×112.
+  [`import_marty_omega_pixellab.py:47`](../../tools/import_marty_omega_pixellab.py#L47)
+
+- O manifesto registra jobs PixelLab e seleções determinísticas do melee limpo.
+  [`manifest.json:1`](../../art/source/characters/marty/omega/pixellab/melee-pixellab/manifest.json#L1)
+
+- O empacotamento publica sete folhas e preview somente após validar o conjunto completo.
+  [`import_marty_omega_pixellab.py:292`](../../tools/import_marty_omega_pixellab.py#L292)
+
+**Integração visual**
+
+- Âncoras 8×6 fazem a espada acompanhar cada pose corporal do melee.
+  [`world_view.gd:981`](../../scripts/world_view.gd#L981)
+
+- O renderer mantém espada separada e remove a mão legada na Ômega.
+  [`world_view.gd:894`](../../scripts/world_view.gd#L894)
+
+- A documentação reúne IDs, overrides e política de seleção dos quadros.
+  [`README.md:1`](../../art/source/characters/marty/omega/pixellab/README.md#L1)
+
+**Verificação**
+
+- Testes cobrem grade, movimento, pés, mão legada e 48 âncoras melee.
+  [`marty_actions_test.gd:11`](../../tests/marty_actions_test.gd#L11)

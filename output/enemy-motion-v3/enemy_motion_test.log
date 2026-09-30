@@ -1,0 +1,86 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: direction 0 retains its own art
+PASS: direction 1 retains its own art
+PASS: direction 2 retains its own art
+PASS: direction 3 retains its own art
+PASS: direction 4 retains its own art
+PASS: direction 5 retains its own art
+PASS: direction 6 retains its own art
+PASS: direction 7 retains its own art
+PASS: walk frame 0 keeps fixed canvas and pivot
+PASS: walk frame 1 keeps fixed canvas and pivot
+PASS: walk frame 2 keeps fixed canvas and pivot
+PASS: walk frame 3 keeps fixed canvas and pivot
+PASS: walk frame 4 keeps fixed canvas and pivot
+PASS: walk frame 5 keeps fixed canvas and pivot
+PASS: walk frame 6 keeps fixed canvas and pivot
+PASS: walk frame 7 keeps fixed canvas and pivot
+PASS: walk frame 8 keeps fixed canvas and pivot
+PASS: walk frame 9 keeps fixed canvas and pivot
+PASS: walk frame 10 keeps fixed canvas and pivot
+PASS: walk frame 11 keeps fixed canvas and pivot
+PASS: walk frame 12 keeps fixed canvas and pivot
+PASS: walk frame 13 keeps fixed canvas and pivot
+PASS: walk frame 14 keeps fixed canvas and pivot
+PASS: walk frame 15 keeps fixed canvas and pivot
+PASS: walk frame 16 keeps fixed canvas and pivot
+PASS: walk frame 17 keeps fixed canvas and pivot
+PASS: walk frame 18 keeps fixed canvas and pivot
+PASS: walk frame 19 keeps fixed canvas and pivot
+PASS: walk frame 20 keeps fixed canvas and pivot
+PASS: walk frame 21 keeps fixed canvas and pivot
+PASS: walk frame 22 keeps fixed canvas and pivot
+PASS: walk frame 23 keeps fixed canvas and pivot
+PASS: walk frame 24 keeps fixed canvas and pivot
+PASS: walk frame 25 keeps fixed canvas and pivot
+PASS: walk frame 26 keeps fixed canvas and pivot
+PASS: walk frame 27 keeps fixed canvas and pivot
+PASS: walk frame 28 keeps fixed canvas and pivot
+PASS: walk frame 29 keeps fixed canvas and pivot
+PASS: walk frame 30 keeps fixed canvas and pivot
+PASS: walk frame 31 keeps fixed canvas and pivot
+PASS: walk frame 32 keeps fixed canvas and pivot
+PASS: walk frame 33 keeps fixed canvas and pivot
+PASS: walk frame 34 keeps fixed canvas and pivot
+PASS: walk frame 35 keeps fixed canvas and pivot
+PASS: walk frame 36 keeps fixed canvas and pivot
+PASS: walk frame 37 keeps fixed canvas and pivot
+PASS: walk frame 38 keeps fixed canvas and pivot
+PASS: walk frame 39 keeps fixed canvas and pivot
+PASS: walk frame 40 keeps fixed canvas and pivot
+PASS: walk frame 41 keeps fixed canvas and pivot
+PASS: walk frame 42 keeps fixed canvas and pivot
+PASS: walk frame 43 keeps fixed canvas and pivot
+PASS: walk frame 44 keeps fixed canvas and pivot
+PASS: walk frame 45 keeps fixed canvas and pivot
+PASS: walk frame 46 keeps fixed canvas and pivot
+PASS: walk frame 47 keeps fixed canvas and pivot
+PASS: walk frame 48 keeps fixed canvas and pivot
+PASS: walk frame 49 keeps fixed canvas and pivot
+PASS: walk frame 50 keeps fixed canvas and pivot
+PASS: walk frame 51 keeps fixed canvas and pivot
+PASS: walk frame 52 keeps fixed canvas and pivot
+PASS: walk frame 53 keeps fixed canvas and pivot
+PASS: walk frame 54 keeps fixed canvas and pivot
+PASS: walk frame 55 keeps fixed canvas and pivot
+PASS: walk frame 56 keeps fixed canvas and pivot
+PASS: walk frame 57 keeps fixed canvas and pivot
+PASS: walk frame 58 keeps fixed canvas and pivot
+PASS: walk frame 59 keeps fixed canvas and pivot
+PASS: walk plays actual sequence instead of a moving still
+PASS: warning uses articulated attack at the same scale
+PASS: attack uses articulated attack at the same scale
+PASS: recover uses articulated attack at the same scale
+PASS: death holds final pose without looping
+PASS: lying corpse does not resize to standing height
+PASS: offspring preserves 60 percent scale through death
+PASS: crawler/walk/south atlas dimensions
+PASS: crawler/walk/south has at least eight unique poses
+PASS: crawler/attack/south atlas dimensions
+PASS: crawler/attack/south has at least eight unique poses
+PASS: crawler/death/south atlas dimensions
+PASS: crawler/death/south has at least eight unique poses
+PASS: cult/walk/south atlas dimensions
+PASS: cult/walk/south has at least eight unique poses
+ENEMY_MOTION failures=0

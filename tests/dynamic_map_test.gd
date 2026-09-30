@@ -24,7 +24,8 @@ func _init() -> void:
 	check(s.doors.size() >= 30, "portões em todas as pontas de corredor (%d)" % s.doors.size())
 
 	# caixa quebra com tiros e vira destroço
-	var i := find_kind(s, "crate", DOCKS.POINTS.spawn)
+	# O estoque junto à parede sul da Oficina mantém cobertura destrutível.
+	var i := find_kind(s, "crate", Vector2(8740, 6740))
 	var box: Rect2 = s.obstacles[i]
 	var n: int = s.obstacles.size(); var d: int = s.decor.size()
 	for k in 6:
@@ -34,7 +35,7 @@ func _init() -> void:
 
 	# barril explosivo: explode, fere inimigo próximo e encadeia no vizinho
 	s.enemies.clear()
-	var b := find_kind(s, "barrel_explosive", Vector2(3380, 6450))
+	var b := find_kind(s, "barrel_explosive", Vector2(3330, 6090))
 	var bc: Vector2 = s.obstacles[b].get_center()
 	s.spawn_enemy(bc + Vector2(90, 30), "brute"); var e: Dictionary = s.enemies[0]
 	var barrels_before: int = s.obstacle_kinds.count("barrel_explosive")

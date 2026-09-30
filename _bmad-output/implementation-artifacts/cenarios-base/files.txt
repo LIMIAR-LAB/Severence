@@ -1,0 +1,39 @@
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\baseline.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\baseline.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\biome_catalog.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\biome_catalog.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\biomes.json
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\inspection_metrics.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\inspection_metrics.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\room_contract.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\room_contract.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\room_preview.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\room_preview.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\seed_manifest.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\scripts\scenarios\seed_manifest.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tools\scenarios\base\capture_pilot.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tools\scenarios\base\inspection_view.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tools\scenarios\base\inspection_view.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tools\scenarios\base\workbench.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tools\scenarios\base\workbench.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\baseline_test.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\baseline_test.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\biome_test.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\biome_test.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\inspection_test.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\inspection_test.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\room_contract_test.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\room_contract_test.gd.uid
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\run.ps1
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\seed_test.gd
+C:\Users\tsmar\OneDrive\Documentos\ChatGPT\Jogo Steam\tests\scenarios_base\seed_test.gd.uid
+scripts/scenarios/farol_module.gd
+tools/scenarios/base/farol_workbench.gd
+tests/scenarios_base/farol_test.gd
+tests/solo_robot_test.gd
+tests/game_audio_test.gd
+tests/guard_opening_test.gd
+scripts/scenario_layout.gd
+tools/scenarios/base/farol_preview.gd
+scripts/scenarios/farol_connections.gd
+tests/scenarios_base/farol_connections_test.gd

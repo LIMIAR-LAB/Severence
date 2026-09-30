@@ -1,0 +1,52 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: arte 0.16 carrega (faltando: [])
+PASS: piso workshop_floor_riveted 64x64
+PASS: piso workshop_floor_worn 64x64
+PASS: piso workshop_floor_oil 64x64
+PASS: piso workshop_floor_grate 64x64
+PASS: piso market_floor_scales 64x64
+PASS: piso market_floor_puddle 64x64
+PASS: piso market_floor_seaweed 64x64
+PASS: piso chapel_floor_eye 64x64
+PASS: piso chapel_floor_spiral 64x64
+PASS: piso depot_floor_a 64x64
+PASS: piso depot_floor_b 64x64
+PASS: piso depot_floor_oil 64x64
+PASS: piso depot_floor_stripe 64x64
+PASS: piso light_floor_a 64x64
+PASS: piso light_floor_rail 64x64
+PASS: piso light_floor_gear 64x64
+PASS: piso dock_floor_steel 64x64
+PASS: piso dock_floor_rust 64x64
+PASS: piso dock_floor_rib 64x64
+PASS: piso cellar_floor_wet 64x64
+PASS: piso cellar_floor_moss 64x64
+PASS: piso cellar_floor_broken 64x64
+PASS: piso boss_floor_stone 64x64
+PASS: piso boss_floor_glyph 64x64
+PASS: piso boss_floor_crack 64x64
+PASS: parede 128x216 e poça 140x100
+PASS: ícone do mapa boss
+PASS: ícone do mapa shop
+PASS: ícone do mapa challenge
+PASS: ícone do mapa chest
+PASS: ícone do mapa locked
+PASS: ícone do mapa exit
+PASS: salas 04, 05 e 10 com piso próprio
+PASS: parede sorteada entre A, B e C pela seed (["wall_crack_b", "wall_crack_c", "wall_crack_a"])
+PASS: atalho fechado por parede rachada indestrutível a tiro
+PASS: parede bloqueia a passagem
+PASS: tiros não derrubam a parede
+PASS: atalho fechado por parede rachada indestrutível a tiro
+PASS: parede bloqueia a passagem
+PASS: tiros não derrubam a parede
+PASS: corredor do atalho é piso
+PASS: 2 portões de tentáculo ativos
+PASS: portão ativo bloqueia o corredor
+PASS: encostar fere e empurra para trás
+PASS: mini-chefe morto: portão selado e atravessável
+PASS: selado não fere
+PASS: portão do gerador segue ativo
+PASS: desafio do gerador concluído sela o outro portão
+SCENERY_016_TESTS_DONE failures=3

@@ -1,0 +1,147 @@
+{
+  "status": "preproduction_review_not_game_acceptance",
+  "reviewer": "Codex art front, visual inspection of original PNGs",
+  "date": "2026-09-30",
+  "all_publishable": false,
+  "kit": {
+    "provider_id": "4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8",
+    "generated_variations": 80,
+    "downloaded_samples": [
+      0,
+      1,
+      3,
+      4,
+      42,
+      43,
+      44
+    ],
+    "scope_note": "One provider kit call automatically produced 80 shaped pieces. Only seven relevant samples retrieved; remaining shapes are unreviewed and not catalogued.",
+    "canvas_each": [
+      102,
+      124
+    ],
+    "items": [
+      {
+        "file": "kit/tile_0.png",
+        "role": "stone_floor",
+        "source_rect": [
+          19,
+          62,
+          64,
+          48
+        ],
+        "decision": "retain_material_candidate",
+        "reason": "Quiet blue-grey slabs, restrained joins and grouped marks; no obstruction baked into floor. Requires repeated montage and actual renderer review."
+      },
+      {
+        "file": "kit/tile_1.png",
+        "role": "north_wall",
+        "source_rect": [
+          19,
+          14,
+          64,
+          68
+        ],
+        "decision": "retain_material_candidate",
+        "reason": "Readable top lip, muted block face, related floor palette. Height is not 44 and cannot define pilot elevation."
+      },
+      {
+        "file": "kit/tile_3.png",
+        "role": "south_wall_edge",
+        "source_rect": [
+          19,
+          42,
+          64,
+          68
+        ],
+        "decision": "retain_material_candidate",
+        "reason": "Coherent masonry and clear upper edge; lower moss restrained. Must author 44-high retaining face separately."
+      },
+      {
+        "file": "kit/tile_4.png",
+        "role": "west_side",
+        "source_rect": [
+          19,
+          14,
+          26,
+          48
+        ],
+        "decision": "needs_join_review",
+        "reason": "Narrow side silhouette from provider projection; not proof of 1:1 baseline compatibility."
+      },
+      {
+        "file": "kit/tile_42.png",
+        "role": "automatic_stairs_east_a",
+        "source_rect": [
+          19,
+          38,
+          64,
+          72
+        ],
+        "decision": "excluded_from_pilot",
+        "reason": "Only 64 pixels of run, baked provider height, no demonstrated 200x360 and 44-rise contract."
+      },
+      {
+        "file": "kit/tile_43.png",
+        "role": "automatic_stairs_east_b",
+        "source_rect": [
+          19,
+          14,
+          64,
+          96
+        ],
+        "decision": "excluded_from_pilot",
+        "reason": "Tall provider step piece incompatible with the low pilot; not approved by appearance."
+      },
+      {
+        "file": "kit/tile_44.png",
+        "role": "wood_floor",
+        "source_rect": [
+          19,
+          62,
+          64,
+          48
+        ],
+        "decision": "retain_material_candidate",
+        "reason": "Muted weathered timber; brighter and busier than stone, reserve for timber zone and verify repetition/actor contrast."
+      }
+    ]
+  },
+  "integrated_stair_study": {
+    "provider_id": "78aaeca8-6702-49e3-8f2b-846c24c0ae54",
+    "file": "stair-study-v01-rejected.png",
+    "decision": "rejected_geometry",
+    "reason": "Style reference overrode requested layout: extra north/south flights and monumental central face. Does not represent two short lateral ascents of 44 units.",
+    "alpha_verified": true,
+    "size": [
+      688,
+      384
+    ]
+  },
+  "bench": {
+    "file": "index.html",
+    "type": "offline material comparison, not game capture",
+    "render_inspected": false,
+    "limitation": "Browser security blocks local file protocol; no workaround attempted. Individual original PNGs inspected through file image viewer.",
+    "game_validation": false
+  },
+  "isolated_stair_retry": {
+    "provider_id": "00c68d17-0c59-454c-a375-846d6c7926c4",
+    "file": "stair-study-v02-rejected.png",
+    "decision": "rejected_orientation_and_volume",
+    "reason": "Four bands run horizontally across image; suggests north/south progression, not lateral left-to-right ascent. No reliable 44-high profile or 200x360 footprint. No additional generations commissioned.",
+    "size": [
+      256,
+      320
+    ],
+    "alpha_verified": true
+  },
+  "game_material_pilot_review": {
+    "capture": "_bmad-output/implementation-artifacts/cenarios-base/captures/pilot-materials.png",
+    "sha256": "8e1a52ecc09fdb6f888c6a6c5337b80cd9d019ccaec667a1363251069a681fa2",
+    "decision": "pilot_material_direction_accepted_with_revisions_not_catalog_acceptance",
+    "report": "_bmad-output/implementation-artifacts/cenarios-arte/pilot-materials-review.json",
+    "catalog_publishable": false,
+    "stairs_accepted": false
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "failures": 0,
+  "scope": "Rendered real actor movement, camera follows at1.22; probes inside useful aperture; static geometry is tested separately.",
+  "traversals": [
+    {
+      "background_samples": 0,
+      "captures": [
+        "1800-west-000.png",
+        "1800-west-020.png",
+        "1800-west-040.png",
+        "1800-west-060.png",
+        "1800-west-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(1800.0, 3700.0)",
+      "side": "west"
+    },
+    {
+      "background_samples": 0,
+      "captures": [
+        "1800-east-000.png",
+        "1800-east-020.png",
+        "1800-east-040.png",
+        "1800-east-060.png",
+        "1800-east-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(1800.0, 3700.0)",
+      "side": "east"
+    },
+    {
+      "background_samples": 0,
+      "captures": [
+        "1800-north-000.png",
+        "1800-north-020.png",
+        "1800-north-040.png",
+        "1800-north-060.png",
+        "1800-north-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(1800.0, 3700.0)",
+      "side": "north"
+    },
+    {
+      "background_samples": 0,
+      "captures": [
+        "400-west-000.png",
+        "400-west-020.png",
+        "400-west-040.png",
+        "400-west-060.png",
+        "400-west-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(400.0, -500.0)",
+      "side": "west"
+    },
+    {
+      "background_samples": 0,
+      "captures": [
+        "400-east-000.png",
+        "400-east-020.png",
+        "400-east-040.png",
+        "400-east-060.png",
+        "400-east-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(400.0, -500.0)",
+      "side": "east"
+    },
+    {
+      "background_samples": 0,
+      "captures": [
+        "400-north-000.png",
+        "400-north-020.png",
+        "400-north-040.png",
+        "400-north-060.png",
+        "400-north-080.png"
+      ],
+      "crossed": true,
+      "floor_samples": 972,
+      "frames": 81,
+      "origin": "(400.0, -500.0)",
+      "side": "north"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: solo card selects without prematurely starting
+PASS: solo selection opens equipment directly before launch
+PASS: solo starts without active partner
+PASS: unlocked robots reconcile to owned mission modules
+PASS: inactive partner cannot move or shoot
+PASS: solo can summon Titan
+PASS: cycle stores Titan and selects owned Spectre
+PASS: cycle preserves both robot resources
+PASS: cycle returns to owned Titan
+PASS: robot cycle is blocked while piloting
+PASS: selected Titan can deploy again after cycling
+PASS: Titan recalls
+PASS: resummoning preserves damage
+PASS: occupied Titan cannot be summoned away
+PASS: solo can summon Spectre
+PASS: fusion consumes follower state
+PASS: fusion absorbs impact using robot energy
+PASS: separation restores armor without free healing
+PASS: depleted fusion applies overflow damage
+PASS: destroyed robot cannot be healed by resummoning
+PASS: snapshot preserves solo and robot state
+PASS: solo defeat restarts arena without spawning partner
+PASS: AI companion remains a separate playable option
+SOLO / ROBOTS: 0 failures
+

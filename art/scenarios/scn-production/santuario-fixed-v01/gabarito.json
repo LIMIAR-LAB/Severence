@@ -1,0 +1,13 @@
+{
+  "status": "one candidate authorized; cranes pending sanctuary review",
+  "canvas": [1600, 2133.333333],
+  "world_origin": [100, 3400],
+  "uniform_scale_only": true,
+  "room_world": [200, 3600, 1300, 1400],
+  "wings_world": [[300, 5000, 300, 340], [1200, 5000, 300, 340]],
+  "doors_world": {"north": [800, 3600, 200], "east": [1500, 4300, 200], "south": [1000, 5000, 200]},
+  "elevation": 0,
+  "visual_reference": "assets/environment/docks12/entry/desembarque_painted_v1.png",
+  "reference_method": "locally inspected; translated to text style and geometry instructions",
+  "second_room": "cranes"
+}

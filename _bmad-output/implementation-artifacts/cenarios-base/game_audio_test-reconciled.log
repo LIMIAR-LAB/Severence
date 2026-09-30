@@ -1,0 +1,45 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: pistol carrega áudio real
+PASS: shotgun carrega áudio real
+PASS: smg carrega áudio real
+PASS: bazooka carrega áudio real
+PASS: mech carrega áudio real
+PASS: sword carrega áudio real
+PASS: melee carrega áudio real
+PASS: spectre carrega áudio real
+PASS: enemy_cult carrega áudio real
+PASS: enemy_fish carrega áudio real
+PASS: enemy_crawler carrega áudio real
+PASS: enemy_brute carrega áudio real
+PASS: enemy_guard carrega áudio real
+PASS: enemy_bomber carrega áudio real
+PASS: enemy_warden carrega áudio real
+PASS: enemy_boss carrega áudio real
+PASS: enemy_die carrega áudio real
+PASS: explosion carrega áudio real
+PASS: hit carrega áudio real
+PASS: jump carrega áudio real
+PASS: dash carrega áudio real
+PASS: pickup carrega áudio real
+PASS: dry_fire carrega áudio real
+PASS: refuge conserva duração autorada e loop
+PASS: expedition conserva duração autorada e loop
+PASS: boss conserva duração autorada e loop
+PASS: evento de disparo toca uma vez
+PASS: snapshot repetido não repete o som
+PASS: variação de áudio não altera RNG do combate
+PASS: inimigos distantes não poluem a mixagem
+PASS: pausa interrompe efeitos ativos
+PASS: retomar não reproduz fila da pausa
+PASS: volume zero silencia efeitos e música
+PASS: efeitos não começam no mudo
+PASS: volume restaura a mixagem
+PASS: refúgio usa sua música
+PASS: expedição troca de música
+PASS: menu reduz suavemente a música
+PASS: carregar sessão descarta efeitos históricos
+PASS: tiro distante pode tocar baixo
+PASS: tiro distante não suprime o tiro local simultâneo
+PASS: tiro distante duplicado não sobrepõe o local
+GAME_AUDIO failures=0

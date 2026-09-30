@@ -18,7 +18,7 @@ func _init() -> void:
 	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 6, "encontra bazuca com seis foguetes")
 	sim.toggle_run_weapon(marty)
 	check(sim.weapon_of(marty) == "pistol" and marty.run_weapons.bazooka == 6, "troca preserva munição")
-	sim.toggle_run_weapon(marty)
+	for _i in range(sim.available_weapons(marty).size() - 1): sim.toggle_run_weapon(marty)
 	check(sim.weapon_of(marty) == "bazooka", "troca reequipa arma da RUN")
 	for _i in range(6):
 		marty.shot = 0; sim.fire_actor(marty)
@@ -28,7 +28,7 @@ func _init() -> void:
 	check(sim.bullets.size() == shots, "arma vazia não dispara")
 	var empty_restore := Expedition.new(); empty_restore.apply_snapshot(sim.snapshot().duplicate(true))
 	check(empty_restore.weapon_of(empty_restore.actors[0]) == "bazooka" and empty_restore.actors[0].run_weapons.bazooka == 0, "save preserva seleção vazia sem gerar munição")
-	sim.toggle_run_weapon(marty); sim.toggle_run_weapon(marty)
+	for _i in range(sim.available_weapons(marty).size()): sim.toggle_run_weapon(marty)
 	check(sim.weapon_of(marty) == "bazooka", "Q reequipa arma vazia")
 	check(not sim.select_run_weapon(0, "invalid"), "seleção recusa arma não possuída")
 	var blast := Expedition.new()

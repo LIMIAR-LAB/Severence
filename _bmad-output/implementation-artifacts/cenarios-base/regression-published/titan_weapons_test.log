@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Marty entra no Titan
+PASS: canhão: bala grande e lenta
+PASS: canhão: cadência pesada
+PASS: canhão: dano direto forte
+PASS: canhão: explosão atinge quem está perto
+PASS: canhão: efeito de explosão
+PASS: R no Titan lança bomba (não veste armadura)
+PASS: armadura não é vestida dentro do Titan
+PASS: bomba respeita a recarga
+PASS: bomba explode ao cair
+PASS: bomba causa dano em área
+PASS: explosão não atravessa paredes
+TITAN_WEAPONS_DONE failures=0

@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "engine_version": "4.7.2-stable (official)",
+  "generator_version": "scn-graph-provisional-v1",
+  "profiles": 5,
+  "seeds_per_profile": 1000,
+  "processes": 2
+}

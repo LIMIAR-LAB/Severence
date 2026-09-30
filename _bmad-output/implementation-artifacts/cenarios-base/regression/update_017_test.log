@@ -1,0 +1,25 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: miniboss deixa baú no local da morte
+PASS: baú gratuito equipa bazuca temporária
+PASS: troca não altera arma do parceiro
+PASS: recompensa equivalente paga uma vez
+PASS: tipos especiais no mapa
+PASS: warehouse sem inimigos
+PASS: chapel sem inimigos
+PASS: aviso da armadilha não fere
+PASS: armadilha fere na janela ativa
+PASS: conversa aceita missão e tem múltiplas falas
+PASS: quest paga uma vez ao retornar
+PASS: quest sincronizada em snapshot
+PASS: hitbox inimiga 80% do visual
+PASS: boss anuncia movimento
+PASS: boss permanece parado no aviso
+PASS: boss move sem atravessar obstáculo
+PASS: boss anuncia movimento
+PASS: boss permanece parado no aviso
+PASS: boss move sem atravessar obstáculo
+PASS: boss anuncia movimento
+PASS: boss permanece parado no aviso
+PASS: boss move sem atravessar obstáculo
+UPDATE_017 failures=0

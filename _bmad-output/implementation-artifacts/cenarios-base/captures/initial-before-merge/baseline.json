@@ -1,0 +1,73 @@
+{
+	"captures": [
+		{
+			"actor": "(1920.0, 3860.0)",
+			"camera": "(2650.0, 4350.0)",
+			"error": 0,
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/stairs.png",
+			"room": "stairs",
+			"viewport": "(1280, 800)",
+			"zoom": 0.433734953403473
+		},
+		{
+			"actor": "(1920.0, 3860.0)",
+			"camera": "(2650.0, 4350.0)",
+			"error": 0,
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/stairs-collision.png",
+			"room": "stairs",
+			"viewport": "(1280, 800)",
+			"zoom": 0.433734953403473
+		},
+		{
+			"actor": "(2620.0, 5960.0)",
+			"camera": "(3600.0, 6450.0)",
+			"error": 0,
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/cranes.png",
+			"room": "cranes",
+			"viewport": "(1280, 800)",
+			"zoom": 0.433734953403473
+		},
+		{
+			"actor": "(2620.0, 5960.0)",
+			"camera": "(3600.0, 6450.0)",
+			"error": 0,
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/cranes-collision.png",
+			"room": "cranes",
+			"viewport": "(1280, 800)",
+			"zoom": 0.433734953403473
+		},
+		{
+			"actor": "(640.0, 3760.0)",
+			"camera": "(850.0, 4470.0)",
+			"error": 0,
+			"mode": "normal",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/chapel.png",
+			"room": "chapel",
+			"viewport": "(1280, 800)",
+			"zoom": 0.342857152223587
+		},
+		{
+			"actor": "(640.0, 3760.0)",
+			"camera": "(850.0, 4470.0)",
+			"error": 0,
+			"mode": "collision",
+			"path": "res://_bmad-output/implementation-artifacts/cenarios-base/captures/chapel-collision.png",
+			"room": "chapel",
+			"viewport": "(1280, 800)",
+			"zoom": 0.342857152223587
+		}
+	],
+	"geometry_sha256": "a3c743331e3e0e79084e8a61b32fef007ba5be31e6104b51779c74d233fb6d01",
+	"seed": 1941,
+	"sources": {
+		"res://scripts/dock_scenery.gd": "25335fbb9d7abddac2be0c9e756a5d098649e71b3fa799ee5bb20002a5d159d5",
+		"res://scripts/docks_map.gd": "80db4051ccb8e044e66fb6dafbadcddd7934755644956e550aee1502d24a3c18",
+		"res://scripts/scenario_layout.gd": "4165a7c417b96c1dea399fcebd0eeb3229d88f2cd37d90b6c83d3b4874cd2599",
+		"res://scripts/simulation.gd": "efc9a6fdfd9a66446fa538a517bb9054c0f59c4b3174ae5cb19837140fd3f58d",
+		"res://scripts/world_view.gd": "4dad1828bd4b680f79f219c4a15c884c985bafcc209d7e486c23be99ad628488"
+	}
+}

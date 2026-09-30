@@ -1,0 +1,49 @@
+{
+  "character_id": "b41db246-47d5-4914-a111-a6bd644abc2b",
+  "generator": "PixelLab MCP animate_image",
+  "source_cell": "96x96",
+  "target_cell": "112x112",
+  "notes": "Weapon-free body motion only. Frames containing generated blades, trails or impacts were rejected. Repeated source indices are intentional deterministic ping-pong/hold poses; the runtime renderer supplies the separate sword and effects.",
+  "directions": {
+    "south": {
+      "job_id": "a8615729-50e2-4aaf-a9cf-d455db6c7586",
+      "selected_source_indices": [0, 1, 2, 3, 4, 6],
+      "frames": ["south/frame-0.png", "south/frame-1.png", "south/frame-2.png", "south/frame-3.png", "south/frame-4.png", "south/frame-5.png"]
+    },
+    "south-east": {
+      "job_id": "18e0ff01-365f-484c-891d-2e662f788062",
+      "selected_source_indices": [0, 1, 2, 3, 4, 3],
+      "frames": ["south-east/frame-0.png", "south-east/frame-1.png", "south-east/frame-2.png", "south-east/frame-3.png", "south-east/frame-4.png", "south-east/frame-5.png"]
+    },
+    "east": {
+      "job_id": "56825f2f-963f-46f4-9ce6-c6a4876d78e9",
+      "selected_source_indices": [1, 2, 3, 4, 5, 6],
+      "frames": ["east/frame-0.png", "east/frame-1.png", "east/frame-2.png", "east/frame-3.png", "east/frame-4.png", "east/frame-5.png"]
+    },
+    "north-east": {
+      "job_id": "b5a6e6d7-17ad-40c2-8401-104046861bc7",
+      "selected_source_indices": [0, 1, 2, 3, 4, 6],
+      "frames": ["north-east/frame-0.png", "north-east/frame-1.png", "north-east/frame-2.png", "north-east/frame-3.png", "north-east/frame-4.png", "north-east/frame-5.png"]
+    },
+    "north": {
+      "job_id": "2bc292fe-5038-41bc-95cf-e4da3265a56d",
+      "selected_source_indices": [0, 1, 2, 2, 1, 0],
+      "frames": ["north/frame-0.png", "north/frame-1.png", "north/frame-2.png", "north/frame-3.png", "north/frame-4.png", "north/frame-5.png"]
+    },
+    "north-west": {
+      "job_id": "05fffc7b-be2f-456c-980e-241915692423",
+      "selected_source_indices": [1, 2, 3, 4, 5, 6],
+      "frames": ["north-west/frame-0.png", "north-west/frame-1.png", "north-west/frame-2.png", "north-west/frame-3.png", "north-west/frame-4.png", "north-west/frame-5.png"]
+    },
+    "west": {
+      "job_id": "81bd0f46-92b6-48d2-ae92-8e26e8a65c41",
+      "selected_source_indices": [1, 2, 3, 4, 5, 6],
+      "frames": ["west/frame-0.png", "west/frame-1.png", "west/frame-2.png", "west/frame-3.png", "west/frame-4.png", "west/frame-5.png"]
+    },
+    "south-west": {
+      "job_id": "824eaf3d-89e5-4495-b10c-9ad7981df81f",
+      "selected_source_indices": [1, 2, 3, 4, 5, 6],
+      "frames": ["south-west/frame-0.png", "south-west/frame-1.png", "south-west/frame-2.png", "south-west/frame-3.png", "south-west/frame-4.png", "south-west/frame-5.png"]
+    }
+  }
+}

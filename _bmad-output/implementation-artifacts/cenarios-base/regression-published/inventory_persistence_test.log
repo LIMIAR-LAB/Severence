@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: inventário persiste no snapshot
+PASS: loadout do inventário persiste
+PASS: snapshot antigo recebe default seguro
+PASS: snapshot antigo recebe a Ômega como desbloqueio inicial
+PASS: migração da Ômega preserva os outros bloqueios do snapshot
+PASS: save inválido é sanitizado
+PASS: loadout não registra armadura bloqueada como equipada
+PASS: inventário cheio rejeita loadout atomicamente
+PASS: loadout do P2 não sobrescreve inventário persistente do host
+PASS: arquivo v1 real migra sem apagar Spectres
+PASS: arquivo v1 recebe inventário padrão
+PASS: save com atores malformados é rejeitado antes de aplicar
+INVENTORY_PERSISTENCE_TESTS_DONE failures=0

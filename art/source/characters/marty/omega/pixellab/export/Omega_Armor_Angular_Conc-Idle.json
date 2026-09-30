@@ -1,0 +1,445 @@
+{
+  "character": {
+    "id": "b41db246-47d5-4914-a111-a6bd644abc2b",
+    "name": "Idle",
+    "prompt": "A master swordsman in a fully enclosed futuristic Omega exosuit, designed for an action RPG. Aggressive, angular, predatory silhouette: wedge-shaped helmet with a sharp brow and narrow luminous cyan T-shaped visor; no visible face, skin, or hair. Ivory-white faceted armor with restrained antique-gold edge accents, dark graphite mechanical joints, luminous cyan chest reactor. Layered V-shaped chest plates, pointed shoulder pauldrons, tapered athletic waist, angular segmented thigh and shin guards, reinforced claw-like gauntlets built for expert two-handed sword handling. Short structured purple half-cape flowing from one shoulder. Sharp blade-like shapes and hard planar surfaces; avoid rounded bubble armor, toy-like proportions, chibi softness, oversized spherical plates, and bulky round forms. Empty hands, no sword or weapon in the body sprite. Consistent armor in every direction, transparent background, readable game sprite silhouette.",
+    "size": {
+      "width": 96,
+      "height": 96
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Omega_Armor_Angular_Conc-Idle.png",
+    "cell_size": {
+      "width": 132,
+      "height": 132
+    },
+    "sheet_size": {
+      "width": 1056,
+      "height": 6732
+    },
+    "columns": 8,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      },
+      {
+        "row": 1,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "south"
+      },
+      {
+        "row": 2,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "south-east"
+      },
+      {
+        "row": 3,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "east"
+      },
+      {
+        "row": 4,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "north-east"
+      },
+      {
+        "row": 5,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "north"
+      },
+      {
+        "row": 6,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "north-west"
+      },
+      {
+        "row": 7,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "west"
+      },
+      {
+        "row": 8,
+        "type": "animation",
+        "frame_count": 5,
+        "animation": "Omega Idle 8-dir",
+        "animation_group_id": "3aa75c6b-8378-42d9-af3a-9ba796bcfac4",
+        "direction": "south-west"
+      },
+      {
+        "row": 9,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "south"
+      },
+      {
+        "row": 10,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "south-east"
+      },
+      {
+        "row": 11,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "east"
+      },
+      {
+        "row": 12,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "north-east"
+      },
+      {
+        "row": 13,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "north"
+      },
+      {
+        "row": 14,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "north-west"
+      },
+      {
+        "row": 15,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "west"
+      },
+      {
+        "row": 16,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Defeat 8-dir",
+        "animation_group_id": "6a92b77d-1235-4e6a-a166-d7514931b27c",
+        "direction": "south-west"
+      },
+      {
+        "row": 17,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt West Clean Retry 2",
+        "animation_group_id": "6e1c87d3-73d4-4318-aeb3-7257cb8747a8",
+        "direction": "west"
+      },
+      {
+        "row": 18,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "south"
+      },
+      {
+        "row": 19,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "south-east"
+      },
+      {
+        "row": 20,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "east"
+      },
+      {
+        "row": 21,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "north-east"
+      },
+      {
+        "row": 22,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "north"
+      },
+      {
+        "row": 23,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "north-west"
+      },
+      {
+        "row": 24,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "west"
+      },
+      {
+        "row": 25,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Rift Dash 8-dir",
+        "animation_group_id": "7f0a6eb1-4af4-4696-80f0-8c7fdde0a7e5",
+        "direction": "south-west"
+      },
+      {
+        "row": 26,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "south"
+      },
+      {
+        "row": 27,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "south-east"
+      },
+      {
+        "row": 28,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "east"
+      },
+      {
+        "row": 29,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "north-east"
+      },
+      {
+        "row": 30,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "north"
+      },
+      {
+        "row": 31,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "north-west"
+      },
+      {
+        "row": 32,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "west"
+      },
+      {
+        "row": 33,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "west"
+      },
+      {
+        "row": 34,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Omega Hurt 8-dir",
+        "animation_group_id": "b4a66c18-db45-412a-923f-dc7c77cec2ba",
+        "direction": "south-west"
+      },
+      {
+        "row": 35,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "south"
+      },
+      {
+        "row": 36,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "south-east"
+      },
+      {
+        "row": 37,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "east"
+      },
+      {
+        "row": 38,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "north-east"
+      },
+      {
+        "row": 39,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "north"
+      },
+      {
+        "row": 40,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "north-west"
+      },
+      {
+        "row": 41,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "west"
+      },
+      {
+        "row": 42,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Jump 8-dir",
+        "animation_group_id": "b5ae32c6-55fa-4cf3-a0ec-4117ba842baf",
+        "direction": "south-west"
+      },
+      {
+        "row": 43,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "south"
+      },
+      {
+        "row": 44,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "south-east"
+      },
+      {
+        "row": 45,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "east"
+      },
+      {
+        "row": 46,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "north-east"
+      },
+      {
+        "row": 47,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "north"
+      },
+      {
+        "row": 48,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "north-west"
+      },
+      {
+        "row": 49,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "west"
+      },
+      {
+        "row": 50,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Omega Run 8-dir",
+        "animation_group_id": "de4daf12-95f8-47cb-b436-d050f07f9472",
+        "direction": "south-west"
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-09-30T05:17:21.223261+00:00"
+}

@@ -1,0 +1,35 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Ômega permanece ativa por 5 minutos
+PASS: ligar a Ômega dispara a transformação
+PASS: ativação carrega 5 minutos completos de uso
+PASS: invulnerável durante a transformação
+PASS: fica parado enquanto carrega
+PASS: onda de choque sai no meio da transformação
+PASS: onda de choque fere inimigos próximos
+PASS: onda de choque apaga projéteis inimigos
+PASS: transformação termina
+PASS: Ômega troca a arma pela Lâmina Ômega
+PASS: com armadura ativa não troca uniforme/arma
+PASS: Ômega é mais rápida até que o Espião
+PASS: 1º corte da espada: 38 e rastro
+PASS: 3º corte solta onda perfurante
+PASS: combo: 38 + 64 no finalizador
+PASS: Ômega: o escudo absorve o golpe
+PASS: armadura acaba sozinha e entra em recarga de 60s
+PASS: não veste de novo durante a recarga
+PASS: Padrão volta ao blaster
+PASS: raio segurado causa dano sem disparar a espada
+PASS: soltar o raio inicia recarga de 30s
+PASS: raio não reinicia durante a recarga
+PASS: recolher Ômega atinge somente inimigos próximos na tela
+PASS: descarga de luz desenha feixes até os alvos
+PASS: Mecânico usa escopeta
+PASS: Espião usa submetralhadora
+PASS: Espião mais rápido, Mecânico mais forte
+PASS: expedição começa com a Ômega carregada
+PASS: baú abre com animação e explosão de itens
+PASS: baú recarrega a armadura (sem vestir sozinho)
+PASS: Titan: Shift segurado ativa o turbo e gasta energia
+PASS: Titan: pisadas pesadas geram poeira/tremor
+OMEGA_TESTS_DONE failures=0

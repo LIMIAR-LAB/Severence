@@ -1,0 +1,58 @@
+{
+  "failures": 0,
+  "runs": [
+    {
+      "boss_reachable": true,
+      "edges": [
+        "corridor-00",
+        "corridor-02",
+        "corridor-03",
+        "corridor-04",
+        "corridor-05",
+        "corridor-06",
+        "corridor-07",
+        "corridor-08",
+        "corridor-09",
+        "corridor-10",
+        "corridor-11",
+        "corridor-13",
+        "corridor-14",
+        "corridor-15",
+        "secret",
+        "shortcut-cranes",
+        "shortcut-warehouse"
+      ],
+      "fallback": "",
+      "hash": "79d180cd2fcc20f97b030d1479348d6732e5cf933704cc913807fff49cfca80d",
+      "origins": "{ \"entry\": (0.0, 0.0), \"cranes\": (2500.0, 0.0), \"warehouse\": (4600.0, 0.0), \"market\": (5700.0, -2900.0), \"shop\": (7000.0, -2900.0), \"generator\": (6500.0, -3200.0), \"ammo\": (5700.0, -3200.0), \"rails\": (2500.0, -3200.0), \"stairs\": (1300.0, 0.0), \"chapel\": (0.0, 0.0), \"drydock\": (-2300.0, 0.0), \"cellar\": (6500.0, -3600.0), \"boss\": (0.0, 0.0), \"secret\": (5700.0, -4300.0) }",
+      "seed": 145910271
+    },
+    {
+      "boss_reachable": true,
+      "edges": [
+        "corridor-00",
+        "corridor-02",
+        "corridor-03",
+        "corridor-04",
+        "corridor-05",
+        "corridor-06",
+        "corridor-07",
+        "corridor-08",
+        "corridor-09",
+        "corridor-10",
+        "corridor-11",
+        "corridor-12",
+        "corridor-13",
+        "corridor-14",
+        "corridor-15",
+        "secret",
+        "shortcut-cranes",
+        "shortcut-warehouse"
+      ],
+      "fallback": "",
+      "hash": "973ff3bd4737301afe415e26eccb13dd95b4b43b1eaf308352f58e865a24cede",
+      "origins": "{ \"entry\": (0.0, 0.0), \"cranes\": (4100.0, 4400.0), \"warehouse\": (4100.0, 1500.0), \"market\": (4500.0, 1500.0), \"shop\": (5300.0, 200.0), \"generator\": (5300.0, 0.0), \"ammo\": (4500.0, 0.0), \"rails\": (4100.0, 0.0), \"stairs\": (500.0, 0.0), \"chapel\": (0.0, 0.0), \"drydock\": (0.0, -3100.0), \"cellar\": (5300.0, -2400.0), \"boss\": (0.0, 0.0), \"secret\": (4500.0, 100.0) }",
+      "seed": 1330921371
+    }
+  ]
+}

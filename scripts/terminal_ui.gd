@@ -817,7 +817,8 @@ func read_equipment() -> void:
 	# 0.17: só itens desbloqueados ficam equipados
 	if outfit_choice not in app.sim.OUTFITS or not app.sim.is_unlocked(outfit_choice): outfit_choice = "padrao"
 	if not app.sim.is_unlocked(robot_choice): robot_choice = app.sim.default_robot()
-	armor_choice = "omega" if app.sim.is_unlocked("omega") else ""
+	armor_choice = str(app.sim.actors[gear_actor].get("armor_type", "omega")) if app.playing else app.selected_armor()
+	if not app.sim.is_unlocked(armor_choice): armor_choice = ""
 
 # ── Tela de EQUIPAMENTO 0.17: módulo scripts/equipment_screen.gd (moldura + camadas, dados em data/equipamento.json)
 var equipment: Control
@@ -902,7 +903,7 @@ func launch() -> void:
 func swap_actor() -> void:
 	gear_actor = 1 - gear_actor
 	var a: Dictionary = app.sim.actors[gear_actor]
-	outfit_choice = a.outfit; robot_choice = a.selected_robot
+	outfit_choice = a.outfit; robot_choice = a.selected_robot; armor_choice = a.get("armor_type", "omega")
 	if equipment != null: equipment.refresh()
 
 func launch_refuge() -> void:

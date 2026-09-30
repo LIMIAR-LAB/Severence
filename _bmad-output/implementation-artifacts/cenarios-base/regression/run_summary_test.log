@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: fatal fish hit is attributed
+PASS: defeat captures summary before refuge
+PASS: captured telemetry survives hub reset
+PASS: fish obituary is contextual
+PASS: obituary variation is seed deterministic
+PASS: extraction creates victory summary
+PASS: victory reward granted and reported once
+PASS: nucleus and clear count are captured accurately
+PASS: refuge interaction cannot duplicate victory reward
+PASS: summary round-trips through network/save snapshot
+PASS: legacy snapshot initializes summary telemetry safely
+PASS: secret room does not inflate ordinary exploration progress
+PASS: new expedition resets combo state
+PASS: grade deterministically accounts for run time
+PASS: enemy-owned damage is not credited to the player
+RUN_SUMMARY_TEST failures=0

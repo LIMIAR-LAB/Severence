@@ -1,0 +1,6 @@
+{
+  "probes": "[{ \"id\": \"warehouse-main\", \"p\": (5520.0, 6480.0) }, { \"id\": \"warehouse-cargo\", \"p\": (5350.0, 6520.0) }, { \"id\": \"warehouse-cranes-join\", \"p\": (4710.0, 6500.0) }, { \"id\": \"warehouse-east\", \"p\": (6300.0, 6510.0) }, { \"id\": \"warehouse-titan\", \"p\": (5520.0, 6480.0) }]",
+  "save_read_only": true,
+  "seed": 42,
+  "zoom": 1.05
+}

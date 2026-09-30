@@ -1,0 +1,26 @@
+{
+  "status": "preproduction_provisional_not_runtime_contract",
+  "source": ["scripts/docks_map.gd:33", "scripts/simulation.gd:654", "scripts/world_view.gd:208"],
+  "units": "world units; proposed environment raster 1 pixel per world unit",
+  "height": 44,
+  "baseline_raised_rect": [2250, 4000, 800, 360],
+  "module_world_origin": [2050, 4000],
+  "module_ground_footprint": [1200, 360],
+  "proposed_projection": "screen=(world.x, world.y-height_at(world)); camera transform afterwards",
+  "proposed_native_canvas": [1200, 404],
+  "canvas_origin_relative_to_world_origin": [0, -44],
+  "local_landing_footprint": [200, 0, 800, 360],
+  "local_landing_projected_top": [200, 0, 800, 360],
+  "local_landing_front_face_in_canvas": [200, 360, 800, 44],
+  "ramps": [
+    {"id":"west", "local_footprint":[0,0,200,360], "axis":"x", "low_x":0, "high_x":200, "entry_world":[2050,4180], "arrival_world":[2250,4180], "height_function":"clamp(x/200,0,1)*44"},
+    {"id":"east", "local_footprint":[1000,0,200,360], "axis":"x", "low_x":1200, "high_x":1000, "entry_world":[3250,4180], "arrival_world":[3050,4180], "height_function":"clamp((1200-x)/200,0,1)*44"}
+  ],
+  "stair_visual_proposal": {"treads_per_flight":4,"tread_run":50,"riser_height":11,"simulation_remains_continuous":true,"status":"requires visual and gameplay validation"},
+  "authored_orientations": ["west_to_east", "east_to_west"],
+  "arbitrary_texture_rotation": false,
+  "layers_proposed": ["lower_floor", "projected_treads_and_landing", "front_face_and_contact_shadows", "peripheral_structure", "foreground_occlusion"],
+  "north_connection": "must remain open; placement checked in full 1700x1300 room, not inferred from concept doorway",
+  "known_risk": "Current legacy raised-top draw coordinates do not subtract height whereas actor feet do. Coordinator must settle projection before art promotion.",
+  "publishable": false
+}

@@ -1,0 +1,36 @@
+{
+  "before": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "D431A81A01CB9FECACB33B9E4B45B08E7A12B00550F6DD74BF9036723AD36564",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\game_audio.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "8D5243BC1A07B1533B5AC39A232CD1F5569F495AC17C6101721DEA40576D961A",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\assets\\audio\\generated\\music_boss.ogg"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "4FA0D69296C46AE85862DBED8709D210969DFAEDF2CB7AC4AA76CBD5A84C414D",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\tests\\scenarios_prototype\\audio_duration_probe.gd"
+    }
+  ],
+  "after": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "D431A81A01CB9FECACB33B9E4B45B08E7A12B00550F6DD74BF9036723AD36564",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\game_audio.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "8D5243BC1A07B1533B5AC39A232CD1F5569F495AC17C6101721DEA40576D961A",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\assets\\audio\\generated\\music_boss.ogg"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "4FA0D69296C46AE85862DBED8709D210969DFAEDF2CB7AC4AA76CBD5A84C414D",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\tests\\scenarios_prototype\\audio_duration_probe.gd"
+    }
+  ]
+}

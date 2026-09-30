@@ -1,0 +1,56 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: equipamento pré-missão mantém a preparação existente
+PASS: B abre diretamente o inventário e mantém a simulação offline pausada
+PASS: atalho direto atualiza o loadout vivo antes de abrir
+PASS: B no inventário retorna à pausa sem retomar
+PASS: inventário é uma ação principal no topo da pausa
+PASS: ação do inventário possui destaque visual e informa o atalho
+PASS: ação destacada do inventário recebe o foco inicial da pausa
+PASS: ação destacada permanece navegável por teclado e controle
+PASS: navegação da pausa forma um ciclo entre a última e a primeira ação
+PASS: B na pausa abre o inventário sem retomar a partida
+PASS: abre shell no modo missão
+PASS: missão usa as docas como cenário contextual
+PASS: chaves coletadas aparecem na grade
+PASS: moedas coletadas aparecem na grade
+PASS: bazuca aparece no inventário da missão
+PASS: foguetes aparecem com munição real
+PASS: módulos Titan e Spectre possuídos ficam disponíveis durante a missão
+PASS: inventário carrega arte final da bazuca e da munição
+PASS: item persistente não levado fica fora da missão
+PASS: fragmentos contam somente o ganho desta missão
+PASS: combustível usa valor vivo quando Titan foi levado
+PASS: energia só aparece quando Spectre foi levado
+PASS: reservas do robô não são consumíveis na mochila
+PASS: recursos da tentativa não entram no inventário persistente
+PASS: recurso da missão possui foco visível
+PASS: recurso temporário não oferece ação falsa
+PASS: detalhe da bazuca mostra munição e estado
+PASS: vitrine da missão combina arte e valores ao vivo
+PASS: comparação especial da bazuca usa a área rolável
+PASS: bazuca distingue melhoria, regressão e mudança textual
+PASS: comparar não altera equipamento nem estado vivo da missão
+PASS: ações continuam navegáveis por teclado após comparar
+PASS: seleção de outro item encerra comparação sem conteúdo residual
+PASS: inventário atualiza bloqueio durante armadura
+PASS: fim da armadura reativa ação sem reabrir inventário
+PASS: inventário acompanha munição e troca ao vivo
+PASS: quantidades mudam ao vivo sem reabrir a tela
+PASS: bazuca vazia continua visível, foguetes zerados somem
+PASS: Enter equipa bazuca vazia sem criar foguetes
+PASS: Enter volta à arma básica pelo inventário
+PASS: alterações contínuas atualizam labels sem destruir controles
+PASS: vida atual atualiza sem reabrir
+PASS: escudo e duração atuais separados da referência
+PASS: integridade combustível e estado reais do Titan
+PASS: recarga Ômega acompanha estado atual
+PASS: energia e estado Spectre atualizam ao vivo
+PASS: ferimentos não alteram referência de vida
+PASS: marcador equipado acompanha robô selecionado sem usar inventário antigo
+PASS: nova RUN não herda a arma encontrada
+PASS: Esc no inventário retorna à pausa sem retomar
+PASS: Voltar no inventário retorna à pausa sem retomar
+PASS: Esc tem precedência quando Esc e B chegam no mesmo quadro
+PASS: atalhos e retornos não alteram o inventário persistente
+MISSION_INVENTORY_UI_TESTS_DONE failures=0

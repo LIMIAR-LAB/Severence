@@ -1,0 +1,114 @@
+extends RefCounted
+## Graph-only preparatory experiment; not the production scenario contract.
+
+const VERSION := "scn-graph-provisional-v1"
+const PROFILE_IDS := ["portuario", "ferroviario", "industrial", "alagado", "cultista"]
+const ATTACHMENTS := ["hub", "alternating", "distributed", "outlying"]
+const NUMERIC_FIELDS := ["spine_length", "branches_min", "branches_max", "branch_length_min", "branch_length_max", "cycles_min", "cycles_max"]
+
+static func profiles() -> Array:
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://profiles.json"))
+	return parsed if parsed is Array else []
+
+static func canonical(manifest: Dictionary) -> String:
+	return JSON.stringify(manifest, "", true, true)
+
+static func _reject(cause: String) -> Dictionary:
+	return {"ok": false, "error": cause}
+
+static func _validate(profile: Dictionary) -> String:
+	if not profile.get("id") is String or not PROFILE_IDS.has(profile.get("id")):
+		return "unsupported profile id"
+	if not profile.get("attachment") is String or not ATTACHMENTS.has(profile.get("attachment")):
+		return "unsupported attachment strategy"
+	for field in NUMERIC_FIELDS:
+		var value: Variant = profile.get(field)
+		if not (value is int or value is float):
+			return "missing or non-numeric bound: " + field
+		if not is_finite(float(value)) or float(value) != floor(float(value)):
+			return "bound must be a finite integer: " + field
+		if value < 0 or value > 64:
+			return "bound outside supported range 0..64: " + field
+	if profile.spine_length < 1:
+		return "spine_length must be at least 1"
+	if profile.branch_length_min < 2:
+		return "branch_length_min must be at least 2 for simple cycles"
+	for prefix in ["branches", "branch_length", "cycles"]:
+		if profile[prefix + "_min"] > profile[prefix + "_max"]:
+			return "inverted bounds: " + prefix
+	# Fail up front rather than retrying or silently clamping RNG outcomes.
+	if profile.cycles_max > profile.branches_min:
+		return "cycles_max must not exceed branches_min (one cycle per branch)"
+	return ""
+
+static func _room(rooms: Array, role: String, stage: int, cell: Array) -> String:
+	var id := "r%04d" % rooms.size()
+	rooms.append({"id": id, "role": role, "stage": stage, "preview_cell": cell})
+	return id
+
+static func _edge(edges: Array, from: String, to: String) -> void:
+	edges.append({"id": "e%04d" % edges.size(), "from": from, "to": to})
+
+static func generate(seed_value: int, profile: Dictionary) -> Dictionary:
+	var cause := _validate(profile)
+	if not cause.is_empty():
+		return _reject(cause)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	var rooms: Array = []
+	var edges: Array = []
+	var main_path: Array = []
+	var stage_anchors: Array = []
+	var previous := _room(rooms, "entry", 0, [0, 0])
+	main_path.append(previous)
+	var x := 0
+	for stage in range(3):
+		var anchors: Array = []
+		for step in range(int(profile.spine_length)):
+			x += 1
+			var id := _room(rooms, "transit", stage, [x, 0])
+			_edge(edges, previous, id)
+			previous = id
+			anchors.append(id)
+			main_path.append(id)
+		stage_anchors.append(anchors)
+		x += 1
+		var required_role: String = ["clue", "miniboss", "boss"][stage]
+		var separator := _room(rooms, required_role, stage + 1, [x, 0])
+		_edge(edges, previous, separator)
+		previous = separator
+		main_path.append(separator)
+	var branch_count := rng.randi_range(int(profile.branches_min), int(profile.branches_max))
+	var cycle_count := rng.randi_range(int(profile.cycles_min), int(profile.cycles_max))
+	# Shuffle explicit branch indices using only this generator's local RNG.
+	var cycle_order: Array = range(branch_count)
+	for i in range(branch_count - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var temporary: int = cycle_order[i]
+		cycle_order[i] = cycle_order[j]
+		cycle_order[j] = temporary
+	var cycle_branches: Array = cycle_order.slice(0, cycle_count)
+	for branch in range(branch_count):
+		var stage := branch % 3
+		var anchors: Array = stage_anchors[stage]
+		var anchor_index := 0
+		match profile.attachment:
+			"alternating": anchor_index = 0 if branch % 2 == 0 else anchors.size() - 1
+			"distributed": anchor_index = rng.randi_range(0, anchors.size() - 1)
+			"outlying": anchor_index = anchors.size() - 1
+		var root: String = anchors[anchor_index]
+		previous = root
+		var length := rng.randi_range(int(profile.branch_length_min), int(profile.branch_length_max))
+		for step in range(length):
+			# Each branch gets a unique schematic row, not collision geometry.
+			var id := _room(rooms, "optional", stage, [step + 1, branch + 1])
+			_edge(edges, previous, id)
+			previous = id
+		if cycle_branches.has(branch):
+			_edge(edges, previous, root)
+	return {
+		"ok": true, "version": VERSION, "schema": "provisional-graph-only",
+		"seed": str(seed_value), "profile_id": profile.id,
+		"profile": profile.duplicate(true), "rooms": rooms, "edges": edges,
+		"main_path": main_path, "branch_count": branch_count, "cycle_count": cycle_count
+	}

@@ -1,0 +1,36 @@
+{
+  "status": "completed_reviewed_concept_only",
+  "date": "2026-09-30",
+  "provider": "PixelLab Pro",
+  "job_id": "168988c6-693c-48ec-b077-4792c72f8ac6",
+  "prompt": "Art direction concept for premium 2D top-down pixel-art action game Severence, haunted English industrial harbor, 1941. LIGHTHOUSE TERRACE, coherent believable environment, fixed overhead three-quarter orthographic camera, north up, horizontal architectural edges, NOT isometric diamond, no vanishing point, no UI or text. Wide composition. Two broad short STONE STAIRCASES rise inward from west and east toward one central raised rectangular terrace across upper middle. Left stairs ascend left to right, right stairs ascend right to left. Six clearly separated large stone treads per flight, lit top faces and dark risers, connected to landings with low stone side parapets. Central terrace has a visible dark front retaining wall showing elevation and a spacious quiet walkable top. Below, broad continuous open lower courtyard connects clearly open left and right entrances. Cropped lighthouse base and one warm doorway anchor upper background without blocking terrace. Beautiful unified chunky deliberate pixel clusters, restrained blue slate, desaturated old brick, weathered timber, oxidized iron, amber lanterns guiding entrances and landings; cold sea beyond perimeter. Expansive subdued low-contrast floor, irregular large paving groups without repetitive checkerboard, 65 percent uncluttered traversable space. Detail and grouped nautical props only along outer edges: rope coil, small crate stack, mooring bollards, wet masonry. Strong silhouettes, coherent pixel density, light from upper left. No giant pillars, scattered rail motifs, magic floor emblem or striped metal ramps. Beautiful atmosphere with unambiguous walkable paths and height transitions. Visual concept, not finished collision map.",
+  "requested_size": [
+    688,
+    384
+  ],
+  "purpose": "Visual direction concept only. Do not stretch into runtime map.",
+  "game_changes": false,
+  "actual_size": [
+    688,
+    384
+  ],
+  "download_url": "https://api.pixellab.ai/mcp/images/168988c6-693c-48ec-b077-4792c72f8ac6/download",
+  "local_image": "farol-pixellab-v1.png",
+  "review": {
+    "retain": [
+      "coherent materials",
+      "quiet floor",
+      "readable step volumes",
+      "localized lighting",
+      "edge prop groups"
+    ],
+    "production_changes": [
+      "reduce height to match 44 world units",
+      "replace double flights with two short lateral flights",
+      "preserve north connection",
+      "resolve decorative doorway affordance",
+      "match character pixel density"
+    ],
+    "runtime_ready": false
+  }
+}

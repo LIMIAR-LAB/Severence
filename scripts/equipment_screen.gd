@@ -7,8 +7,8 @@ const InventoryState := preload("res://scripts/inventory_state.gd")
 const DIR := "res://assets/ui/equipamento/"
 const INDUSTRIAL_DIR := DIR + "industrial/"
 const SIZE := Vector2(1344, 752)
-const TAB_NAMES := ["INVENTÁRIO", "ROBÔS", "ÔMEGA", "EQUIPADOS", "ATRIBUTOS"]
-const FILTERS := [["todos", "TODOS"], ["armas", "UNIFORMES"], ["pecas", "ROBÔS"], ["consumiveis", "ÔMEGA"], ["recursos", "EXPEDIÇÃO"]]
+const TAB_NAMES := ["INVENTÁRIO", "ROBÔS", "FORMAS", "EQUIPADOS", "ATRIBUTOS"]
+const FILTERS := [["todos", "TODOS"], ["armas", "UNIFORMES"], ["pecas", "ROBÔS"], ["consumiveis", "FORMAS"], ["recursos", "EXPEDIÇÃO"]]
 const TAB_ICONS := ["tab_inventory.svg", "tab_robot.svg", "tab_omega.svg", "tab_equipped.svg", "tab_stats.svg"]
 const FILTER_ICONS := ["filter_all.svg", "filter_uniform.svg", "filter_robot.svg", "filter_omega.svg", "filter_expedition.svg"]
 const TEAL := Color("54e4e7")
@@ -27,7 +27,7 @@ var inventory: RefCounted
 var active_tab := 0
 var focus_id := ""
 var slots: Dictionary = {}
-var order: Array = ["padrao", "mecanico", "espiao", "omega", "titan", "spectre"]
+var order: Array = ["padrao", "mecanico", "espiao", "omega", "azul", "titan", "spectre"]
 var card: TextureRect
 var card_lock: TextureRect
 var numbers: Array = []
@@ -98,6 +98,7 @@ func button(parent: Control, rect: Rect2, caption: String, callback: Callable, n
 
 func image(parent: Control, rect: Rect2, texture: Texture2D) -> TextureRect:
 	var node := TextureRect.new(); node.position = rect.position; node.size = rect.size; node.texture = texture
+	if texture != null and texture.resource_path == "res://assets/characters/marty/azul/front.tres": node.material = preload("res://assets/characters/marty/azul/palette.tres")
 	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; node.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(node); return node
 
@@ -165,7 +166,7 @@ func show_tab(index: int) -> void:
 	match active_tab:
 		0: build_inventory()
 		1: build_equipment_category("robo", "ROBÔS", "Unidades de combate e apoio")
-		2: build_equipment_category("armadura", "ÔMEGA", "Poder temporário • ative com R durante a expedição")
+		2: build_equipment_category("armadura", "TRANSFORMAÇÕES", "Poder temporário • ative com R durante a expedição")
 		3: build_equipped()
 		4: build_status()
 
@@ -301,7 +302,7 @@ func build_loadout_strip() -> void:
 	var selected := [
 		["UNIFORME", "uniforme", host.outfit_choice],
 		["ROBÔ", "robo", host.robot_choice],
-		["ÔMEGA", "armadura", host.armor_choice]
+		["FORMA", "armadura", host.armor_choice]
 	]
 	for i in selected.size():
 		var box := panel(page, Rect2(206 + i * 196, 480, 184, 94), Color("0d2926"), Color("4b6c5d")); box.name = "LoadoutSlot_%s" % selected[i][1]
@@ -449,6 +450,7 @@ func refresh_inventory_details() -> void:
 	var open: bool = transient or InventoryData.unlocked(entry, app.sim.unlocked)
 	var art_path := str(entry.get("arte", entry.get("icone", "")))
 	detail_art.texture = tex(art_path) if tex(art_path) != null else tex(str(entry.get("icone", "")))
+	detail_art.material = preload("res://assets/characters/marty/azul/palette.tres") if entry.get("loadout_id", "") == "azul" else null
 	detail_art.modulate = Color.WHITE if open else Color(0.28, 0.34, 0.33)
 	detail_title.text = entry.nome
 	detail_rarity.text = "%s • %s%s" % [item_role(entry), str(entry.raridade).to_upper(), " • BLOQUEADO" if not open else ""]
@@ -461,7 +463,7 @@ func refresh_inventory_details() -> void:
 	if entry.id == "missao_bazuca":
 		var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
 		lines.append("FOGUETES  %d" % int(mission_actor.get("run_weapons", {}).get("bazooka", 0)))
-		lines.append("ESTADO  %s" % ("EM USO" if mission_actor.get("run_weapon", "") == "bazooka" and not mission_actor.get("armor", false) and not mission_actor.get("mech", false) else "GUARDADA"))
+		lines.append("ESTADO  %s" % ("EM USO" if mission_actor.get("run_weapon", "") == "bazooka" and not mission_actor.get("mech", false) else "GUARDADA"))
 	if entry.id == "missao_bazuca":
 		lines.append("DANO DIRETO  %d" % app.sim.WEAPONS.bazooka.damage)
 	var loadout_id := str(entry.get("loadout_id", ""))
@@ -476,7 +478,7 @@ func refresh_inventory_details() -> void:
 	var usable: bool = not transient and entry.get("equipavel", false) == true and not entry.get("prototipo", false) and quantity_for(entry) > 0 and open
 	if entry.id == "missao_bazuca" and mission_mode and quantity_for(entry) > 0:
 		var actor: Dictionary = app.sim.actors[host.gear_actor]
-		usable = actor.active and not actor.dead and not actor.mech and not actor.armor
+		usable = actor.active and not actor.dead and not actor.mech
 	detail_action.visible = not transient or entry.id == "missao_bazuca"
 	detail_action.disabled = not usable
 	detail_action.text = "EQUIPADO" if carried(entry) else "EQUIPAR"
@@ -484,7 +486,7 @@ func refresh_inventory_details() -> void:
 		detail_action.text = "ARMA BÁSICA" if app.sim.actors[host.gear_actor].get("run_weapon", "") == "bazooka" else "EQUIPAR"
 	if not open: detail_reason.text = "Ação indisponível: item bloqueado."
 	elif entry.id == "missao_fragmentos": detail_reason.text = "Ganho desta missão • preservado entre expedições."
-	elif transient: detail_reason.text = (("Saia do Titan ou da armadura e esteja vivo para trocar." if not usable else ("Arma temporária • Q/R1 também alterna; vazia continua selecionável." if app.playstation_controller_connected() else "Arma temporária • Q/RB também alterna; vazia continua selecionável.")) if entry.id == "missao_bazuca" else "Recurso temporário • utilizado durante a expedição.")
+	elif transient: detail_reason.text = (("Saia do Titan e esteja vivo para trocar." if not usable else ("Arma temporária • Q/R1 também alterna; vazia continua selecionável." if app.playstation_controller_connected() else "Arma temporária • Q/RB também alterna; vazia continua selecionável.")) if entry.id == "missao_bazuca" else "Recurso temporário • utilizado durante a expedição.")
 	elif quantity_for(entry) <= 0: detail_reason.text = "Ação indisponível: item ainda não obtido."
 	elif entry.get("prototipo", false): detail_reason.text = "Ação indisponível: protótipo sem mecânica implementada."
 	elif entry.get("equipavel", false) != true: detail_reason.text = "Este item não ocupa um slot equipável."
@@ -580,7 +582,8 @@ func show_comparison() -> void:
 	var entry := InventoryData.item(inventory.selected_id)
 	if entry.is_empty(): return
 	if entry.id == "missao_bazuca":
-		var basic: String = app.sim.uniform_of(app.sim.actors[host.gear_actor]).weapon
+		var actor: Dictionary = app.sim.actors[host.gear_actor]
+		var basic: String = actor.get("basic_weapon", app.sim.uniform_of(actor).weapon)
 		var gun: Dictionary = app.sim.WEAPONS[basic]
 		var rocket: Dictionary = app.sim.WEAPONS.bazooka
 		var before := {
@@ -592,7 +595,7 @@ func show_comparison() -> void:
 			"INTERVALO": {"display": "%.2fs" % rocket.cooldown, "score": 1.0 / float(rocket.cooldown)},
 			"MUNIÇÃO": {"display": str(app.sim.actors[host.gear_actor].run_weapons.bazooka), "score": null}}
 		display_comparison("ARMA BÁSICA → BAZUCA", before, after)
-		detail_reason.text = "Comparação com a arma básica do uniforme."; return
+		detail_reason.text = "Comparação com a arma básica selecionada."; return
 	if entry.get("transiente", false): detail_reason.text = "Recurso automático • quantidade nesta tentativa: %d." % quantity_for(entry); return
 	var slot := str(entry.get("slot", "")); var current_id := ""
 	for candidate in InventoryData.valid_items():
@@ -637,7 +640,7 @@ func build_equipped() -> void:
 		var slot_name: String = rows[i][1]
 		var clear := button(p, Rect2(1010, 31, 190, 52), "DESEQUIPAR", func(): unequip_slot(slot_name), "Unequip_%s" % slot_name)
 		clear.disabled = equipment_id == "" or slot_name in ["uniforme", "armadura"]
-		if slot_name == "armadura": clear.text = "PODER FIXO"; clear.tooltip_text = "A Armadura Ômega é um poder desbloqueado e não um slot removível."
+		if slot_name == "armadura": clear.text = "PODER FIXO"; clear.tooltip_text = "A transformação selecionada é um poder desbloqueado. Escolha outra na aba FORMAS."
 		equipped_controls.append(clear)
 	wire_page_controls(equipped_controls)
 
@@ -653,7 +656,7 @@ func unequip_slot(slot: String) -> void:
 
 func reference_rows(kind: String, outfit: String = "padrao") -> Array:
 	var rows: Array = app.sim.loadout_stats(kind, outfit).duplicate(true)
-	if kind == "omega":
+	if kind in ["omega", "azul"]:
 		rows[0][0] = "ESCUDO TEMPORÁRIO"; rows[0][1] = "%d corações" % app.sim.OMEGA_SHIELD_HEARTS
 	if kind == "uniform":
 		var u: Dictionary = app.sim.UNIFORMS.get(outfit, app.sim.UNIFORMS.padrao)
@@ -682,11 +685,11 @@ func status_panel(x: float, title: String, subtitle: String, rows: Array, node_n
 func build_status() -> void:
 	panel(page, Rect2(0, 0, 1308, 592), Color("0b211e"), BRASS)
 	label(page, Rect2(28, 16, 1250, 36), "ATRIBUTOS DE REFERÊNCIA • CADA EQUIPAMENTO TEM SEU USO", 23, GOLD)
-	label(page, Rect2(28, 53, 1240, 26), "Uniforme a pé • Ômega somente quando ativa • robô separado da vida de Marty", 15, DIM)
+	label(page, Rect2(28, 53, 1240, 26), "Uniforme a pé • transformação somente quando ativa • robô separado da vida de Marty", 15, DIM)
 	var u: Dictionary = app.sim.UNIFORMS.get(host.outfit_choice, app.sim.UNIFORMS.padrao)
-	status_panel(20, "MARTY • " + str(u.name), str(u.weapon_name) + " • munição infinita\nGolpes tiram ½ ou 1 coração.", reference_rows("uniform", host.outfit_choice), "MartyReference")
+	status_panel(20, "MARTY • " + str(u.name), "Referência do uniforme: " + str(u.weapon_name) + "\nA arma equipada é selecionada separadamente.", reference_rows("uniform", host.outfit_choice), "MartyReference")
 	var omega_ready := unlocked(host.armor_choice)
-	status_panel(449, "ARMADURA ÔMEGA", "R ativa a armadura e sua lâmina temporária." if omega_ready else "Poder bloqueado.", reference_rows("omega") if omega_ready else [], "OmegaReference")
+	status_panel(449, DATA.item(host.armor_choice).get("nome", "TRANSFORMAÇÃO"), ("R transforma • F ou T: garra sob o alvo mais próximo." if host.armor_choice == "azul" else "R ativa a armadura e sua lâmina temporária.") if omega_ready else "Poder bloqueado.", reference_rows(host.armor_choice) if omega_ready else [], "OmegaReference")
 	var robot: String = host.robot_choice if unlocked(host.robot_choice) else ""
 	status_panel(878, robot.to_upper() if robot != "" else "SEM ROBÔ", "C invoca • E pilota • consome combustível" if robot == "titan" else ("C invoca/recolhe • G funde/separa" if robot == "spectre" else "Selecione um robô na aba ROBÔS."), reference_rows(robot) if robot != "" else [], "RobotReference")
 	if not mission_mode:
@@ -694,15 +697,31 @@ func build_status() -> void:
 		wire_page_controls([])
 		return
 	update_status_condition()
-	wire_page_controls([])
+	var weapon_buttons: Array = []
+	var actor: Dictionary = app.sim.actors[host.gear_actor]
+	for weapon in app.sim.available_weapons(actor):
+		var selected: String = weapon
+		var caption: String = {"pistol":"BLASTER", "shotgun":"ESCOPETA", "smg":"SUBMETRALHADORA", "bazooka":"BAZUCA"}[weapon]
+		var control := button(page, Rect2(30 + weapon_buttons.size()*305, 548, 290, 26), caption, func():
+			if app.request_run_weapon(host.gear_actor, selected): update_status_condition(), "SelectWeapon_" + weapon)
+		control.disabled = actor.mech or actor.dead
+		weapon_buttons.append(control)
+	update_status_condition()
+	wire_page_controls(weapon_buttons)
 
 func update_status_condition() -> void:
 	var a: Dictionary = app.sim.actors[host.gear_actor]
+	for weapon in app.sim.available_weapons(a):
+		var control := page.find_child("SelectWeapon_" + weapon, true, false) as Button
+		if control != null:
+			control.disabled = a.mech or a.dead
+			var caption: String = {"pistol":"BLASTER", "shotgun":"ESCOPETA", "smg":"SUBMETRALHADORA", "bazooka":"BAZUCA"}[weapon]
+			control.text = ("• " if app.sim.weapon_of(a) == weapon else "") + caption
 	var u: Dictionary = app.sim.UNIFORMS.get(host.outfit_choice, app.sim.UNIFORMS.padrao)
 	var omega_ready := unlocked(host.armor_choice)
 	var robot: String = host.robot_choice if unlocked(host.robot_choice) else ""
 	condition_label(Rect2(30, 438, 1200, 27), "CONDIÇÃO ATUAL • JOGADOR %d" % (host.gear_actor + 1), "MissionPlayer", GOLD)
-	var state := "CAÍDO" if a.get("dead", false) else ("PILOTANDO TITAN" if a.get("mech", false) else ("ÔMEGA ATIVA" if a.get("armor", false) else ("EM FUSÃO" if a.get("fused", false) else "A PÉ")))
+	var state := "CAÍDO" if a.get("dead", false) else ("PILOTANDO TITAN" if a.get("mech", false) else (("FORMA AZUL ATIVA" if a.get("armor_type", "omega") == "azul" else "ÔMEGA ATIVA") if a.get("armor", false) else ("EM FUSÃO" if a.get("fused", false) else "A PÉ")))
 	var health := condition_label(Rect2(30, 476, 390, 65), "VIDA  %.1f / %d corações\n%s" % [float(a.hp) / app.sim.HEART, app.sim.BASE_HEARTS, state], "MissionHealth")
 	var omega_state := "ATIVA • %.0fs restantes" % ceilf(float(a.get("armor_time", 0))) if a.get("armor", false) else ("RECARREGANDO • %.0fs" % ceilf(float(a.get("armor_cd", 0))) if float(a.get("armor_cd", 0)) > 0 else ("INATIVA • pronta para ativar" if omega_ready else "BLOQUEADA"))
 	var shield := condition_label(Rect2(450, 476, 410, 65), "ESCUDO  %.1f / %d corações\n%s" % [float(a.get("shield", 0)) / app.sim.HEART, app.sim.OMEGA_SHIELD_HEARTS, omega_state], "MissionShield")
@@ -716,11 +735,11 @@ func update_status_condition() -> void:
 		var states := {"stored": "RECOLHIDO", "following": "ACOMPANHANDO", "fused": "EM FUSÃO", "destroyed": "DESTRUÍDO"}
 		robot_text = "%s\nENERGIA  %.0f / %.0f" % [states.get(spectre.state, "INATIVO"), spectre.hp, app.sim.SPECTRE_HP]
 	var condition := condition_label(Rect2(880, 476, 400, 65), robot_text, "MissionRobot")
-	var ammo := condition_label(Rect2(30, 548, 1250, 28), "ARMA BÁSICA • %s • munição infinita" % u.weapon_name, "MissionAmmo", TEAL)
+	var ammo := condition_label(Rect2(30, 518, 1250, 24), "ARMA EQUIPADA • %s" % app.sim.weapon_name(a), "MissionAmmo", TEAL)
 	if a.get("mech", false): ammo.text = "CANHÃO TITAN EM USO • consome combustível"
-	elif a.get("armor", false): ammo.text = "LÂMINA ÔMEGA EM USO"
+	elif a.get("armor", false): ammo.text += " • F / T: GARRA DO CHÃO" if a.get("armor_type", "omega") == "azul" else " • CORPO A CORPO: LÂMINA ÔMEGA"
 	if a.get("run_weapons", {}).has("bazooka"):
-		ammo.text += "    |    BAZUCA %s • %d foguetes" % ["EM USO" if a.get("run_weapon", "") == "bazooka" and not a.get("armor", false) and not a.get("mech", false) else "GUARDADA", a.run_weapons.bazooka]
+		ammo.text += "    |    BAZUCA %s • %d foguetes" % ["EM USO" if a.get("run_weapon", "") == "bazooka" and not a.get("mech", false) else "GUARDADA", a.run_weapons.bazooka]
 
 func rebuild_current() -> void:
 	var focused := get_viewport().gui_get_focus_owner()
@@ -769,7 +788,7 @@ func current_mission_signature() -> String:
 	if not mission_mode: return ""
 	var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
 	var watched: Array = [app.sim.keys, app.sim.money, app.sim.materials, host.gear_actor, host.outfit_choice, host.robot_choice, host.armor_choice]
-	for key in ["armor", "fused", "run_weapons", "run_weapon", "active", "dead", "mech"]: watched.append(mission_actor.get(key))
+	for key in ["armor", "fused", "run_weapons", "run_weapon", "basic_weapon", "active", "dead", "mech"]: watched.append(mission_actor.get(key))
 	return str(watched)
 
 

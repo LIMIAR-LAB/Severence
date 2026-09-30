@@ -1,0 +1,34 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS CAPELA: carrega 12 overlays uma única vez
+PASS CAPELA: overlay 00 mede 800x900
+PASS CAPELA: overlay 01 mede 800x900
+PASS CAPELA: overlay 02 mede 800x900
+PASS CAPELA: overlay 03 mede 800x900
+PASS CAPELA: overlay 04 mede 800x900
+PASS CAPELA: overlay 05 mede 800x900
+PASS CAPELA: overlay 06 mede 800x900
+PASS CAPELA: overlay 07 mede 800x900
+PASS CAPELA: overlay 08 mede 800x900
+PASS CAPELA: overlay 09 mede 800x900
+PASS CAPELA: overlay 10 mede 800x900
+PASS CAPELA: overlay 11 mede 800x900
+PASS CAPELA: fallback estático disponível
+PASS CAPELA: quadro dura 110 ms
+PASS CAPELA: troca no limite de 110 ms
+PASS CAPELA: animação fecha o loop em 1,32 s
+PASS CAPELA: geometria externa da sala foi preservada
+PASS CAPELA: placa unifica sala e corredores em resolução nativa
+PASS CAPELA: sala descoberta exibe a placa
+PASS CAPELA: sala oculta não revela a arte
+PASS CAPELA: porta de estado permanece acima da placa
+PASS CAPELA: altar procedural duplicado é ocultado
+PASS CAPELA: banner sobreposto é ocultado
+PASS CAPELA: seis bancos pintados possuem colisão
+PASS CAPELA: colisões acompanham os bancos visíveis
+PASS CAPELA: corredor central continua livre
+PASS CAPELA: abordagem norte permanece transitável
+PASS CAPELA: abordagem leste permanece transitável
+PASS CAPELA: abordagem sul permanece transitável
+PASS CAPELA: sem arte, visuais antigos continuam disponíveis
+CHAPEL_ANIMATED_TESTS_DONE failures=0

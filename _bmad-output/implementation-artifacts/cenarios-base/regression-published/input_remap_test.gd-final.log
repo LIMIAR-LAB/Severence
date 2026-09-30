@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS REMAP: default binds match WASD/F/G layout
+PASS REMAP: robot switch defaults to V
+PASS REMAP: rebind up to I applies
+PASS REMAP: rebind to a key already in use is rejected
+PASS REMAP: reserved keys are rejected
+PASS REMAP: unknown action is rejected
+PASS REMAP: mapped V cycles the live owned robot
+PASS REMAP: rebound key drives movement in game
+PASS REMAP: non-numeric saved bind falls back to default
+PASS REMAP: negative saved bind falls back to default
+PASS REMAP: reserved saved bind falls back to default
+PASS REMAP: valid saved bind loads
+PASS REMAP: duplicate saved bind falls back to default
+PASS REMAP: reset restores defaults
+INPUT REMAP TEST: 0 failures
+

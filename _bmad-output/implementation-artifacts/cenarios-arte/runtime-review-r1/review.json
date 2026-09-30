@@ -1,0 +1,140 @@
+{
+  "reviewed_at": "2026-09-30T12:13:16.152895-03:00",
+  "decision": "accepted_restricted_runtime_visual_evidence",
+  "concrete_defects": [],
+  "asset_changes": false,
+  "scope": "Five real-renderer static captures and twenty motion keyframes visually inspected; Farol perimeter walls revision3, north corner, south shortcut and west/east joins.",
+  "observations": [
+    "North opening stays readable and unbridged; east corner/jamb and corridor edges meet without an observed empty seam.",
+    "South wall terminates on both sides of shortcut; Marty remains visible through the aperture in the supplied sequence.",
+    "West/east joins show continuous floor at sampled positions; no wall strip spans the passage.",
+    "Full-room shot shows south perimeter at correct room boundary and open shortcut.",
+    "Landing static shot shows retained stair face and actors; no additional issue identified in requested scope."
+  ],
+  "motion_report_evidence": {
+    "failures": 0,
+    "traversals": 4,
+    "frames_per_traversal": [
+      81,
+      81,
+      81,
+      81
+    ],
+    "all_crossed": true,
+    "background_samples": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "provenance": "Read from Base report, not re-executed by Art; visually reviewed only five stored keyframes per traversal."
+  },
+  "limitations": [
+    "No claim of all324 frames visually inspected or of temporal smoothness between stored frames.",
+    "Motion keyframes show Marty; no Titan traversal acceptance inferred.",
+    "This review does not independently certify collisions, combat, catalog completeness or SCN-03."
+  ],
+  "captures": [
+    {
+      "file": "runtime/east.png",
+      "sha256": "03ad6cfe328f782a06f5d55b781ab87f02ba6eadb47aaed239eb428f1283e9b6"
+    },
+    {
+      "file": "runtime/landing.png",
+      "sha256": "9c369d1fe392748020f421da78341247f9219d0108940955ae2f8f47df65e120"
+    },
+    {
+      "file": "runtime/north.png",
+      "sha256": "94ed570fad922b07a919a5176ee30dad0421baa8b92ea18c76a8024321a1b378"
+    },
+    {
+      "file": "runtime/room.png",
+      "sha256": "afcb8d1a5a786776c682a1461c9452055c26183649e612841a92a49fc31e9562"
+    },
+    {
+      "file": "runtime/west.png",
+      "sha256": "e2b0a2e84f30e9ddf41916c0feff5cffaa260bd169af157a2da2ccfdfb6b3a7f"
+    },
+    {
+      "file": "runtime-motion/1800-east-000.png",
+      "sha256": "f0a8b14975bbe4d444d8b26d4774e555bb7c49a81eba6186f65d73cf8ecbffd3"
+    },
+    {
+      "file": "runtime-motion/1800-east-020.png",
+      "sha256": "a9777016d25646bf237fca2c3dabe3279b83172ec441f870eee3e1dab7dec14d"
+    },
+    {
+      "file": "runtime-motion/1800-east-040.png",
+      "sha256": "b5928c9cb3c31506d644d4fea7716b1fe0fedd3a564c15497b1e9c95acfe1312"
+    },
+    {
+      "file": "runtime-motion/1800-east-060.png",
+      "sha256": "a0a9edb474586964bb6755deff1555a9d849960589d7ae7522bd6e8faa8a8d11"
+    },
+    {
+      "file": "runtime-motion/1800-east-080.png",
+      "sha256": "8955f4236018c35ceb7ac4c73e51c751b778a006dfbd769e3254c4b2c05f6373"
+    },
+    {
+      "file": "runtime-motion/1800-north-000.png",
+      "sha256": "f0adc9b3b4eb7a1798a87779f68a92e9f578a3c3879895f826586ba238b60213"
+    },
+    {
+      "file": "runtime-motion/1800-north-020.png",
+      "sha256": "332981fce6e246f657f7ba132d07db865f079e23a75f1ef8c2fef345d8f72cc2"
+    },
+    {
+      "file": "runtime-motion/1800-north-040.png",
+      "sha256": "5d09a5aa5857141a9806b618e61216aa423eaaba661b7e95b1960faaaef001ec"
+    },
+    {
+      "file": "runtime-motion/1800-north-060.png",
+      "sha256": "55519895819be62896050166415b96bc6334e0d2a11e7d89787aa3325d19de58"
+    },
+    {
+      "file": "runtime-motion/1800-north-080.png",
+      "sha256": "a7d1bfdd86159403aca47af6b71dd1dcbb2ea2f98f5fb362d21e91bf88988e62"
+    },
+    {
+      "file": "runtime-motion/1800-shortcut-000.png",
+      "sha256": "af96b954286710158112aaca8b3eb41a2a578c4c482dbcc1e8d2f2ab5c1e76a4"
+    },
+    {
+      "file": "runtime-motion/1800-shortcut-020.png",
+      "sha256": "e738361817ba2b548c51239a1a3fa0b9c5269e566075d71c80bbc7fbc8c6672c"
+    },
+    {
+      "file": "runtime-motion/1800-shortcut-040.png",
+      "sha256": "a17a3f9ca1f9031ad5c6dee49fa83a156ed7ce3c44f9ee4cea5a45176feb2f6b"
+    },
+    {
+      "file": "runtime-motion/1800-shortcut-060.png",
+      "sha256": "a44ba0967aae851a4550e2214f18f3e423bdf56fcdcc2e809e29a51be0120635"
+    },
+    {
+      "file": "runtime-motion/1800-shortcut-080.png",
+      "sha256": "7a50b608fefc6e19bfd977fdc2da3f5d69e8e89fb76402ff484c0a3335116666"
+    },
+    {
+      "file": "runtime-motion/1800-west-000.png",
+      "sha256": "da6a18fa9001a280d51552136921323a4c2c733194362b095354927c8f21843a"
+    },
+    {
+      "file": "runtime-motion/1800-west-020.png",
+      "sha256": "6dea45a90d5d7483898ba157c816cdf60b67c881f4aa8b0ea1ba96f6ccc69113"
+    },
+    {
+      "file": "runtime-motion/1800-west-040.png",
+      "sha256": "599a209f364b56641996d6af5b9167dad2d65e49d9665ba75659217f21669d66"
+    },
+    {
+      "file": "runtime-motion/1800-west-060.png",
+      "sha256": "92b7e05e6db3fb9f6c6e3ac5b89f265c4f52cefc4c81b7effedae5e0c3527eea"
+    },
+    {
+      "file": "runtime-motion/1800-west-080.png",
+      "sha256": "79660b6152b518dfafb0588f7b19156f7c3f697bd718cdad19ab2072ba82c471"
+    }
+  ],
+  "motion_report_sha256": "633402bf13042d105fd6533f70bf6c59f8e6536539028d39c6a6269ad84af527"
+}

@@ -71,4 +71,5 @@ func _initialize() -> void:
 	ui.cycle_outfit(1)
 	check(eq.focus_id != before, "LB/RB e setas passam pelos itens da vitrine")
 	print("EQUIPMENT_UI_TESTS_DONE failures=%d" % failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures > 0 else 0)

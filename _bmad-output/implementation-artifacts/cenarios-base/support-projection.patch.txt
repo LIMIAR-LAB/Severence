@@ -1,0 +1,16 @@
+--- a/scripts/world_view.gd
++++ b/scripts/world_view.gd
+@@ draw_actor
+ var foot: Vector2 = a.p
++var support: Vector2 = foot - Vector2(0, sim.height_at(foot))
+-visual_transform(foot, 0, Vector2(1, 0.42))
++visual_transform(support, 0, Vector2(1, 0.42))
+-draw_arc(foot, 16, 0, TAU, 20, player_color, 2)
++draw_arc(support, 16, 0, TAU, 20, player_color, 2)
+@@ draw_mech
+ var p: Vector2 = m.p
++var support: Vector2 = p - Vector2(0, sim.height_at(p))
+-visual_transform(p, 0, Vector2(1, 0.45))
++visual_transform(support, 0, Vector2(1, 0.45))
+-text_at(p + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)
++text_at(support + Vector2(-50, 27), "E • PILOTAR TITAN", CYAN, 13)

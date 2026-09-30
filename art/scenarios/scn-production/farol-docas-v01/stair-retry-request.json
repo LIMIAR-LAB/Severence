@@ -1,0 +1,11 @@
+{
+  "id": "00c68d17-0c59-454c-a375-846d6c7926c4",
+  "provider": "PixelLab Pro",
+  "description": "Game asset: a SINGLE LOW STONE STAIR rising toward the RIGHT in screen coordinates. Whole stair only 4 shallow risers, total elevation 44 pixels. The stair footprint is 200 pixels horizontal length by 240 pixels vertical width. Camera fixed high three-quarter TOP DOWN with orthographic projection. Low entrance is the LEFT vertical edge, high exit is the RIGHT vertical edge. Four broad treads are vertical strips running from upper edge to lower edge. Therefore their seam lines run VERTICALLY, never horizontally. In profile along lower edge the four steps rise gently rightward, each only 11 pixels high. NO stairs toward the top of the image. NO upper or lower additional flights. NO platform, NO parapets, NO railings, NO door, NO building, NO props. This is a very wide shallow access stair, not a monumental staircase. Muted cool blue-grey large slate slabs, extremely quiet texture, subtle chipped lips, dark desaturated indigo riser faces, upper-left illumination, carefully placed crisp pixel clusters, no diagonal isometric diamond, no text. Show whole isolated stair with transparent margin.",
+  "width": 256,
+  "height": 320,
+  "no_background": true,
+  "seed": 440203,
+  "purpose": "Bounded retry without composition reference; dimensional study, never stretched to runtime footprint",
+  "publishable": false
+}

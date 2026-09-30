@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: acerto de bala gera número de dano
+PASS: bala empurra o inimigo levemente
+PASS: abate inicia a sequência
+PASS: primeiro abate vale 4 moedas
+PASS: abate dispara hitstop
+PASS: sequência acumula
+PASS: segundo abate na sequência vale +1
+PASS: sequência expira sem abates
+PASS: abate de elite gera hitstop forte
+PASS: meio coração dispara slow-mo clutch
+PASS: embarque no Titan
+PASS: pouso do Titan causa dano em área
+PASS: pouso do Titan dispara hitstop
+JUICE_TESTS_DONE failures=0

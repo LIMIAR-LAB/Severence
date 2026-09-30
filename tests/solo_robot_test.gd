@@ -17,9 +17,7 @@ func run() -> void:
 	# Exercise the actual solo selection callback, then equipment launch.
 	app.menu.content.find_child("SoloChoice", true, false).pressed.emit()
 	check(app.menu.pending_mode == "solo" and not app.playing, "solo card selects without prematurely starting")
-	check(app.menu.screen == "play", "solo card remains selected until confirmation")
-	app.menu.content.find_child("EquipAndEnter", true, false).pressed.emit()
-	check(app.menu.screen == "equipment" and app.menu.pending_mode == "solo", "solo confirmation opens equipment")
+	check(app.menu.screen == "equipment" and app.menu.pending_mode == "solo", "solo selection opens equipment directly before launch")
 	# O teste precisa começar com Titan, sem depender da preferência persistida em user://.
 	app.menu.outfit_choice = "padrao"; app.menu.robot_choice = "titan"
 	app.menu.launch(); app.paused = true
@@ -64,4 +62,8 @@ func run() -> void:
 	app.start_solo()
 	check(s.coop == "ai" and s.actors[1].active, "AI companion remains a separate playable option")
 	print("SOLO / ROBOTS: ", failures, " failures")
+	app.free()
+	copy = null
+	s = null
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)

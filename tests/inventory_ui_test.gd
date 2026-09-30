@@ -109,5 +109,6 @@ func _initialize() -> void:
 	inventory_catalog._cache = original_cache
 	app.queue_free(); await process_frame
 	print("INVENTORY_UI_TESTS_DONE failures=%d" % failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)
 

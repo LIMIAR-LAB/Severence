@@ -1,0 +1,64 @@
+{
+  "failures": 0,
+  "runs": [
+    {
+      "boss_reachable": true,
+      "edges": [
+        "corridor-00",
+        "corridor-01",
+        "corridor-02",
+        "corridor-03",
+        "corridor-04",
+        "corridor-05",
+        "corridor-06",
+        "corridor-07",
+        "corridor-08",
+        "corridor-09",
+        "corridor-10",
+        "corridor-12",
+        "corridor-13",
+        "corridor-15",
+        "secret",
+        "shortcut-cranes",
+        "shortcut-warehouse"
+      ],
+      "fallback": "",
+      "hash": "ef9c52cf012ef2a65715778f9ae843abc947aa580b2790b70adc61d943928110",
+      "origins": "{ \"entry\": (0.0, 0.0), \"cranes\": (1700.0, 0.0), \"warehouse\": (5000.0, 0.0), \"market\": (7500.0, 0.0), \"shop\": (8000.0, 0.0), \"generator\": (9500.0, -2700.0), \"ammo\": (7500.0, -2700.0), \"rails\": (4900.0, -800.0), \"stairs\": (1700.0, -800.0), \"chapel\": (0.0, 0.0), \"drydock\": (0.0, -1500.0), \"cellar\": (9500.0, -1900.0), \"boss\": (0.0, 0.0), \"secret\": (7500.0, -4200.0) }",
+      "save_restored": true,
+      "seed": 458216874,
+      "walked_distance": 12000.0,
+      "walked_to_boss": true
+    },
+    {
+      "boss_reachable": true,
+      "edges": [
+        "corridor-01",
+        "corridor-02",
+        "corridor-03",
+        "corridor-04",
+        "corridor-05",
+        "corridor-06",
+        "corridor-07",
+        "corridor-08",
+        "corridor-09",
+        "corridor-10",
+        "corridor-11",
+        "corridor-12",
+        "corridor-13",
+        "corridor-14",
+        "corridor-15",
+        "secret",
+        "shortcut-cranes",
+        "shortcut-warehouse"
+      ],
+      "fallback": "",
+      "hash": "5735703da9ee871ccb2476c7ce6a30578422bf98172ece2673582b9ab36b1a61",
+      "origins": "{ \"entry\": (0.0, 0.0), \"cranes\": (1300.0, 2000.0), \"warehouse\": (2200.0, 2000.0), \"market\": (5500.0, 2000.0), \"shop\": (6800.0, 2000.0), \"generator\": (5900.0, -300.0), \"ammo\": (5500.0, -300.0), \"rails\": (3900.0, -300.0), \"stairs\": (1300.0, 0.0), \"chapel\": (0.0, 0.0), \"drydock\": (0.0, -2300.0), \"cellar\": (5900.0, 100.0), \"boss\": (0.0, 0.0), \"secret\": (5500.0, 600.0) }",
+      "save_restored": true,
+      "seed": 1978583481,
+      "walked_distance": 11000.0,
+      "walked_to_boss": true
+    }
+  ]
+}

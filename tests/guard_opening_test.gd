@@ -16,10 +16,11 @@ func _init() -> void:
 	var guard: Dictionary = sim.enemies[0]
 	guard.cd = 0; guard["alerted"] = true
 	sim.step_enemies(0.01)
-	check(guard.combat == "warning" and guard.combat_t > 1.0, "preparação do Guardião é lenta")
-	for _i in range(100): sim.step_enemies(0.01)
+	check(guard.combat == "warning" and is_equal_approx(guard.combat_t, sim.GUARD_WARNING), "preparação respeita duração declarada")
+	check(is_equal_approx(sim.GUARD_WARNING, 0.85), "contrato atual do Guardião usa aviso de0.85s")
+	for _i in range(83): sim.step_enemies(0.01)
 	check(guard.combat == "warning" and sim.bullets.is_empty(), "a preparação não dispara cedo")
-	for _i in range(11): sim.step_enemies(0.01)
+	for _i in range(3): sim.step_enemies(0.01)
 	check(guard.combat == "attack", "ataque abre a guarda")
 	var enemy_shots := sim.bullets.filter(func(b): return b.team == 1).size()
 	for _i in range(100): sim.step_enemies(0.01)

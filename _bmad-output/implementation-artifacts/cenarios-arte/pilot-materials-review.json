@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-30T10:23:05.581146-03:00",
+  "file": "_bmad-output/implementation-artifacts/cenarios-base/captures/pilot-materials.png",
+  "sha256": "8e1a52ecc09fdb6f888c6a6c5337b80cd9d019ccaec667a1363251069a681fa2",
+  "size": [
+    1280,
+    800
+  ],
+  "decision": "pilot_material_direction_accepted_with_revisions_not_catalog_acceptance",
+  "scope": "SCN-02.01 isolated material pilot only",
+  "scale": {
+    "environment": 1.0,
+    "marty": 1.12,
+    "camera_zoom_in_capture_script": 1.0
+  },
+  "findings": [
+    {
+      "material": "stone_floor",
+      "decision": "accepted_for_pilot",
+      "observation": "Low contrast blue-grey stone keeps Marty silhouette and feet readable. Orthogonal paving agrees with wall perspective; repeated tile rhythm remains visible but subdued.",
+      "production_followup": "Break repeated paving motifs with restrained authored variants before large-area use."
+    },
+    {
+      "material": "wall_south_border",
+      "decision": "accepted_for_pilot",
+      "observation": "Top lip and darker face clearly separate wall from floor; masonry size visually coherent with Marty and stone floor. No transparent gaps seen along repeated strip.",
+      "production_followup": "Repeated block pattern and moss line need variation for long spans; this 68-high wall is not the 44-high Farol face."
+    },
+    {
+      "material": "wood_floor",
+      "decision": "retained_as_material_sample_revise_before_large_area_use",
+      "observation": "Muted timber belongs to palette but repeated horizontal bright/dark bands and same knots dominate the large patch.",
+      "production_followup": "Author two or three compatible plank arrangements and stagger joints; preserve pixel density and direction. Capture Marty over wood before accepting actor contrast there."
+    }
+  ],
+  "limits": [
+    "Marty is on stone only; wood actor contrast not demonstrated",
+    "No Titan shown",
+    "No motion, combat, foreground occlusion or stair validation",
+    "Hard stone/wood split is a study boundary, not an approved doorway transition",
+    "No SCN-03 release or story-status update"
+  ],
+  "previous_capture_sha256": "efc1808118a7ab565d618486cc59021461cd1d7b6893090aef713c8e0855998b",
+  "runtime_changes_by_art_front": false
+}

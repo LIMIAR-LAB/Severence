@@ -12,6 +12,8 @@
     "south-west"
   ],
   "frames": {
-    "idle": 1
+    "idle": 4,
+    "run": 6,
+    "shoot": 4
   }
 }

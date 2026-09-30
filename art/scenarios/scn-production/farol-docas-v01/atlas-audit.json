@@ -1,0 +1,70 @@
+{
+  "method": "static resource/source region validation, not Godot import",
+  "checks": [
+    {
+      "resource": "stone-floor.tres",
+      "source": "art/scenarios/scn-production/farol-docas-v01/kit/tile_0.png",
+      "region": [
+        19,
+        62,
+        64,
+        48
+      ],
+      "within_source": true,
+      "alpha_bbox_matches_region": true,
+      "godot_loaded": false
+    },
+    {
+      "resource": "wall-north.tres",
+      "source": "art/scenarios/scn-production/farol-docas-v01/kit/tile_1.png",
+      "region": [
+        19,
+        14,
+        64,
+        68
+      ],
+      "within_source": true,
+      "alpha_bbox_matches_region": true,
+      "godot_loaded": false
+    },
+    {
+      "resource": "wall-south.tres",
+      "source": "art/scenarios/scn-production/farol-docas-v01/kit/tile_3.png",
+      "region": [
+        19,
+        42,
+        64,
+        68
+      ],
+      "within_source": true,
+      "alpha_bbox_matches_region": true,
+      "godot_loaded": false
+    },
+    {
+      "resource": "wall-west.tres",
+      "source": "art/scenarios/scn-production/farol-docas-v01/kit/tile_4.png",
+      "region": [
+        19,
+        14,
+        26,
+        48
+      ],
+      "within_source": true,
+      "alpha_bbox_matches_region": true,
+      "godot_loaded": false
+    },
+    {
+      "resource": "wood-floor.tres",
+      "source": "art/scenarios/scn-production/farol-docas-v01/kit/tile_44.png",
+      "region": [
+        19,
+        62,
+        64,
+        48
+      ],
+      "within_source": true,
+      "alpha_bbox_matches_region": true,
+      "godot_loaded": false
+    }
+  ]
+}

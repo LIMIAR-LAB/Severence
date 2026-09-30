@@ -1,0 +1,27 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: placa dedicada da arena carrega
+PASS: placa tem resolução 4:3 preparada para escala inteira 2x
+PASS: placa preserva proporção 4:3
+PASS: existe exatamente uma sala do Almirante
+PASS: geometria física da sala permanece 2400x1800
+PASS: as duas alas de entrada permanecem intactas
+PASS: spawn do chefe permanece intacto
+PASS: extração permanece intacta
+PASS: moldura aquática cobre os quatro lados sem alterar o piso
+PASS: água cobre câmera ampla em (1000.0, -200.0)
+PASS: água cobre câmera ampla em (1000.0, 3000.0)
+PASS: água cobre câmera ampla em (7400.0, 1000.0)
+PASS: água cobre câmera ampla em (7400.0, 3000.0)
+PASS: obstáculos físicos do chefe permanecem idênticos
+PASS: perigos do chefe permanecem idênticos
+PASS: entrada oeste continua livre
+PASS: entrada leste continua livre
+PASS: ponto de extração continua navegável
+PASS: disco central de esquiva de 360 px permanece livre
+PASS: entrada oeste tem nó de navegação local
+PASS: entrada leste tem nó de navegação local
+PASS: navegação liga entrada oeste ao centro
+PASS: navegação liga entrada leste ao centro
+PASS: navegação liga centro à extração
+BOSS_ARENA_SCENERY_TESTS_DONE failures=0

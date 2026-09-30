@@ -77,6 +77,12 @@ func run() -> void:
 	var comparison_scroll: ScrollContainer = eq.find_child("InventoryComparisonScroll", true, false)
 	var comparison: RichTextLabel = eq.find_child("InventoryComparisonText", true, false)
 	check(comparison_scroll.visible and "ARMA BÁSICA → BAZUCA" in comparison.get_parsed_text(), "comparação especial da bazuca usa a área rolável")
+	var original_basic: String = marty.basic_weapon
+	marty.basic_weapon = "shotgun"
+	eq.show_comparison()
+	check("54" in comparison.get_parsed_text() and "0.65s" in comparison.get_parsed_text(), "comparação segue escopeta selecionada mesmo com outra roupa")
+	marty.basic_weapon = original_basic
+	eq.show_comparison()
 	check("#%s" % eq.bbcode_color(eq.IMPROVEMENT) in comparison.text and "#%s" % eq.bbcode_color(eq.REGRESSION) in comparison.text and "#%s" % eq.bbcode_color(eq.TEAL) in comparison.text, "bazuca distingue melhoria, regressão e mudança textual")
 	check(app.sim.actors[0] == live_before_compare and app.sim.inventory_state == persistent_before, "comparar não altera equipamento nem estado vivo da missão")
 	eq.detail_action.grab_focus(); check(eq.detail_action.has_focus(), "ações continuam navegáveis por teclado após comparar")
@@ -84,7 +90,7 @@ func run() -> void:
 	check(not comparison_scroll.visible and eq.detail_text.visible and eq.detail_stats.visible, "seleção de outro item encerra comparação sem conteúdo residual")
 	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
 	marty.armor = true; await process_frame; await process_frame
-	check(eq.detail_action.disabled, "inventário atualiza bloqueio durante armadura")
+	check(not eq.detail_action.disabled, "inventário permite trocar arma durante armadura")
 	marty.armor = false; await process_frame; await process_frame
 	check(not eq.detail_action.disabled, "fim da armadura reativa ação sem reabrir inventário")
 	marty.run_weapons.bazooka = 4; marty.run_weapon = ""
@@ -140,5 +146,6 @@ func run() -> void:
 	check(app.sim.inventory_state == persistent_before, "atalhos e retornos não alteram o inventário persistente")
 	app.queue_free(); await process_frame
 	print("MISSION_INVENTORY_UI_TESTS_DONE failures=%d" % failures)
+	await preload("res://tests/support/scene_cleanup.gd").finish(self)
 	quit(1 if failures else 0)
 

@@ -1,0 +1,82 @@
+{
+	"cases": [
+		{
+			"attempts": 1,
+			"caps": 2,
+			"dropped_edges": [
+				"corridor-09"
+			],
+			"edge_ids": [
+				"corridor-00",
+				"corridor-01",
+				"corridor-02",
+				"corridor-03",
+				"corridor-04",
+				"corridor-05",
+				"corridor-06",
+				"corridor-07",
+				"corridor-08",
+				"corridor-10",
+				"corridor-11",
+				"corridor-12",
+				"corridor-13",
+				"corridor-14",
+				"corridor-15",
+				"secret",
+				"shortcut-cranes",
+				"shortcut-warehouse"
+			],
+			"elapsed_ms": 84,
+			"errors": [],
+			"ok": true,
+			"seed": 1941
+		},
+		{
+			"attempts": 2,
+			"caps": 2,
+			"dropped_edges": [
+				"corridor-01"
+			],
+			"edge_ids": [
+				"corridor-00",
+				"corridor-02",
+				"corridor-03",
+				"corridor-04",
+				"corridor-05",
+				"corridor-06",
+				"corridor-07",
+				"corridor-08",
+				"corridor-09",
+				"corridor-10",
+				"corridor-11",
+				"corridor-12",
+				"corridor-13",
+				"corridor-14",
+				"corridor-15",
+				"secret",
+				"shortcut-cranes",
+				"shortcut-warehouse"
+			],
+			"elapsed_ms": 167,
+			"errors": [],
+			"ok": true,
+			"seed": 42
+		}
+	],
+	"elapsed_ms": [
+		84,
+		167
+	],
+	"engine": "4.7.2-stable (official)",
+	"failures": [],
+	"hashes": [
+		"fa344cb048f26cf7d2a2ab78246e5aa6fc04b70c25d300bd553fa850296f7ccf",
+		"0c229c23135b5f620226eaf2f068e1a23dd0ae012a85c11dd061f10d41f4db83"
+	],
+	"seeds": [
+		1941,
+		42
+	],
+	"unique_origins": 2,
+	"version": "scn-layout-2"
+}

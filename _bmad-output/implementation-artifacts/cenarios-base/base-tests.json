@@ -1,0 +1,47 @@
+[
+  {
+    "test": "baseline_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nBASELINE_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "biome_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nBIOME_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "farol_connections_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nFAROL_CONNECTIONS_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "farol_runtime_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nFAROL_RUNTIME_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "farol_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nFAROL_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "inspection_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nINSPECTION_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "module_catalog_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nMODULE_CATALOG_TESTS_DONE failures=0 publication_performed=false\r\n"
+  },
+  {
+    "test": "room_contract_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nROOM_CONTRACT_TESTS_DONE failures=0\r\n"
+  },
+  {
+    "test": "seed_test.gd",
+    "ok": true,
+    "output": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\r\n\r\nSEED_MANIFEST_TESTS_DONE failures=0 hash=9f30c2f7b77e8fbdf19242502aee347cdd9e9e1faf8f1c80ddfd0d79155ad850\r\n"
+  }
+]

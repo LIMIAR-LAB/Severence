@@ -1,0 +1,119 @@
+status: completed
+id: 4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8
+name: Blue grey aged harbor retaining masonry, broad sla
+description: Blue grey aged harbor retaining masonry, broad slate stone blocks, muted charcoal recesses, moss limited to base, understated oxidized iron reinforcement, upper left light, crisp chunky pixel art with Quiet low contrast large blue grey slate flagstones, weathered English industrial harbor 1941, broad irregular stone slabs, crisp restrained pixel clusters, subtle joints, no checkerboard, no symbols, soft upper left light
+type: square_topdown
+size: 64x64px
+kind: building
+variations: 80
+view: low top-down
+download: https://api.pixellab.ai/mcp/tiles-pro/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/download
+seed: 440201
+
+placement_rules:
+  rule_type: composed (arity 8)
+  connectivity: same
+  terrains: wall, empty
+  tiles: none mask-placeable — stamp pieces individually
+  parts (role -> tile index; stamp each piece):
+    roof: ends={'E': 74, 'N': 76, 'S': 77, 'W': 75} hips={'NE': 64, 'NW': 67, 'SE': 65, 'SW': 66} eaves={'E': 61, 'N': 60, 'S': 62, 'W': 63} ridges={'EW': 72, 'NS': 73} peak_px=48 profile=gable pyramid=78 valleys={'NE': 68, 'NW': 71, 'SE': 69, 'SW': 70} interior=79 pitch_reach_px=32
+    doors: Ea=34 Eb=35 Na=32 Nb=33 Sa=36 Sb=37 Wa=38 Wb=39
+    floor: 0
+    sides: E=2 N=1 S=3 W=4
+    pillar: 31
+    slopes: 56, 57
+    stairs: 40, 41
+    corners: NE=5 NW=8 SE=6 SW=7
+    partition: E=15 N=14 S=16 W=17 hub=13
+    floor_roof: 44
+    outer_multi: EW=55 NS=54 ESW=52 NES=49 NEW=50 NSW=51 NESW=53
+    slopes_east: 58, 59
+    stairs_east: 42, 43
+    outer_corners: NE=9 NW=12 SE=10 SW=11
+    partition_wall: E=19 N=18 S=20 W=21
+    partition_doors: Ha=47 Hb=48 Va=45 Vb=46
+    partition_multi: ES=24 NE=22 NW=23 SW=25 ESW=29 NES=26 NEW=28 NSW=27 NESW=30
+  materials (role -> description, not an index): wall=Blue grey aged harbor retaining masonry, broad slate stone blocks, muted charcoal recesses, moss limited to base, understated oxidized iron reinforcement, upper left light, crisp chunky pixel art floor=Quiet low contrast large blue grey slate flagstones, weathered English industrial harbor 1941, broad irregular stone slabs, crisp restrained pixel clusters, subtle joints, no checkerboard, no symbols, soft upper left light floor2=Weathered desaturated brown dock timber planks, subtle broad grain and dark iron nails, quiet low contrast, same harbor palette
+  painted (tile indices Gemini rendered): 0, 1, 4, 8, 14, 17, 31, 32, 33, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48
+
+storage_urls:
+  tile_0: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_0.png
+  tile_1: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_1.png
+  tile_2: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_2.png
+  tile_3: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_3.png
+  tile_4: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_4.png
+  tile_5: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_5.png
+  tile_6: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_6.png
+  tile_7: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_7.png
+  tile_8: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_8.png
+  tile_9: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_9.png
+  tile_10: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_10.png
+  tile_11: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_11.png
+  tile_12: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_12.png
+  tile_13: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_13.png
+  tile_14: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_14.png
+  tile_15: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_15.png
+  tile_16: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_16.png
+  tile_17: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_17.png
+  tile_18: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_18.png
+  tile_19: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_19.png
+  tile_20: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_20.png
+  tile_21: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_21.png
+  tile_22: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_22.png
+  tile_23: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_23.png
+  tile_24: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_24.png
+  tile_25: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_25.png
+  tile_26: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_26.png
+  tile_27: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_27.png
+  tile_28: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_28.png
+  tile_29: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_29.png
+  tile_30: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_30.png
+  tile_31: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_31.png
+  tile_32: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_32.png
+  tile_33: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_33.png
+  tile_34: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_34.png
+  tile_35: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_35.png
+  tile_36: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_36.png
+  tile_37: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_37.png
+  tile_38: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_38.png
+  tile_39: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_39.png
+  tile_40: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_40.png
+  tile_41: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_41.png
+  tile_42: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_42.png
+  tile_43: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_43.png
+  tile_44: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_44.png
+  tile_45: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_45.png
+  tile_46: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_46.png
+  tile_47: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_47.png
+  tile_48: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_48.png
+  tile_49: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_49.png
+  tile_50: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_50.png
+  tile_51: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_51.png
+  tile_52: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_52.png
+  tile_53: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_53.png
+  tile_54: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_54.png
+  tile_55: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_55.png
+  tile_56: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_56.png
+  tile_57: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_57.png
+  tile_58: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_58.png
+  tile_59: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_59.png
+  tile_60: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_60.png
+  tile_61: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_61.png
+  tile_62: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_62.png
+  tile_63: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_63.png
+  tile_64: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_64.png
+  tile_65: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_65.png
+  tile_66: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_66.png
+  tile_67: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_67.png
+  tile_68: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_68.png
+  tile_69: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_69.png
+  tile_70: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_70.png
+  tile_71: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_71.png
+  tile_72: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_72.png
+  tile_73: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_73.png
+  tile_74: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_74.png
+  tile_75: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_75.png
+  tile_76: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_76.png
+  tile_77: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_77.png
+  tile_78: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_78.png
+  tile_79: https://backblaze.pixellab.ai/file/pixellab-tiles/acccde46-716d-43ee-8075-f974ba3eb5d4/4803f5b5-6c5c-419d-bb2f-5cb3d70b0bc8/tile_79.png

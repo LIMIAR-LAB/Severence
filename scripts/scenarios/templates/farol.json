@@ -1,0 +1,518 @@
+{
+	"allowed_transforms": [
+		"translate"
+	],
+	"biome_id": "docks",
+	"connectors": [
+		{
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "door-0",
+			"material_family": "docks-stone",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1700.0,
+					600.0
+				]
+			},
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "door-1",
+			"material_family": "docks-stone",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					-1.0,
+					0.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					600.0
+				]
+			},
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "door-2",
+			"material_family": "docks-stone",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					-1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1600.0,
+					0.0
+				]
+			},
+			"type": "walk",
+			"width": 200.0
+		},
+		{
+			"height": {
+				"$type": "int",
+				"value": "0"
+			},
+			"id": "shortcut-south",
+			"material_family": "docks-stone",
+			"normal": {
+				"$type": "Vector2",
+				"values": [
+					0.0,
+					1.0
+				]
+			},
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					1004.0,
+					1300.0
+				]
+			},
+			"type": "shortcut",
+			"width": {
+				"$type": "int",
+				"value": "128"
+			}
+		}
+	],
+	"era_id": "1941",
+	"footprint": [
+		{
+			"$type": "Rect2",
+			"values": [
+				0.0,
+				0.0,
+				1700.0,
+				1300.0
+			]
+		}
+	],
+	"gaps": [],
+	"layers": [
+		{
+			"depth": "ground",
+			"id": "floor-0",
+			"mode": "tile",
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					0.0,
+					0.0,
+					1700.0,
+					1300.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png"
+		},
+		{
+			"depth": "ground",
+			"id": "landing-top",
+			"mode": "plate",
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					450.0,
+					256.0,
+					800.0,
+					360.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-top.png"
+		},
+		{
+			"depth": "ground",
+			"id": "west-flight",
+			"mode": "plate",
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					250.0,
+					256.0,
+					200.0,
+					404.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-west-composed.png"
+		},
+		{
+			"depth": "ground",
+			"id": "east-flight",
+			"mode": "plate",
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1250.0,
+					256.0,
+					200.0,
+					404.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/stairs-east-composed.png"
+		},
+		{
+			"depth": "foreground",
+			"id": "landing-face",
+			"mode": "plate",
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					450.0,
+					616.0,
+					800.0,
+					44.0
+				]
+			},
+			"sort_y": 660.0,
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/stairs/landing-face44.png"
+		},
+		{
+			"depth": "ground",
+			"id": "wall-north-face",
+			"mode": "plate",
+			"order": 100.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					0.0,
+					-68.0,
+					1500.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/north-face.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-northwest-corner",
+			"mode": "plate",
+			"order": 101.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					-26.0,
+					-68.0,
+					26.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/northwest-corner.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-west-upper",
+			"mode": "plate",
+			"order": 102.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					-26.0,
+					0.0,
+					26.0,
+					500.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-upper.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-west-lower",
+			"mode": "plate",
+			"order": 103.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					-26.0,
+					700.0,
+					26.0,
+					600.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/west-lower.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-east-north-jamb",
+			"mode": "plate",
+			"order": 104.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1700.0,
+					-68.0,
+					26.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-north-jamb.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-east-upper",
+			"mode": "plate",
+			"order": 105.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1700.0,
+					0.0,
+					26.0,
+					500.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-upper.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-east-lower",
+			"mode": "plate",
+			"order": 106.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1700.0,
+					700.0,
+					26.0,
+					600.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/east-lower.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-south-face-left",
+			"mode": "plate",
+			"order": 107.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					0.0,
+					1300.0,
+					940.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-left.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-south-face-right",
+			"mode": "plate",
+			"order": 108.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1068.0,
+					1300.0,
+					632.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/south-face-right.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-southwest-corner",
+			"mode": "plate",
+			"order": 109.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					-26.0,
+					1300.0,
+					26.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southwest-corner.png",
+			"world_units_per_pixel": 1.0
+		},
+		{
+			"depth": "ground",
+			"id": "wall-southeast-corner",
+			"mode": "plate",
+			"order": 110.0,
+			"projected": true,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1700.0,
+					1300.0,
+					26.0,
+					68.0
+				]
+			},
+			"texture": "res://art/scenarios/scn-production/farol-docas-v01/walls/southeast-corner.png",
+			"world_units_per_pixel": 1.0
+		}
+	],
+	"neighbor_rules": {
+		"height": {
+			"$type": "int",
+			"value": "0"
+		},
+		"material_family": "docks-stone"
+	},
+	"obstacles": [
+		{
+			"baked": false,
+			"kind": "sandbags",
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					645.0,
+					780.0,
+					110.0,
+					40.0
+				]
+			}
+		},
+		{
+			"baked": false,
+			"kind": "sandbags",
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					757.0,
+					780.0,
+					110.0,
+					40.0
+				]
+			}
+		},
+		{
+			"baked": false,
+			"kind": "sandbags",
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					869.0,
+					780.0,
+					110.0,
+					40.0
+				]
+			}
+		}
+	],
+	"points_of_interest": [],
+	"provenance": "effective simulation baseline",
+	"publication": "published",
+	"raised": [
+		{
+			"$type": "Rect2",
+			"values": [
+				450.0,
+				300.0,
+				800.0,
+				360.0
+			]
+		}
+	],
+	"ramps": [
+		{
+			"axis": "x",
+			"high": 450.0,
+			"low": 250.0,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					250.0,
+					300.0,
+					200.0,
+					360.0
+				]
+			}
+		},
+		{
+			"axis": "x",
+			"high": 1250.0,
+			"low": 1450.0,
+			"rect": {
+				"$type": "Rect2",
+				"values": [
+					1250.0,
+					300.0,
+					200.0,
+					360.0
+				]
+			}
+		}
+	],
+	"repeat_limit": {
+		"$type": "int",
+		"value": "1"
+	},
+	"room_role": "stairs",
+	"spawns": [
+		{
+			"id": "player",
+			"position": {
+				"$type": "Vector2",
+				"values": [
+					190.0,
+					480.0
+				]
+			},
+			"radius": {
+				"$type": "int",
+				"value": "23"
+			}
+		}
+	],
+	"template_id": "docks.farol.pilot",
+	"version": {
+		"$type": "int",
+		"value": "1"
+	}
+}

@@ -1,0 +1,36 @@
+{
+  "before": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "76D561A1687EDC917BA82619D01082EE65D86C9AF9388FAB5363BCC633EA8B99",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\tools\\scenarios\\prototype\\layout_generator.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "5E6D98E71080EB5D474011E31B3603E6E503D24F2005D0261A03531939906AA0",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\scenarios\\procedural_docks.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "46088864AFC12C521205A747F018574713D496F2636690D54B7B8E7C5C57F14A",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\scenarios\\templates\\farol.json"
+    }
+  ],
+  "after": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "76D561A1687EDC917BA82619D01082EE65D86C9AF9388FAB5363BCC633EA8B99",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\tools\\scenarios\\prototype\\layout_generator.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "5E6D98E71080EB5D474011E31B3603E6E503D24F2005D0261A03531939906AA0",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\scenarios\\procedural_docks.gd"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "46088864AFC12C521205A747F018574713D496F2636690D54B7B8E7C5C57F14A",
+      "Path": "C:\\Users\\tsmar\\OneDrive\\Documentos\\ChatGPT\\Jogo Steam\\scripts\\scenarios\\templates\\farol.json"
+    }
+  ]
+}

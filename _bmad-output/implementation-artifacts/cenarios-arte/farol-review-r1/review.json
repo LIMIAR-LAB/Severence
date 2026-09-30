@@ -1,0 +1,73 @@
+{
+  "reviewed_at": "2026-09-30T10:43:08.619173-03:00",
+  "status": "geometry_materials_retained_feet_not_accepted",
+  "capture_files": [
+    {
+      "file": "1800-west.png",
+      "sha256": "311fd6043ed8be6c0233dad3342500137bd10a2f5ab91dcb5915458f9539f9e2"
+    },
+    {
+      "file": "1800-landing.png",
+      "sha256": "981b12b3bfe22afe735aad70f17d7d5da4baca4795ecad0f591deadb1ec37f7b"
+    },
+    {
+      "file": "1800-east.png",
+      "sha256": "9b49ffd45f60568d5149ad87145c4ff40467f532106fda551d14e4dca83058eb"
+    },
+    {
+      "file": "1800-front.png",
+      "sha256": "9bd077a28a5a1dceffab30a629e8f9c1aaf3fdf9e256e27f44f4933a8070540f"
+    },
+    {
+      "file": "400-west.png",
+      "sha256": "d5c09ace4e60bc27def8a9e9796713c465d7d4687ed2fdaa1dd45b41f90ae92e"
+    },
+    {
+      "file": "400-landing.png",
+      "sha256": "8bf169e2081602fe4126d0e84d5285540c5d66c8edd682cb16f3913e4a1bb54a"
+    },
+    {
+      "file": "400-east.png",
+      "sha256": "205c107b6d71850ec387d3cd292f97fc67adf2ce493b64ea6289870c776c6d92"
+    },
+    {
+      "file": "400-front.png",
+      "sha256": "498209765317fceebf8cf7e59154615a3f1104ace57f3b2d937c46b1f6e4d79e"
+    }
+  ],
+  "observations": [
+    {
+      "severity": "blocking_evidence",
+      "issue": "Titan obscures Marty lower body/feet in west/landing/east; front also occluded by sandbags",
+      "request": "Separate actor/Titan probes with same physical positions/heights"
+    },
+    {
+      "severity": "projection",
+      "issue": "Titan shadow on landing is visibly below sprite feet; inherited draw_actor also draws shadow at physical foot before elevation",
+      "request": "Base verify projected contact shadow vs actor body; no art changes to compensate"
+    },
+    {
+      "severity": "capture",
+      "issue": "1800-west lacks surrounding floor; 400-west and later probes show floor",
+      "request": "Warm/cache textures and capture after stabilized frames; repeat first probe"
+    },
+    {
+      "severity": "visual_reservation",
+      "issue": "Same-value stone ground reduces elevation contrast under blue profile tint",
+      "request": "Evaluate uncluttered probes before deciding whether small lip/cap contrast correction is needed"
+    }
+  ],
+  "retained": [
+    "two lateral shallow flights",
+    "44-high retaining face native pixel composition",
+    "consistent perspective/material",
+    "relative module alignment visually retained under translation"
+  ],
+  "not_proven": [
+    "individual foot contact",
+    "movement perception",
+    "combat",
+    "human playtest"
+  ],
+  "art_changes_after_capture": false
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version":1,
+  "status":"authorship_specification_before_composition",
+  "room_origin_baseline":[1800,3700],
+  "material_family":"docks-stone",
+  "height":0,
+  "world_units_per_pixel":1,
+  "allowed_transforms":["translate"],
+  "source_floor":"res://art/scenarios/scn-production/farol-docas-v01/stairs/floor-stone.png",
+  "floor_phase":{"anchor_room_local":[0,0],"period":[64,48],"mapping":"texel=(room_local_position-anchor) modulo native period; translate anchor with room","neighbor_requirement":"Corridor must share room floor anchor at the seam or explicitly convert phase; do not randomize phase independently","not_automatic_runtime_support":true},
+  "border_width":8,
+  "crossing_length":96,
+  "connectors":[
+    {"side":"west","legacy_id":"door-1","position":[0,600],"normal":[-1,0],"width":200,"height":0,"opening_range":[500,700],"rect":[-48,492,96,216],"useful_aperture_canvas":[0,8,96,200],"border_regions_canvas":[[0,0,96,8],[0,208,96,8]],"source_corridor_world":[1500,4200,300,200]},
+    {"side":"east","legacy_id":"door-0","position":[1700,600],"normal":[1,0],"width":200,"height":0,"opening_range":[500,700],"rect":[1652,492,96,216],"useful_aperture_canvas":[0,8,96,200],"border_regions_canvas":[[0,0,96,8],[0,208,96,8]],"source_corridor_world":[3500,4200,400,200]},
+    {"side":"north","legacy_id":"door-2","position":[1600,0],"normal":[0,-1],"width":200,"height":0,"opening_range":[1500,1700],"rect":[1492,-48,216,96],"useful_aperture_canvas":[8,0,200,96],"border_regions_canvas":[[0,0,8,96],[208,0,8,96]],"source_corridor_world":[3300,2200,200,1500]}
+  ],
+  "geometry_sources":["scripts/docks_map.gd ROOMS and CORRIDORS","scripts/simulation.gd build_doors DOOR_DEPTH36","scripts/scenarios/room_contract.gd from_legacy connector conversion","scripts/scenarios/farol_module.gd template preserves connectors"],
+  "notes":["Width200 is transverse useful passage, not DOOR_DEPTH36","Canvas border is decorative and creates no collision","North eastern trim extends outside room at x1700; needs corner/wall clipping review","Legacy IDs depend on corridor iteration order: rebind by side/position if order changes","Only ground layer, no raised sill, no gate, no foreground occlusion"]
+}

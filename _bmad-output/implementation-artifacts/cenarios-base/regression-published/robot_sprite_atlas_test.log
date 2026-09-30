@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: Titan Mk II: 10x5 em 176px
+PASS: Cockpit Mk II: 6x1 em 176px
+PASS: Marty embarcando: 5x1 em 96px
+PASS: Spectre: 4x4 em 128px
+PASS: Fusão: 4x4 em 160px
+PASS: fusão 0,0: corpo inteiro e pés alinhados
+PASS: fusão 0,1: corpo inteiro e pés alinhados
+PASS: fusão 0,2: corpo inteiro e pés alinhados
+PASS: fusão 0,3: corpo inteiro e pés alinhados
+PASS: fusão 1,0: corpo inteiro e pés alinhados
+PASS: fusão 1,1: corpo inteiro e pés alinhados
+PASS: fusão 1,2: corpo inteiro e pés alinhados
+PASS: fusão 1,3: corpo inteiro e pés alinhados
+PASS: fusão 2,0: corpo inteiro e pés alinhados
+PASS: fusão 2,1: corpo inteiro e pés alinhados
+PASS: fusão 2,2: corpo inteiro e pés alinhados
+PASS: fusão 2,3: corpo inteiro e pés alinhados
+PASS: fusão 3,0: corpo inteiro e pés alinhados
+PASS: fusão 3,1: corpo inteiro e pés alinhados
+PASS: fusão 3,2: corpo inteiro e pés alinhados
+PASS: fusão 3,3: corpo inteiro e pés alinhados
+PASS: Titan vista 0 possui passos distintos
+PASS: Titan vista 1 possui passos distintos
+PASS: Titan vista 2 possui passos distintos
+PASS: Titan vista 3 possui passos distintos
+PASS: Titan vista 4 possui passos distintos
+PASS: Titan quadro 0,0 tem margem isolada
+PASS: Titan quadro 1,0 tem margem isolada
+PASS: Titan quadro 2,0 tem margem isolada
+PASS: Titan quadro 3,0 tem margem isolada
+PASS: Titan quadro 4,0 tem margem isolada
+PASS: Titan quadro 5,0 tem margem isolada
+PASS: Titan quadro 6,0 tem margem isolada
+PASS: Titan quadro 7,0 tem margem isolada
+PASS: Titan quadro 8,0 tem margem isolada
+PASS: Titan quadro 9,0 tem margem isolada
+PASS: Titan quadro 0,1 tem margem isolada
+PASS: Titan quadro 1,1 tem margem isolada
+PASS: Titan quadro 2,1 tem margem isolada
+PASS: Titan quadro 3,1 tem margem isolada
+PASS: Titan quadro 4,1 tem margem isolada
+PASS: Titan quadro 5,1 tem margem isolada
+PASS: Titan quadro 6,1 tem margem isolada
+PASS: Titan quadro 7,1 tem margem isolada
+PASS: Titan quadro 8,1 tem margem isolada
+PASS: Titan quadro 9,1 tem margem isolada
+PASS: Titan quadro 0,2 tem margem isolada
+PASS: Titan quadro 1,2 tem margem isolada
+PASS: Titan quadro 2,2 tem margem isolada
+PASS: Titan quadro 3,2 tem margem isolada
+PASS: Titan quadro 4,2 tem margem isolada
+PASS: Titan quadro 5,2 tem margem isolada
+PASS: Titan quadro 6,2 tem margem isolada
+PASS: Titan quadro 7,2 tem margem isolada
+PASS: Titan quadro 8,2 tem margem isolada
+PASS: Titan quadro 9,2 tem margem isolada
+PASS: Titan quadro 0,3 tem margem isolada
+PASS: Titan quadro 1,3 tem margem isolada
+PASS: Titan quadro 2,3 tem margem isolada
+PASS: Titan quadro 3,3 tem margem isolada
+PASS: Titan quadro 4,3 tem margem isolada
+PASS: Titan quadro 5,3 tem margem isolada
+PASS: Titan quadro 6,3 tem margem isolada
+PASS: Titan quadro 7,3 tem margem isolada
+PASS: Titan quadro 8,3 tem margem isolada
+PASS: Titan quadro 9,3 tem margem isolada
+PASS: Titan quadro 0,4 tem margem isolada
+PASS: Titan quadro 1,4 tem margem isolada
+PASS: Titan quadro 2,4 tem margem isolada
+PASS: Titan quadro 3,4 tem margem isolada
+PASS: Titan quadro 4,4 tem margem isolada
+PASS: Titan quadro 5,4 tem margem isolada
+PASS: Titan quadro 6,4 tem margem isolada
+PASS: Titan quadro 7,4 tem margem isolada
+PASS: Titan quadro 8,4 tem margem isolada
+PASS: Titan quadro 9,4 tem margem isolada
+PASS: Titan costas 0,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 1,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 2,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 3,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 4,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 5,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 6,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 7,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 8,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 9,3 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 0,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 1,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 2,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 3,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 4,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 5,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 6,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 7,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 8,4 sem viseira/núcleo (0 px ciano)
+PASS: Titan costas 9,4 sem viseira/núcleo (0 px ciano)
+PASS: fusão andando para cima mostra as costas
+PASS: fusão atacando acompanha a mira
+PASS: Spectre andando para cima mostra as costas
+PASS: Spectre atacando acompanha a mira
+PASS: Titan andando para cima mostra as costas
+PASS: Titan olhando para cima usa a linha de costas
+PASS: Titan à direita conserva a lateral original
+PASS: Titan à esquerda espelha a lateral original
+PASS: Titan para baixo usa frente
+PASS: Titan parado mirando para cima mostra as costas
+PASS: Titan disparando acompanha a mira
+ROBOT_SPRITE_ATLAS failures=0

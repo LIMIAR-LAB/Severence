@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: partida abre menu de pausa separado
+PASS: moldura PixelLab aparece na pausa
+PASS: pausa oferece salvar jogo
+PASS: pausa oferece voltar ao menu
+PASS: pausa não oferece troca de uniforme
+PASS: arquivo da expedição criado
+PASS: salvamento existente pode ser atualizado
+PASS: voltar abre o título
+PASS: voltar grava a sessão offline antes de sair
+PASS: Continuar habilitado após salvar
+PASS: retoma dentro das docas
+PASS: coop local preservado
+PASS: posições preservadas
+PASS: equipamento e progresso preservados no salvamento de saída
+PASS: navegação reconstruída após carregar
+PASS: equipamento não abre durante a partida
+PASS: falha de gravação mantém a partida em pausa
+PASS: falha de gravação aparece na pausa
+PASS: salvar fica indisponível na sessão online
+PASS: voltar encerra a sessão online
+PASS: retorno online não substitui o save offline
+SAVE GAME FLOW failures=0

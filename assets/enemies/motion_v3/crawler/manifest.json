@@ -1,0 +1,186 @@
+{
+  "cell": 128,
+  "pivot": [
+    64,
+    112
+  ],
+  "world_scale": 0.8936170212765958,
+  "clips": {
+    "walk": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-south.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "77b49f0a-35c9-40f7-82a2-121d9f6bcac3",
+        "source_anchor": [
+          48,
+          89
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-south-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "d88527ad-9867-4298-9de6-babfca416c6b",
+        "source_anchor": [
+          50,
+          89
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "a3f558d6-bf4a-4b28-817a-151b2d6a33f5",
+        "source_anchor": [
+          48,
+          88
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-north-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "3b0bc462-d699-4932-88f3-c996127ae00f",
+        "source_anchor": [
+          46,
+          89
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-north.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "fe4f53b6-de87-4625-bf09-d92553c3324f",
+        "source_anchor": [
+          48,
+          88
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-north-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "c1a0edaa-12f4-496d-be36-4eeb0b58e176",
+        "source_anchor": [
+          50,
+          89
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "b9021837-60d7-4629-ae37-0f99a2e0f100",
+        "source_anchor": [
+          49,
+          88
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/crawler/walk-south-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "8adb68c8-7003-4e32-9620-21a804fd3135",
+        "source_anchor": [
+          46,
+          89
+        ]
+      }
+    },
+    "attack": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/crawler/attack-south.png",
+        "frames": 17,
+        "duration": 1.0,
+        "job_id": "ef50a97b-5184-4027-a5e3-0150945f8c9b",
+        "source_anchor": [
+          48,
+          89
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/crawler/attack-east.png",
+        "frames": 17,
+        "duration": 1.0,
+        "job_id": "a91192da-0e32-4b4d-b084-76cd631ea1eb",
+        "source_anchor": [
+          48,
+          88
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/crawler/attack-south-east.png",
+        "frames": 17,
+        "duration": 1.0,
+        "job_id": "af2178fe-af65-480d-8eed-6e2b80ce0ff2",
+        "source_anchor": [
+          50,
+          89
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/crawler/attack-north.png",
+        "frames": 17,
+        "duration": 1.0,
+        "job_id": "51b2630d-9435-4792-87a9-c6a3f0f84dc9",
+        "source_anchor": [
+          48,
+          88
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/crawler/attack-west.png",
+        "frames": 17,
+        "duration": 1.0,
+        "job_id": "f999de51-1815-47d9-af90-5e961706b655",
+        "source_anchor": [
+          49,
+          88
+        ]
+      }
+    },
+    "death": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/crawler/death-south.png",
+        "frames": 21,
+        "duration": 1.0,
+        "job_id": "3d82b61d-7683-4323-9e89-3408de1cdd5a",
+        "source_anchor": [
+          48,
+          89
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/crawler/death-east.png",
+        "frames": 21,
+        "duration": 1.0,
+        "job_id": "66c55735-9888-4c7a-9606-00b9250b5039",
+        "source_anchor": [
+          48,
+          88
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/crawler/death-south-east.png",
+        "frames": 21,
+        "duration": 1.0,
+        "job_id": "9c5a0600-1f0c-453f-b89a-c2ade45042b2",
+        "source_anchor": [
+          50,
+          89
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/crawler/death-north.png",
+        "frames": 21,
+        "duration": 1.0,
+        "job_id": "ee8cc9a8-0347-4d14-afca-24d77b30047e",
+        "source_anchor": [
+          48,
+          88
+        ]
+      }
+    }
+  }
+}

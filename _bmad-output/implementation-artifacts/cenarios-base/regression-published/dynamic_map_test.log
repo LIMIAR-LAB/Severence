@@ -1,0 +1,21 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: mapa grande: 14 salas
+PASS: mapa ocupa 9400x6900 px
+PASS: portões em todas as pontas de corredor (32)
+PASS: caixa destruída libera a passagem e deixa destroço
+PASS: explosão do barril fere inimigos
+PASS: reação em cadeia: barris vizinhos também explodem
+PASS: efeito de explosão
+PASS: sala seguinte conserva sua população inicial
+PASS: entrar no Pátio tranca os portões
+PASS: eliminar a população atual abre a sala imediatamente
+PASS: sala limpa não repopula após o antigo atraso
+PASS: limpar uma sala não remove inimigos das áreas seguintes
+PASS: entrar na sala seguinte ativa seu encontro normalmente
+PASS: crawler sozinho mantém a sala trancada
+PASS: filhos do crawler surgem antes de os portões abrirem
+PASS: filhos do crawler preservam a sala de origem
+PASS: portões abrem depois que os filhos morrem
+PASS: cair no fosso devolve ao ponto do salto
+DYNAMIC_MAP_TESTS_DONE failures=0

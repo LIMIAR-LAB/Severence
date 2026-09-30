@@ -1,0 +1,46 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS CAPELA V2: placa cobre a capela e os três corredores
+PASS CAPELA V2: doze overlays carregados
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: overlay recortado mantém geometria 800x900
+PASS CAPELA V2: master estático disponível
+PASS CAPELA V2: Pescador dedicado tem quatro quadros
+PASS CAPELA V2: soleiras integradas substituem os dois lados dos portões genéricos da capela
+PASS CAPELA V2: quadros do Pescador têm animação localizada distinta
+PASS CAPELA V2: loop ambiental determinístico
+PASS CAPELA V2: móveis coincidem com o contrato autoral
+PASS CAPELA V2: paredes/void coincidem com o contrato autoral
+PASS CAPELA V2: procissão central livre
+PASS CAPELA V2: retângulos dos três corredores preservados
+PASS CAPELA V2: void visível em 370,3740 bloqueado
+PASS CAPELA V2: âncora autoral do Pescador segura até para o Titan
+PASS CAPELA V2: âncora autoral do baú em piso verificado
+PASS CAPELA V2: raio 11 alcança norte
+PASS CAPELA V2: raio 11 alcança leste
+PASS CAPELA V2: raio 11 alcança sul
+PASS CAPELA V2: raio 14 alcança norte
+PASS CAPELA V2: raio 14 alcança leste
+PASS CAPELA V2: raio 14 alcança sul
+PASS CAPELA V2: raio 15 alcança norte
+PASS CAPELA V2: raio 15 alcança leste
+PASS CAPELA V2: raio 15 alcança sul
+PASS CAPELA V2: raio 23 alcança norte
+PASS CAPELA V2: raio 23 alcança leste
+PASS CAPELA V2: raio 23 alcança sul
+PASS CAPELA V2: prompt não fixa tecla e acompanha a missão
+PASS CAPELA V2: marcador desaparece após concluir a missão
+PASS CAPELA V2: overlay individual ausente preserva master estático
+PASS CAPELA V2: quadro nulo do Pescador usa fallback estável
+PASS CAPELA V2: static ausente mantém o cenário legacy
+CHAPEL_UNIFIED_TESTS_DONE failures=0

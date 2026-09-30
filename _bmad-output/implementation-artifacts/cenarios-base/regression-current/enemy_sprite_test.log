@@ -1,0 +1,409 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS: filhote reutiliza a arte nova do crawler
+PASS: brute mantém sua própria arte
+PASS: filhote mantém escala de 60% vivo e morto
+PASS: brute agachado mantém compressão vertical
+PASS: direção 0 usa linha própria sem espelhar
+PASS: direção 1 usa linha própria sem espelhar
+PASS: direção 2 usa linha própria sem espelhar
+PASS: direção 3 usa linha própria sem espelhar
+PASS: direção 4 usa linha própria sem espelhar
+PASS: direção 5 usa linha própria sem espelhar
+PASS: direção 6 usa linha própria sem espelhar
+PASS: direção 7 usa linha própria sem espelhar
+PASS: guard: arte PixelLab disponível
+PASS: guard: atlas 5 poses x 8 direções
+PASS: guard: direção 0 pose 0 contém desenho
+PASS: guard: direção 0 pose 1 contém desenho
+PASS: guard: direção 0 pose 2 contém desenho
+PASS: guard: direção 0 pose 3 contém desenho
+PASS: guard: direção 0 pose 4 contém desenho
+PASS: guard: direção 1 pose 0 contém desenho
+PASS: guard: direção 1 pose 1 contém desenho
+PASS: guard: direção 1 pose 2 contém desenho
+PASS: guard: direção 1 pose 3 contém desenho
+PASS: guard: direção 1 pose 4 contém desenho
+PASS: guard: direção 2 pose 0 contém desenho
+PASS: guard: direção 2 pose 1 contém desenho
+PASS: guard: direção 2 pose 2 contém desenho
+PASS: guard: direção 2 pose 3 contém desenho
+PASS: guard: direção 2 pose 4 contém desenho
+PASS: guard: direção 3 pose 0 contém desenho
+PASS: guard: direção 3 pose 1 contém desenho
+PASS: guard: direção 3 pose 2 contém desenho
+PASS: guard: direção 3 pose 3 contém desenho
+PASS: guard: direção 3 pose 4 contém desenho
+PASS: guard: direção 4 pose 0 contém desenho
+PASS: guard: direção 4 pose 1 contém desenho
+PASS: guard: direção 4 pose 2 contém desenho
+PASS: guard: direção 4 pose 3 contém desenho
+PASS: guard: direção 4 pose 4 contém desenho
+PASS: guard: direção 5 pose 0 contém desenho
+PASS: guard: direção 5 pose 1 contém desenho
+PASS: guard: direção 5 pose 2 contém desenho
+PASS: guard: direção 5 pose 3 contém desenho
+PASS: guard: direção 5 pose 4 contém desenho
+PASS: guard: direção 6 pose 0 contém desenho
+PASS: guard: direção 6 pose 1 contém desenho
+PASS: guard: direção 6 pose 2 contém desenho
+PASS: guard: direção 6 pose 3 contém desenho
+PASS: guard: direção 6 pose 4 contém desenho
+PASS: guard: direção 7 pose 0 contém desenho
+PASS: guard: direção 7 pose 1 contém desenho
+PASS: guard: direção 7 pose 2 contém desenho
+PASS: guard: direção 7 pose 3 contém desenho
+PASS: guard: direção 7 pose 4 contém desenho
+PASS: guard: transições, ataque e morte gerados
+PASS: guard: quatro poses em oito direções
+PASS: guard: quatro poses visíveis na direção 0
+PASS: guard: movimento de ataque distinto na direção 0
+PASS: guard: origem do tiro coincide com a arma na direção 0
+PASS: guard: quatro poses visíveis na direção 1
+PASS: guard: movimento de ataque distinto na direção 1
+PASS: guard: origem do tiro coincide com a arma na direção 1
+PASS: guard: quatro poses visíveis na direção 2
+PASS: guard: movimento de ataque distinto na direção 2
+PASS: guard: origem do tiro coincide com a arma na direção 2
+PASS: guard: quatro poses visíveis na direção 3
+PASS: guard: movimento de ataque distinto na direção 3
+PASS: guard: origem do tiro coincide com a arma na direção 3
+PASS: guard: quatro poses visíveis na direção 4
+PASS: guard: movimento de ataque distinto na direção 4
+PASS: guard: origem do tiro coincide com a arma na direção 4
+PASS: guard: quatro poses visíveis na direção 5
+PASS: guard: movimento de ataque distinto na direção 5
+PASS: guard: origem do tiro coincide com a arma na direção 5
+PASS: guard: quatro poses visíveis na direção 6
+PASS: guard: movimento de ataque distinto na direção 6
+PASS: guard: origem do tiro coincide com a arma na direção 6
+PASS: guard: quatro poses visíveis na direção 7
+PASS: guard: movimento de ataque distinto na direção 7
+PASS: guard: origem do tiro coincide com a arma na direção 7
+PASS: bomber: arte PixelLab disponível
+PASS: bomber: atlas 5 poses x 8 direções
+PASS: bomber: direção 0 pose 0 contém desenho
+PASS: bomber: direção 0 pose 1 contém desenho
+PASS: bomber: direção 0 pose 2 contém desenho
+PASS: bomber: direção 0 pose 3 contém desenho
+PASS: bomber: direção 0 pose 4 contém desenho
+PASS: bomber: direção 1 pose 0 contém desenho
+PASS: bomber: direção 1 pose 1 contém desenho
+PASS: bomber: direção 1 pose 2 contém desenho
+PASS: bomber: direção 1 pose 3 contém desenho
+PASS: bomber: direção 1 pose 4 contém desenho
+PASS: bomber: direção 2 pose 0 contém desenho
+PASS: bomber: direção 2 pose 1 contém desenho
+PASS: bomber: direção 2 pose 2 contém desenho
+PASS: bomber: direção 2 pose 3 contém desenho
+PASS: bomber: direção 2 pose 4 contém desenho
+PASS: bomber: direção 3 pose 0 contém desenho
+PASS: bomber: direção 3 pose 1 contém desenho
+PASS: bomber: direção 3 pose 2 contém desenho
+PASS: bomber: direção 3 pose 3 contém desenho
+PASS: bomber: direção 3 pose 4 contém desenho
+PASS: bomber: direção 4 pose 0 contém desenho
+PASS: bomber: direção 4 pose 1 contém desenho
+PASS: bomber: direção 4 pose 2 contém desenho
+PASS: bomber: direção 4 pose 3 contém desenho
+PASS: bomber: direção 4 pose 4 contém desenho
+PASS: bomber: direção 5 pose 0 contém desenho
+PASS: bomber: direção 5 pose 1 contém desenho
+PASS: bomber: direção 5 pose 2 contém desenho
+PASS: bomber: direção 5 pose 3 contém desenho
+PASS: bomber: direção 5 pose 4 contém desenho
+PASS: bomber: direção 6 pose 0 contém desenho
+PASS: bomber: direção 6 pose 1 contém desenho
+PASS: bomber: direção 6 pose 2 contém desenho
+PASS: bomber: direção 6 pose 3 contém desenho
+PASS: bomber: direção 6 pose 4 contém desenho
+PASS: bomber: direção 7 pose 0 contém desenho
+PASS: bomber: direção 7 pose 1 contém desenho
+PASS: bomber: direção 7 pose 2 contém desenho
+PASS: bomber: direção 7 pose 3 contém desenho
+PASS: bomber: direção 7 pose 4 contém desenho
+PASS: bomber: transições, ataque e morte gerados
+PASS: bomber: quatro poses em oito direções
+PASS: bomber: quatro poses visíveis na direção 0
+PASS: bomber: movimento de ataque distinto na direção 0
+PASS: bomber: quatro poses visíveis na direção 1
+PASS: bomber: movimento de ataque distinto na direção 1
+PASS: bomber: quatro poses visíveis na direção 2
+PASS: bomber: movimento de ataque distinto na direção 2
+PASS: bomber: quatro poses visíveis na direção 3
+PASS: bomber: movimento de ataque distinto na direção 3
+PASS: bomber: quatro poses visíveis na direção 4
+PASS: bomber: movimento de ataque distinto na direção 4
+PASS: bomber: quatro poses visíveis na direção 5
+PASS: bomber: movimento de ataque distinto na direção 5
+PASS: bomber: quatro poses visíveis na direção 6
+PASS: bomber: movimento de ataque distinto na direção 6
+PASS: bomber: quatro poses visíveis na direção 7
+PASS: bomber: movimento de ataque distinto na direção 7
+PASS: cult: arte PixelLab disponível
+PASS: cult: atlas 5 poses x 8 direções
+PASS: cult: direção 0 pose 0 contém desenho
+PASS: cult: direção 0 pose 1 contém desenho
+PASS: cult: direção 0 pose 2 contém desenho
+PASS: cult: direção 0 pose 3 contém desenho
+PASS: cult: direção 0 pose 4 contém desenho
+PASS: cult: direção 1 pose 0 contém desenho
+PASS: cult: direção 1 pose 1 contém desenho
+PASS: cult: direção 1 pose 2 contém desenho
+PASS: cult: direção 1 pose 3 contém desenho
+PASS: cult: direção 1 pose 4 contém desenho
+PASS: cult: direção 2 pose 0 contém desenho
+PASS: cult: direção 2 pose 1 contém desenho
+PASS: cult: direção 2 pose 2 contém desenho
+PASS: cult: direção 2 pose 3 contém desenho
+PASS: cult: direção 2 pose 4 contém desenho
+PASS: cult: direção 3 pose 0 contém desenho
+PASS: cult: direção 3 pose 1 contém desenho
+PASS: cult: direção 3 pose 2 contém desenho
+PASS: cult: direção 3 pose 3 contém desenho
+PASS: cult: direção 3 pose 4 contém desenho
+PASS: cult: direção 4 pose 0 contém desenho
+PASS: cult: direção 4 pose 1 contém desenho
+PASS: cult: direção 4 pose 2 contém desenho
+PASS: cult: direção 4 pose 3 contém desenho
+PASS: cult: direção 4 pose 4 contém desenho
+PASS: cult: direção 5 pose 0 contém desenho
+PASS: cult: direção 5 pose 1 contém desenho
+PASS: cult: direção 5 pose 2 contém desenho
+PASS: cult: direção 5 pose 3 contém desenho
+PASS: cult: direção 5 pose 4 contém desenho
+PASS: cult: direção 6 pose 0 contém desenho
+PASS: cult: direção 6 pose 1 contém desenho
+PASS: cult: direção 6 pose 2 contém desenho
+PASS: cult: direção 6 pose 3 contém desenho
+PASS: cult: direção 6 pose 4 contém desenho
+PASS: cult: direção 7 pose 0 contém desenho
+PASS: cult: direção 7 pose 1 contém desenho
+PASS: cult: direção 7 pose 2 contém desenho
+PASS: cult: direção 7 pose 3 contém desenho
+PASS: cult: direção 7 pose 4 contém desenho
+PASS: cult: transições, ataque e morte gerados
+PASS: cult: quatro poses em oito direções
+PASS: cult: quatro poses visíveis na direção 0
+PASS: cult: movimento de ataque distinto na direção 0
+PASS: cult: origem do tiro coincide com a arma na direção 0
+PASS: cult: quatro poses visíveis na direção 1
+PASS: cult: movimento de ataque distinto na direção 1
+PASS: cult: origem do tiro coincide com a arma na direção 1
+PASS: cult: quatro poses visíveis na direção 2
+PASS: cult: movimento de ataque distinto na direção 2
+PASS: cult: origem do tiro coincide com a arma na direção 2
+PASS: cult: quatro poses visíveis na direção 3
+PASS: cult: movimento de ataque distinto na direção 3
+PASS: cult: origem do tiro coincide com a arma na direção 3
+PASS: cult: quatro poses visíveis na direção 4
+PASS: cult: movimento de ataque distinto na direção 4
+PASS: cult: origem do tiro coincide com a arma na direção 4
+PASS: cult: quatro poses visíveis na direção 5
+PASS: cult: movimento de ataque distinto na direção 5
+PASS: cult: origem do tiro coincide com a arma na direção 5
+PASS: cult: quatro poses visíveis na direção 6
+PASS: cult: movimento de ataque distinto na direção 6
+PASS: cult: origem do tiro coincide com a arma na direção 6
+PASS: cult: quatro poses visíveis na direção 7
+PASS: cult: movimento de ataque distinto na direção 7
+PASS: cult: origem do tiro coincide com a arma na direção 7
+PASS: fish: arte PixelLab disponível
+PASS: fish: atlas 5 poses x 8 direções
+PASS: fish: direção 0 pose 0 contém desenho
+PASS: fish: direção 0 pose 1 contém desenho
+PASS: fish: direção 0 pose 2 contém desenho
+PASS: fish: direção 0 pose 3 contém desenho
+PASS: fish: direção 0 pose 4 contém desenho
+PASS: fish: direção 1 pose 0 contém desenho
+PASS: fish: direção 1 pose 1 contém desenho
+PASS: fish: direção 1 pose 2 contém desenho
+PASS: fish: direção 1 pose 3 contém desenho
+PASS: fish: direção 1 pose 4 contém desenho
+PASS: fish: direção 2 pose 0 contém desenho
+PASS: fish: direção 2 pose 1 contém desenho
+PASS: fish: direção 2 pose 2 contém desenho
+PASS: fish: direção 2 pose 3 contém desenho
+PASS: fish: direção 2 pose 4 contém desenho
+PASS: fish: direção 3 pose 0 contém desenho
+PASS: fish: direção 3 pose 1 contém desenho
+PASS: fish: direção 3 pose 2 contém desenho
+PASS: fish: direção 3 pose 3 contém desenho
+PASS: fish: direção 3 pose 4 contém desenho
+PASS: fish: direção 4 pose 0 contém desenho
+PASS: fish: direção 4 pose 1 contém desenho
+PASS: fish: direção 4 pose 2 contém desenho
+PASS: fish: direção 4 pose 3 contém desenho
+PASS: fish: direção 4 pose 4 contém desenho
+PASS: fish: direção 5 pose 0 contém desenho
+PASS: fish: direção 5 pose 1 contém desenho
+PASS: fish: direção 5 pose 2 contém desenho
+PASS: fish: direção 5 pose 3 contém desenho
+PASS: fish: direção 5 pose 4 contém desenho
+PASS: fish: direção 6 pose 0 contém desenho
+PASS: fish: direção 6 pose 1 contém desenho
+PASS: fish: direção 6 pose 2 contém desenho
+PASS: fish: direção 6 pose 3 contém desenho
+PASS: fish: direção 6 pose 4 contém desenho
+PASS: fish: direção 7 pose 0 contém desenho
+PASS: fish: direção 7 pose 1 contém desenho
+PASS: fish: direção 7 pose 2 contém desenho
+PASS: fish: direção 7 pose 3 contém desenho
+PASS: fish: direção 7 pose 4 contém desenho
+PASS: fish: transições, ataque e morte gerados
+PASS: fish: quatro poses em oito direções
+PASS: fish: quatro poses visíveis na direção 0
+PASS: fish: movimento de ataque distinto na direção 0
+PASS: fish: origem do tiro coincide com a arma na direção 0
+PASS: fish: quatro poses visíveis na direção 1
+PASS: fish: movimento de ataque distinto na direção 1
+PASS: fish: origem do tiro coincide com a arma na direção 1
+PASS: fish: quatro poses visíveis na direção 2
+PASS: fish: movimento de ataque distinto na direção 2
+PASS: fish: origem do tiro coincide com a arma na direção 2
+PASS: fish: quatro poses visíveis na direção 3
+PASS: fish: movimento de ataque distinto na direção 3
+PASS: fish: origem do tiro coincide com a arma na direção 3
+PASS: fish: quatro poses visíveis na direção 4
+PASS: fish: movimento de ataque distinto na direção 4
+PASS: fish: origem do tiro coincide com a arma na direção 4
+PASS: fish: quatro poses visíveis na direção 5
+PASS: fish: movimento de ataque distinto na direção 5
+PASS: fish: origem do tiro coincide com a arma na direção 5
+PASS: fish: quatro poses visíveis na direção 6
+PASS: fish: movimento de ataque distinto na direção 6
+PASS: fish: origem do tiro coincide com a arma na direção 6
+PASS: fish: quatro poses visíveis na direção 7
+PASS: fish: movimento de ataque distinto na direção 7
+PASS: fish: origem do tiro coincide com a arma na direção 7
+PASS: crawler: arte PixelLab disponível
+PASS: crawler: atlas 5 poses x 8 direções
+PASS: crawler: direção 0 pose 0 contém desenho
+PASS: crawler: direção 0 pose 1 contém desenho
+PASS: crawler: direção 0 pose 2 contém desenho
+PASS: crawler: direção 0 pose 3 contém desenho
+PASS: crawler: direção 0 pose 4 contém desenho
+PASS: crawler: direção 1 pose 0 contém desenho
+PASS: crawler: direção 1 pose 1 contém desenho
+PASS: crawler: direção 1 pose 2 contém desenho
+PASS: crawler: direção 1 pose 3 contém desenho
+PASS: crawler: direção 1 pose 4 contém desenho
+PASS: crawler: direção 2 pose 0 contém desenho
+PASS: crawler: direção 2 pose 1 contém desenho
+PASS: crawler: direção 2 pose 2 contém desenho
+PASS: crawler: direção 2 pose 3 contém desenho
+PASS: crawler: direção 2 pose 4 contém desenho
+PASS: crawler: direção 3 pose 0 contém desenho
+PASS: crawler: direção 3 pose 1 contém desenho
+PASS: crawler: direção 3 pose 2 contém desenho
+PASS: crawler: direção 3 pose 3 contém desenho
+PASS: crawler: direção 3 pose 4 contém desenho
+PASS: crawler: direção 4 pose 0 contém desenho
+PASS: crawler: direção 4 pose 1 contém desenho
+PASS: crawler: direção 4 pose 2 contém desenho
+PASS: crawler: direção 4 pose 3 contém desenho
+PASS: crawler: direção 4 pose 4 contém desenho
+PASS: crawler: direção 5 pose 0 contém desenho
+PASS: crawler: direção 5 pose 1 contém desenho
+PASS: crawler: direção 5 pose 2 contém desenho
+PASS: crawler: direção 5 pose 3 contém desenho
+PASS: crawler: direção 5 pose 4 contém desenho
+PASS: crawler: direção 6 pose 0 contém desenho
+PASS: crawler: direção 6 pose 1 contém desenho
+PASS: crawler: direção 6 pose 2 contém desenho
+PASS: crawler: direção 6 pose 3 contém desenho
+PASS: crawler: direção 6 pose 4 contém desenho
+PASS: crawler: direção 7 pose 0 contém desenho
+PASS: crawler: direção 7 pose 1 contém desenho
+PASS: crawler: direção 7 pose 2 contém desenho
+PASS: crawler: direção 7 pose 3 contém desenho
+PASS: crawler: direção 7 pose 4 contém desenho
+PASS: crawler: transições, ataque e morte gerados
+PASS: crawler: quatro poses em oito direções
+PASS: crawler: quatro poses visíveis na direção 0
+PASS: crawler: movimento de ataque distinto na direção 0
+PASS: crawler: quatro poses visíveis na direção 1
+PASS: crawler: movimento de ataque distinto na direção 1
+PASS: crawler: quatro poses visíveis na direção 2
+PASS: crawler: movimento de ataque distinto na direção 2
+PASS: crawler: quatro poses visíveis na direção 3
+PASS: crawler: movimento de ataque distinto na direção 3
+PASS: crawler: quatro poses visíveis na direção 4
+PASS: crawler: movimento de ataque distinto na direção 4
+PASS: crawler: quatro poses visíveis na direção 5
+PASS: crawler: movimento de ataque distinto na direção 5
+PASS: crawler: quatro poses visíveis na direção 6
+PASS: crawler: movimento de ataque distinto na direção 6
+PASS: crawler: quatro poses visíveis na direção 7
+PASS: crawler: movimento de ataque distinto na direção 7
+PASS: brute: arte PixelLab disponível
+PASS: brute: atlas 5 poses x 8 direções
+PASS: brute: direção 0 pose 0 contém desenho
+PASS: brute: direção 0 pose 1 contém desenho
+PASS: brute: direção 0 pose 2 contém desenho
+PASS: brute: direção 0 pose 3 contém desenho
+PASS: brute: direção 0 pose 4 contém desenho
+PASS: brute: direção 1 pose 0 contém desenho
+PASS: brute: direção 1 pose 1 contém desenho
+PASS: brute: direção 1 pose 2 contém desenho
+PASS: brute: direção 1 pose 3 contém desenho
+PASS: brute: direção 1 pose 4 contém desenho
+PASS: brute: direção 2 pose 0 contém desenho
+PASS: brute: direção 2 pose 1 contém desenho
+PASS: brute: direção 2 pose 2 contém desenho
+PASS: brute: direção 2 pose 3 contém desenho
+PASS: brute: direção 2 pose 4 contém desenho
+PASS: brute: direção 3 pose 0 contém desenho
+PASS: brute: direção 3 pose 1 contém desenho
+PASS: brute: direção 3 pose 2 contém desenho
+PASS: brute: direção 3 pose 3 contém desenho
+PASS: brute: direção 3 pose 4 contém desenho
+PASS: brute: direção 4 pose 0 contém desenho
+PASS: brute: direção 4 pose 1 contém desenho
+PASS: brute: direção 4 pose 2 contém desenho
+PASS: brute: direção 4 pose 3 contém desenho
+PASS: brute: direção 4 pose 4 contém desenho
+PASS: brute: direção 5 pose 0 contém desenho
+PASS: brute: direção 5 pose 1 contém desenho
+PASS: brute: direção 5 pose 2 contém desenho
+PASS: brute: direção 5 pose 3 contém desenho
+PASS: brute: direção 5 pose 4 contém desenho
+PASS: brute: direção 6 pose 0 contém desenho
+PASS: brute: direção 6 pose 1 contém desenho
+PASS: brute: direção 6 pose 2 contém desenho
+PASS: brute: direção 6 pose 3 contém desenho
+PASS: brute: direção 6 pose 4 contém desenho
+PASS: brute: direção 7 pose 0 contém desenho
+PASS: brute: direção 7 pose 1 contém desenho
+PASS: brute: direção 7 pose 2 contém desenho
+PASS: brute: direção 7 pose 3 contém desenho
+PASS: brute: direção 7 pose 4 contém desenho
+PASS: brute: transições, ataque e morte gerados
+PASS: brute: quatro poses em oito direções
+PASS: brute: quatro poses visíveis na direção 0
+PASS: brute: movimento de ataque distinto na direção 0
+PASS: brute: origem do tiro coincide com a arma na direção 0
+PASS: brute: quatro poses visíveis na direção 1
+PASS: brute: movimento de ataque distinto na direção 1
+PASS: brute: origem do tiro coincide com a arma na direção 1
+PASS: brute: quatro poses visíveis na direção 2
+PASS: brute: movimento de ataque distinto na direção 2
+PASS: brute: origem do tiro coincide com a arma na direção 2
+PASS: brute: quatro poses visíveis na direção 3
+PASS: brute: movimento de ataque distinto na direção 3
+PASS: brute: origem do tiro coincide com a arma na direção 3
+PASS: brute: quatro poses visíveis na direção 4
+PASS: brute: movimento de ataque distinto na direção 4
+PASS: brute: origem do tiro coincide com a arma na direção 4
+PASS: brute: quatro poses visíveis na direção 5
+PASS: brute: movimento de ataque distinto na direção 5
+PASS: brute: origem do tiro coincide com a arma na direção 5
+PASS: brute: quatro poses visíveis na direção 6
+PASS: brute: movimento de ataque distinto na direção 6
+PASS: brute: origem do tiro coincide com a arma na direção 6
+PASS: brute: quatro poses visíveis na direção 7
+PASS: brute: movimento de ataque distinto na direção 7
+PASS: brute: origem do tiro coincide com a arma na direção 7
+PASS: guard pode surgir na partida
+PASS: bomber pode surgir na partida
+failures=0

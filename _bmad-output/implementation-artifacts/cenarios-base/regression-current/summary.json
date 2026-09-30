@@ -1,0 +1,308 @@
+[
+  {
+    "test": "arrival_art_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "boss_arena_scenery_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "boss_intro_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 4 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "boss_music_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 4 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "chapel_animated_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "chapel_unified_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "combat_framework_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "combat_regression_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "controller_input_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "dynamic_map_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "encyclopedia_data_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "encyclopedia_ui_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "enemies_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "enemy_sprite_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "equipment_ui_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "equipment_unlock_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "game_audio_test.gd",
+    "finished": true,
+    "exit": 1,
+    "errors": "ERROR: boss possui trilha longa com loop\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/game_audio_test.gd:7)\r\n       [1] run (res://tests/game_audio_test.gd:20)\r\n"
+  },
+  {
+    "test": "guard_opening_test.gd",
+    "finished": true,
+    "exit": 2,
+    "errors": "ERROR: preparação do Guardião é lenta\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/guard_opening_test.gd:8)\r\n       [1] _init (res://tests/guard_opening_test.gd:19)\r\nERROR: a preparação não dispara cedo\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/guard_opening_test.gd:8)\r\n       [1] _init (res://tests/guard_opening_test.gd:21)\r\n"
+  },
+  {
+    "test": "hearts_stats_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "input_remap_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "input_scene_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 10 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 5 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "intro_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "inventory_model_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "inventory_persistence_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "inventory_ui_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "juice_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "marty_actions_test.gd",
+    "finished": true,
+    "exit": 18,
+    "errors": "ERROR: ancora melee Omega toca corpo linha 2 quadro 0\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 2 quadro 1\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 2 quadro 2\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 2 quadro 3\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 2 quadro 4\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 2 quadro 5\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 3 quadro 3\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 3 quadro 4\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 3 quadro 5\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 6 quadro 1\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 6 quadro 2\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 6 quadro 3\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 0\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 1\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 2\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 3\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 4\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\nERROR: ancora melee Omega toca corpo linha 7 quadro 5\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/marty_actions_test.gd:6)\r\n       [1] run (res://tests/marty_actions_test.gd:104)\r\n"
+  },
+  {
+    "test": "marty_sprite_atlas_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "mission_inventory_ui_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "new_enemies_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "omega_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "props_hd_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "refuge_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "robot_sprite_atlas_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "run_summary_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "run_summary_ui_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 8 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 4 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "run_weapons_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "save_game_flow_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "scenario_layout_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "scenery_016_test.gd",
+    "finished": true,
+    "exit": 1,
+    "errors": "ERROR: FAIL: barril explosivo perto da parede rachada\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/scenery_016_test.gd:8)\r\n       [1] _init (res://tests/scenery_016_test.gd:53)\r\nERROR: FAIL: explosão abre o atalho e libera a colisão\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/scenery_016_test.gd:8)\r\n       [1] _init (res://tests/scenery_016_test.gd:57)\r\nERROR: FAIL: sprite troca para a versão _open (wall_crack_a_open)\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/scenery_016_test.gd:8)\r\n       [1] _init (res://tests/scenery_016_test.gd:58)\r\n"
+  },
+  {
+    "test": "scenery_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "simulation_audio_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "simulation_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "solo_robot_test.gd",
+    "finished": false,
+    "exit": -1,
+    "errors": "ERROR: solo card remains selected until confirmation\r\n   at: push_error (core/variant/variant_utility.cpp:1023)\r\n   GDScript backtrace (most recent call first):\r\n       [0] check (res://tests/solo_robot_test.gd:6)\r\n       [1] run (res://tests/solo_robot_test.gd:20)\r\nSCRIPT ERROR: Invalid access to property or key 'pressed' on a base object of type 'null instance'.\r\n   at: run (res://tests/solo_robot_test.gd:21)\r\n   GDScript backtrace (most recent call first):\r\n       [0] run (res://tests/solo_robot_test.gd:21)\r\n"
+  },
+  {
+    "test": "summon_fx_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "titan_cockpit_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "titan_fuel_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "titan_weapons_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "title_screen_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).\r\n   at: cleanup (core/object/object.cpp:2536)\r\nERROR: 2 resources still in use at exit (run with --verbose for details).\r\n   at: clear (core/io/resource.cpp:822)\r\n"
+  },
+  {
+    "test": "update_017_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  },
+  {
+    "test": "warden_test.gd",
+    "finished": true,
+    "exit": 0,
+    "errors": null
+  }
+]
