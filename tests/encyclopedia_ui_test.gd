@@ -59,18 +59,24 @@ func _initialize() -> void:
 	fragment.pressed.emit(); await process_frame
 	check((ui.content.find_child("EntryFallback", true, false) as Label).visible, "entrada sem arte usa fallback")
 	check(ui.content.find_child("MissingArtSeal", true, false) is Panel, "fallback sem arte usa selo intencional")
-	check((ui.content.find_child("ArchiveBackdrop", true, false) as TextureRect).texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "fundo preserva filtragem nearest")
-	check((ui.content.find_child("ArchivePortraitFrame", true, false) as NinePatchRect).texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "moldura preserva filtragem nearest")
+	var archive_backdrop := ui.content.find_child("ArchiveBackdrop", true, false) as TextureRect
+	var portrait_frame := ui.content.find_child("ArchivePortraitFrame", true, false) as NinePatchRect
+	check(archive_backdrop != null and archive_backdrop.texture != null and archive_backdrop.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "fundo reutilizado preserva filtragem nearest")
+	check(portrait_frame != null and portrait_frame.texture != null and portrait_frame.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "moldura reutilizada preserva filtragem nearest")
 	check(root.get_viewport().gui_get_focus_owner() is Button, "navegação mantém um botão em foco")
 	(ui.content.find_child("EncyclopediaBack", true, false) as Button).pressed.emit(); await process_frame
 	check(ui.screen == "options", "Voltar retorna a Opções")
 
 	var injected = EncyclopediaScreen.new(); injected.host = ui
-	injected.records_override = EncyclopediaData.valid_entries([{"id":"novo_item", "categoria":"itens", "nome":"NOVO ITEM", "subtitulo":"adicionado depois", "descricao":"Entrada incluída sem mudar a tela.", "ordem":1, "imagem":"res://imagem-ausente.png", "tracos":["Dinâmico"]}])
+	var long_traits: Array[String] = []
+	for i in 24: long_traits.append("Traço temporal de validação %02d" % i)
+	injected.records_override = EncyclopediaData.valid_entries([{"id":"novo_item", "categoria":"itens", "nome":"NOVO ITEM COM NOME EXTENSO PARA VALIDAR O RECORTE DO DOSSIÊ", "subtitulo":"adicionado depois", "descricao":"Entrada incluída sem mudar a tela. ".repeat(24), "ordem":1, "imagem":"res://imagem-ausente.png", "tracos":long_traits}])
 	root.add_child(injected); injected.build(); injected.select_category("itens"); await process_frame
 	check(injected.find_child("Entry_novo_item", true, false) is Button, "entrada adicionada aparece sem mudança na UI")
 	check((injected.find_child("EntryFallback", true, false) as Label).visible, "caminho de imagem indisponível usa fallback")
 	check(injected.find_child("DetailScroll", true, false) is ScrollContainer, "detalhes extensos possuem rolagem")
+	var detail_scroll := injected.find_child("DetailScroll", true, false) as ScrollContainer
+	check(detail_scroll != null and detail_scroll.get_v_scroll_bar().max_value > detail_scroll.get_v_scroll_bar().page, "conteúdo longo ativa rolagem vertical")
 	injected.queue_free(); await process_frame
 
 	var empty = EncyclopediaScreen.new(); empty.host = ui; empty.records_override = []
