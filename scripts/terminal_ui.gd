@@ -4,6 +4,7 @@ const DisplaySettingsScript = preload("res://scripts/display_settings.gd")
 const MenuBackground = preload("res://scripts/menu_background.gd")
 const EquipmentScreen = preload("res://scripts/equipment_screen.gd")
 const CharacterSilhouette = preload("res://scripts/character_silhouette.gd")
+const EncyclopediaScreen = preload("res://scripts/encyclopedia_screen.gd")
 const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png"
 const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 
@@ -30,6 +31,8 @@ var start_target := "arena"
 var current_choice: Label
 var main_resume: Button
 var telemetry: Label
+var encyclopedia: Control
+var encyclopedia_return_screen := "main"
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -102,7 +105,7 @@ func show_screen(next: String) -> void:
 	content = Control.new(); content.size = Vector2(1344, 752)
 	if next in ["equipment", "mission_inventory"]: add_child(content); place_equipment()   # escala inteira, fora do stage
 	else: stage.add_child(content)
-	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null
+	rows.clear(); slot_buttons.clear(); preview = null; detail = null; live_status = null; main_resume = null; telemetry = null; equipment = null; encyclopedia = null
 	if next in ["equipment", "mission_inventory"]: build_equipment(next == "mission_inventory"); return
 	if next != "pause":
 		if next == "main":
@@ -120,6 +123,7 @@ func show_screen(next: String) -> void:
 		"pause": build_pause()
 		"seed": build_seed()
 		"options": build_options()
+		"encyclopedia": build_encyclopedia()
 	focus_first.call_deferred()   # navegação pelo controle
 
 func open(page: String = "main") -> void:
@@ -137,7 +141,8 @@ func close() -> void:
 const TITLE_DIR := "res://assets/ui/title/"
 const TITLE_SCENE_CROP := Rect2(384, 107, 960, 537)
 const TITLE_TIPS := ["Voltar para a expedição em andamento", "Escolher personagem e modo", "Hospedar ou entrar por IP",
-	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo"]
+	"Escolher uma seed para as docas", "Carregar expedição salva", "Resolução, modo de tela, FPS, câmera, áudio e controles", "Sair do jogo",
+	"Consultar monstros, itens e robôs"]
 var title_video: VideoStreamPlayer
 
 func title_background() -> Control:
@@ -305,15 +310,19 @@ func build_pause() -> void:
 			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
 			telemetry.add_theme_color_override("font_color", Color("ffad99")))
 	leave.name = "ReturnToMenu"
-	var mission_inventory := button(p, Rect2(160, 360, 580, 52), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
+	var encyclopedia_button := button(p, Rect2(160, 360, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
+	encyclopedia_button.name = "PauseEncyclopedia"
+	var mission_inventory := button(p, Rect2(160, 416, 580, 48), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
 	mission_inventory.name = "MissionInventory"
 	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
 	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
 	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
 	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
-	leave.focus_neighbor_bottom = leave.get_path_to(mission_inventory); leave.focus_next = leave.get_path_to(mission_inventory)
-	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(leave); mission_inventory.focus_previous = mission_inventory.get_path_to(leave)
-	telemetry = label(p, Rect2(105, 430, 690, 42), "Esc ou Start também continua a partida.", 16, GOLD)
+	leave.focus_neighbor_bottom = leave.get_path_to(encyclopedia_button); leave.focus_next = leave.get_path_to(encyclopedia_button)
+	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
+	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
+	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button); mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
+	telemetry = label(p, Rect2(105, 476, 690, 34), "Esc ou Start também continua a partida.", 15, GOLD)
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -329,6 +338,14 @@ func build_online() -> void:
 	panel(content, Rect2(425, 489, 513, 39), Color("042b36"), CYAN)
 	app.status_label = label(content, Rect2(438, 493, 490, 33), "PRONTO • escolha hospedar ou conectar", 17)
 	label(content, Rect2(355, 543, 660, 26), "Conexão direta por IP • internet requer UDP 24871 acessível", 15, GOLD)
+
+func open_encyclopedia(return_screen: String) -> void:
+	encyclopedia_return_screen = return_screen if return_screen in ["main", "pause"] else "main"
+	show_screen("encyclopedia")
+
+func build_encyclopedia() -> void:
+	encyclopedia = EncyclopediaScreen.new(); encyclopedia.host = self
+	content.add_child(encyclopedia); encyclopedia.build()
 
 func build_seed() -> void:
 	var p := overlay("EXPEDIÇÃO DIRETA")
@@ -476,6 +493,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == JOY_BUTTON_B and screen == "pause": close(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "equipment": show_screen("play"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "encyclopedia": show_screen(encyclopedia_return_screen); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen != "main": show_screen("main"); accept_event()
 	var focus := get_viewport().gui_get_focus_owner()

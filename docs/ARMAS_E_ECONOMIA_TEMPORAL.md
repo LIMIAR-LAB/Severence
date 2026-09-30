@@ -1,0 +1,7 @@
+# Armas e economia temporal — 0.21
+
+O Refúgio consegue levar Marty, a equipe e seus equipamentos de origem entre épocas. Armas encontradas em uma viagem ficam presas àquela linha temporal: no retorno, Marty conserva apenas a arma inicial do uniforme, que tem munição infinita. Foguetes, moedas e chaves também pertencem à expedição. Fragmentos do Núcleo Temporal são a exceção: sua assinatura coincide com a da tecnologia da equipe e permite armazená-los no Refúgio. Essa regra dá sentido narrativo à progressão permanente sem tornar cada RUN dependente dos achados anteriores.
+
+Nas Docas de 1941, uma bazuca pode ser encontrada logo após a chegada. Ela vem com seis foguetes, causa dano alto e explode em área, inclusive contra barris e estruturas. A tecla **Q** ou o botão **RB** alterna entre a bazuca e a arma inicial. Quando acaba a munição, a arma inicial volta automaticamente. Inimigos maiores têm 6% de chance de derrubar dois foguetes; qualquer inimigo tem 4% de chance de derrubar uma chave. A chave garantida do início e as recompensas de missão são decisões de nível, separadas desses drops.
+
+O arsenal de uma RUN é guardado no estado de cada personagem (`run_weapons` e `run_weapon`), para que dois jogadores tenham armas e munição independentes e o salvamento da expedição possa preservá-las. Uma nova RUN cria personagens novos e descarta esse arsenal. O miniboss agora pode conceder a bazuca com três foguetes; se Marty já a encontrou, concede fragmentos e cura. Futuras armas podem usar a mesma regra de posse e seleção.

@@ -17,6 +17,10 @@ func run() -> void:
 	for action in padrao_frames:
 		var texture := load("res://assets/characters/marty/padrao/pixellab/%s.png" % action) as Texture2D
 		check(texture != null and texture.get_size() == Vector2(96 * padrao_frames[action], 96 * 8), "Marty Padrao %s: 8 direcoes" % action)
+	for action in ["idle", "run", "jump", "evade", "melee", "hurt", "defeat"]:
+		check(not view.marty_padrao_shows_weapon(action), "Marty Padrao sem arma em " + action)
+	check(view.marty_padrao_shows_weapon("shoot"), "Marty Padrao exibe arma somente no disparo")
+	check(not view.marty_padrao_shows_weapon("shoot", 0.5), "transformacao nao mistura arma Omega com sprite Padrao")
 	var directions := [Vector2.DOWN, Vector2(1,1), Vector2.RIGHT, Vector2(1,-1), Vector2.UP, Vector2(-1,-1), Vector2.LEFT, Vector2(-1,1)]
 	for row in range(directions.size()):
 		check(view.marty_direction_row(directions[row]) == row, "linha direcional PixelLab %d" % row)
@@ -35,6 +39,13 @@ func run() -> void:
 	var sim := view.sim
 	sim.coop="solo"; sim.start_run(1941)
 	var a: Dictionary = sim.actors[0]
+	var padrao_anchors := [Vector2(10,-35), Vector2(15,-36), Vector2(17,-35), Vector2(14,-38), Vector2(7,-40), Vector2(-14,-38), Vector2(-17,-35), Vector2(-15,-36)]
+	for row in range(directions.size()):
+		a.aim = directions[row]
+		check(view.weapon_hand_anchor(a) == padrao_anchors[row], "ancora da arma PixelLab %d" % row)
+	a.outfit = "mecanico"
+	check(view.weapon_hand_anchor(a) == Vector2(20,-27), "roupa legada conserva ancora existente")
+	a.outfit = "padrao"
 	var start: Vector2 = a.p
 	sim.step(0.016,[{"move":Vector2(1,1),"aim":Vector2.RIGHT,"dodge":true},{}])
 	check(a.dash_dir.distance_to(Vector2(1,1).normalized())<0.001,"dash conserva direção diagonal normalizada")

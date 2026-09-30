@@ -144,7 +144,7 @@ func _ready() -> void:
 		if arg == "--unlock-all": sim.set_unlocks(EquipmentData.items().map(func(it): return it.id))
 		if arg == "--visit-all":
 			for room in sim.rooms: sim.visited.append(room.id)
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "encyclopedia"]:
 		if "--capture-ui-" + page in args and page == "options": menu.show_screen("options")
 		if "--capture-ui-" + page in args:
 			screenshot_mode = true
@@ -371,6 +371,7 @@ func _physics_process(dt: float) -> void:
 		if menu.visible:
 			if menu.screen == "equipment": menu.show_screen("play")
 			elif menu.screen == "mission_inventory": menu.show_screen("pause")
+			elif menu.screen == "encyclopedia": menu.show_screen(menu.encyclopedia_return_screen)
 			else: menu.close()
 		elif playing: menu.open("pause")
 	if edge("gear", Input.is_physical_key_pressed(KEY_B)) and playing:
@@ -616,7 +617,7 @@ func capture() -> void:
 	if "--capture-arena" in OS.get_cmdline_user_args(): path = "res://test-output/arena-v06.png"
 	if "--capture-boss" in OS.get_cmdline_user_args(): path = "res://test-output/boss-v06.png"
 	if "--capture-docks-v04" in OS.get_cmdline_user_args(): path = "res://test-output/docks-v04.png"
-	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause"]:
+	for page in ["main", "play", "online", "equipment", "mission_inventory", "options", "characters", "pause", "encyclopedia"]:
 		if "--capture-ui-" + page in OS.get_cmdline_user_args(): path = "res://test-output/ui-" + page + ".png"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--capture-name="): path = "res://test-output/" + arg.trim_prefix("--capture-name=") + ".png"
