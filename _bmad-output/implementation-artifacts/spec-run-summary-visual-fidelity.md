@@ -124,4 +124,3 @@ Render order: opaque cinematic backdrop → clean console/surfaces → live port
 
 - Capture-only flag supplies deterministic death and victory visual fixtures.
   [`main.gd:159`](../../scripts/main.gd#L159)
-

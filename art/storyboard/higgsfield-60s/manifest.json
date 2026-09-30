@@ -1,0 +1,129 @@
+{
+  "project_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+  "workspace_id": "cc68c7eb-97f1-4e41-aabc-bdce748c4a68",
+  "folder_id": "469d17d0-cf5f-4a42-834f-05833bec3d90",
+  "title": "Severence: Ecos do Tempo",
+  "duration_seconds": 60,
+  "provider": "Higgsfield",
+  "model": "gpt_image_2_5",
+  "assets": [
+    {
+      "index": 1,
+      "job_id": "82fe2c8f-0dbb-4da2-9283-ee836fc06b68",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_82fe2c8f-0dbb-4da2-9283-ee836fc06b68.png",
+      "file": "01-nave.png",
+      "time": "00–04"
+    },
+    {
+      "index": 2,
+      "job_id": "75c3612b-c14f-43ee-9d5b-472226448816",
+      "status": "completed",
+      "file": "02-equipe.png",
+      "time": "04–08",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_011625_75c3612b-c14f-43ee-9d5b-472226448816.png"
+    },
+    {
+      "index": 3,
+      "job_id": "1a15846a-bfd6-45a3-afd3-528a7df75e08",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_1a15846a-bfd6-45a3-afd3-528a7df75e08.png",
+      "file": "03-casal.png",
+      "time": "08–15"
+    },
+    {
+      "index": 4,
+      "job_id": "2065d304-d3f1-4313-95a6-8cba662de0f6",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_2065d304-d3f1-4313-95a6-8cba662de0f6.png",
+      "file": "04-ataque.png",
+      "time": "15–23"
+    },
+    {
+      "index": 5,
+      "job_id": "938762d6-61b2-4685-9fea-69a00a216c14",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_938762d6-61b2-4685-9fea-69a00a216c14.png",
+      "file": "05-separacao.png",
+      "time": "23–31"
+    },
+    {
+      "index": 6,
+      "job_id": "2750d1ab-855e-454e-baa2-55be5720ff6b",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_2750d1ab-855e-454e-baa2-55be5720ff6b.png",
+      "file": "06-vincent.png",
+      "time": "31–33"
+    },
+    {
+      "index": 7,
+      "job_id": "8103e032-f2a4-4440-baeb-4072341f205e",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012150_8103e032-f2a4-4440-baeb-4072341f205e.png",
+      "file": "07-elias.png",
+      "time": "33–35"
+    },
+    {
+      "index": 8,
+      "job_id": "35ed9424-9578-4346-9e1f-0a1009952b89",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012319_35ed9424-9578-4346-9e1f-0a1009952b89.png",
+      "file": "08-iris.png",
+      "time": "35–37"
+    },
+    {
+      "index": 9,
+      "job_id": "74d9f085-2cce-4506-b337-773d89f5101d",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012319_74d9f085-2cce-4506-b337-773d89f5101d.png",
+      "file": "09-leticia.png",
+      "time": "37–39"
+    },
+    {
+      "index": 10,
+      "job_id": "60c79bd2-ca94-44c1-b9eb-6eba83863a61",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012319_60c79bd2-ca94-44c1-b9eb-6eba83863a61.png",
+      "file": "10-refugio.png",
+      "time": "39–49"
+    },
+    {
+      "index": 11,
+      "job_id": "54b54683-c584-4c02-af5e-2985cbd3c0eb",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_012319_54b54683-c584-4c02-af5e-2985cbd3c0eb.png",
+      "file": "11-docas.png",
+      "time": "49–56"
+    },
+    {
+      "index": 12,
+      "job_id": "b2d1b988-7174-4419-91ae-92c3998eaf13",
+      "status": "completed",
+      "type": "image",
+      "model": "gpt_image_2_5",
+      "result_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3E6li5EqXAK5QFdb89k65gr9KBY/hf_20260930_013824_b2d1b988-7174-4419-91ae-92c3998eaf13.png",
+      "file": "12-titulo-v2.png",
+      "time": "56–60"
+    }
+  ]
+}

@@ -77,4 +77,3 @@ Use the existing equipment icons for robot faces instead of generating redundant
 **Commands:**
 - `Get-ChildItem tests\*_test.gd | ForEach-Object { & 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --headless --path . --script "tests/$($_.Name)" }` -- expected: every test exits successfully.
 - `& 'C:\Users\tsmar\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe' --path . -- --capture-arena --transform-demo` -- expected: captures show crisp HUD portraits, both robot faces/states, and readable start/mid/lock/final Omega stages at native scale.
-

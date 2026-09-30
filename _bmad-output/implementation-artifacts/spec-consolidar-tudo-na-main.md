@@ -2,7 +2,7 @@
 title: 'Consolidate all completed work on main'
 type: 'chore'
 created: '2026-09-29'
-status: 'in-progress'
+status: 'done'
 baseline_commit: '6d4443f'
 context: []
 ---
@@ -51,7 +51,7 @@ context: []
 - [x] `main` -- merge `origin/main`, resolving overlaps as a union of chapel and boss-arena behavior.
 - [x] `codex/resumo-fiel-conceito` -- integrate its unique completed run-summary commit without duplicating already-applied work.
 - [x] `scripts/main.gd` and `scripts/simulation.gd` -- confirm resolved syntax and absence of VCS markers; change only if validation exposes a current defect.
-- [ ] Tests and repository -- run marker/whitespace checks and Godot headless suites, then push unified `main` to `origin/main`.
+- [x] Tests and repository -- run marker/whitespace checks and Godot headless suites, then push unified `main` to `origin/main`.
 
 **Acceptance Criteria:**
 - Given all current local files and divergent commits, when consolidation finishes, then every intended artifact is reachable from `main` and the safety reference remains available.
@@ -73,3 +73,11 @@ The parser report corresponds to an intermediate merge state rather than a commi
 - `Godot_v4.7.2-stable_win64_console.exe --headless --path . --script tests/run_summary_test.gd` -- expected: zero failures and no parser errors.
 - `Get-ChildItem tests\*_test.gd | ForEach-Object { Godot ... --headless --path . --script $_ }` -- expected: all suites exit successfully.
 - `git status --short --branch` -- expected: clean `main` synchronized with `origin/main` after push.
+
+## Suggested Review Order
+
+1. [`../../scripts/dock_scenery.gd`](../../scripts/dock_scenery.gd) — verify that the animated chapel and boss arena coexist in the same scenery pipeline.
+2. [`../../tests/chapel_animated_test.gd`](../../tests/chapel_animated_test.gd) and [`../../tests/boss_arena_scenery_test.gd`](../../tests/boss_arena_scenery_test.gd) — confirm focused coverage for both overlapping features.
+3. [`../../scripts/terminal_ui.gd`](../../scripts/terminal_ui.gd) and [`../../tests/run_summary_ui_test.gd`](../../tests/run_summary_ui_test.gd) — review the integrated faithful run-summary screen and its fallback behavior.
+4. [`../../scripts/world_view.gd`](../../scripts/world_view.gd) and [`../../tests/marty_actions_test.gd`](../../tests/marty_actions_test.gd) — inspect the consolidated Marty Omega animation assets and frame contracts.
+5. Review the retained art/source, storyboard, and generated runtime assets as the final completeness pass.
