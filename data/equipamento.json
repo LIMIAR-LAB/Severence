@@ -50,8 +50,8 @@
 			"icone": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_armadura_omega_bloqueada.png",
 			"card": "res://assets/ui/equipamento/cards/card_armadura_omega.png",
-			"desbloqueado_no_inicio": false,
-			"desbloqueio": {"tipo": "chefe", "texto": "Derrote o Almirante das Profundezas e extraia o núcleo."},
+			"desbloqueado_no_inicio": true,
+			"desbloqueio": {"tipo": "inicio", "texto": "Disponível desde o início."},
 			"atributos": {"vida": "+3", "velocidade": "=430", "golpe": "=38", "dash": "=0.3"}
 		},
 		{

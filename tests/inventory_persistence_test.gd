@@ -17,9 +17,11 @@ func run() -> void:
 	var loaded := Expedition.new(); loaded.apply_snapshot(snapshot)
 	check(loaded.inventory_state.stacks.get("fragmento_cronal", 0) == 6, "inventário persiste no snapshot")
 	check(loaded.inventory_state.equipped.uniforme == "arma_blaster", "loadout do inventário persiste")
-	var legacy := snapshot.duplicate(); legacy.erase("inventory_state"); legacy["campo_futuro"] = "ignorar"
+	var legacy := snapshot.duplicate(); legacy.erase("inventory_state"); legacy["campo_futuro"] = "ignorar"; legacy.unlocked = {"padrao": true}
 	loaded.apply_snapshot(legacy)
 	check(loaded.inventory_state is Dictionary and loaded.inventory_state.has("stacks"), "snapshot antigo recebe default seguro")
+	check(loaded.is_unlocked("omega"), "snapshot antigo recebe a Ômega como desbloqueio inicial")
+	check(not loaded.is_unlocked("titan") and not loaded.is_unlocked("spectre"), "migração da Ômega preserva os outros bloqueios do snapshot")
 	var bad := snapshot.duplicate(); bad.inventory_state = {"capacity": 2, "stacks": {"desconhecido": 4, "kit_reparo": 999}}
 	loaded.apply_snapshot(bad)
 	check(not loaded.inventory_state.stacks.has("desconhecido") and loaded.inventory_state.stacks.kit_reparo == 8, "save inválido é sanitizado")

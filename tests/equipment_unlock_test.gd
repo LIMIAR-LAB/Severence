@@ -15,10 +15,11 @@ func _init() -> void:
 			if not it.has(key): check(false, "%s sem %s" % [it.get("id", "?"), key])
 		for path in [it.icone, it.card, it.get("icone_bloqueado", "")]:
 			if path != "" and not ResourceLoader.exists(path): check(false, "arquivo faltando: " + path)
-	check(EquipmentData.starting_unlocks() == ["padrao", "titan", "spectre"], "fase de teste: Padrão, Titan e Spectre liberados")
+	check(EquipmentData.starting_unlocks() == ["padrao", "omega", "titan", "spectre"], "Padrão, Ômega, Titan e Spectre liberados desde o início")
 	var testing = Expedition.new()
 	testing.set_unlocks(EquipmentData.starting_unlocks())
 	testing.make_hub()
+	check(testing.is_unlocked("omega"), "Armadura Ômega disponível desde o início")
 	check(testing.is_unlocked("titan") and testing.is_unlocked("spectre"), "robôs disponíveis no Refúgio")
 	check(testing.equip(0, "padrao", "titan"), "Titan pode ser equipado desde o início")
 	check(testing.equip(0, "padrao", "spectre"), "Spectre pode ser equipado desde o início")
@@ -33,13 +34,14 @@ func _init() -> void:
 	check(EquipmentData.combine("espiao", "", "titan").final.velocidade == 190.0, "Titan pilotado anda a 190")
 
 	# início do jogo
-	# Mantém a cobertura da progressão normal, sem a liberação temporária de testes.
-	s.set_unlocks(["padrao"])
+	# Mantém a cobertura da progressão normal com a Ômega como equipamento inicial.
+	s.set_unlocks(["padrao", "omega"])
 	s.coop = "solo"; s.start_run(1941)
 	var a: Dictionary = s.actors[0]
 	check(a.selected_robot == "" and not s.mech.deployed, "começa sem robô e sem Titan no mapa")
 	s.toggle_armor(a)
-	check(not a.armor, "R não veste armadura bloqueada")
+	check(a.armor and is_equal_approx(a.armor_time, 300.0), "R veste a Ômega inicial por 5 minutos")
+	s.set_armor(a, false)
 	check(not s.summon_robot(a), "C não invoca robô bloqueado")
 	check(not s.equip(0, "mecanico", ""), "uniforme bloqueado não equipa")
 	# Titan: encontrado na Oficina
@@ -51,7 +53,7 @@ func _init() -> void:
 	check(s.is_unlocked("spectre"), "desafio do gerador libera o Spectre")
 	# chefe + expedições
 	s.boss_dead = true; a.p = s.DOCKS.POINTS.extraction; s.interact(a)
-	check(s.is_unlocked("omega") and s.is_unlocked("mecanico") and not s.is_unlocked("espiao"), "extração libera Ômega e Mecânico (1 expedição)")
+	check(s.is_unlocked("omega") and s.is_unlocked("mecanico") and not s.is_unlocked("espiao"), "extração mantém Ômega e libera Mecânico (1 expedição)")
 	s.clears = 2; s.check_unlocks()
 	check(s.is_unlocked("espiao"), "2 expedições liberam o Espião")
 	print("EQUIPMENT_UNLOCK_TESTS_DONE failures=%d" % failures)

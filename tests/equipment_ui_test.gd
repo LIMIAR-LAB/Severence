@@ -1,6 +1,6 @@
 extends SceneTree
 
-# 0.17: tela de Equipamento modular — moldura + camadas, dois estados: começo do jogo (só o Padrão)
+# 0.17: tela de Equipamento modular — moldura + camadas, dois estados: começo do jogo (Padrão + Ômega)
 # e tudo desbloqueado. Cards, ícones, textos e números vêm de data/equipamento.json.
 var failures := 0
 func check(ok: bool, label: String) -> void:
@@ -17,7 +17,7 @@ func _initialize() -> void:
 	var sim = app.sim
 
 	# ── estado 1: começo do jogo ──
-	sim.set_unlocks(["padrao"]); app.pref_outfit = "padrao"; app.pref_robot = "titan"
+	sim.set_unlocks(["padrao", "omega"]); app.pref_outfit = "padrao"; app.pref_robot = "titan"
 	ui.read_equipment(); ui.show_screen("equipment")
 	await process_frame; await process_frame
 	var eq = ui.equipment
@@ -27,10 +27,10 @@ func _initialize() -> void:
 		check(eq.slots.has(id), "slot do item " + id)
 	check(tex_name(eq.slots.padrao.icon) == "icon_uniforme_padrao.png", "Padrão com o ícone dele")
 	check(tex_name(eq.slots.mecanico.icon) == "icon_uniforme_mecanico_bloqueado.png" and eq.slots.mecanico.sub.text == "BLOQUEADO", "Mecânico bloqueado no início")
-	check(tex_name(eq.slots.omega.icon) == "icon_armadura_omega_bloqueada.png", "Ômega bloqueada no início")
+	check(tex_name(eq.slots.omega.icon) == "icon_armadura_omega.png", "Ômega liberada no início")
 	check(tex_name(eq.slots.titan.icon) == "icon_robo_titan_bloqueado.png" and tex_name(eq.slots.spectre.icon) == "icon_robo_spectre_bloqueado.png", "robôs bloqueados no início")
 	check(eq.find_child("EmptyArmor_1", true, false) != null and eq.find_child("EmptyRobot_2", true, false) != null, "vagas vazias com icon_slot_vazio")
-	check(ui.armor_choice == "" and ui.robot_choice == "", "sem armadura e sem robô equipados")
+	check(ui.armor_choice == "omega" and ui.robot_choice == "", "Ômega equipada e nenhum robô selecionado")
 	check(eq.robot_label.text == "SEM ROBÔ", "painel do robô vazio")
 	check(tex_name(eq.card) == "card_marty_padrao.png" and eq.card.modulate == Color.WHITE and not eq.card_lock.visible, "vitrine mostra o card do Padrão")
 	check(eq.slots.padrao.frame.visible, "Padrão equipado com frame de seleção")
@@ -39,7 +39,7 @@ func _initialize() -> void:
 	check(eq.desc_body.text.begins_with("Como desbloquear"), "descrição explica como desbloquear")
 	ui.choose("titan")
 	check(ui.robot_choice == "", "bloqueado não equipa")
-	check(eq.numbers[0].text == "3" and eq.numbers[1].text == "320", "STATUS do Padrão: 3 corações, velocidade 320")
+	check(eq.numbers[0].text == "6" and eq.numbers[1].text == "430", "STATUS inicial inclui Ômega: 6 corações, velocidade 430")
 	check(ui.find_child("INICIAR*", true, false) == null, "sem botão INICIAR ARENA")
 	for b in ui.content.find_children("*", "Button", true, false):
 		check(not b.text.contains("ARENA"), "nenhum botão de arena")

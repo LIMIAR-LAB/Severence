@@ -1560,6 +1560,10 @@ func apply_snapshot(data: Dictionary) -> void:
 	var allowed := snapshot().keys()
 	for name in data:
 		if name in allowed and name != "inventory_state": set(name, data[name])
+	# Saves de expedições antigas podem carregar uma lista anterior de desbloqueios.
+	# A Ômega agora é inicial; migre somente ela sem alterar a progressão dos outros itens.
+	if not unlocked is Dictionary: unlocked = {}
+	unlocked["omega"] = true
 	if data.get("inventory_state") is Dictionary: inventory_state = InventoryState.new(data.inventory_state).to_dict()
 	else: inventory_state = InventoryState.new(inventory_state).to_dict()
 	if not run_stats is Dictionary or run_stats.is_empty(): run_stats = fresh_run_stats()
