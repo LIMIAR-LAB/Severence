@@ -219,3 +219,26 @@ Cada folha usa células 96×96 e oito linhas nesta ordem: sul, sudeste, leste,
 nordeste, norte, noroeste, oeste e sudoeste. Todas as oito vistas são próprias;
 não espelhar horizontalmente, pois a ombreira, a manopla e a mochila são
 assimétricas. Armas, projéteis e clarões continuam em camadas separadas no jogo.
+
+## Marty — Armadura Ômega
+
+A Armadura Ômega é um estado do mesmo personagem no PixelLab, identificado por
+`443b4141-fc70-438c-ada1-4f5bfa87cbe5`. Ela usa células de produção 112×112 e é
+desenhada um pouco maior no jogo para preservar o peso das ombreiras, manoplas,
+botas e capa. As oito direções são próprias e seguem a mesma ordem do Marty
+Padrão.
+
+| Ação | Quadros | Arquivo de jogo |
+| --- | ---: | --- |
+| Parado/energia do núcleo | 4 | `assets/characters/marty/omega/pixellab/idle.png` |
+| Corrida pesada | 8 | `assets/characters/marty/omega/pixellab/run.png` |
+| Salto | 8 | `assets/characters/marty/omega/pixellab/jump.png` |
+| Dash por fissura temporal | 7 | `assets/characters/marty/omega/pixellab/evade.png` |
+| Movimento corporal do combo | 6 | `assets/characters/marty/omega/pixellab/melee.png` |
+| Dano | 6 | `assets/characters/marty/omega/pixellab/hurt.png` |
+| Derrota | 8 | `assets/characters/marty/omega/pixellab/defeat.png` |
+
+O capacete permanece fechado e a armadura completa em todos os quadros. A espada
+de energia aparece somente durante o combo; a onda do terceiro golpe e os efeitos
+de impacto continuam separados do corpo. A esquiva usa a animação de fissura em
+vez do rolamento das roupas comuns.

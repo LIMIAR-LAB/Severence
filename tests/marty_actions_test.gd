@@ -17,7 +17,7 @@ func run() -> void:
 	for action in padrao_frames:
 		var texture := load("res://assets/characters/marty/padrao/pixellab/%s.png" % action) as Texture2D
 		check(texture != null and texture.get_size() == Vector2(96 * padrao_frames[action], 96 * 8), "Marty Padrao %s: 8 direcoes" % action)
-	var omega_frames := {"idle":4,"run":8,"jump":7,"evade":7,"melee":6,"hurt":6,"defeat":7}
+	var omega_frames := {"idle":4,"run":8,"jump":8,"evade":7,"melee":6,"hurt":6,"defeat":8}
 	for action in omega_frames:
 		var texture := load("res://assets/characters/marty/omega/pixellab/%s.png" % action) as Texture2D
 		check(texture != null and texture.get_size() == Vector2(112 * omega_frames[action], 112 * 8), "Marty Omega %s: 8 direcoes" % action)

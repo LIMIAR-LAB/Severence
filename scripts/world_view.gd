@@ -56,8 +56,8 @@ const MARTY_OMEGA_ROOT := "res://assets/characters/marty/omega/pixellab/"
 const MARTY_OMEGA_CELL := 112
 const MARTY_OMEGA_DRAW_SIZE := 124.0
 const MARTY_OMEGA_FRAMES := {
-	"idle": 4, "run": 8, "jump": 7, "evade": 7,
-	"melee": 6, "hurt": 6, "defeat": 7,
+	"idle": 4, "run": 8, "jump": 8, "evade": 7,
+	"melee": 6, "hurt": 6, "defeat": 8,
 }
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_v5.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
@@ -620,7 +620,8 @@ func draw_actor(a: Dictionary) -> void:
 		else:
 			draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
 			draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
-		text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12); return
+		text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12)
+		return
 	var jump_height := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
 	var elevation := sim.height_at(foot)
 	var draw_pos := foot - Vector2(0, jump_height + elevation)
