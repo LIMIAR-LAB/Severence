@@ -128,7 +128,7 @@
       "ordem": 50,
       "nome": "BAZUCA",
       "subtitulo": "Arma de missão",
-      "imagem": "res://assets/weapons/bazooka.png",
+      "imagem": "res://assets/weapons/bazooka_v2.png",
       "descricao": "Lança foguetes de munição limitada encontrados durante a expedição. A explosão atinge alvos próximos do impacto.",
       "tracos": ["48 de dano direto", "Dano em área", "Munição limitada"]
     },

@@ -159,7 +159,10 @@ func quantity_for(entry: Dictionary) -> int:
 	if not entry.get("transiente", false):
 		if mission_mode: return 1 if carried(entry) else 0
 		return inventory.quantity(entry.id)
+	var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
 	match str(entry.id):
+		"missao_bazuca": return 1 if mission_actor.get("run_weapons", {}).has("bazooka") else 0
+		"missao_foguetes": return maxi(0, int(mission_actor.get("run_weapons", {}).get("bazooka", 0)))
 		"missao_chaves": return maxi(0, int(app.sim.keys))
 		"missao_moedas": return maxi(0, int(app.sim.money))
 		"missao_fragmentos": return maxi(0, int(app.sim.materials) - int(app.sim.run_materials_start))
@@ -261,6 +264,10 @@ func refresh_inventory_details() -> void:
 	detail_text.text = entry.get("descricao", "") if open else "Como desbloquear: " + DATA.item(entry.get("desbloqueio_id", "")).get("desbloqueio", {}).get("texto", "Prossiga na campanha.")
 	var lines: Array[String] = []
 	if transient: lines.append("QUANTIDADE  %d" % quantity_for(entry))
+	if entry.id == "missao_bazuca":
+		var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
+		lines.append("FOGUETES  %d" % int(mission_actor.get("run_weapons", {}).get("bazooka", 0)))
+		lines.append("ESTADO  %s" % ("EM USO" if mission_actor.get("run_weapon", "") == "bazooka" else "GUARDADA"))
 	for key in entry.get("atributos", {}): lines.append("%s  %s" % [str(key).to_upper(), str(entry.atributos[key])])
 	var loadout_id := str(entry.get("loadout_id", ""))
 	if loadout_id != "":
@@ -273,7 +280,7 @@ func refresh_inventory_details() -> void:
 	detail_action.disabled = not usable
 	detail_action.text = "EQUIPADO" if (carried(entry) if mission_mode else inventory.equipped.values().has(entry.id)) else "EQUIPAR"
 	if not open: detail_reason.text = "Ação indisponível: item bloqueado."
-	elif transient: detail_reason.text = ("Ícone provisório • " if entry.get("icone_provisorio", false) else "") + "Recurso temporário da missão • não ocupa o inventário persistente."
+	elif transient: detail_reason.text = ("Ícone provisório • " if entry.get("icone_provisorio", false) else "") + ("Arma temporária • Q/RB alterna durante a missão." if entry.id == "missao_bazuca" else "Recurso temporário da missão • não ocupa o inventário persistente.")
 	elif quantity_for(entry) <= 0: detail_reason.text = "Ação indisponível: item ainda não obtido."
 	elif entry.get("prototipo", false): detail_reason.text = "Ação indisponível: protótipo sem mecânica implementada."
 	elif entry.get("equipavel", false) != true: detail_reason.text = "Este item não ocupa um slot equipável."
@@ -401,7 +408,8 @@ func sync_authoritative_loadout() -> void:
 
 func current_mission_signature() -> String:
 	if not mission_mode: return ""
-	return "%s|%s|%s|%s|%s|%s|%s" % [app.sim.keys, app.sim.money, app.sim.materials, app.sim.mech.get("fuel", 0.0), app.sim.spectres[host.gear_actor].get("hp", 0.0) if host.gear_actor >= 0 and host.gear_actor < app.sim.spectres.size() else 0, host.outfit_choice, host.robot_choice]
+	var mission_actor: Dictionary = app.sim.actors[host.gear_actor] if host.gear_actor >= 0 and host.gear_actor < app.sim.actors.size() else {}
+	return "%s|%s|%s|%s|%s|%s|%s|%s|%s" % [app.sim.keys, app.sim.money, app.sim.materials, app.sim.mech.get("fuel", 0.0), app.sim.spectres[host.gear_actor].get("hp", 0.0) if host.gear_actor >= 0 and host.gear_actor < app.sim.spectres.size() else 0, host.outfit_choice, host.robot_choice, mission_actor.get("run_weapons", {}), mission_actor.get("run_weapon", "")]
 
 func _process(_delta: float) -> void:
 	if not mission_mode or page == null: return

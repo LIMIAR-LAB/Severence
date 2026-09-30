@@ -10,6 +10,9 @@ func _initialize() -> void:
 	app.sim.set_unlocks(["padrao", "titan", "spectre", "omega"])
 	app.sim.materials = 5
 	app.start_single(); app.sim.start_run(1941)
+	var marty: Dictionary = app.sim.actors[0]
+	marty.p = app.sim.pickups.filter(func(p): return p.kind == "weapon")[0].p
+	app.sim.collect_pickups()
 	app.sim.keys = 3; app.sim.money = 47; app.sim.materials = 8
 	app.sim.mech.fuel = app.sim.FUEL_MAX * 0.62; app.sim.spectres[0].hp = 71
 	var persistent_before: Dictionary = app.sim.inventory_state.duplicate(true)
@@ -21,6 +24,9 @@ func _initialize() -> void:
 	check(app.menu.screen == "mission_inventory" and eq != null and eq.mission_mode, "abre shell no modo missão")
 	check(eq.find_child("InventorySlot_missao_chaves", true, false) is Button, "chaves coletadas aparecem na grade")
 	check(eq.find_child("InventorySlot_missao_moedas", true, false) is Button, "moedas coletadas aparecem na grade")
+	check(eq.find_child("InventorySlot_missao_bazuca", true, false) is Button, "bazuca aparece no inventário da missão")
+	check(eq.find_child("InventorySlot_missao_foguetes", true, false) is Button and eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_foguetes")) == 6, "foguetes aparecem com munição real")
+	check(load("res://assets/weapons/bazooka_v2.png") is Texture2D and load("res://assets/ui/equipamento/icones/icon_foguete_v1.png") is Texture2D, "inventário carrega arte final da bazuca e da munição")
 	check(eq.find_child("InventorySlot_prototipo_reparo", true, false) == null, "item persistente não levado fica fora da missão")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_fragmentos")) == 3, "fragmentos contam somente o ganho desta missão")
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_combustivel")) == 62, "combustível usa valor vivo quando Titan foi levado")
@@ -30,8 +36,17 @@ func _initialize() -> void:
 	check(transient_button.has_focus() and transient_button.get_theme_stylebox("focus") is StyleBoxFlat, "recurso da missão possui foco visível")
 	eq.select_inventory("missao_chaves")
 	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and "provisório" in eq.detail_reason.text, "recurso temporário identifica ícone provisório e não oferece ação falsa")
+	eq.select_inventory("missao_bazuca")
+	check(eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
+	marty.run_weapons.bazooka = 4; marty.run_weapon = ""
+	await process_frame; await process_frame
+	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_foguetes")) == 4 and "GUARDADA" in eq.detail_stats.text, "inventário acompanha munição e troca ao vivo")
 	app.sim.keys = 9; await process_frame; await process_frame
 	check(eq.find_child("InventorySlot_missao_chaves", true, false) != null and eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_chaves")) == 9, "quantidades mudam ao vivo sem reabrir a tela")
+	marty.run_weapons.bazooka = 0; await process_frame; await process_frame
+	check(eq.find_child("InventorySlot_missao_bazuca", true, false) != null and eq.find_child("InventorySlot_missao_foguetes", true, false) == null, "bazuca vazia continua visível, foguetes zerados somem")
+	app.sim.start_run(1942); await process_frame; await process_frame
+	check(eq.find_child("InventorySlot_missao_bazuca", true, false) == null, "nova RUN não herda a arma encontrada")
 	eq.go_back(); await process_frame
 	check(app.menu.screen == "pause" and app.menu.visible and app.paused, "voltar retorna à pausa sem retomar")
 	app.queue_free(); await process_frame

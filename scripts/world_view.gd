@@ -96,7 +96,8 @@ func _ready() -> void:
 	cobble_texture = load("res://assets/environment/cobble.png")
 	enemy_anim = load("res://assets/enemies/docas_anim.png")
 	for key in ["pistol", "shotgun", "smg", "bazooka", "omega", "omega_sword", "knife", "wrench", "sword_smear", "flash", "flash_cyan"]:
-		weapon_art[key] = load("res://assets/weapons/" + key + ".png")
+		weapon_art[key] = load("res://assets/weapons/" + ("bazooka_v2" if key == "bazooka" else key) + ".png")
+	weapon_art["foguete"] = load("res://assets/ui/equipamento/icones/icon_foguete_v1.png")
 	for key in ["pistol", "smg", "pellet", "omega", "wave"]:
 		projectile_art["p_" + key] = load("res://assets/weapons/b_" + key + ".png")
 	enemy_texture = load("res://assets/enemies/docas.png")
@@ -294,12 +295,10 @@ func draw_entities() -> void:
 			draw_texture_rect(docks_art.key, Rect2(p - Vector2(12, 26), Vector2(24, 27)), false)
 		elif pickup.kind == "weapon":
 			draw_circle(p - Vector2(0, 13), 34, Color(0.35, 0.9, 1, 0.15))
-			draw_texture_rect(weapon_art.bazooka, Rect2(p - Vector2(32, 30), Vector2(64, 28)), false)
+			draw_texture_rect(weapon_art.bazooka, Rect2(p - Vector2(42, 38), Vector2(84, 56)), false)
 		elif pickup.kind == "ammo":
 			draw_circle(p - Vector2(0, 9), 17, Color(1, 0.65, 0.3, 0.18))
-			draw_rect(Rect2(p - Vector2(7, 22), Vector2(14, 17)), Color("36443c"))
-			draw_rect(Rect2(p - Vector2(5, 20), Vector2(10, 8)), Color("c49553"))
-			draw_rect(Rect2(p - Vector2(3, 11), Vector2(6, 4)), Color("4be4f0"))
+			draw_texture_rect(weapon_art.foguete, Rect2(p - Vector2(18, 29), Vector2(36, 36)), false)
 		elif pickup.kind == "fuel":
 			# Galão de gasolina (0.14): corpo vermelho com alça escura
 			draw_circle(p - Vector2(0, 10), 17, Color(1, 0.5, 0.25, 0.15))
@@ -841,7 +840,7 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 	if weapon == "omega":
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 9)
 		draw_circle(grip + aim * 18, 9 + pulse * 3, Color(0.35, 0.9, 1, 0.12 + pulse * 0.08))
-	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15), "bazooka": Vector2(32, 25)}.get(weapon, Vector2(8, size.y * 0.5))
+	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15), "bazooka": Vector2(34, 42)}.get(weapon, Vector2(8, size.y * 0.5))
 	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, -handle)
 	visual_transform(Vector2.ZERO)

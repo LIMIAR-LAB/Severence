@@ -24,7 +24,7 @@ func _ready() -> void:
 	# 0.16: ícones do mapa (tools/prepare_map_icons.py) — 48x48, mostrados em 1/2 (24) no mapa e 1/3 (16) no minimapa
 	for key in ["boss", "shop", "challenge", "chest", "locked", "exit"]: art["map_" + key] = load("res://assets/ui/map_icons/map_icon_" + key + ".png")
 	for key in ["pistol", "shotgun", "smg", "bazooka", "omega_sword"]:
-		art["w_" + key] = load("res://assets/weapons/" + key + ".png")
+		art["w_" + key] = load("res://assets/weapons/" + ("bazooka_v2" if key == "bazooka" else key) + ".png")
 
 func _process(_dt: float) -> void:
 	visible = app.playing and not app.menu.visible
