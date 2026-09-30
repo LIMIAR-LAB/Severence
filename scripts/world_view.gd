@@ -1203,29 +1203,30 @@ func boss_pose(e: Dictionary) -> String:
 	return "idle"
 
 func draw_boss(e: Dictionary) -> void:
+	const BOSS_VISUAL_SCALE := 1.3
 	if e.get("motion", "idle") == "warning":
-		draw_arc(e.motion_to,75,0,TAU,48,Color("ffb451"),5)
+		draw_arc(e.motion_to,95,0,TAU,48,Color("ffb451"),5)
 		draw_line(e.p,e.motion_to,Color(1,0.4,0.2,0.6),4)
 		text_at(e.motion_to-Vector2(50,85),"! MERGULHO" if e.motion_kind == "dive" else "! AVANÇO",GOLD,16)
 	if e.get("motion", "idle") == "moving" and e.get("motion_kind", "") == "dive":
-		draw_arc(e.p,60,0,TAU,32,CYAN,3); return
+		draw_arc(e.p,78,0,TAU,32,CYAN,3); return
 	var p: Vector2 = e.p
 	var pose := boss_pose(e)
 	var tex: Texture2D = boss_art[pose]
-	var size := tex.get_size()
+	var size := tex.get_size() * BOSS_VISUAL_SCALE
 	if pose == "spiral":
 		visual_transform(p - Vector2(0, 40), e.get("spin_angle", 0.0) * 0.35)
-		draw_texture(tex, -size * 0.5)
+		draw_texture_rect(tex, Rect2(-size * 0.5, size), false)
 		visual_transform(Vector2.ZERO)
 	else:
 		var sway := sin(sim.tick_time * 1.6) * 2.0
-		draw_texture(tex, p + Vector2(-size.x * 0.5, 92 - size.y + sway))
+		draw_texture_rect(tex, Rect2(p + Vector2(-size.x * 0.5, 92 - size.y + sway), size), false)
 	if pose == "charge":
 		var k: float = 1.0 - e.charge / 0.9
 		draw_circle(p - Vector2(0, 20), 10 + k * 26, Color(0.65, 0.3, 1, 0.12 + k * 0.2))
-	draw_rect(Rect2(p - Vector2(70, 168), Vector2(140, 7)), Color("181625"))
-	draw_rect(Rect2(p - Vector2(70, 168), Vector2(140 * e.hp / e.max, 7)), Color("df729f"))
-	text_at(p + Vector2(-96, -176), "O ALMIRANTE DAS PROFUNDEZAS", Color("d1b3c5"), 12)
+	draw_rect(Rect2(p - Vector2(91, 212), Vector2(182, 7)), Color("181625"))
+	draw_rect(Rect2(p - Vector2(91, 212), Vector2(182 * e.hp / e.max, 7)), Color("df729f"))
+	text_at(p + Vector2(-96, -220), "O ALMIRANTE DAS PROFUNDEZAS", Color("d1b3c5"), 12)
 
 func draw_corpse(fx: Dictionary) -> void:
 	var fade: float = clampf(fx.life / (fx.max * 0.4), 0, 1)
@@ -1234,7 +1235,8 @@ func draw_corpse(fx: Dictionary) -> void:
 	if fx.enemy == "boss":
 		var tex: Texture2D = boss_art.defeat
 		var sink: float = (1.0 - fx.life / fx.max) * 50
-		draw_texture(tex, fx.p + Vector2(-tex.get_size().x * 0.5, 92 - tex.get_size().y + sink), Color(1, 1, 1, fade))
+		var size := tex.get_size() * 1.3
+		draw_texture_rect(tex, Rect2(fx.p + Vector2(-size.x * 0.5, 92 - size.y + sink), size), false, Color(1, 1, 1, fade))
 		return
 	var art_kind := enemy_art_kind(fx.enemy)
 	if pixellab_enemy_actions.has(art_kind):
