@@ -2,7 +2,7 @@
 title: 'Integrate the animated PixelLab cult chapel'
 type: 'feature'
 created: '2026-09-29'
-status: 'draft'
+status: 'implemented'
 baseline_commit: 'e61905899034d6bbcd24ce9f21bc8262ee3e7508'
 context:
   - 'docs/CENARIO_0_16.md'
@@ -41,6 +41,7 @@ context:
 - `assets/environment/docks12/chapel/animated/` -- production PNG frames derived from the approved PixelLab loop.
 - `scripts/dock_scenery.gd` -- loads chapel frames, selects the active frame, draws the plate and suppresses baked duplicate decoration.
 - `scripts/world_view.gd` -- invokes the chapel plate at the correct ground-layer point and keeps entities/effects above it.
+- `tools/build_docks_map.py` -- aligns the chapel's collision boxes with the painted pew bases while preserving all three approaches.
 - `tools/build_chapel_animation.py` -- reproducibly exports production frames from the approved PixelLab source.
 - `tests/chapel_animated_test.gd` -- asset, timing, fallback, and render-boundary checks.
 
@@ -49,9 +50,10 @@ context:
 **Execution:**
 - [x] `tools/build_chapel_animation.py` -- export twelve lossless 1344×752 PNG frames plus the review GIF from the approved source -- make runtime assets reproducible and avoid unsupported GIF playback.
 - [x] `assets/environment/docks12/chapel/animated/` -- add optimized production frames and static fallback with nearest filtering/no mipmaps -- provide runtime-ready art.
-- [ ] `scripts/dock_scenery.gd` -- load frames once, expose deterministic frame selection, draw the aspect-correct plate only for the discovered chapel, and skip legacy visuals baked into the plate -- pending collision alignment with the painted pews.
-- [ ] `scripts/world_view.gd` -- place the chapel draw call before walls, entities, labels, and effects -- pending the same alignment correction.
-- [ ] `tests/chapel_animated_test.gd` -- verify dimensions, frame cadence/wrap, fallback, geometry, visibility, and collision alignment -- add with the runtime integration.
+- [x] `scripts/dock_scenery.gd` -- load frames once, expose deterministic frame selection, draw the aspect-correct plate only for the discovered chapel, and skip legacy visuals baked into the plate.
+- [x] `scripts/world_view.gd` -- place the chapel draw call above procedural walls and below entities, labels, and effects.
+- [x] `tools/build_docks_map.py` -- align eight collision boxes to the painted pew bases while keeping the central aisle and north/east/south approaches open.
+- [x] `tests/chapel_animated_test.gd` -- verify dimensions, frame cadence/wrap, fallback, geometry, visibility, collision alignment, and approach traversal.
 
 **Acceptance Criteria:**
 - Given a run in the discovered chapel, when the camera views the altar area, then the approved PixelLab environment renders at its original aspect ratio with animated relic, rift, candles, and stars.
@@ -63,7 +65,7 @@ context:
 
 The approved plate covers the upper chapel sanctum at its native 1344×752 presentation scale and is clipped to the chapel bounds. The lower portion of the existing 1300×1400 room remains the approach nave and uses the current procedural floor, avoiding vertical distortion and keeping all three connections intact. Runtime animation uses PNG frames selected from `sim.tick_time`; the GIF remains a review artifact.
 
-The approved frames and reproducible generator are preserved in the consolidated branch. Runtime activation remains pending because the baked pew positions do not yet match the frozen collision rectangles; enabling the earlier draft would create visible walk-through furniture and invisible blockers.
+The approved frames and reproducible generator are preserved in the consolidated branch. Runtime activation now uses eight shallow collision boxes aligned to the visible bases of the painted pews. The central aisle and the north, east, and south approaches remain open.
 
 ## Verification
 

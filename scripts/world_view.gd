@@ -196,6 +196,8 @@ func draw_expedition_ground() -> void:
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
 	scenery.draw_walls(self, sim, vis_floors, vis_rooms, view)
+	# Placa animada acima das paredes procedurais antigas e abaixo do gameplay.
+	scenery.draw_chapel_plate(self, sim, vis_rooms, view)
 	arrival_art.draw_rift(self, sim, scenery.lights)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
@@ -206,6 +208,7 @@ func draw_expedition_ground() -> void:
 		h["alert"] = alert
 	for d in sim.decor:
 		if not view.has_point(d.p) or not seen(d.p, 120): continue
+		if scenery.chapel_hides_legacy(d.kind, d.p): continue
 		if scenery.is_flat(d.kind):
 			if d.kind == "tentacle_pool":
 				for h in sim.hazards:
@@ -322,9 +325,11 @@ func draw_entities() -> void:
 		var view := view_rect()
 		for i in range(sim.obstacles.size()):
 			var box: Rect2 = sim.obstacles[i]
-			if box.intersects(view) and seen(box.get_center(), 60): drawable.append({"type": "obstacle", "data": {"r": box, "k": sim.obstacle_kinds[i] if i < sim.obstacle_kinds.size() else "crate"}, "y": box.end.y})
+			var kind: String = sim.obstacle_kinds[i] if i < sim.obstacle_kinds.size() else "crate"
+			if box.intersects(view) and seen(box.get_center(), 60) and not scenery.chapel_hides_legacy(kind, box.get_center()):
+				drawable.append({"type": "obstacle", "data": {"r": box, "k": kind}, "y": box.end.y})
 		for d in sim.decor:   # props de decoração em pé entram na ordenação por Y
-			if scenery.handles(d.kind) and not scenery.is_flat(d.kind) and view.has_point(d.p) and seen(d.p, 60):
+			if scenery.handles(d.kind) and not scenery.is_flat(d.kind) and view.has_point(d.p) and seen(d.p, 60) and not scenery.chapel_hides_legacy(d.kind, d.p):
 				drawable.append({"type": "decor", "data": d, "y": d.p.y})
 		if seen(DocksMap.POINTS.extraction): drawable.append({"type": "capsule", "data": {}, "y": DocksMap.POINTS.extraction.y + 20})
 	else:
