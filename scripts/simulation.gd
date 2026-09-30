@@ -129,8 +129,8 @@ const UNIFORMS := {
 	"espiao": {"name": "ESPIÃO", "weapon": "smg", "weapon_name": "SUBMETRALHADORA", "speed": 385.0, "melee": 20.0, "taken": 1.1, "dash_cd": 0.35,
 		"desc": "MAIS VELOCIDADE.\nSubmetralhadora: rajada rápida (7).\nVelocidade 385 • dash recarrega 2× mais rápido.\nInimigos só o notam de perto.\n+10% de dano recebido."}}
 const ARMORS := {
-	"omega": {"name": "ARMADURA ÔMEGA", "duration": 5.0, "cooldown": 60.0, "speed": 430.0, "taken": 1.0,
-		"desc": "LENDÁRIA • dura 5s, recarrega 60s (R).\nBaús recarregam na hora.\nLâmina Ômega: combo de 3 cortes (38/38/64);\no 3º solta uma onda que atravessa inimigos.\n+3 CORAÇÕES DE ESCUDO • MUITO mais rápido (430) • corte reflete tiros.\nUniforme e arma não mudam enquanto ativa."}}
+	"omega": {"name": "ARMADURA ÔMEGA", "duration": 300.0, "cooldown": 60.0, "speed": 430.0, "taken": 1.0,
+		"desc": "LENDÁRIA • dura 5 min, recarrega 60s (R).\nComeça cada expedição carregada; baús recarregam na hora.\nLâmina Ômega: combo de 3 cortes (38/38/64);\no 3º solta uma onda que atravessa inimigos.\n+3 CORAÇÕES DE ESCUDO • MUITO mais rápido (430) • corte reflete tiros.\nUniforme e arma não mudam enquanto ativa."}}
 const OUTFIT_NAMES := {"padrao": "PADRÃO", "mecanico": "MECÂNICO", "espiao": "ESPIÃO", "omega": "ARMADURA ÔMEGA"}
 
 # Enrage do Almirante: sem isso a luta podia travar indefinidamente contra um time passivo.
@@ -319,7 +319,7 @@ func start_run(new_seed: int) -> void:
 	var P: Dictionary = DOCKS.POINTS
 	actors = [actor(0, P.spawn), actor(1, P.spawn2)]
 	for a in actors:
-		a.hp = max_hp(); a.shield = 0.0; a.armor = false; a.armor_cd = ARMORS[a.armor_type].cooldown  # carrega durante a expedição
+		a.hp = max_hp(); a.shield = 0.0; a.armor = false; a.armor_cd = 0.0  # começa pronta para vestir
 	combat_zones.clear(); harpoons.clear(); enemies.clear(); bullets.clear(); pickups.clear(); effects.clear(); obstacles.clear(); chests.clear(); obstacle_kinds.clear(); decor.clear(); visited.clear()
 	rooms = []
 	for room in DOCKS.ROOMS: rooms.append(room.duplicate())
@@ -358,7 +358,7 @@ func start_run(new_seed: int) -> void:
 	pickups.append({"p": P.key, "kind": "key"})
 	pickups.append({"p": P.spawn + Vector2(165, 0), "kind": "weapon", "weapon": "bazooka", "ammo": 6})
 	build_navigation()
-	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. A armadura carrega em 60s.")
+	say("Docas de 1941 • recupere o núcleo do Almirante. TAB/M abre o mapa. Armadura Ômega pronta.")
 
 func run_progress_percent(outcome: String = "") -> int:
 	var discoverable := rooms.filter(func(room): return room.get("kind", "") != "secret")

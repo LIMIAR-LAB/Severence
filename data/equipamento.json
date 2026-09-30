@@ -45,8 +45,8 @@
 		},
 		{
 			"id": "omega", "categoria": "armadura", "nome": "ARMADURA ÔMEGA", "subtitulo": "lendária", "arma": "LÂMINA ÔMEGA", "raridade": "lendario",
-			"descricao_curta": "R: 5s de poder, recarga 60s.",
-			"descricao": "LENDÁRIA. Vestida com R por 5 segundos (recarga de 60s; baús recarregam na hora). +3 corações de escudo, velocidade 430 e a Lâmina Ômega: combo de 3 cortes (38/38/64); o 3º solta uma onda que atravessa inimigos e o corte reflete tiros.",
+			"descricao_curta": "R: 5 min de poder, começa carregada.",
+			"descricao": "LENDÁRIA. Começa cada expedição carregada e, ao vestir com R, permanece ativa por 5 minutos (recarga de 60s; baús recarregam na hora). +3 corações de escudo, velocidade 430 e a Lâmina Ômega: combo de 3 cortes (38/38/64); o 3º solta uma onda que atravessa inimigos e o corte reflete tiros.",
 			"icone": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_armadura_omega_bloqueada.png",
 			"card": "res://assets/ui/equipamento/cards/card_armadura_omega.png",

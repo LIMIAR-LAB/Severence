@@ -11,10 +11,12 @@ func _init() -> void:
 	s.coop = "solo"; s.start_arena(); s.enemies.clear(); s.bullets.clear()
 	var a: Dictionary = s.actors[0]
 	a.p = Vector2(400, 500); a.armor = false
+	check(is_equal_approx(s.ARMORS.omega.duration, 300.0), "Ômega permanece ativa por 5 minutos")
 	s.spawn_enemy(a.p + Vector2(120, 0), "cult")
 	s.add_bullet(a.p + Vector2(150, 0), Vector2.LEFT, 1, 10, 10, 5)
 	s.step_actor(a, {"armor": true}, 0.016)
 	check(a.armor and a.transform > 0 and s.effects.any(func(fx): return fx.kind == "transform"), "ligar a Ômega dispara a transformação")
+	check(is_equal_approx(a.armor_time, 300.0), "ativação carrega 5 minutos completos de uso")
 	var hp: float = a.hp
 	s.damage_actor(a, 50)
 	check(a.hp == hp, "invulnerável durante a transformação")
@@ -55,7 +57,9 @@ func _init() -> void:
 	check(s.UNIFORMS.espiao.speed > s.UNIFORMS.padrao.speed and s.UNIFORMS.mecanico.melee > s.UNIFORMS.padrao.melee, "Espião mais rápido, Mecânico mais forte")
 	# Baú
 	s = Expedition.new(); s.coop = "solo"; s.start_run(1941)
-	a = s.actors[0]; a.p = s.chests[0].p; s.keys = 1
+	a = s.actors[0]
+	check(a.armor_cd == 0 and not a.armor, "expedição começa com a Ômega carregada")
+	a.p = s.chests[0].p; s.keys = 1
 	s.interact(a); wait_cockpit(s, a)
 	check(s.chests[0].open and s.chests[0].has("t") and s.effects.any(func(fx): return fx.kind == "chest_burst"), "baú abre com animação e explosão de itens")
 	check(a.armor_cd == 0 and not a.armor, "baú recarrega a armadura (sem vestir sozinho)")
