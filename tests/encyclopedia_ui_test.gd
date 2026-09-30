@@ -26,6 +26,12 @@ func _initialize() -> void:
 	check(ui.content.find_child("Category_itens", true, false) is Button, "aba de itens existe")
 	check(ui.content.find_child("Category_robos", true, false) is Button, "aba de robôs existe")
 	check(ui.content.find_child("Entry_monstro_almirante", true, false) is Button, "lista é gerada pelos dados")
+	check(ui.content.find_child("ArchiveBackdrop", true, false) is TextureRect, "Arquivo reutiliza atmosfera pixel-art do jogo")
+	check(ui.content.find_child("ArchiveChassis", true, false) is Panel, "Arquivo possui chassi industrial próprio")
+	check(ui.content.find_child("DossierListPanel", true, false) is Panel, "índice assume linguagem de dossiê")
+	check(ui.content.find_child("ArchivePortraitFrame", true, false) is NinePatchRect, "moldura ornamentada enquadra o registro")
+	check(ui.content.find_child("ArchiveControlLegend", true, false) is Panel, "legenda de controles permanece visível")
+	check(ui.content.find_child("FractureAccent", true, false) is ColorRect, "fratura violeta integra a identidade temporal")
 
 	var robot_tab := ui.content.find_child("Category_robos", true, false) as Button
 	check(robot_tab != null, "aba de robôs pode receber foco")
@@ -52,6 +58,9 @@ func _initialize() -> void:
 	if fragment == null: check(false, "fragmento aparece na lista"); finish(); return
 	fragment.pressed.emit(); await process_frame
 	check((ui.content.find_child("EntryFallback", true, false) as Label).visible, "entrada sem arte usa fallback")
+	check(ui.content.find_child("MissingArtSeal", true, false) is Panel, "fallback sem arte usa selo intencional")
+	check((ui.content.find_child("ArchiveBackdrop", true, false) as TextureRect).texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "fundo preserva filtragem nearest")
+	check((ui.content.find_child("ArchivePortraitFrame", true, false) as NinePatchRect).texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "moldura preserva filtragem nearest")
 	check(root.get_viewport().gui_get_focus_owner() is Button, "navegação mantém um botão em foco")
 	(ui.content.find_child("EncyclopediaBack", true, false) as Button).pressed.emit(); await process_frame
 	check(ui.screen == "options", "Voltar retorna a Opções")

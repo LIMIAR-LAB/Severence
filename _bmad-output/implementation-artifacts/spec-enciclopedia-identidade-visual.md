@@ -2,7 +2,7 @@
 title: 'Bring the encyclopedia into the game visual identity'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-progress'
+status: 'in-review'
 baseline_commit: '41f296266cf478be895bd5637c8b80a77a279a30'
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-enciclopedia-dinamica.md'
@@ -49,10 +49,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `scripts/encyclopedia_screen.gd` -- replace the flat composition with reusable archive chrome, industrial panels, dossier rows, intentional fallback seal, and themed control legend while leaving data/navigation contracts intact.
-- [ ] `scripts/encyclopedia_screen.gd` -- integrate existing atmospheric and ornate-frame assets with nearest filtering and safe resource fallbacks.
-- [ ] `tests/encyclopedia_ui_test.gd` -- assert stable semantic controls plus the new identity-bearing layers without testing fragile pixel coordinates.
-- [ ] `test-output/ui-encyclopedia.png` -- regenerate and inspect a real 1280×800 capture after automated tests pass.
+- [x] `scripts/encyclopedia_screen.gd` -- replace the flat composition with reusable archive chrome, industrial panels, dossier rows, intentional fallback seal, and themed control legend while leaving data/navigation contracts intact.
+- [x] `scripts/encyclopedia_screen.gd` -- integrate existing atmospheric and ornate-frame assets with nearest filtering and safe resource fallbacks.
+- [x] `tests/encyclopedia_ui_test.gd` -- assert stable semantic controls plus the new identity-bearing layers without testing fragile pixel coordinates.
+- [x] `test-output/ui-encyclopedia.png` -- regenerate and inspect a real 1280×800 capture after automated tests pass.
 
 **Acceptance Criteria:**
 - Given the encyclopedia beside the title and equipment screens, when a player sees it, then its brass, metal, cyan-energy, pixel-art, and docks-era cues visibly belong to the same game.
