@@ -13,42 +13,50 @@ func check(ok: bool, label: String) -> void:
 	else: print("PASS: ", label)
 
 func _initialize() -> void:
-	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
+	var app = SaveStateApp.new(); root.add_child(app)
 	await process_frame
 	var ui = app.menu
 	ui.show_screen("main"); await process_frame; await process_frame
 	check(ResourceLoader.exists("res://assets/ui/title/title_loop.ogv"), "vídeo da tela inicial no projeto (Theora)")
-	check(ui.content.find_child("TitleConsole", true, false) is Panel, "console único cobre os controles pintados no vídeo")
-	var mask := ui.content.find_child("TitleControlMask", true, false) as ColorRect
-	check(mask != null and mask.position.y <= 261 and mask.color.a == 1.0, "máscara opaca cobre integralmente as placas antigas")
-	var buttons: Array = []
-	for i in 7: buttons.append(ui.content.find_child("Title_%d" % i, true, false))
-	check(buttons.all(func(b): return b is Button), "7 ações são controles vivos")
-	check(buttons[0].disabled and not app.playing, "CONTINUAR desativado sem expedição")
+	check(ui.content.find_child("TitleLockup", true, false) is Control, "novo lockup pertence ao cenário")
+	check(ui.content.find_child("TitleCommandDeck", true, false) is Panel, "um único deck concentra toda a navegação")
+	var scene_crop := ui.content.find_child("TitleStillCropped", true, false) as TextureRect
+	check(scene_crop != null and scene_crop.texture is AtlasTexture and scene_crop.texture.region == Rect2(384, 107, 960, 537), "fundo recorta a sidebar na fonte sem distorção não uniforme")
+	var title_scene := ui.content.find_child("TitleSceneCrop", true, false) as Control
+	var final_bg_scale: Vector2 = ui.stage.scale * title_scene.scale
+	check(is_equal_approx(final_bg_scale.x, final_bg_scale.y), "cenário mantém escala uniforme após o ajuste global")
+	var button_ids := [0, 1, 2, 5, 6]
+	var buttons: Array = button_ids.map(func(i): return ui.content.find_child("Title_%d" % i, true, false))
+	check(buttons.all(func(b): return b is Button), "5 ações do conceito são controles vivos")
+	var deck := ui.content.find_child("TitleCommandDeck", true, false) as Panel
+	check(deck.find_children("*", "Button", true, false).size() == 5, "deck contém exatamente cinco ações")
+	check(ui.content.find_child("Title_3", true, false) == null, "Expedição Direta foi removida")
+	check(ui.content.find_child("Title_4", true, false) == null, "não existe botão separado de Carregar")
+	check(ui.content.find_child("EncyclopediaButton", true, false) == null, "Arquivo permanece fora da tela inicial")
+	check(buttons[0].disabled and not app.playing, "CONTINUAR desativado sem expedição ou save")
 	var focus: Control = root.get_viewport().gui_get_focus_owner()
 	check(focus == buttons[1], "foco inicial em NOVA EXPEDIÇÃO")
 	check(not buttons[1].disabled and buttons[1].has_focus(), "somente uma ação habilitada inicia em foco")
-	check(ui.content.find_children("Plate_*", "TextureRect", true, false).is_empty(), "não usa placas recortadas sobre o cenário")
-	check(ui.content.find_child("Title_4", true, false).disabled == not app.has_saved_game(), "carregar habilitado apenas com save")
+	check(ui.content.find_child("TitleControlMask", true, false) == null, "não mascara a sidebar antiga com outro painel")
 	check(ui.content.find_child("TitleNetworkStatus", true, false) is Label, "estado da rede ocupa área própria no rodapé")
-	check(buttons[1].focus_next != NodePath(""), "navegação sequencial usa a ordem visual do console")
+	check(buttons[1].focus_next != NodePath(""), "navegação sequencial usa a ordem visual do deck")
 	buttons[2].mouse_entered.emit(); await process_frame
 	check(root.get_viewport().gui_get_focus_owner() == buttons[2], "hover transfere o foco e mantém um único destaque")
-	app.playing = true; ui.show_screen("main"); await process_frame; await process_frame
+	app.playing = true; app.fake_save = true; ui.show_screen("main"); await process_frame; await process_frame
 	var active_continue := ui.content.find_child("Title_0", true, false) as Button
 	check(not active_continue.disabled, "CONTINUAR habilitado durante expedição ativa")
 	check(root.get_viewport().gui_get_focus_owner() == active_continue, "expedição ativa prioriza CONTINUAR no foco")
 	check(active_continue.get_theme_stylebox("normal").border_color == Color("56cdd4"), "expedição ativa promove CONTINUAR à ação principal")
-	active_continue.pressed.emit(); check(not ui.visible and not app.paused, "CONTINUAR retoma a expedição ativa")
+	active_continue.pressed.emit(); check(not ui.visible and not app.paused and not app.load_requested, "CONTINUAR prioriza a expedição ativa mesmo quando também existe save")
 	app.playing = false; ui.show(); ui.show_screen("main"); await process_frame
 	var save_app := SaveStateApp.new(); root.add_child(save_app); await process_frame
-	check(save_app.menu.content.find_child("Title_4", true, false).disabled, "CARREGAR fica indisponível sem save")
+	check(save_app.menu.content.find_child("Title_0", true, false).disabled, "CONTINUAR fica indisponível sem save")
 	save_app.fake_save = true; save_app.menu.show_screen("main"); await process_frame
-	var saved_load := save_app.menu.content.find_child("Title_4", true, false) as Button
-	check(not saved_load.disabled, "CARREGAR fica disponível com save")
-	saved_load.pressed.emit(); check(save_app.load_requested, "CARREGAR preserva o callback de load")
+	var saved_continue := save_app.menu.content.find_child("Title_0", true, false) as Button
+	check(not saved_continue.disabled, "CONTINUAR fica disponível com save")
+	saved_continue.pressed.emit(); check(save_app.load_requested, "CONTINUAR carrega a expedição salva")
 	save_app.queue_free(); await process_frame
-	var targets := {1: "characters", 2: "online", 3: "seed", 5: "options"}
+	var targets := {1: "characters", 2: "online", 5: "options"}
 	for i in targets:
 		ui.show_screen("main"); await process_frame
 		(ui.content.find_child("Title_%d" % i, true, false) as Button).pressed.emit()

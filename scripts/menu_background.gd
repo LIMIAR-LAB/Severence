@@ -19,6 +19,7 @@ var embers: Array = []
 var rain: Array = []
 var fog: Array = []
 var rng := RandomNumberGenerator.new()
+var scene_only := false
 
 class Glow extends Node2D:
 	var host
@@ -28,7 +29,12 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	size = SIZE
 	rng.seed = 1941
-	bg = TextureRect.new(); bg.texture = load("res://assets/ui/menu.png")
+	bg = TextureRect.new()
+	var menu_texture = load("res://assets/ui/menu.png")
+	if scene_only and menu_texture != null:
+		var cropped := AtlasTexture.new(); cropped.atlas = menu_texture; cropped.region = Rect2(384, 107, 960, 537)
+		bg.texture = cropped
+	else: bg.texture = menu_texture
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; bg.size = SIZE; bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat := ShaderMaterial.new(); mat.shader = load("res://shaders/menu_bg.gdshader")
 	mat.set_shader_parameter("gears", [Vector4(705, 37, 29, 0.55), Vector4(1164, 65, 27, -0.7), Vector4(857, 222, 19, 0.9), Vector4(685, 110, 11, -1.2), Vector4(0, 0, 0, 0)])
