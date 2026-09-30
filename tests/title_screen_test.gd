@@ -104,13 +104,16 @@ func _initialize() -> void:
 	ui.content.find_child("CharacterMarty", true, false).pressed.emit()
 	check(ui.screen == "play" and ui.content.find_child("LocalChoice", true, false) is Button, "escolha de Marty abre os três modos")
 	var adventure_art := ui.content.find_child("MenuConceptArt", true, false) as TextureRect
-	check(adventure_art != null and adventure_art.texture.resource_path.ends_with("selecao-aventura-conceito-v2.png"), "aventura usa os cartões ilustrados aprovados")
-	ui.content.find_child("LocalChoice", true, false).pressed.emit()
-	await process_frame
-	check(root.get_viewport().gui_get_focus_owner().name == "LocalChoice", "foco acompanha o modo escolhido")
-	check(ui.screen == "play" and ui.pending_mode == "local", "coop local fica selecionado até confirmar")
-	ui.content.find_child("EquipAndEnter", true, false).pressed.emit(); await process_frame
-	check(ui.screen == "characters_coop", "coop local abre seleção de dois jogadores")
+	check(adventure_art != null and adventure_art.texture.resource_path.ends_with("selecao-aventura-conceito-v3.png"), "aventura usa arte sem botão de confirmação")
+	check(ui.content.find_child("EquipAndEnter", true, false) == null, "aventura não exige botão de confirmação")
+	ui.content.find_child("SoloChoice", true, false).pressed.emit(); await process_frame
+	check(ui.screen == "equipment" and ui.pending_mode == "solo", "clique em solo abre equipamento")
+	ui.content.find_child("Back", true, false).pressed.emit(); await process_frame
+	ui.content.find_child("AIChoice", true, false).pressed.emit(); await process_frame
+	check(ui.screen == "equipment" and ui.pending_mode == "ai", "clique em solo + IA abre equipamento")
+	ui.content.find_child("Back", true, false).pressed.emit(); await process_frame
+	ui.content.find_child("LocalChoice", true, false).pressed.emit(); await process_frame
+	check(ui.screen == "characters_coop" and ui.pending_mode == "local", "clique em coop local abre seleção de dois jogadores")
 	var coop_art := ui.content.find_child("MenuConceptArt", true, false) as TextureRect
 	check(coop_art != null and coop_art.texture.resource_path.ends_with("selecao-personagem-coop-conceito-v3.png"), "coop mostra Marty selecionado em ambos os lados")
 	ui.content.find_child("ConfirmCharacters", true, false).pressed.emit(); await process_frame
@@ -118,7 +121,6 @@ func _initialize() -> void:
 	ui.content.find_child("Back", true, false).pressed.emit()
 	check(ui.screen == "play", "equipamento volta à escolha do modo")
 	ui.content.find_child("LocalChoice", true, false).pressed.emit()
-	ui.content.find_child("EquipAndEnter", true, false).pressed.emit()
 	ui.content.find_child("ConfirmCharacters", true, false).pressed.emit()
 	ui.content.find_child("Refuge", true, false).pressed.emit()
 	check(app.playing and app.sim.coop == "local" and app.sim.mode == "hub", "coop local inicia no refúgio")
