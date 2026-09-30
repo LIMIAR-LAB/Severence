@@ -24,6 +24,7 @@ func _ready() -> void:
 	art["coin_clean"] = load("res://assets/environment/docks/coin.png")
 	art["titan"] = load("res://assets/mech/titan_v2.png")
 	art["portraits"] = load("res://assets/ui/hud/marty_omega_portraits_v1.png")
+	art["omega_icon"] = load("res://assets/ui/equipamento/icones/icon_armadura_omega.png")
 	art["robot_titan"] = load("res://assets/ui/equipamento/icones/icon_robo_titan.png")
 	art["robot_spectre"] = load("res://assets/ui/equipamento/icones/icon_robo_spectre.png")
 	art["boss"] = load("res://assets/boss/almirante_idle.png")
@@ -44,6 +45,45 @@ func frame(r: Rect2) -> void:
 
 func text(p: Vector2, value: String, size: int = 15, color: Color = Color("e8dfba")) -> void:
 	draw_string(font, p, value, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
+
+func draw_omega_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
+	var armor_info: Dictionary = s.ARMORS[a.armor_type]
+	var ratio: float = 1.0
+	var state := "PRONTA"
+	var detail := "L1 • VESTIR" if ps else "R • VESTIR"
+	var color := CYAN
+	if a.armor:
+		ratio = clampf(a.armor_time / armor_info.duration, 0.0, 1.0)
+		state = "ATIVA • %.0fs" % ceilf(a.armor_time)
+		detail = "TEMPO RESTANTE"
+	elif a.armor_cd > 0.0:
+		ratio = clampf(1.0 - a.armor_cd / armor_info.cooldown, 0.0, 1.0)
+		state = "RECARREGANDO • %.0fs" % ceilf(a.armor_cd)
+		detail = "%d%% CARREGADA" % int(roundf(ratio * 100.0))
+		color = GOLD
+	elif a.mech:
+		state = "PRONTA"
+		detail = "SAIA DO TITAN PARA VESTIR"
+
+	var center := Vector2(55, 140)
+	var icon_tint := Color.WHITE if a.armor or a.armor_cd <= 0.0 else Color(0.55, 0.58, 0.62)
+	draw_rect(Rect2(17, 102, 76, 76), Color("081724"))
+	draw_texture_rect(art.omega_icon, Rect2(29, 114, 52, 52), false, icon_tint)
+	for segment in range(12):
+		var start: float = -PI * 0.5 + TAU * float(segment) / 12.0
+		var end: float = start + TAU * 0.075
+		var segment_color: Color = color if float(segment) < ratio * 12.0 else Color("34404a")
+		draw_arc(center, 35.0, start, end, 3, segment_color, 4.0, true)
+	if ratio >= 1.0 and not a.armor:
+		var pulse := 0.65 + 0.35 * sin(Time.get_ticks_msec() * 0.008)
+		draw_arc(center, 39.0, -PI * 0.5, PI * 1.5, 36, Color(CYAN, pulse), 2.0, true)
+	text(Vector2(103, 125), "ARMADURA ÔMEGA", 13, GOLD)
+	text(Vector2(103, 146), state, 14, color)
+	text(Vector2(103, 165), detail, 11, Color("b6c8cd"))
+	if a.armor:
+		var special_key := "→" if ps else ("T" if id == 0 else "P")
+		var beam_label := "RAIO ATIVO • %.1fs" % a.beam_time if a.beam_time > 0 else ("RAIO • %.0fs" % ceilf(a.beam_cd) if a.beam_cd > 0 else "%s • SEGURAR RAIO" % special_key)
+		text(Vector2(103, 182), beam_label, 11, CYAN if a.beam_cd <= 0 else Color("8a7a58"))
 
 func _draw() -> void:
 	if app == null or app.sim == null: return
@@ -71,31 +111,19 @@ func _draw() -> void:
 	for n in range(6):
 		draw_rect(Rect2(153+n*21,46,18,8), CYAN if (1-a.dodge_cd/s.uniform_of(a).dash_cd)*6 > n else Color("1a3548"))
 	text(Vector2(111,80), "UNIFORME: " + s.UNIFORMS[a.outfit].name, 13, GOLD)
-	# Armadura: pronta / ativa (tempo restante) / recarregando
-	var armor_info: Dictionary = s.ARMORS[a.armor_type]
+	# A carga da Ômega acompanha o ícone abaixo do retrato.
+	draw_omega_indicator(s, a, ps, id)
 	var vp: Vector2 = get_viewport_rect().size
 	var dx := vp.x - 1280.0; var dy := vp.y - 800.0   # HUD ancorado nas bordas reais (qualquer proporção)
-	var box := Rect2(660 + dx * 0.5, 14, 260, 72 if a.armor else 54)
-	frame(box)
-	var ratio := 0.0; var label := ""; var col := GOLD
 	if a.mech:
+		var box := Rect2(660 + dx * 0.5, 14, 260, 54)
+		frame(box)
 		var bcd: float = a.get("bomb_cd", 0.0)
-		ratio = 1.0 - bcd / s.MECH_BOMB.cooldown
-		label = ("→ • BOMBA PRONTA" if ps else "R • BOMBA PRONTA") if bcd <= 0 else "BOMBA • %.1fs" % bcd
-		col = Color("ff9a4a") if bcd <= 0 else Color("8a7a58")
-	elif a.armor:
-		ratio = a.armor_time / armor_info.duration; label = "%s • %.0fs" % [armor_info.name, ceilf(a.armor_time)]; col = CYAN
-	elif a.armor_cd > 0:
-		ratio = 1.0 - a.armor_cd / armor_info.cooldown; label = "RECARGA • %.0fs" % ceilf(a.armor_cd); col = Color("8a7a58")
-	else:
-		ratio = 1.0; label = ("L1 • VESTIR ARMADURA ÔMEGA" if ps else "R • VESTIR ARMADURA ÔMEGA"); col = CYAN.lerp(Color.WHITE, 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008))
-	text(box.position + Vector2(12, 22), label, 13, col)
-	draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236, 10)), Color("1a2430"))
-	draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236 * clampf(ratio, 0, 1), 10)), col)
-	if a.armor:
-		var special_key := "→" if ps else ("T" if id == 0 else "P")
-		var beam_label := "RAIO ATIVO • %.1fs" % a.beam_time if a.beam_time > 0 else ("RAIO • %.0fs" % ceilf(a.beam_cd) if a.beam_cd > 0 else "%s • SEGURAR RAIO" % special_key)
-		text(box.position + Vector2(12, 59), beam_label, 12, CYAN if a.beam_cd <= 0 else Color("8a7a58"))
+		var bomb_ratio: float = clampf(1.0 - bcd / s.MECH_BOMB.cooldown, 0.0, 1.0)
+		var bomb_color := Color("ff9a4a") if bcd <= 0 else Color("8a7a58")
+		text(box.position + Vector2(12, 22), ("→ • BOMBA PRONTA" if ps else "R • BOMBA PRONTA") if bcd <= 0 else "BOMBA • %.1fs" % bcd, 13, bomb_color)
+		draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236, 10)), Color("1a2430"))
+		draw_rect(Rect2(box.position + Vector2(12, 32), Vector2(236 * bomb_ratio, 10)), bomb_color)
 	frame(Rect2(300,14,146,82))
 	var weapon: String = s.weapon_of(a)
 	if weapon == "mech": weapon = "shotgun"
