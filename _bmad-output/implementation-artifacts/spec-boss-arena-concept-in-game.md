@@ -2,7 +2,7 @@
 title: 'Bring the Almirante concept arena into gameplay'
 type: 'feature'
 created: '2026-09-29'
-status: 'in-review'
+status: 'done'
 baseline_commit: 'd1ab1005c1020b8ace25481b3e980553010efa2e'
 context:
   - '{project-root}/docs/deep-dive-boss.md'
@@ -80,3 +80,23 @@ The concept is a direction reference, not a drop-in background. The runtime comp
 
 **Manual checks (if no CLI):**
 - Inspect clean, stage 1, charge/spin, fury, and defeat captures at gameplay zoom for seams, occlusion, contrast, and concept fidelity.
+
+## Suggested Review Order
+
+**Arena rendering**
+
+- Dedicated plate replaces repetitive tiles while preserving fallback and layer order.
+  [`dock_scenery.gd:298`](../../scripts/dock_scenery.gd#L298)
+
+- Runtime artwork keeps the entire physical room visually walkable.
+  [`boss_arena_plate.png:1`](../../assets/environment/docks12/boss/boss_arena_plate.png#L1)
+
+**Camera-edge coverage**
+
+- Boss-only water surrounds every supported viewport without changing collision.
+  [`docks_map.gd:61`](../../scripts/docks_map.gd#L61)
+
+**Safety contract**
+
+- Tests lock geometry, hazards, dodge space, entrances, navigation, and wide-camera coverage.
+  [`boss_arena_scenery_test.gd:17`](../../tests/boss_arena_scenery_test.gd#L17)
