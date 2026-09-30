@@ -394,18 +394,25 @@ func _physics_process(dt: float) -> void:
 	var pause_pressed := Input.is_physical_key_pressed(KEY_ESCAPE)
 	for device in connected_gamepads():
 		pause_pressed = pause_pressed or Input.is_joy_button_pressed(device, JOY_BUTTON_START)
-	if edge("esc", pause_pressed):
+	var pause_edge := edge("esc", pause_pressed)
+	var gear_edge := edge("gear", Input.is_physical_key_pressed(KEY_B)) and playing
+	if pause_edge:
 		if menu.visible:
 			if menu.screen == "equipment": menu.show_screen("play")
 			elif menu.screen == "mission_inventory": menu.show_screen("pause")
 			elif menu.screen == "encyclopedia": menu.show_screen(menu.encyclopedia_return_screen)
 			else: menu.close()
 		elif playing: menu.open("pause")
-	if edge("gear", Input.is_physical_key_pressed(KEY_B)) and playing:
+	elif gear_edge:
 		if menu.visible:
 			if menu.screen == "mission_inventory": menu.show_screen("pause")
+			elif menu.screen == "pause":
+				menu.read_equipment()
+				menu.show_screen("mission_inventory")
 			else: menu.close()
-		else: menu.open("pause")
+		else:
+			menu.read_equipment()
+			menu.open("mission_inventory")
 	# Mapa: TAB, M ou clique no minimapa (canto superior direito)
 	var mouse_on_map := minimap_rect().has_point(get_viewport().get_mouse_position())
 	if edge("map", Input.is_physical_key_pressed(KEY_TAB) or Input.is_physical_key_pressed(KEY_M) or (mouse_on_map and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT))): map_open = not map_open

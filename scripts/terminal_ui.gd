@@ -303,29 +303,40 @@ func build_pause() -> void:
 		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; p.add_child(frame)
 	label(p, Rect2(110, 89, 680, 48), "PAUSA", 31, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label(p, Rect2(110, 139, 680, 36), "Expedição em andamento", 20, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var resume := button(p, Rect2(160, 174, 580, 52), "CONTINUAR", close)
+	var mission_inventory := button(p, Rect2(160, 174, 580, 52), "INVENTÁRIO DA MISSÃO   [B]", func(): read_equipment(); show_screen("mission_inventory"))
+	mission_inventory.name = "MissionInventory"
+	mission_inventory.tooltip_text = "Consultar itens levados e recursos obtidos nesta missão"
+	mission_inventory.add_theme_font_size_override("font_size", 21)
+	mission_inventory.add_theme_color_override("font_color", GOLD)
+	var inventory_normal := mission_inventory.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+	inventory_normal.bg_color = Color("16444a"); inventory_normal.border_color = CYAN; inventory_normal.set_border_width_all(3)
+	mission_inventory.add_theme_stylebox_override("normal", inventory_normal)
+	var resume := button(p, Rect2(160, 236, 580, 52), "CONTINUAR", close)
 	resume.name = "ResumeGame"
-	var save := button(p, Rect2(160, 236, 580, 52), "SALVAR JOGO", func():
+	var save := button(p, Rect2(160, 298, 580, 52), "SALVAR JOGO", func():
 		if app.save_game(): telemetry.text = "Expedição salva."
 		else: telemetry.text = "Não foi possível salvar esta partida.")
 	save.name = "SaveGame"; save.disabled = app.online
-	var leave := button(p, Rect2(160, 298, 580, 52), "VOLTAR AO MENU", func():
+	var leave := button(p, Rect2(160, 360, 580, 48), "VOLTAR AO MENU", func():
 		if not app.return_to_title():
 			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
 			telemetry.add_theme_color_override("font_color", Color("ffad99")))
 	leave.name = "ReturnToMenu"
-	var encyclopedia_button := button(p, Rect2(160, 360, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
+	var encyclopedia_button := button(p, Rect2(160, 416, 580, 48), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
 	encyclopedia_button.name = "PauseEncyclopedia"
-	var mission_inventory := button(p, Rect2(160, 416, 580, 48), "INVENTÁRIO DA MISSÃO", func(): read_equipment(); show_screen("mission_inventory"))
-	mission_inventory.name = "MissionInventory"
+	mission_inventory.focus_neighbor_bottom = mission_inventory.get_path_to(resume); mission_inventory.focus_next = mission_inventory.get_path_to(resume)
+	resume.focus_neighbor_top = resume.get_path_to(mission_inventory); resume.focus_previous = resume.get_path_to(mission_inventory)
 	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
 	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
 	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
 	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
 	leave.focus_neighbor_bottom = leave.get_path_to(encyclopedia_button); leave.focus_next = leave.get_path_to(encyclopedia_button)
-	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
-	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave); encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
-	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button); mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
+	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave)
+	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave)
+	encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
+	encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
+	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button)
+	mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
 	telemetry = label(p, Rect2(105, 476, 690, 34), "Esc ou Start também continua a partida.", 15, GOLD)
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
