@@ -19,7 +19,7 @@ context:
 
 ## Boundaries & Constraints
 
-**Always:** Preserve every tracked and untracked user change; keep transparent PNGs and native crisp pixel art; match the docks enemies' abyssal 1941 naval palette and silhouettes; retain source exports under `art/source/pixellab/`; use stable runtime copies under `assets/enemies/encyclopedia/`; keep encyclopedia behavior data-driven; fetch before reconciliation; inspect branch ancestry and diffs before merging; resolve conflicts by integrating both compatible sides; run import, automated tests, and a real encyclopedia capture before push; push only after local `main` contains the latest `origin/main`.
+**Always:** Preserve every tracked and untracked user change; use native crisp pixel art; match the supplied maximalist arcade-card reference with dramatic stormy dock scenes, dense detail, saturated cyan/magenta/orange effects, aged brass framing, and recognizable 1941 naval-horror silhouettes; retain source exports under `art/source/pixellab/`; use stable runtime copies under `assets/enemies/encyclopedia/`; keep encyclopedia behavior data-driven; fetch before reconciliation; inspect branch ancestry and diffs before merging; resolve conflicts by integrating both compatible sides; run import, automated tests, and a real encyclopedia capture before push; push only after local `main` contains the latest `origin/main`.
 
 **Ask First:** Dropping a commit or file because two variants cannot coexist; force-pushing; rewriting published history; deleting branches; changing enemy gameplay, collisions, stats, or encyclopedia prose.
 
@@ -29,7 +29,7 @@ context:
 
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|---------------|---------------------------|----------------|
-| Missing portrait | One of the four named monster entries | A coherent transparent PixelLab portrait loads in its dossier | Keep the intentional seal until a candidate passes inspection |
+| Missing portrait | One of the four named monster entries | A cohesive full-bleed PixelLab bestiary card loads in its dossier | Keep the intentional seal until a candidate passes inspection |
 | Dirty work | Tracked and untracked changes from parallel features | All files are preserved in explicit commits before branch reconciliation | Stop if ownership is ambiguous or a file cannot be safely retained |
 | Divergent branch | Branch contains commits absent from `main` | Relevant history/content becomes reachable from unified `main` | Inspect conflicts and integrate both sides; never favor a side automatically |
 | Remote advanced | `origin/main` has commits absent locally | Remote work is merged before final push | No force push; re-run verification after reconciliation |
@@ -51,7 +51,7 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] `art/source/pixellab/encyclopedia-enemies/` -- create four cohesive transparent enemy portraits in PixelLab and retain source provenance.
+- [x] `art/source/pixellab/encyclopedia-enemies/` -- create four cohesive illustrated enemy cards in PixelLab and retain both source passes with provenance.
 - [x] `assets/enemies/encyclopedia/` -- normalize accepted portraits for runtime use with crisp nearest-filtered output.
 - [x] `data/enciclopedia.json` -- bind each named monster to its matching portrait without changing the schema.
 - [x] `tests/encyclopedia_data_test.gd` and `tests/encyclopedia_ui_test.gd` -- prove every monster image resolves and missing-art fallback still works for bad paths.
@@ -59,16 +59,18 @@ context:
 - [ ] Full project -- import, run relevant regression suites, capture the encyclopedia, audit ancestry, and push unified `main` to `origin`.
 
 **Acceptance Criteria:**
-- Given any of the four previously incomplete monster dossiers, when opened, then its matching PixelLab portrait appears with transparent background and the established docks identity.
+- Given any of the four previously incomplete monster dossiers, when opened, then its matching PixelLab card fills the frame with the supplied saturated arcade-poster identity.
 - Given an invalid or absent future image path, when the dossier opens, then the intentional archive seal still renders safely.
 - Given the pre-existing dirty files and branch tips, when consolidation completes, then all content is retained, `main` includes the latest remote history, and no contributing branch has unique commits left outside `main`.
 - Given verification passes, when `main` is pushed, then `origin/main` points at the verified unified commit without force rewriting.
 
 ## Spec Change Log
 
+- 2026-09-29 — User rejected the sparse transparent-sprite treatment and supplied a maximalist Almirante card reference; acceptance now requires illustrated full-bleed cards with dramatic environments and saturated effects. The original sprites remain as exploration, while the v2 cards are promoted to runtime.
+
 ## Design Notes
 
-The portraits are dossier busts rather than new gameplay animation sets. They should reuse the recognizable forms already established in `enemies-docas-v2.png`: hooded cultist with candle and rifle, amphibious harpooner in striped dockwear, one-eyed corrosive crawler, and helmeted tentacled heavy soldier. A compact shared canvas and lighting direction will make the four records feel like one archival set.
+The portraits are illustrated dossier cards rather than gameplay animation sets. They reuse the recognizable forms already established in `enemies-docas-v2.png`: hooded cultist with candle and rifle, amphibious harpooner in striped dockwear, one-eyed corrosive crawler, and helmeted tentacled heavy soldier. The accepted 256×256 pass places each enemy in a different dock battle while sharing the same brass border, storm lighting, neon tracers, palette density, and close action framing.
 
 Branch consolidation is content-oriented: merge commits are preferred when they preserve meaningful independent history, while branches already reachable or patch-equivalent are documented as integrated rather than merged redundantly.
 
