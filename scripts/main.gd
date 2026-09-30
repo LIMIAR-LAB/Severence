@@ -287,6 +287,17 @@ func change_loadout(outfit: String, robot: String, armor_type: String) -> void:
 	if hosting and multiplayer.get_remote_sender_id() == guest_id:
 		sim.equip(1, outfit, robot, armor_type)
 
+func request_run_weapon(id: int, weapon: String) -> bool:
+	if online and not hosting:
+		if id != 1 or weapon not in ["", "bazooka"]: return false
+		change_run_weapon.rpc_id(1, weapon); return true
+	return sim.select_run_weapon(id, weapon)
+
+@rpc("any_peer", "call_remote", "reliable", 3)
+func change_run_weapon(weapon: String) -> void:
+	if hosting and multiplayer.get_remote_sender_id() == guest_id:
+		sim.select_run_weapon(1, weapon)
+
 func request_robot_action(id: int, action: String) -> void:
 	if action not in ["summon", "fusion"]: return
 	if online and not hosting:

@@ -97,7 +97,7 @@ func _init() -> void:
 
 func actor(id: int, pos: Vector2) -> Dictionary:
 	return {"id": id, "active": id == 0 or coop != "solo", "p": pos, "aim": Vector2.RIGHT, "facing": Vector2.DOWN, "dash_dir": Vector2.RIGHT, "move": Vector2.ZERO, "hp": BASE_HEARTS * HEART, "shield": 0.0, "armor": false,
-		"jump": 0.0, "jump_cd": 0.0, "shot": 0.0, "slash": 0.0, "dodge": 0.0, "dodge_cd": 0.0,
+		"jump": 0.0, "jump_cd": 0.0, "shot": 0.0, "slash": 0.0, "dodge": 0.0, "roll_visual": 0.0, "dodge_cd": 0.0,
 		"hurt": 0.0, "step": 0.0, "mech": false, "dead": id == 1 and coop == "solo", "gun": 0, "interact_cd": 0.0, "revive": 0.0,
 		"selected_robot": default_robot(), "summon_cd": 0.0, "fused": false, "armor_before_fusion": false,
 		"outfit": "mecanico" if id == 1 and is_unlocked("mecanico") else "padrao", "snare": 0.0, "fire_flash": 0.0, "transform": 0.0,
@@ -768,7 +768,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 		if a.dead or mech.hp <= 0: mech.cockpit_t = 0.0
 		a.move = Vector2.ZERO
 		return
-	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "combo_t", "bomb_cd"]:
+	for timer in ["shot", "slash", "hurt", "jump_cd", "dodge_cd", "interact_cd", "summon_cd", "snare", "fire_flash", "transform", "armor_cd", "combo_t", "bomb_cd", "roll_visual"]:
 		a[timer] = maxf(0, a.get(timer, 0.0) - dt)
 	if a.dead: return
 	if a.armor and a.get("transform", 0.0) <= 0:
@@ -791,7 +791,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	if cmd.get("jump", false) and a.jump <= 0 and a.jump_cd <= 0 and not a.mech:
 		a.jump = 0.65; a.jump_cd = 0.8; a["jump_from"] = a.p
 	if cmd.get("dodge", false) and a.dodge_cd <= 0 and not a.mech:
-		a.dodge = 0.20; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
+		a.dodge = 0.20; a.roll_visual = 0.36; a.dodge_cd = 0.3 if a.armor else uniform_of(a).dash_cd
 		a.dash_dir = moving.normalized() if moving.length() > 0.1 else a.facing.normalized()
 	var speed: float = 190.0 if a.mech else (ARMORS[a.armor_type].speed if a.armor else uniform_of(a).speed)
 	if a.fused: speed = FUSION.speed
@@ -839,6 +839,7 @@ func step_actor(a: Dictionary, cmd: Dictionary, dt: float) -> void:
 	if a.mech:
 		mech.p = a.p; mech.aim = a.aim; mech.step = a.step; mech["facing"] = a.facing; mech["moving"] = a.move.length() > 0.1
 		if a.move.length() > 0.1: mech["move_dir"] = a.move.normalized()
+	if a.dodge <= 0 and (cmd.get("fire", false) or cmd.get("melee", false) or a.jump > 0): a.roll_visual = 0.0
 	if a.armor and not a.mech:
 		if (cmd.get("fire", false) or cmd.get("melee", false)) and a.shot <= 0: sword_attack(a)
 	else:
@@ -920,7 +921,7 @@ func weapon_of(a: Dictionary) -> String:
 	if a.mech: return "mech"
 	if a.armor: return "omega_sword"
 	var selected: String = a.get("run_weapon", "")
-	if selected != "" and int(a.get("run_weapons", {}).get(selected, 0)) > 0: return selected
+	if selected != "" and a.get("run_weapons", {}).has(selected): return selected
 	return uniform_of(a).weapon
 
 func grant_run_weapon(a: Dictionary, name: String, ammo: int) -> void:
@@ -936,9 +937,17 @@ func toggle_run_weapon(a: Dictionary) -> void:
 	if a.get("run_weapon", "") != "":
 		a["run_weapon"] = ""; say("ARMA BÁSICA • munição infinita"); return
 	for name in owned:
-		if int(owned[name]) > 0:
-			a["run_weapon"] = name; say("%s • %d foguetes" % [str(name).to_upper(), owned[name]]); return
-	say("Nenhuma arma de expedição com munição.")
+		a["run_weapon"] = name; say("%s • %d foguetes" % [str(name).to_upper(), owned[name]]); return
+	say("Nenhuma arma de expedição obtida.")
+
+func select_run_weapon(id: int, weapon: String) -> bool:
+	if id < 0 or id >= actors.size(): return false
+	var a: Dictionary = actors[id]
+	if not a.active or a.dead or a.mech or a.armor: return false
+	if weapon != "" and (weapon != "bazooka" or not a.get("run_weapons", {}).has(weapon)): return false
+	a.run_weapon = weapon
+	return true
+
 
 # 0.14: tabela única das armas — o jogo e a tela de Equipamento (loadout_stats) leem daqui.
 const WEAPONS := {
@@ -954,10 +963,74 @@ const SPECTRE_SHOT := {"damage": 9.0, "cooldown": 0.55}
 const SPECTRE_HP := 100.0
 const FUSION := {"damage": 1.35, "cadence": 0.8, "speed": 360.0}
 
+const ACTOR_VISUAL_SCALE := 1.12
+
+# Hand and barrel geometry is shared with WorldView. Height never shifts collision Y.
+func weapon_hand_anchor(a: Dictionary, body_direction: Vector2 = Vector2.ZERO) -> Vector2:
+	var direction: Vector2 = a.get("aim", a.facing) if body_direction == Vector2.ZERO else body_direction
+	if outfit_of(a) == "omega":
+		var omega_anchors := [
+			Vector2(20, -40), Vector2(23, -43), Vector2(25, -44), Vector2(20, -47),
+			Vector2(10, -49), Vector2(-20, -47), Vector2(-25, -44), Vector2(-23, -43),
+		]
+		return omega_anchors[weapon_direction_row(direction)]
+	if outfit_of(a) == "padrao":
+		# O novo atlas tem oito direcoes e corpo mais alto que o legado.
+		# A ancora segue a mira para manter a empunhadura junto da mao no disparo.
+		var padrao_anchors := [
+			Vector2(10, -35), Vector2(15, -36), Vector2(17, -35), Vector2(14, -38),
+			Vector2(7, -40), Vector2(-14, -38), Vector2(-17, -35), Vector2(-15, -36),
+		]
+		return padrao_anchors[weapon_direction_row(direction)]
+	# 0.17: acompanha a mão visível de cada vista, em vez de orbitar o centro do corpo.
+	var pose := weapon_pose(a.facing)
+	var anchors := [Vector2(20, -27), Vector2(21, -28), Vector2(18, -26), Vector2(18, -26), Vector2(20, -25)]
+	var hand: Vector2 = anchors[pose[0]]
+	if pose[1]: hand.x = -hand.x
+	if a.armor: hand.y -= 2
+	return hand
+
+func weapon_pose(f: Vector2) -> Array:
+	# 8 direções com 5 vistas: frente, frente-3/4, lado, costas-3/4, costas (espelhadas para a esquerda).
+	var octant := int(round(fposmod(f.angle(), TAU) / (TAU / 8))) % 8
+	match octant:
+		0: return [2, false]   # direita
+		1: return [1, false]   # baixo-direita
+		2: return [0, false]   # baixo
+		3: return [1, true]    # baixo-esquerda
+		4: return [2, true]    # esquerda
+		5: return [3, true]    # cima-esquerda
+		6: return [4, false]   # cima
+		_: return [3, false]   # cima-direita
+
+func weapon_direction_row(direction: Vector2) -> int:
+	# Ordem do export PixelLab: sul, sudeste, leste, nordeste, norte,
+	# noroeste, oeste, sudoeste.
+	var f := direction.normalized() if direction.length() > 0.01 else Vector2.DOWN
+	var octant := int(round(fposmod(f.angle(), TAU) / (TAU / 8))) % 8
+	return [2, 1, 0, 7, 6, 5, 4, 3][octant]
+
+func weapon_geometry(a: Dictionary, body_direction: Vector2 = Vector2.ZERO) -> Dictionary:
+	var weapon := weapon_of(a)
+	var sizes := {"pistol": Vector2(40, 18), "shotgun": Vector2(56, 18), "smg": Vector2(52, 22), "bazooka": Vector2(96, 64), "omega": Vector2(44, 18)}
+	var size: Vector2 = sizes.get(weapon, Vector2(32, 20))
+	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15), "bazooka": Vector2(34, 42)}.get(weapon, Vector2(8, size.y * 0.5))
+	var aim: Vector2 = a.aim.normalized()
+	var mirror := -1.0 if aim.x < 0 else 1.0
+	var hand := weapon_hand_anchor(a, body_direction)
+	var tip: Vector2 = Vector2(90, 28) if weapon == "bazooka" else Vector2(size.x - 2, size.y * 0.5)
+	var barrel := Vector2(tip.x - handle.x, (tip.y - handle.y) * mirror).rotated(aim.angle())
+	var jump_height := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
+	return {"hand": hand, "handle": handle, "angle": aim.angle(), "mirror": mirror,
+		"ground": a.p + (Vector2(hand.x, 0) + barrel) * ACTOR_VISUAL_SCALE, "height": (-hand.y + height_at(a.p) + jump_height) * ACTOR_VISUAL_SCALE,
+		"muzzle": a.p + hand + barrel - Vector2(0, height_at(a.p) + jump_height)}
+
 func fire_actor(a: Dictionary) -> void:
 	var weapon := weapon_of(a)
 	if weapon == "bazooka":
 		var owned: Dictionary = a.run_weapons
+		if int(owned.get("bazooka", 0)) <= 0:
+			a.shot = 0.3; say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica"); return
 		owned.bazooka = maxi(0, int(owned.bazooka) - 1)
 		a.run_weapons = owned
 	var w: Dictionary = WEAPONS.get(weapon, WEAPONS.pistol)
@@ -968,14 +1041,30 @@ func fire_actor(a: Dictionary) -> void:
 		damage = MECH_SHELL.damage; cooldown = MECH_SHELL.cooldown; radius = MECH_SHELL.radius; speed = MECH_SHELL.speed; kind = "p_heavy"
 		mech.fuel = maxf(0, mech.fuel - FUEL_SHOT)
 	if a.fused: damage *= FUSION.damage; cooldown *= FUSION.cadence
+	var geometry := weapon_geometry(a)
+	var origin: Vector2 = a.p + a.aim * 40 if a.mech else geometry.ground
+	# Sweep to the barrel so a long weapon cannot spawn through a thin wall.
+	var steps := maxi(1, ceili(a.p.distance_to(origin) / 2.0))
+	for step in range(1, steps + 1):
+		var sample: Vector2 = a.p.lerp(origin, float(step) / steps)
+		if not clear_at(sample, radius, true):
+			origin = a.p.lerp(origin, float(step - 1) / steps); break
 	for n in range(count):
 		var direction: Vector2 = a.aim.rotated((n - (count - 1) / 2.0) * spread)
-		add_bullet(a.p + direction * (40 if a.mech else 34), direction, 0, damage, speed, radius, a.id, kind)
+		add_bullet(origin, direction, 0, damage, speed, radius, a.id, kind)
+		bullets[-1]["height"] = 28.0 if a.mech else geometry.height
 		bullets[-1]["pierce"] = pierce
 		if weapon == "shotgun": bullets[-1].v *= rng.randf_range(0.85, 1.1)
+		# Resolve close targets hidden behind the long barrel before normal flight.
+		var bullet: Dictionary = bullets[-1]
+		var near_steps := maxi(1, ceili(a.p.distance_to(origin) / 2.0))
+		for step in range(1, near_steps + 1):
+			bullet.p = a.p.lerp(origin, float(step) / near_steps)
+			hit_bullet_enemy(bullet, true)
+			if bullet.life <= 0 or bullet.team != 0: break
 	a.shot = cooldown; a["fire_flash"] = 0.09
 	if weapon == "bazooka" and int(a.run_weapons.bazooka) == 0:
-		a.run_weapon = ""; say("BAZUCA SEM FOGUETES • arma básica equipada")
+		say("BAZUCA SEM FOGUETES • Q/RB equipa a arma básica")
 	if a.mech: effects.append({"p": a.p + a.aim * 30, "kind": "flash", "life": 0.12, "dir": a.aim}); effects.append({"p": a.p, "kind": "recoil", "life": 0.2, "max": 0.2, "dir": a.aim})
 	elif weapon in ["shotgun", "smg"]:
 		effects.append({"p": a.p, "kind": "casing", "life": 0.5, "max": 0.5, "dir": a.aim.rotated(-PI / 2 if a.aim.x >= 0 else PI / 2), "seed": rng.randi() % 1000})
@@ -1334,6 +1423,42 @@ func step_boss(e: Dictionary, target: Dictionary, direction: Vector2, closest: f
 				2:
 					for n in range(20): add_bullet(e.p, Vector2.RIGHT.rotated(n * TAU / 20 + e.phase * 0.3), 1, 12, 175, 7, -1, "orb")
 
+func muzzle_line_clear(from: Vector2, to: Vector2) -> bool:
+	var steps := maxi(1, ceili(from.distance_to(to) / 2.0))
+	for step in range(1, steps + 1):
+		if not clear_at(from.lerp(to, float(step) / steps), 0, true): return false
+	return true
+
+func hit_bullet_enemy(b: Dictionary, check_wall: bool = false) -> void:
+	for e in enemies:
+		if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
+			var previous_hits: Array = b.get("hits", [])
+			if previous_hits.has(e.id): continue
+			if e.hp <= 0: continue
+			if check_wall and not muzzle_line_clear(b.p, e.p): continue
+			if (e.kind == "guard" or e.get("elite", "") == "shield") and not (e.kind == "guard" and e.combat == "attack") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") not in ["p_omega", "p_rocket"]:
+				b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
+				effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
+			hurt_enemy(e, b.damage); e.hurt = 0.12; e["alerted"] = true
+			if b.get("kind", "") == "p_rocket":
+				explode(b.p, 72, 30, false); b.life = 0; break
+			# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
+			pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
+			if e.kind not in ["boss", "warden"]:
+				e.p = move_body(e.p, b.v.normalized() * (14.0 if b.get("kind", "") == "p_heavy" else 4.0), 12 if e.kind == "crawler_small" else 14)
+			if b.get("kind", "") == "p_heavy":
+				var heavy_hits: Array = b.get("hits", []); heavy_hits.append(e.id)
+				for other in enemies:   # respingo não repete o dano no alvo direto
+					if not heavy_hits.has(other.id) and other.p.distance_to(b.p) < MECH_SHELL.splash + 19:
+						hurt_enemy(other, MECH_SHELL.splash_damage); other.hurt = 0.15; other["alerted"] = true
+						pop_dmg(other.p, MECH_SHELL.splash_damage)
+				effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
+			effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
+			if b.get("pierce", 0) > 0:
+				b.pierce -= 1; previous_hits.append(e.id); b["hits"] = previous_hits
+			else: b.life = 0
+			break
+
 func step_bullets(dt: float) -> void:
 	var children: Array = []
 	for b in bullets:
@@ -1365,33 +1490,7 @@ func step_bullets(dt: float) -> void:
 				if b.team == 0: effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
 				break
 			if b.team == 0:
-				for e in enemies:
-					if b.p.distance_to(e.p) < (48 if e.kind == "warden" else (45 if e.kind == "boss" else (12 if e.kind == "crawler_small" else 19))) + b.r:
-						var previous_hits: Array = b.get("hits", [])
-						if previous_hits.has(e.id): continue
-						if e.hp <= 0: continue
-						if (e.kind == "guard" or e.get("elite", "") == "shield") and not (e.kind == "guard" and e.combat == "attack") and -b.v.normalized().dot(e.face) > 0 and b.get("kind", "") not in ["p_omega", "p_rocket"]:
-							b.team = 1; b.v = -b.v; b["owner"] = -1; b.p += b.v.normalized() * 12
-							effects.append({"p": b.p, "kind": "impact", "omega": false, "life": 0.18, "max": 0.18}); break
-						hurt_enemy(e, b.damage); e.hurt = 0.12; e["alerted"] = true
-						if b.get("kind", "") == "p_rocket":
-							explode(b.p, 72, 30, false); b.life = 0; break
-						# 0.15: número de dano + empurrão leve no impacto (pesada empurra mais)
-						pop_dmg(e.p, b.damage, b.get("kind", "") in ["p_heavy", "p_omega"])
-						if e.kind not in ["boss", "warden"]:
-							e.p = move_body(e.p, b.v.normalized() * (14.0 if b.get("kind", "") == "p_heavy" else 4.0), 12 if e.kind == "crawler_small" else 14)
-						if b.get("kind", "") == "p_heavy":
-							var heavy_hits: Array = b.get("hits", []); heavy_hits.append(e.id)
-							for other in enemies:   # respingo não repete o dano no alvo direto
-								if not heavy_hits.has(other.id) and other.p.distance_to(b.p) < MECH_SHELL.splash + 19:
-									hurt_enemy(other, MECH_SHELL.splash_damage); other.hurt = 0.15; other["alerted"] = true
-									pop_dmg(other.p, MECH_SHELL.splash_damage)
-							effects.append({"p": b.p, "kind": "explosion", "life": 0.4, "max": 0.4, "r": MECH_SHELL.splash})
-						effects.append({"p": b.p, "kind": "impact", "life": 0.18, "max": 0.18, "omega": b.get("kind", "") == "p_omega"})
-						if b.get("pierce", 0) > 0:
-							b.pierce -= 1; previous_hits.append(e.id); b["hits"] = previous_hits
-						else: b.life = 0
-						break
+				hit_bullet_enemy(b)
 			else:
 				for s in spectres:
 					if s.state == "following" and b.p.distance_to(s.p) < 15 + b.r:

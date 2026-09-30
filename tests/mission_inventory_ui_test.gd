@@ -66,8 +66,12 @@ func run() -> void:
 	check(transient_button.has_focus() and transient_button.get_theme_stylebox("focus") is StyleBoxFlat, "recurso da missão possui foco visível")
 	eq.select_inventory("missao_chaves")
 	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and "provisório" in eq.detail_reason.text, "recurso temporário identifica ícone provisório e não oferece ação falsa")
-	eq.select_inventory("missao_bazuca")
-	check(eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
+	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
+	check(not eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
+	marty.armor = true; await process_frame; await process_frame
+	check(eq.detail_action.disabled, "inventário atualiza bloqueio durante armadura")
+	marty.armor = false; await process_frame; await process_frame
+	check(not eq.detail_action.disabled, "fim da armadura reativa ação sem reabrir inventário")
 	marty.run_weapons.bazooka = 4; marty.run_weapon = ""
 	await process_frame; await process_frame
 	check(eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_foguetes")) == 4 and "GUARDADA" in eq.detail_stats.text, "inventário acompanha munição e troca ao vivo")
@@ -75,6 +79,10 @@ func run() -> void:
 	check(eq.find_child("InventorySlot_missao_chaves", true, false) != null and eq.quantity_for(load("res://scripts/inventory_data.gd").item("missao_chaves")) == 9, "quantidades mudam ao vivo sem reabrir a tela")
 	marty.run_weapons.bazooka = 0; await process_frame; await process_frame
 	check(eq.find_child("InventorySlot_missao_bazuca", true, false) != null and eq.find_child("InventorySlot_missao_foguetes", true, false) == null, "bazuca vazia continua visível, foguetes zerados somem")
+	eq.detail_action.grab_focus(); await press_key(KEY_ENTER)
+	check(marty.run_weapon == "bazooka" and marty.run_weapons.bazooka == 0, "Enter equipa bazuca vazia sem criar foguetes")
+	eq.detail_action.grab_focus(); await press_key(KEY_ENTER)
+	check(marty.run_weapon == "", "Enter volta à arma básica pelo inventário")
 	app.sim.start_run(1942); await process_frame; await process_frame
 	check(eq.find_child("InventorySlot_missao_bazuca", true, false) == null, "nova RUN não herda a arma encontrada")
 	await press_key(KEY_ESCAPE); await process_frame

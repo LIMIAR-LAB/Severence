@@ -22,10 +22,15 @@ func _init() -> void:
 	check(sim.weapon_of(marty) == "bazooka", "troca reequipa arma da RUN")
 	for _i in range(6):
 		marty.shot = 0; sim.fire_actor(marty)
-	check(sim.weapon_of(marty) == "pistol" and marty.run_weapons.bazooka == 0, "munição acaba e arma básica volta")
+	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 0, "arma vazia permanece equipada")
 	var shots: int = sim.bullets.size()
 	marty.shot = 0; sim.fire_actor(marty)
-	check(sim.bullets.size() == shots + 1, "arma básica continua disparando sem munição")
+	check(sim.bullets.size() == shots, "arma vazia não dispara")
+	var empty_restore := Expedition.new(); empty_restore.apply_snapshot(sim.snapshot().duplicate(true))
+	check(empty_restore.weapon_of(empty_restore.actors[0]) == "bazooka" and empty_restore.actors[0].run_weapons.bazooka == 0, "save preserva seleção vazia sem gerar munição")
+	sim.toggle_run_weapon(marty); sim.toggle_run_weapon(marty)
+	check(sim.weapon_of(marty) == "bazooka", "Q reequipa arma vazia")
+	check(not sim.select_run_weapon(0, "invalid"), "seleção recusa arma não possuída")
 	var blast := Expedition.new()
 	blast.coop = "solo"; blast.start_arena(); blast.enemies.clear(); blast.bullets.clear(); blast.effects.clear(); blast.pending_spawns.clear()
 	blast.spawn_enemy(Vector2(500, 500), "brute")
@@ -35,7 +40,7 @@ func _init() -> void:
 	check(blast.enemies[0].hp < blast.enemies[0].max and blast.enemies[1].hp < blast.enemies[1].max, "foguete atinge alvo e inimigo vizinho")
 	check(blast.effects.any(func(fx): return fx.kind == "explosion"), "foguete cria explosão visível")
 	sim.pickups.append({"p": marty.p, "kind": "ammo", "weapon": "bazooka", "ammo": 2})
-	sim.collect_pickups(); sim.toggle_run_weapon(marty)
+	sim.collect_pickups()
 	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 2, "munição rara reativa bazuca")
 	var restored := Expedition.new()
 	restored.apply_snapshot(sim.snapshot().duplicate(true))
@@ -45,5 +50,15 @@ func _init() -> void:
 	sim.start_run(1942)
 	check(sim.weapon_of(sim.actors[0]) == "pistol" and sim.actors[0].run_weapons.is_empty(), "nova RUN reinicia o arsenal temporário")
 	check(sim.KEY_DROP_CHANCE < sim.AMMO_DROP_CHANCE and sim.KEY_DROP_CHANCE <= 0.05, "chaves são mais raras que munição")
+	var close := Expedition.new(); close.coop = "solo"; close.start_arena(); close.enemies.clear(); close.obstacles.clear()
+	var shooter: Dictionary = close.actors[0]; shooter.p = Vector2(500, 500); shooter.aim = Vector2.RIGHT; shooter.facing = Vector2.RIGHT
+	close.grant_run_weapon(shooter, "bazooka", 2)
+	close.spawn_enemy(Vector2(545,500), "brute"); var target: Dictionary = close.enemies[-1]
+	close.fire_actor(shooter)
+	check(target.hp < target.max and close.effects.any(func(fx): return fx.kind == "explosion"), "bazuca acerta e explode no inimigo entre ator e cano")
+	close.enemies.clear(); close.bullets.clear(); close.effects.clear(); close.obstacles = [Rect2(520,450,3,100)]
+	close.spawn_enemy(Vector2(545,500), "brute"); target = close.enemies[-1]
+	close.fire_actor(shooter)
+	check(target.hp == target.max, "varredura do cano não acerta inimigo atrás de parede fina")
 	print("failures=", failures)
 	quit(failures)

@@ -356,7 +356,7 @@ func draw_entities() -> void:
 	drawable.sort_custom(func(a, b): return a.y < b.y)
 	draw_combat_warnings()
 	for thing in drawable:
-		visual_scale = 1.12 if thing.type in ["actor", "enemy", "mech", "spectre"] else 1.0
+		visual_scale = sim.ACTOR_VISUAL_SCALE if thing.type in ["actor", "enemy", "mech", "spectre"] else 1.0
 		visual_origin = thing.data.get("p", Vector2.ZERO)
 		visual_transform(Vector2.ZERO)
 		match thing.type:
@@ -371,7 +371,7 @@ func draw_entities() -> void:
 	visual_scale = 1.0; visual_origin = Vector2.ZERO; visual_transform(Vector2.ZERO)
 	for b in sim.bullets:
 		if not seen(b.p): continue
-		var bullet_pos: Vector2 = b.p - Vector2(0, 28)
+		var bullet_pos: Vector2 = b.p - Vector2(0, b.get("height", 28.0))
 		var kind: String = b.get("kind", "")
 		if kind == "bomb":
 			# 0.15: telegraph da zona de impacto — anel vermelho no ponto de queda
@@ -414,7 +414,7 @@ func draw_entities() -> void:
 			draw_arc(fx.p, 70 * (1 - fx.life / 0.6), 0, TAU, 40, CYAN, 3)
 			draw_line(fx.p, fx.p - Vector2(0, 140 * fx.life / 0.6), Color(0.3, 0.95, 1, fx.life), 12)
 		elif fx.kind == "dash":
-			draw_line(fx.p - fx.dir * 18 - Vector2(0, 20), fx.p - Vector2(0, 20), Color(0.3, 0.9, 1, fx.life * 4), 8)
+			draw_line(fx.p - fx.dir * 18 - Vector2(0, 20), fx.p - Vector2(0, 20), Color(0.3, 0.9, 1, fx.life * 1.5), 3)
 		elif fx.kind == "slash":
 			var t: float = clampf(1.0 - fx.life / 0.18, 0, 1)
 			var frame := 0 if t < 0.3 else (1 if t < 0.7 else 2)
@@ -598,7 +598,7 @@ func marty_dash_view(direction: Vector2) -> String:
 func draw_marty_dodge(a: Dictionary, pos: Vector2, outfit: String, tint: Color) -> void:
 	var direction: Vector2 = a.dash_dir
 	var view_key := marty_dash_view(direction)
-	var frame := clampi(int((1.0 - a.dodge / 0.20) * 4.0), 0, 3)
+	var frame := clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * 4.0), 0, 3)
 	var omega := outfit == "omega"
 	var texture: Texture2D = marty_teleport[view_key] if omega else marty_roll[view_key]
 	var row: int = (1 if view_key == "back_diag" else 0) if omega else OUTFIT_ROW[outfit]
@@ -658,7 +658,7 @@ func draw_actor(a: Dictionary) -> void:
 	elif firing: column = 5
 	else: bob = -1.0 if fmod(sim.tick_time + a.id * 0.7, 1.6) < 0.8 else 0.0  # respiração
 	var tint := Color.WHITE
-	if a.hurt > 0 and int(a.hurt * 20) % 2 == 0: tint.a = 0.45
+	if a.get("roll_visual", a.dodge) <= 0 and a.hurt > 0 and int(a.hurt * 20) % 2 == 0: tint.a = 0.45
 	if a.slash > 0.24: tint = tint.lightened(0.25)
 	if transforming > 0:
 		bob -= sin(clampf(charge_t / 0.8, 0, 1) * PI) * 8.0   # flutua enquanto carrega
@@ -671,24 +671,24 @@ func draw_actor(a: Dictionary) -> void:
 		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else (a.move if padrao_action == "run" else a.facing)
 		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
 		draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
-		# A arma entra em cena apenas no disparo. O golpe corpo a corpo usa a
-		# animacao desarmada, e as demais poses preservam a silhueta do personagem.
-		if marty_padrao_shows_weapon(padrao_action, transforming): draw_weapon(a, draw_pos + Vector2(0, bob))
+		# Arma básica aparece no disparo; arma da expedição também fica visível
+		# em repouso/corrida, inclusive vazia. Ações especiais liberam as mãos.
+		if marty_padrao_shows_weapon(padrao_action, transforming) or (a.get("run_weapon", "") != "" and padrao_action in ["idle", "run"] and transforming <= 0): draw_weapon(a, draw_pos, padrao_direction if padrao_action in ["idle", "run"] else Vector2.ZERO)
 	elif outfit_key == "omega":
 		var omega_action := marty_omega_action(a, walking)
 		var omega_direction: Vector2 = a.dash_dir if omega_action == "evade" else (a.move if omega_action == "run" else a.facing)
 		var omega_frame := marty_omega_frame(a, omega_action, slash_dur)
 		draw_marty_omega_frame(omega_action, omega_direction, omega_frame, draw_pos + Vector2(0, bob), tint)
 		# A espada materializa apenas durante o combo; repouso e movimento ficam livres.
-		if omega_action == "melee": draw_weapon(a, draw_pos + Vector2(0, bob))
-	elif a.dodge > 0 and not a.mech:
+		if omega_action == "melee": draw_weapon(a, draw_pos)
+	elif a.get("roll_visual", a.dodge) > 0 and not a.mech:
 		draw_marty_dodge(a, draw_pos + Vector2(0, bob), outfit_key, tint)
 	else:
 		visual_transform(draw_pos + Vector2(0, bob), 0, Vector2(-1 if flip else 1, 1))
 		draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
 		visual_transform(Vector2.ZERO)
 		# A arma é uma camada separada; durante a esquiva as mãos ficam livres.
-		draw_weapon(a, draw_pos + Vector2(0, bob))
+		draw_weapon(a, draw_pos)
 	if a.jump > 0 and a.armor: draw_circle(draw_pos + Vector2(0, -13), 5, CYAN)
 	if a.get("shield", 0.0) > 0: draw_shield_hex(draw_pos - Vector2(0, 40), a.shield / (sim.OMEGA_SHIELD_HEARTS * sim.HEART))
 	if a.fused: text_at(draw_pos + Vector2(-30, 24), "FUSÃO • G", CYAN, 12)
@@ -815,27 +815,7 @@ func draw_warden(e: Dictionary) -> void:
 	text_at(p + Vector2(-72, -293), "CÃO DE GUERRA", Color("ffb451"), 15)
 
 func weapon_hand_anchor(a: Dictionary) -> Vector2:
-	if sim.outfit_of(a) == "omega":
-		var omega_anchors := [
-			Vector2(20, -40), Vector2(23, -43), Vector2(25, -44), Vector2(20, -47),
-			Vector2(10, -49), Vector2(-20, -47), Vector2(-25, -44), Vector2(-23, -43),
-		]
-		return omega_anchors[marty_direction_row(a.get("aim", a.facing))]
-	if sim.outfit_of(a) == "padrao":
-		# O novo atlas tem oito direcoes e corpo mais alto que o legado.
-		# A ancora segue a mira para manter a empunhadura junto da mao no disparo.
-		var padrao_anchors := [
-			Vector2(10, -35), Vector2(15, -36), Vector2(17, -35), Vector2(14, -38),
-			Vector2(7, -40), Vector2(-14, -38), Vector2(-17, -35), Vector2(-15, -36),
-		]
-		return padrao_anchors[marty_direction_row(a.get("aim", a.facing))]
-	# 0.17: acompanha a mão visível de cada vista, em vez de orbitar o centro do corpo.
-	var pose := marty_pose(a.facing)
-	var anchors := [Vector2(20, -27), Vector2(21, -28), Vector2(18, -26), Vector2(18, -26), Vector2(20, -25)]
-	var hand: Vector2 = anchors[pose[0]]
-	if pose[1]: hand.x = -hand.x
-	if a.armor: hand.y -= 2
-	return hand
+	return sim.weapon_hand_anchor(a)
 
 func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	# 0.18: dedos da própria arte cobrem a empunhadura, sem braços geométricos.
@@ -850,8 +830,8 @@ func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	draw_texture_rect_region(marty_anim, Rect2(-4, -4, 8, 8), Rect2(patch.position + Vector2(0, row * 96), patch.size))
 	visual_transform(Vector2.ZERO)
 
-func draw_weapon(a: Dictionary, base: Vector2) -> void:
-	# Arma na mão: gira com a mira (360°), espelha para a esquerda, dá tranco para trás e para cima,
+func draw_weapon(a: Dictionary, base: Vector2, body_direction: Vector2 = Vector2.ZERO) -> void:
+	# Arma e cano compartilham a mira (360°) e o espelhamento com a simulação,
 	# e o clarão passa por 3 estágios (estrela → brilho → fumaça).
 	var weapon: String = sim.weapon_of(a)
 	var aim: Vector2 = a.aim.normalized()
@@ -862,24 +842,19 @@ func draw_weapon(a: Dictionary, base: Vector2) -> void:
 		draw_blade(a, base, tool, 0.45, false); return
 	var tex: Texture2D = weapon_art[weapon]
 	var k: float = clampf(a.get("fire_flash", 0.0) / 0.09, 0, 1)
-	var kick_back: float = k * {"pistol": 4.0, "shotgun": 8.0, "smg": 3.0, "bazooka": 10.0, "omega": 6.0}[weapon]
-	var mirrored: bool = aim.x < 0
-	var lift: float = k * {"pistol": 0.25, "shotgun": 0.45, "smg": 0.12, "bazooka": 0.5, "omega": 0.3}[weapon]
-	var angle: float = aim.angle() + (lift if mirrored else -lift)
-	var wrist := base + weapon_hand_anchor(a)
+	var geometry: Dictionary = sim.weapon_geometry(a, body_direction)
+	var mirrored: bool = geometry.mirror < 0
+	var angle: float = geometry.angle
+	var wrist: Vector2 = base + geometry.hand
 	var grip: Vector2 = wrist
-	var size := tex.get_size()
-	if weapon == "omega":
-		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 9)
-		draw_circle(grip + aim * 18, 9 + pulse * 3, Color(0.35, 0.9, 1, 0.12 + pulse * 0.08))
-	var handle: Vector2 = {"pistol": Vector2(8, 12), "shotgun": Vector2(18, 12), "smg": Vector2(17, 15), "bazooka": Vector2(34, 42)}.get(weapon, Vector2(8, size.y * 0.5))
+	var handle: Vector2 = geometry.handle
 	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
 	draw_texture(tex, -handle)
 	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
 	if k <= 0: return
 	var dir := Vector2.RIGHT.rotated(angle)
-	var muzzle: Vector2 = grip + Vector2(size.x - 2 - handle.x, (size.y * 0.5 - handle.y) * (-1 if mirrored else 1)).rotated(angle)
+	var muzzle: Vector2 = geometry.muzzle
 	var cyan: bool = weapon in ["pistol", "omega"]
 	var fx: Texture2D = weapon_art.flash_cyan if cyan else weapon_art.flash
 	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "bazooka": 2.2, "omega": 2.2}[weapon]
@@ -981,7 +956,7 @@ func marty_direction_row(direction: Vector2) -> int:
 	return [2, 1, 0, 7, 6, 5, 4, 3][octant]
 
 func marty_padrao_action(a: Dictionary, walking: bool, firing: bool) -> String:
-	if a.dodge > 0: return "evade"
+	if a.get("roll_visual", a.dodge) > 0: return "evade"
 	if a.slash > 0 and not a.mech: return "melee"
 	if a.jump > 0: return "jump"
 	if a.hurt > 0: return "hurt"
@@ -997,7 +972,7 @@ func marty_padrao_shows_weapon(action: String, transforming: float = 0.0) -> boo
 func marty_padrao_frame(a: Dictionary, action: String, slash_dur: float) -> int:
 	var count: int = MARTY_PADRAO_FRAMES[action]
 	match action:
-		"evade": return clampi(int((1.0 - a.dodge / 0.20) * count), 0, count - 1)
+		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
 		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
 		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
 		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
@@ -1011,7 +986,7 @@ func draw_marty_padrao_frame(action: String, direction: Vector2, frame: int, foo
 	draw_texture_rect_region(texture, Rect2(foot - Vector2(48, 94), Vector2(96, 96)), Rect2(frame * 96, row * 96, 96, 96), tint)
 
 func marty_omega_action(a: Dictionary, walking: bool) -> String:
-	if a.dodge > 0: return "evade"
+	if a.get("roll_visual", a.dodge) > 0: return "evade"
 	if a.slash > 0 and not a.mech: return "melee"
 	if a.jump > 0: return "jump"
 	if a.hurt > 0: return "hurt"
@@ -1021,7 +996,7 @@ func marty_omega_action(a: Dictionary, walking: bool) -> String:
 func marty_omega_frame(a: Dictionary, action: String, slash_dur: float) -> int:
 	var count: int = MARTY_OMEGA_FRAMES[action]
 	match action:
-		"evade": return clampi(int((1.0 - a.dodge / 0.20) * count), 0, count - 1)
+		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
 		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
 		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
 		"run": return int(a.step) % count

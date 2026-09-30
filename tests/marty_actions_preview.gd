@@ -16,7 +16,7 @@ func capture() -> void:
 		{"name":"marty-omega-teleport-diagonal","armor":true,"direction":Vector2(1,1),"remaining":0.10},
 		{"name":"marty-omega-teleport-back","armor":true,"direction":Vector2(-1,-1),"remaining":0.10},
 	]:
-		a.armor=shot.armor; a.dodge=shot.remaining; a.dash_dir=shot.direction.normalized()
+		a.armor=shot.armor; a.dodge=shot.remaining; a.roll_visual=shot.remaining * 1.8; a.dash_dir=shot.direction.normalized()
 		view.sim.tick_time=3.0; view.queue_redraw()
 		await process_frame
 		await RenderingServer.frame_post_draw

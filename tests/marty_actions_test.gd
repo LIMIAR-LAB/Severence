@@ -60,5 +60,34 @@ func run() -> void:
 	sim.step(0.016,[{"move":Vector2(1,1),"aim":Vector2.RIGHT,"dodge":true},{}])
 	check(a.dash_dir.distance_to(Vector2(1,1).normalized())<0.001,"dash conserva direção diagonal normalizada")
 	check(a.p.x>start.x and a.p.y>start.y,"dash diagonal move Marty nos dois eixos")
+	for _i in 13: sim.step_actor(a, {}, 0.016)
+	check(a.dodge <= 0 and a.roll_visual > 0, "leitura da pose continua depois da proteção")
+	check(view.marty_padrao_action(a, false, false) == "evade", "render usa temporização visual independente")
+	a.hurt = 0; var hp: float = a.hp; sim.damage_actor(a, 10)
+	check(a.hp < hp, "pose visual não prolonga invulnerabilidade")
+	# All gun textures and directions use a shared barrel with elevation separate from collision.
+	sim.start_arena(); a = sim.actors[0]; a.p = Vector2(500, 500); a.jump = 0; a.armor = false; sim.obstacles.clear()
+	for outfit in ["padrao", "mecanico", "espiao", "bazooka"]:
+		a.outfit = "padrao" if outfit == "bazooka" else outfit
+		a.run_weapon = "bazooka" if outfit == "bazooka" else ""
+		a.run_weapons = {"bazooka": 12}
+		a.jump = 0.3 if outfit == "bazooka" else 0.0
+		for direction in directions:
+			a.aim = direction.normalized(); a.facing = a.aim
+			var geometry: Dictionary = sim.weapon_geometry(a)
+			sim.fire_actor(a)
+			var bullet: Dictionary = sim.bullets[-1]
+			check((bullet.p - Vector2(0, bullet.height)).distance_to(a.p + (geometry.muzzle - a.p) * sim.ACTOR_VISUAL_SCALE) < 0.01, "origem visual no cano %s %s" % [outfit, direction])
+			check(bullet.v.normalized().dot(a.aim) > 0.96, "tiro acompanha direção da arma")
+	a.outfit = "padrao"; a.run_weapon = ""; a.jump = 0; a.aim = Vector2.RIGHT; a.facing = a.aim
+	sim.obstacles = [Rect2(525, 470, 3, 80)]
+	sim.fire_actor(a)
+	check(sim.bullets[-1].p.x < 525, "cano não gera projétil depois de parede fina")
+	sim.obstacles.clear(); a.aim = Vector2.RIGHT; a.move = Vector2.LEFT; a.facing = Vector2.LEFT; a.fire_flash = 0
+	var carried: Dictionary = sim.weapon_geometry(a, a.move)
+	check(carried.hand == sim.weapon_hand_anchor(a, Vector2.LEFT) and carried.angle == a.aim.angle(), "arma em movimento acompanha mão do corpo sem mudar mira")
+	sim.fire_actor(a)
+	var fired_geometry: Dictionary = sim.weapon_geometry(a)
+	check((sim.bullets[-1].p - Vector2(0, sim.bullets[-1].height)).distance_to(a.p + (fired_geometry.muzzle - a.p) * sim.ACTOR_VISUAL_SCALE) < 0.01, "primeiro disparo em movimento oposto nasce no cano da pose de tiro")
 	print("MARTY ACTIONS failures=", failures)
 	quit(failures)

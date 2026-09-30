@@ -5,6 +5,15 @@ func check(ok: bool, description: String) -> void:
 	if ok: print("PASS: ", description)
 	else: failures += 1; push_error(description)
 
+func click_control(control: Control) -> void:
+	var point := control.get_global_rect().get_center()
+	var motion := InputEventMouseMotion.new(); motion.position = point; motion.global_position = point
+	root.push_input(motion, true); await process_frame
+	for down in [true, false]:
+		var event := InputEventMouseButton.new(); event.position = point; event.global_position = point
+		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = down
+		root.push_input(event, true); await process_frame
+
 func _initialize() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
@@ -29,6 +38,17 @@ func _initialize() -> void:
 	eq.show_tab(4); check(eq.active_tab == 4 and eq.page.find_children("*", "Label", true, false).size() >= 10, "aba Status usa linhas calculadas")
 	var before: int = eq.active_tab; eq.cycle(1)
 	check(eq.active_tab != before and eq.tabs[eq.active_tab].has_focus() and eq.find_child("InventorySlot_arma_blaster", true, false) is Button, "controle alterna aba e conteúdo com foco visível")
+	for i in [1, 2, 3, 4, 0]:
+		await click_control(eq.find_child("MenuTab_%d" % i, true, false))
+		check(eq.active_tab == i, "clique real troca aba %d" % i)
+	await click_control(eq.find_child("Filter_armas", true, false))
+	check(eq.inventory.filter == "armas", "clique real aplica filtro")
+	await click_control(eq.find_child("InventorySlot_arma_blaster", true, false))
+	check(eq.inventory.selected_id == "arma_blaster", "clique real seleciona item")
+	await click_control(eq.find_child("InventoryCompare", true, false))
+	check("→" in eq.detail_stats.text and "DANO" in eq.detail_stats.text, "comparação exibe valores reais")
+	await click_control(eq.find_child("InventoryAction", true, false))
+	check("equipado" in eq.status.text, "clique real executa equipamento")
 	app.queue_free(); await process_frame
 	print("INVENTORY_UI_TESTS_DONE failures=%d" % failures)
 	quit(1 if failures else 0)
