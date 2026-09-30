@@ -32,6 +32,14 @@ func _initialize() -> void:
 	check(ui.content.find_child("ArchivePortraitFrame", true, false) is NinePatchRect, "moldura ornamentada enquadra o registro")
 	check(ui.content.find_child("ArchiveControlLegend", true, false) is Panel, "legenda de controles permanece visível")
 	check(ui.content.find_child("FractureAccent", true, false) is ColorRect, "fratura violeta integra a identidade temporal")
+	var portrait := ui.content.find_child("EntryImage", true, false) as TextureRect
+	var portrait_fallback := ui.content.find_child("EntryFallback", true, false) as Label
+	for monster_id in ["monstro_cultista", "monstro_peixeiro", "monstro_rastejante", "monstro_brutamontes"]:
+		var monster_entry := ui.content.find_child("Entry_" + monster_id, true, false) as Button
+		check(monster_entry != null, "dossiê %s aparece no índice" % monster_id)
+		if monster_entry != null:
+			monster_entry.pressed.emit(); await process_frame
+			check(portrait.visible and portrait.texture != null and not portrait_fallback.visible, "dossiê %s exibe seu portrait" % monster_id)
 
 	var robot_tab := ui.content.find_child("Category_robos", true, false) as Button
 	check(robot_tab != null, "aba de robôs pode receber foco")
