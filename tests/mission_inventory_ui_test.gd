@@ -70,6 +70,17 @@ func run() -> void:
 	check(eq.detail_action.disabled and "temporário" in eq.detail_reason.text and not eq.detail_action.visible, "recurso temporário não oferece ação falsa")
 	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
 	check(not eq.detail_action.disabled and "FOGUETES  6" in eq.detail_stats.text and "EM USO" in eq.detail_stats.text, "detalhe da bazuca mostra munição e estado")
+	var live_before_compare: Dictionary = app.sim.actors[0].duplicate(true)
+	eq.show_comparison()
+	var comparison_scroll: ScrollContainer = eq.find_child("InventoryComparisonScroll", true, false)
+	var comparison: RichTextLabel = eq.find_child("InventoryComparisonText", true, false)
+	check(comparison_scroll.visible and "ARMA BÁSICA → BAZUCA" in comparison.get_parsed_text(), "comparação especial da bazuca usa a área rolável")
+	check("#%s" % eq.bbcode_color(eq.IMPROVEMENT) in comparison.text and "#%s" % eq.bbcode_color(eq.REGRESSION) in comparison.text and "#%s" % eq.bbcode_color(eq.TEAL) in comparison.text, "bazuca distingue melhoria, regressão e mudança textual")
+	check(app.sim.actors[0] == live_before_compare and app.sim.inventory_state == persistent_before, "comparar não altera equipamento nem estado vivo da missão")
+	eq.detail_action.grab_focus(); check(eq.detail_action.has_focus(), "ações continuam navegáveis por teclado após comparar")
+	eq.select_inventory("missao_chaves")
+	check(not comparison_scroll.visible and eq.detail_text.visible and eq.detail_stats.visible, "seleção de outro item encerra comparação sem conteúdo residual")
+	eq.find_child("InventorySlot_missao_bazuca", true, false).grab_focus()
 	marty.armor = true; await process_frame; await process_frame
 	check(eq.detail_action.disabled, "inventário atualiza bloqueio durante armadura")
 	marty.armor = false; await process_frame; await process_frame

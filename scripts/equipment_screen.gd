@@ -12,6 +12,8 @@ const TEAL := Color("54e4e7")
 const GOLD := Color("efc56b")
 const TEXT := Color("dce8df")
 const DIM := Color("83968e")
+const IMPROVEMENT := Color("73e06f")
+const REGRESSION := Color("ff6b6b")
 const PANEL := Color("102b25")
 const BRASS := Color("a87732")
 const RARITY := {"comum": Color("aab8b4"), "incomum": Color("67d591"), "raro": Color("57a8ff"), "especial": Color("d186ff"), "lendario": Color("ffc34f")}
@@ -35,7 +37,12 @@ var detail_title: Label
 var detail_rarity: Label
 var detail_text: Label
 var detail_stats: Label
+var detail_description_panel: Panel
+var comparison_panel: Panel
+var comparison_scroll: ScrollContainer
+var comparison_rich: RichTextLabel
 var detail_action: Button
+var detail_compare: Button
 var detail_reason: Label
 var capacity_label: Label
 var grid_buttons: Array = []
@@ -261,13 +268,40 @@ func build_details_panel() -> void:
 	panel(page, Rect2(884, 0, 424, 592), Color("0b2626"), BRASS)
 	detail_title = label(page, Rect2(908, 20, 374, 42), "", 25, GOLD)
 	detail_rarity = label(page, Rect2(908, 61, 374, 28), "", 15, TEAL)
-	panel(page, Rect2(906, 98, 380, 158), Color("071b1d"), Color("316b69"))
+	detail_description_panel = panel(page, Rect2(906, 98, 380, 158), Color("071b1d"), Color("316b69"))
 	detail_text = label(page, Rect2(922, 112, 348, 130), "", 14, TEXT); detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail_stats = label(page, Rect2(910, 276, 368, 142), "", 15, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	comparison_panel = panel(page, Rect2(906, 98, 380, 342), Color("071b1d"), Color("316b69")); comparison_panel.visible = false
+	comparison_scroll = ScrollContainer.new(); comparison_scroll.name = "InventoryComparisonScroll"
+	comparison_scroll.position = Vector2(916, 108); comparison_scroll.size = Vector2(360, 322)
+	comparison_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; comparison_scroll.visible = false
+	comparison_scroll.focus_mode = Control.FOCUS_ALL; comparison_scroll.gui_input.connect(handle_comparison_scroll_input)
+	comparison_rich = RichTextLabel.new(); comparison_rich.name = "InventoryComparisonText"
+	comparison_rich.bbcode_enabled = true; comparison_rich.fit_content = true
+	comparison_rich.custom_minimum_size = Vector2(338, 0); comparison_rich.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	comparison_rich.add_theme_font_size_override("normal_font_size", 13)
+	comparison_scroll.add_child(comparison_rich); page.add_child(comparison_scroll)
 	detail_action = button(page, Rect2(908, 454, 180, 50), "EQUIPAR", equip_selected_inventory, "InventoryAction")
-	var compare := button(page, Rect2(1102, 454, 180, 50), "COMPARAR", show_comparison, "InventoryCompare")
+	detail_compare = button(page, Rect2(1102, 454, 180, 50), "COMPARAR", show_comparison, "InventoryCompare")
 	detail_reason = label(page, Rect2(908, 516, 374, 55), "", 13, DIM); detail_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	compare.tooltip_text = "Compara o slot atual usando os dados reais do catálogo."
+	detail_compare.tooltip_text = "Compara com o item equipado."
+	detail_compare.focus_neighbor_top = detail_compare.get_path_to(comparison_scroll)
+	comparison_scroll.focus_neighbor_bottom = comparison_scroll.get_path_to(detail_compare)
+
+func handle_comparison_scroll_input(event: InputEvent) -> void:
+	if not comparison_scroll.visible or not event.is_pressed(): return
+	var direction := 0
+	if event.is_action_pressed("ui_down") or (event is InputEventKey and event.keycode == KEY_PAGEDOWN): direction = 1
+	elif event.is_action_pressed("ui_up") or (event is InputEventKey and event.keycode == KEY_PAGEUP): direction = -1
+	if direction == 0: return
+	var bar := comparison_scroll.get_v_scroll_bar()
+	var limit := maxi(0, roundi(bar.max_value - bar.page))
+	var target := clampi(comparison_scroll.scroll_vertical + direction * 56, 0, limit)
+	if target == comparison_scroll.scroll_vertical and direction > 0:
+		detail_compare.grab_focus()
+	else:
+		comparison_scroll.scroll_vertical = target
+	comparison_scroll.accept_event()
 
 func select_inventory(id: String) -> void:
 	inventory.selected_id = id
@@ -276,6 +310,7 @@ func select_inventory(id: String) -> void:
 
 func refresh_inventory_details() -> void:
 	if detail_title == null: return
+	reset_comparison_view()
 	detail_stats.position.y = 276; detail_stats.size.y = 142
 	detail_stats.add_theme_font_size_override("font_size", 13)
 	var entry := InventoryData.item(inventory.selected_id)
@@ -348,11 +383,60 @@ func equip_selected_inventory() -> void:
 	rebuild_current()
 
 func comparison_values(entry: Dictionary) -> Dictionary:
-	var values: Dictionary = entry.get("atributos", {}).duplicate()
+	var values: Dictionary = {}
+	for key in entry.get("atributos", {}):
+		values[str(key).to_upper().replace("_", " ")] = {"display": str(entry.atributos[key]), "score": null}
 	var loadout := str(entry.get("loadout_id", ""))
 	if loadout != "":
-		for row in reference_rows("uniform" if entry.get("slot", "") == "uniforme" else loadout, loadout): values[str(row[0])] = str(row[1])
+		for row in reference_rows("uniform" if entry.get("slot", "") == "uniforme" else loadout, loadout):
+			values[str(row[0])] = {"display": str(row[1]), "score": row[2] if row.size() > 2 and float(row[2]) >= 0.0 else null}
 	return values
+
+func reset_comparison_view() -> void:
+	if comparison_panel == null: return
+	comparison_panel.visible = false; comparison_scroll.visible = false; comparison_rich.text = ""
+	detail_description_panel.visible = true; detail_text.visible = true; detail_stats.visible = true
+	detail_stats.position.y = 276; detail_stats.size.y = 142
+	detail_stats.add_theme_font_size_override("font_size", 13)
+
+func comparison_tone(before: Dictionary, after: Dictionary) -> String:
+	var before_display := str(before.get("display", "—")); var after_display := str(after.get("display", "—"))
+	if before_display == after_display: return "neutral"
+	var before_score = before.get("score"); var after_score = after.get("score")
+	if before_score == null or after_score == null: return "changed"
+	if is_equal_approx(float(before_score), float(after_score)): return "neutral"
+	return "improvement" if float(after_score) > float(before_score) else "regression"
+
+func comparison_color(tone: String) -> Color:
+	match tone:
+		"improvement": return IMPROVEMENT
+		"regression": return REGRESSION
+		"changed": return TEAL
+	return TEXT
+
+func bbcode_color(color: Color) -> String:
+	return color.to_html(false)
+
+func comparison_markup(title: String, before: Dictionary, after: Dictionary, keys: Array) -> String:
+	var rows: Array[String] = ["[color=#%s][b]%s[/b][/color]" % [bbcode_color(GOLD), title]]
+	for key in keys:
+		var previous: Dictionary = before.get(key, {"display": "—", "score": null})
+		var selected: Dictionary = after.get(key, {"display": "—", "score": null})
+		var tone := comparison_tone(previous, selected)
+		rows.append("[color=#%s]%s:  %s  →  [/color][color=#%s]%s[/color]" % [bbcode_color(DIM), str(key), str(previous.display), bbcode_color(comparison_color(tone)), str(selected.display)])
+	# A linha em branco mantém rótulo, origem, seta e destino legíveis em telas menores;
+	# comparações longas passam a usar a rolagem em vez de comprimir ou transbordar.
+	return "\n\n".join(rows)
+
+func display_comparison(title: String, before: Dictionary, after: Dictionary) -> void:
+	var keys: Array = before.keys()
+	for key in after:
+		if not keys.has(key): keys.append(key)
+	detail_description_panel.visible = false; detail_text.visible = false; detail_stats.visible = false
+	comparison_panel.visible = true; comparison_scroll.visible = true
+	comparison_rich.text = comparison_markup(title, before, after, keys)
+	comparison_scroll.scroll_vertical = 0
+	comparison_scroll.grab_focus.call_deferred()
 
 func show_comparison() -> void:
 	var entry := InventoryData.item(inventory.selected_id)
@@ -361,7 +445,15 @@ func show_comparison() -> void:
 		var basic: String = app.sim.uniform_of(app.sim.actors[host.gear_actor]).weapon
 		var gun: Dictionary = app.sim.WEAPONS[basic]
 		var rocket: Dictionary = app.sim.WEAPONS.bazooka
-		detail_stats.text = "ARMA BÁSICA → BAZUCA\nDANO/TIRO  %d → %d + área\nINTERVALO  %.2fs → %.2fs\nMUNIÇÃO  infinita → %d" % [gun.damage * gun.count, rocket.damage, gun.cooldown, rocket.cooldown, app.sim.actors[host.gear_actor].run_weapons.bazooka]
+		var before := {
+			"DANO / TIRO": {"display": str(int(gun.damage * gun.count)), "score": float(gun.damage * gun.count)},
+			"INTERVALO": {"display": "%.2fs" % gun.cooldown, "score": 1.0 / float(gun.cooldown)},
+			"MUNIÇÃO": {"display": "infinita", "score": null}}
+		var after := {
+			"DANO / TIRO": {"display": "%d + área" % rocket.damage, "score": float(rocket.damage)},
+			"INTERVALO": {"display": "%.2fs" % rocket.cooldown, "score": 1.0 / float(rocket.cooldown)},
+			"MUNIÇÃO": {"display": str(app.sim.actors[host.gear_actor].run_weapons.bazooka), "score": null}}
+		display_comparison("ARMA BÁSICA → BAZUCA", before, after)
 		detail_reason.text = "Comparação com a arma básica do uniforme."; return
 	if entry.get("transiente", false): detail_reason.text = "Recurso automático • quantidade nesta tentativa: %d." % quantity_for(entry); return
 	var slot := str(entry.get("slot", "")); var current_id := ""
@@ -370,17 +462,7 @@ func show_comparison() -> void:
 	var current := InventoryData.item(current_id)
 	if current.is_empty(): detail_reason.text = "Sem item comparável neste slot."; return
 	var before := comparison_values(current); var after := comparison_values(entry)
-	var keys: Array = before.keys()
-	for key in after:
-		if not keys.has(key): keys.append(key)
-	var lines: Array[String] = []
-	for key in keys:
-		lines.append("%s: %s → %s" % [key, before.get(key, "—"), after.get(key, "—")])
-	# Description area has enough room for the complete union, including unlike robot stats.
-	detail_text.text = "%s → %s" % [current.nome, entry.nome]
-	detail_stats.text = "\n".join(lines)
-	detail_stats.add_theme_font_size_override("font_size", 12 if lines.size() > 7 else 14)
-	detail_stats.position.y = 156; detail_stats.size.y = 280
+	display_comparison("%s → %s" % [current.nome, entry.nome], before, after)
 	detail_reason.text = "Atual → selecionado" + (" • mesmo item" if current_id == entry.id else "")
 
 func build_equipment_category(category: String, title: String, subtitle: String) -> void:
@@ -430,11 +512,13 @@ func unequip_slot(slot: String) -> void:
 
 func reference_rows(kind: String, outfit: String = "padrao") -> Array:
 	var rows: Array = app.sim.loadout_stats(kind, outfit).duplicate(true)
-	if kind == "omega": rows[0] = ["ESCUDO TEMPORÁRIO", "%d corações" % app.sim.OMEGA_SHIELD_HEARTS]
+	if kind == "omega":
+		rows[0][0] = "ESCUDO TEMPORÁRIO"; rows[0][1] = "%d corações" % app.sim.OMEGA_SHIELD_HEARTS
 	if kind == "uniform":
 		var u: Dictionary = app.sim.UNIFORMS.get(outfit, app.sim.UNIFORMS.padrao)
-		rows[4] = ["INTERVALO DE TIRO", "%.2fs" % app.sim.WEAPONS[u.weapon].cooldown]
-		rows[5] = ["RESISTÊNCIA", "Maior" if float(u.taken) < 1.0 else ("Menor" if float(u.taken) > 1.0 else "Padrão")]
+		var cooldown := float(app.sim.WEAPONS[u.weapon].cooldown)
+		rows[4][0] = "INTERVALO DE TIRO"; rows[4][1] = "%.2fs" % cooldown; rows[4][2] = 1.0 / cooldown
+		rows[5][0] = "RESISTÊNCIA"; rows[5][1] = "Maior" if float(u.taken) < 1.0 else ("Menor" if float(u.taken) > 1.0 else "Padrão")
 	return rows
 
 func condition_label(rect: Rect2, caption: String, node_name: String, color := TEXT) -> Label:

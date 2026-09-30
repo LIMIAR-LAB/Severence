@@ -14,6 +14,11 @@ func click_control(control: Control) -> void:
 		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = down
 		root.push_input(event, true); await process_frame
 
+func press_key(keycode: Key) -> void:
+	for pressed in [true, false]:
+		var event := InputEventKey.new(); event.keycode = keycode; event.physical_keycode = keycode; event.pressed = pressed
+		Input.parse_input_event(event); Input.flush_buffered_events(); await process_frame
+
 func _initialize() -> void:
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app)
 	await process_frame
@@ -52,7 +57,24 @@ func _initialize() -> void:
 	await click_control(eq.find_child("InventorySlot_arma_blaster", true, false))
 	check(eq.inventory.selected_id == "arma_blaster", "clique real seleciona item")
 	await click_control(eq.find_child("InventoryCompare", true, false))
-	check("→" in eq.detail_stats.text and "DANO" in eq.detail_stats.text, "comparação exibe valores reais")
+	var comparison: RichTextLabel = eq.find_child("InventoryComparisonText", true, false)
+	var comparison_scroll: ScrollContainer = eq.find_child("InventoryComparisonScroll", true, false)
+	check(comparison_scroll.visible and "→" in comparison.get_parsed_text() and "DANO" in comparison.get_parsed_text(), "comparação exibe valores reais em área própria")
+	check("#%s" % eq.bbcode_color(eq.TEXT) in comparison.text, "valores iguais permanecem neutros")
+	check(eq.comparison_tone({"display":"A", "score":null}, {"display":"B", "score":null}) == "changed", "mudança textual sem escore usa estado teal sem inferir qualidade")
+	app.sim.set_unlocks(["padrao", "mecanico", "espiao", "titan", "spectre"])
+	eq.select_inventory("arma_rebite"); eq.show_comparison()
+	check("#%s" % eq.bbcode_color(eq.IMPROVEMENT) in comparison.text and "#%s" % eq.bbcode_color(eq.REGRESSION) in comparison.text, "melhorias e regressões recebem cores semânticas pelos escores")
+	check(comparison_scroll.position.y + comparison_scroll.size.y < eq.detail_action.position.y, "comparação fica contida acima das ações")
+	eq.select_inventory("arma_smg")
+	check(not comparison_scroll.visible and eq.detail_text.visible and eq.detail_stats.visible and eq.detail_stats.position.y == 276, "nova seleção restaura geometria e conteúdo normais")
+	# Robôs têm conjuntos diferentes e forçam conteúdo maior que a janela rolável.
+	eq.host.robot_choice = "titan"; eq.select_inventory("nucleo_spectre"); eq.show_comparison()
+	await process_frame
+	check(comparison_scroll.visible and comparison.custom_minimum_size.x <= comparison_scroll.size.x and comparison.get_content_height() > comparison_scroll.size.y, "comparação longa de robôs permanece rolável e sem largura excedente")
+	var scroll_before := comparison_scroll.scroll_vertical
+	await press_key(KEY_DOWN)
+	check(comparison_scroll.scroll_vertical > scroll_before and comparison_scroll.has_focus(), "teclado/controle rola a comparação sem perder o foco")
 	await click_control(eq.find_child("InventoryAction", true, false))
 	check("equipado" in eq.status.text, "clique real executa equipamento")
 	app.queue_free(); await process_frame
