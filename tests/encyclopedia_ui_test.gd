@@ -34,7 +34,7 @@ func _initialize() -> void:
 	check(ui.content.find_child("FractureAccent", true, false) is ColorRect, "fratura violeta integra a identidade temporal")
 	var portrait := ui.content.find_child("EntryImage", true, false) as TextureRect
 	var portrait_fallback := ui.content.find_child("EntryFallback", true, false) as Label
-	for monster_id in ["monstro_cultista", "monstro_peixeiro", "monstro_rastejante", "monstro_brutamontes"]:
+	for monster_id in ["monstro_cultista", "monstro_peixeiro", "monstro_rastejante", "monstro_brutamontes", "monstro_bombardeiro", "monstro_guarda", "monstro_vigia", "monstro_almirante"]:
 		var monster_entry := ui.content.find_child("Entry_" + monster_id, true, false) as Button
 		check(monster_entry != null, "dossiê %s aparece no índice" % monster_id)
 		if monster_entry != null:
@@ -62,11 +62,13 @@ func _initialize() -> void:
 	accept.pressed = false; Input.parse_input_event(accept); await process_frame
 	check(ui.encyclopedia.category == "itens", "aceitar pelo foco troca a categoria")
 	await process_frame
-	var fragment := ui.content.find_child("Entry_item_fragmento", true, false) as Button
-	if fragment == null: check(false, "fragmento aparece na lista"); finish(); return
-	fragment.pressed.emit(); await process_frame
-	check((ui.content.find_child("EntryFallback", true, false) as Label).visible, "entrada sem arte usa fallback")
-	check(ui.content.find_child("MissingArtSeal", true, false) is Panel, "fallback sem arte usa selo intencional")
+	for item_id in ["item_blaster", "item_escopeta_rebite", "item_smg", "item_lamina_omega", "item_bazuca", "item_fragmento"]:
+		var item_entry := ui.content.find_child("Entry_" + item_id, true, false) as Button
+		check(item_entry != null, "dossiê %s aparece no índice" % item_id)
+		if item_entry != null:
+			item_entry.pressed.emit(); await process_frame
+			check(portrait.visible and portrait.texture != null and not portrait_fallback.visible, "dossiê %s exibe seu card" % item_id)
+	check(ui.content.find_child("MissingArtSeal", true, false) is Panel, "fallback tem selo intencional quando necessário")
 	var archive_backdrop := ui.content.find_child("ArchiveBackdrop", true, false) as TextureRect
 	var portrait_frame := ui.content.find_child("ArchivePortraitFrame", true, false) as NinePatchRect
 	check(archive_backdrop != null and archive_backdrop.texture != null and archive_backdrop.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "fundo reutilizado preserva filtragem nearest")

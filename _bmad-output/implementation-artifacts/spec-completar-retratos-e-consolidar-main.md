@@ -13,9 +13,9 @@ context:
 
 ## Intent
 
-**Problem:** Four monster dossiers still show the generic missing-art seal, while completed work is spread across dirty files and multiple local or remote branches instead of one authoritative `main`.
+**Problem:** Several encyclopedia dossiers still use missing art, tiny inventory icons, or gameplay sprite sheets instead of the approved illustrated-card standard, while completed work is spread across dirty files and multiple local or remote branches instead of one authoritative `main`.
 
-**Approach:** Use PixelLab to create cohesive pixel-art dossier portraits for Cultista Abissal, Arpoador, Rastejante, and Brutamontes; connect them through the data-driven catalog; preserve and reconcile all current work; merge every branch that contributes commits absent from `main`; verify the unified game; then push the resulting `main` to `origin`.
+**Approach:** Use PixelLab to create a cohesive illustrated-card set for every encyclopedia record that lacks the approved visual standard; connect it through the data-driven catalog without replacing gameplay art; preserve and reconcile all current work; merge every branch that contributes commits absent from `main`; verify the unified game; then push the resulting `main` to `origin`.
 
 ## Boundaries & Constraints
 
@@ -55,6 +55,7 @@ context:
 - [x] `assets/enemies/encyclopedia/` -- normalize accepted portraits for runtime use with crisp nearest-filtered output.
 - [x] `data/enciclopedia.json` -- bind each named monster to its matching portrait without changing the schema.
 - [x] `tests/encyclopedia_data_test.gd` and `tests/encyclopedia_ui_test.gd` -- prove every monster image resolves and missing-art fallback still works for bad paths.
+- [x] `art/source/pixellab/encyclopedia-completion-v3/`, `assets/enemies/encyclopedia/`, and `assets/items/encyclopedia/` -- replace remaining sprite-sheet, tiny-icon, and missing-art dossier visuals with nine cohesive cards while preserving gameplay assets.
 - [ ] Repository history -- commit all current dirty work, fetch, reconcile `origin/main`, then merge every local/remote branch with unique contributing commits into `main`.
 - [ ] Full project -- import, run relevant regression suites, capture the encyclopedia, audit ancestry, and push unified `main` to `origin`.
 
@@ -67,6 +68,7 @@ context:
 ## Spec Change Log
 
 - 2026-09-29 — User rejected the sparse transparent-sprite treatment and supplied a maximalist Almirante card reference; acceptance now requires illustrated full-bleed cards with dramatic environments and saturated effects. The original sprites remain as exploration, while the v2 cards are promoted to runtime.
+- 2026-09-30 — Visual audit found three remaining monster sprite sheets, five tiny equipment icons, and one missing item image. A nine-card PixelLab completion pass now makes every monster and item dossier use purpose-built artwork; existing gameplay resources remain untouched.
 
 ## Design Notes
 

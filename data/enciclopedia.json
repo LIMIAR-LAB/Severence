@@ -48,7 +48,7 @@
       "ordem": 50,
       "nome": "BOMBARDEIRO",
       "subtitulo": "Ameaça explosiva",
-      "imagem": "res://assets/enemies/bomber.png",
+      "imagem": "res://assets/enemies/encyclopedia/bombardeiro_card.png",
       "descricao": "Corre em zigue-zague para encurtar a distância e detona perto do alvo. Pouca resistência compensa uma explosão perigosa.",
       "tracos": ["Muito veloz", "Baixa vida", "Explode a curta distância"]
     },
@@ -58,7 +58,7 @@
       "ordem": 60,
       "nome": "GUARDA DAS DOCAS",
       "subtitulo": "Defensor disciplinado",
-      "imagem": "res://assets/enemies/guard.png",
+      "imagem": "res://assets/enemies/encyclopedia/guarda_docas_card.png",
       "descricao": "Mantém a guarda fechada contra tiros frontais e responde com rajadas cadenciadas. Fica vulnerável durante a ofensiva.",
       "tracos": ["Bloqueio frontal", "Rajada de tiros", "Abre a guarda ao atacar"]
     },
@@ -68,7 +68,7 @@
       "ordem": 70,
       "nome": "VIGIA",
       "subtitulo": "Minichefe das docas",
-      "imagem": "res://assets/enemies/warden.png",
+      "imagem": "res://assets/enemies/encyclopedia/vigia_card.png",
       "descricao": "Sentinela enorme que protege as passagens centrais. Alterna pressão direta, disparos e golpes de grande alcance.",
       "tracos": ["Minichefe", "Grande reserva de vida", "Múltiplos padrões de ataque"]
     },
@@ -88,7 +88,7 @@
       "ordem": 10,
       "nome": "BLASTER",
       "subtitulo": "Arma do uniforme Padrão",
-      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_padrao.png",
+      "imagem": "res://assets/items/encyclopedia/blaster_card.png",
       "descricao": "Arma de energia equilibrada, com boa cadência e precisão. É a ferramenta mais confiável para qualquer expedição.",
       "tracos": ["16 de dano por tiro", "Cadência média", "Disponível desde o início"]
     },
@@ -98,7 +98,7 @@
       "ordem": 20,
       "nome": "ESCOPETA DE REBITE",
       "subtitulo": "Arma do uniforme Mecânico",
-      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_mecanico.png",
+      "imagem": "res://assets/items/encyclopedia/escopeta_rebite_card.png",
       "descricao": "Dispara seis rebites de uma vez. Excelente de perto e acompanhada pela pesada chave inglesa do Mecânico.",
       "tracos": ["Seis projéteis", "Alto dano próximo", "Conclua 1 expedição"]
     },
@@ -108,7 +108,7 @@
       "ordem": 30,
       "nome": "SUBMETRALHADORA",
       "subtitulo": "Arma do uniforme Espião",
-      "imagem": "res://assets/ui/equipamento/icones/icon_uniforme_espiao.png",
+      "imagem": "res://assets/items/encyclopedia/submetralhadora_card.png",
       "descricao": "Arma leve de disparo muito rápido. Combina com a mobilidade e a aproximação discreta do uniforme Espião.",
       "tracos": ["Cadência alta", "Dano leve por tiro", "Conclua 2 expedições"]
     },
@@ -118,7 +118,7 @@
       "ordem": 40,
       "nome": "LÂMINA ÔMEGA",
       "subtitulo": "Arma lendária temporária",
-      "imagem": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
+      "imagem": "res://assets/items/encyclopedia/lamina_omega_card.png",
       "descricao": "Manifestada pela Armadura Ômega, executa um combo de três cortes. O golpe final lança uma onda que atravessa inimigos.",
       "tracos": ["Combo de três golpes", "Reflete projéteis", "Exige Armadura Ômega ativa"]
     },
@@ -128,7 +128,7 @@
       "ordem": 50,
       "nome": "BAZUCA",
       "subtitulo": "Arma de missão",
-      "imagem": "res://assets/weapons/bazooka_v2.png",
+      "imagem": "res://assets/items/encyclopedia/bazuca_card.png",
       "descricao": "Lança foguetes de munição limitada encontrados durante a expedição. A explosão atinge alvos próximos do impacto.",
       "tracos": ["48 de dano direto", "Dano em área", "Munição limitada"]
     },
@@ -138,7 +138,7 @@
       "ordem": 60,
       "nome": "FRAGMENTO CRONAL",
       "subtitulo": "Recurso temporal",
-      "imagem": "",
+      "imagem": "res://assets/items/encyclopedia/fragmento_cronal_card.png",
       "descricao": "Matéria instável recuperada das fraturas. É preservada entre expedições para futuras melhorias no Refúgio.",
       "tracos": ["Recurso persistente", "Origem temporal", "Uso futuro na oficina"]
     },
