@@ -9,7 +9,7 @@ const MARTY_PORTRAIT := "res://assets/ui/equipamento/cards/card_marty_padrao.png
 const TITLE_CONCEPT := "res://art/concept/tela-inicial-conceito-v3-severence.png"
 const CHARACTER_CONCEPT := "res://art/concept/selecao-personagem-conceito-v3.png"
 const CHARACTER_COOP_CONCEPT := "res://art/concept/selecao-personagem-coop-conceito-v3.png"
-const ADVENTURE_CONCEPT := "res://art/concept/selecao-aventura-conceito-v2.png"
+const ADVENTURE_CONCEPT := "res://art/concept/selecao-aventura-conceito-v3.png"
 const TITLE_CONCEPT_SHADER := preload("res://shaders/title_concept_overlay.gdshader")
 const PAUSE_FRAME := "res://assets/ui/pause/pause_frame_pixellab.png"
 const RUN_SUMMARY_FRAME := "res://assets/ui/run_summary/frame_main.png"
@@ -377,30 +377,21 @@ func build_play() -> void:
 	if pending_mode not in ["solo", "ai", "local"]: pending_mode = "solo"
 	var choices := Control.new(); choices.name = "AdventureChoices"; choices.size = Vector2(1344, 752)
 	choices.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(choices)
-	var solo := concept_button(choices, "SoloChoice", Rect2(348, 191, 311, 312), func(): pending_mode = "solo"; show_screen("play"))
+	var solo := concept_button(choices, "SoloChoice", Rect2(348, 191, 311, 312), func(): choose_adventure("solo"))
 	solo.tooltip_text = "Só Marty"
-	var ai := concept_button(choices, "AIChoice", Rect2(682, 191, 312, 312), func(): pending_mode = "ai"; show_screen("play"))
+	var ai := concept_button(choices, "AIChoice", Rect2(682, 191, 312, 312), func(): choose_adventure("ai"))
 	ai.tooltip_text = "Marty com parceiro controlado pelo jogo"
-	var local := concept_button(choices, "LocalChoice", Rect2(309, 519, 730, 90), func(): pending_mode = "local"; show_screen("play"))
+	var local := concept_button(choices, "LocalChoice", Rect2(309, 519, 730, 90), func(): choose_adventure("local"))
 	local.tooltip_text = "Dois jogadores no mesmo computador"
 	var back := concept_button(choices, "AdventureBack", Rect2(346, 630, 280, 68), func(): show_screen("characters"))
 	back.tooltip_text = "Voltar aos personagens"
-	var confirm := concept_button(choices, "EquipAndEnter", Rect2(657, 630, 364, 68), func():
-		if pending_mode == "local": show_screen("characters_coop")
-		else: read_equipment(); show_screen("equipment"))
-	confirm.tooltip_text = "Confirmar aventura e abrir equipamento"
-	if pending_mode != "solo":
-		var solo_dimmer := ColorRect.new(); solo_dimmer.name = "UnselectedSoloOverlay"
-		solo_dimmer.position = Vector2(344, 187); solo_dimmer.size = Vector2(318, 317)
-		solo_dimmer.color = Color(0.0, 0.01, 0.02, 0.5); solo_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		choices.add_child(solo_dimmer)
-		var selected_rect := Rect2(682, 191, 312, 312) if pending_mode == "ai" else Rect2(309, 519, 730, 90)
-		var selected := panel(choices, selected_rect, Color.TRANSPARENT, CYAN)
-		selected.name = "ModeSelectionFrame"; selected.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var selected_style := selected.get_theme_stylebox("panel") as StyleBoxFlat
-		selected_style.set_border_width_all(5)
 	solo.focus_next = solo.get_path_to(ai); ai.focus_next = ai.get_path_to(local)
-	local.focus_next = local.get_path_to(confirm); confirm.focus_next = confirm.get_path_to(back)
+	local.focus_next = local.get_path_to(back); back.focus_next = back.get_path_to(solo)
+
+func choose_adventure(mode: String) -> void:
+	pending_mode = mode
+	if mode == "local": show_screen("characters_coop")
+	else: read_equipment(); show_screen("equipment")
 
 func build_pause() -> void:
 	var p := panel(content, Rect2(222, 110, 900, 532), Color("11272b"), Color("1c2829"))
