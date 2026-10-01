@@ -26,6 +26,45 @@ personagens jogáveis. É o que vai para pré-venda/early access.
 
 ## 1. Estado atual (auditado no código)
 
+> **Revisão pós-consolidação (2026-09-30):** o merge do trabalho dos outros agentes
+> implementou a maior parte da espinha roguelike planejada. O que já EXISTE em
+> `simulation.gd`/`scenarios/` hoje:
+>
+> - **Ciclo de run completo**: `start_new_run()` / `start_run(seed)` /
+>   `finish_run(outcome)` com `run_stats`, nota (`run_grade`), obituário por causa
+>   de morte e tela de relatório. Morte → âncora temporal resgata → resumo → hub.
+> - **RNG seedado**: `rng`/`seed_value` dirigem elites, tipos de inimigo e layout.
+> - **Geração procedural de layout**: `scenarios/procedural_docks.gd` +
+>   `tools/scenarios/prototype/layout_generator.gd` — topologia variável por seed
+>   reaproveitando interiores autorais (`variable_topology`), com `layout_manifest`
+>   e tradução de todas as entidades. Liga/desliga por `procedural_enabled`.
+> - **BiomeDef equivalente**: `scenarios/biomes.json` + `biome_catalog.gd`
+>   (materiais, atmosfera, room_roles, template_pool, connector_rules, fallback com
+>   detecção de ciclo, estágios de publicação) + `module_catalog.gd`/`modules.json`
+>   com módulos fixos pilotos (cranes, warehouse, sanctuary, farol).
+> - **Meta/unlocks**: `unlocked` + `unlock()`/`check_unlocks()` persistidos no
+>   save; tipos de desbloqueio já data-driven em `data/equipamento.json`
+>   (`inicio | sala | desafio | chefe | expedicoes`) — **o hook "resgate →
+>   desbloqueio" da lore já tem onde pendurar**.
+> - **Hub com portais**: Refúgio tem portal "DOCAS / 1941" e um "COORDENADA PERDIDA
+>   • BLOQUEADO" — a estrutura de portas de era já existe como conceito.
+> - **Equipamento/inventário**: `equipment_screen.gd` (loadout: uniforme +
+>   transformação Ômega/Azul + robô Titan/Spectre + arma), `inventory_state.gd`,
+>   enciclopédia, terminal, intro em vídeo (`opening.ogv`), intro de boss.
+> - **Combate tático**: inimigos com cover/slots/line-of-fire, combat zones
+>   telegrafadas, harpoons, tentacle gates (o evento do Desembarque da lore!),
+>   rampas/plataformas/gaps, dash 900, cockpit do Titan, fusão Spectre.
+
+### O que mudou no plano por causa disso
+
+- **Passo 0 está ~80% feito.** Falta: split formal RunState/MetaState (hoje os
+  campos de run são zerados em `start_run` e os meta persistem — funciona, mas
+  sem a fronteira formal), sub-streams de RNG por sistema, daily run.
+- **Epic 5 (BiomeDef) já tem o esqueleto** — eras novas são dados em
+  `biomes.json` + módulos, como previsto.
+- **Passo 2 (roster) é o maior item da pré-venda** — o "personagem" hoje é
+  uniforme+forma+robô do Marty; não há CharacterDef multi-personagem.
+
 ### Docas de 1941 — a primeira era já está de pé
 
 - 14 salas autorais: Desembarque, Pátio dos Guindastes, Armazém 7 (maze), Mercado de
@@ -51,16 +90,16 @@ personagens jogáveis. É o que vai para pré-venda/early access.
 
 | Lore | Estado |
 |---|---|
-| Letícia, Vincent, Elias, Íris jogáveis | Não existem — só Marty (P2 é segundo Marty) |
-| Sistema de personagem jogável (roster/kit) | Não existe — só "outfit" do Marty |
-| Eras: Japão (Vincent), Medieval (Elias), Laboratório (Íris), Região antiga (Letícia) | Só Docas 1941 |
-| Portas do Refúgio para cada era | Refúgio é sala única, sem portas de era |
-| Resgate → personagem desbloqueável | Sem sistema (MetaState ainda não existe) |
-| Recompensa garantida de 1ª vitória | Recompensa fixa existe (núcleo/ômega), mas não o framework "1ª vitória = story beat garantido" |
-| Pista do ataque à nave por era | Só ambientação (capela) — sem sistema de pistas |
-| Cinemática inicial | Roteiro escrito; NÃO implementada |
-| Arauto da Maré Negra + Cthulhu | Não existem |
-| Horror cósmico sistêmico (vozes, sonhos, mutações) | Só ambientação estática |
+| Letícia, Vincent, Elias, Íris jogáveis | **Falta** — só Marty (P2 é segundo Marty); "personagens" atuais são uniforme+forma+robô |
+| Sistema de personagem jogável (roster/kit) | **Falta** — precisa de `CharacterDef` separado do loadout do Marty |
+| Eras: Japão (Vincent), Medieval (Elias), Laboratório (Íris), Região antiga (Letícia) | **Falta conteúdo** — mas o `biomes.json` + módulos já são o molde; hoje só `docks` + fixture de teste |
+| Portas do Refúgio para cada era | **Parcial** — portal "DOCAS / 1941" + "COORDENADA PERDIDA • BLOQUEADO" já existem no hub |
+| Resgate → personagem desbloqueável | **Framework pronto** — `unlocked`/`unlock()` persistem; tipos de desbloqueio data-driven (falta tipo "resgate"/era) |
+| Recompensa garantida de 1ª vitória | **Parcial** — vitória dá recompensa fixa; falta tabela de story beats garantidos por era |
+| Pista do ataque à nave por era | **Falta** — só ambientação (capela); sem sistema de pistas |
+| Cinemática inicial | **Implementada como vídeo** — `intro.gd` toca `assets/video/opening.ogv` |
+| Arauto da Maré Negra + Cthulhu | **Falta** |
+| Horror cósmico sistêmico (vozes, sonhos, mutações) | **Parcial** — tentacle gates do Desembarque existem; falta sistema por era |
 
 ### Insight-chave
 
