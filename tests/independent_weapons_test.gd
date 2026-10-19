@@ -9,7 +9,7 @@ func _init() -> void:
 	s.grant_run_weapon(a,"bazooka",6)
 	for outfit in ["padrao","mecanico","espiao"]:
 		a.outfit = outfit
-		for form in ["normal","omega","fusion"]:
+		for form in ["normal","fusion"]:
 			a.armor = form == "omega"; a.fused = form == "fusion"
 			check(s.weapon_of(a) == "bazooka" and a.run_weapons.bazooka == 6,"equipment survives " + outfit + "/" + form)
 			for row in 8:
@@ -35,8 +35,10 @@ func _init() -> void:
 	s.set_unlocks(["padrao","omega","mecanico","espiao"])
 	check(s.select_run_weapon(0,"shotgun") and s.weapon_of(a)=="shotgun","unlocked shotgun selectable independent of outfit")
 	a.outfit="padrao"; a.armor=true
-	check(s.weapon_of(a)=="shotgun","Omega retains selected shotgun")
-	check(s.select_run_weapon(0,"smg") and s.weapon_of(a)=="smg","unlocked smg selectable in armor")
+	check(s.weapon_of(a)=="omega_orb" and a.basic_weapon=="shotgun","Omega stores selected shotgun under temporary orbs")
+	check(not s.select_run_weapon(0,"smg"),"temporary weapon cannot be replaced in armor")
+	a.armor=false
+	check(s.weapon_of(a)=="shotgun","shotgun returns when armor ends")
 	var view := DockView.new()
 	var size := view.omega_assembly_draw_size(Vector2(271.5,724))
 	check(is_equal_approx(size.x/size.y,271.5/724.0),"transformation preserves source aspect")

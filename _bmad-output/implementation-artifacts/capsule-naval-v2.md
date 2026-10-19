@@ -1,0 +1,9 @@
+# Cápsula de extração naval — 2026-10-03
+
+Arte gerada com a ferramenta integrada image_gen, PNG transparente em assets/environment/docks/capsule_naval_v2.png. Sprite anterior preservado. Renderização usa 240x384 e portas/efeitos alinhados ao novo vidro; feixe aparece somente durante a partida. Círculo ritual removido da decoração do chefe e da fonte do gerador de mapa; filtro de renderização também cobre saves anteriores.
+
+Prompt: Create a single production-ready 2D game sprite: a beautiful vertical one-person extraction capsule for a dark maritime dieselpunk pixel-art action game. True transparent background. Front-facing orthographic view with slightly visible top and base, perfectly symmetric. Weathered midnight navy steel hull, restrained aged brass trim, bolts, pipework integrated into silhouette, chunky foot platform with two short steps. Rounded armored canopy, small cyan status indicator, two slim cyan light strips. Large EMPTY dark blue glass doorway in middle, no person, no occupant, no scenery, no text, no ritual symbols, no circle, no other objects. Cohesive polished hand-painted pixel-art shading and crisp edges, tactile materials, strong readable silhouette, avoid flat white plastic and toy/cartoon look. Full capsule visible with only 4% transparent padding, vertical 5:8 aspect canvas. Doorway centered approximately x=30%-70%, y=30%-78% of sprite. Dark glass unobstructed to accept animated doors in engine. Intended display about 170x270 game pixels. Save output as local PNG asset.
+
+Validação: capsule_p10_test.gd e boss_arena_scenery_test.gd finalizaram com zero falhas. Embarque, porta, partida, relatório de vitória, snapshot durante extração e navegação da arena preservados.
+
+Prévia no motor inspecionada: output/capsule-preview/naval-v2.png (selada, pronta, fechando e partindo); sem erros de renderização. Importação Godot concluída.

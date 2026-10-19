@@ -22,6 +22,24 @@ func run() -> void:
 	check(intro.player.stream_position > 0, "decoder advances playback")
 	intro.size = Vector2(1280, 800); intro._fit_video()
 	check(intro.player.size.is_equal_approx(Vector2(1280, 720)) and intro.player.position.is_equal_approx(Vector2(0, 40)), "16:10 window preserves video proportions")
+	var navigate := InputEventKey.new(); navigate.keycode = KEY_TAB; navigate.pressed = true
+	intro._input(navigate)
+	var direction := InputEventJoypadButton.new(); direction.button_index = JOY_BUTTON_DPAD_RIGHT; direction.pressed = true
+	intro._input(direction)
+	check(not intro.leaving, "keyboard and controller navigation never skip opening")
+	var pause := InputEventKey.new(); pause.keycode = KEY_SPACE; pause.pressed = true
+	intro._input(pause)
+	check(intro.player.paused and not intro.leaving, "Space pauses without skipping")
+	var click := InputEventMouseButton.new(); click.button_index = MOUSE_BUTTON_LEFT; click.pressed = true
+	intro._input(click)
+	check(not intro.leaving, "mouse input reaches explicit pause button instead of skipping")
+	intro.get_node("PauseIntro").pressed.emit()
+	check(not intro.player.paused and not intro.leaving, "pause button resumes without transition")
+	var start := InputEventJoypadButton.new(); start.button_index = JOY_BUTTON_START; start.pressed = true
+	intro._input(start)
+	check(intro.player.paused and not intro.leaving, "Start pauses instead of skipping")
+	intro._input(start)
+	check(not intro.player.paused, "Start resumes")
 	var key := InputEventKey.new(); key.keycode = KEY_ENTER; key.pressed = true; key.echo = true
 	intro._input(key)
 	check(not intro.leaving, "held key repeats do not skip")

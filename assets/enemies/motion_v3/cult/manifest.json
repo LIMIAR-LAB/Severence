@@ -6,100 +6,6 @@
   ],
   "world_scale": 0.8279569892473119,
   "clips": {
-    "walk": {
-      "south": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-south.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "3fd44040-ec0e-407d-a001-5067ce734cef",
-        "source_anchor": [
-          51,
-          93
-        ]
-      },
-      "south-east": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-south-east.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "e21fc1ea-0b84-4815-8da0-c8389f182def",
-        "source_anchor": [
-          50,
-          94
-        ]
-      },
-      "east": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-east.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "5c81bb64-7b81-448f-a335-8bb26178af95",
-        "source_anchor": [
-          48,
-          95
-        ]
-      },
-      "west": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-west.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "040f04c5-fdde-4742-be7d-4d6267bff361",
-        "source_anchor": [
-          52,
-          95
-        ]
-      },
-      "north": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-north.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "8302f6ad-c3b1-4ab1-b719-4d80e6d034c8",
-        "source_anchor": [
-          45,
-          94
-        ]
-      },
-      "north-west": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-north-west.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "20624930-96ca-40f8-bb8a-2e40d73184c2",
-        "source_anchor": [
-          44,
-          94
-        ]
-      },
-      "south-west": {
-        "path": "res://assets/enemies/motion_v3/cult/walk-south-west.png",
-        "frames": 17,
-        "duration": 0.9,
-        "job_id": "ba727974-9d40-4b96-85d5-6bd57693f3e7",
-        "source_anchor": [
-          56,
-          94
-        ]
-      }
-    },
-    "attack": {
-      "south": {
-        "path": "res://assets/enemies/motion_v3/cult/attack-south.png",
-        "frames": 17,
-        "duration": 1.0,
-        "job_id": "0cb42fa7-d3fb-4362-86ef-fb1711db4c68",
-        "source_anchor": [
-          51,
-          93
-        ]
-      },
-      "east": {
-        "path": "res://assets/enemies/motion_v3/cult/attack-east.png",
-        "frames": 17,
-        "duration": 1.0,
-        "job_id": "8676c9a0-14d8-4d04-a08c-be174d64d065",
-        "source_anchor": [
-          48,
-          95
-        ]
-      }
-    },
     "death": {
       "south": {
         "path": "res://assets/enemies/motion_v3/cult/death-south.png",
@@ -119,6 +25,230 @@
         "source_anchor": [
           48,
           95
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/cult/death-north-west.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "fd704bd6-3cd0-459b-ab2d-30aa95580ba7",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/cult/death-north.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "4452d555-97ee-4821-bdef-841a6442eee2",
+        "source_anchor": [
+          63,
+          112
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/cult/death-north-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "c9a1fa10-4da9-4eb1-8a38-f502d8ddf81d",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/cult/death-south-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "186e0036-6a59-4761-8c5e-85a3dc66b80a",
+        "source_anchor": [
+          68,
+          112
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/cult/death-west.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "85473200-094d-408b-9d6a-190d9985cc0a",
+        "source_anchor": [
+          70,
+          113
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/cult/death-south-west.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "f385fbe5-3ac9-4bd2-b311-ff73673c5eab",
+        "source_anchor": [
+          74,
+          112
+        ]
+      }
+    },
+    "attack": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-south.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "12bff2ca-4885-4ff6-a34a-613feb203fd0",
+        "source_anchor": [
+          69,
+          111
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-west.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "20d5abe1-f883-4f54-938c-dbdceeabbf3e",
+        "source_anchor": [
+          70,
+          113
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-south-east.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "1479bc45-0888-4dc8-9695-a812bdbb3105",
+        "source_anchor": [
+          68,
+          112
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-north-west.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "7a7e3334-520b-4b67-94d9-09ad4fbdcc7d",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-north-east.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "840a838d-4687-4b9e-90fb-30d845769207",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-south-west.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "e7b01576-c850-40f7-86ed-8d1d3960a8a7",
+        "source_anchor": [
+          74,
+          112
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-east.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "041b9bbf-0794-40b5-9605-988615c47d4a",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/cult/attack-north.png",
+        "frames": 9,
+        "duration": 1.0,
+        "job_id": "0802a5b4-775c-4776-8a58-b2a25f1b636e",
+        "source_anchor": [
+          63,
+          112
+        ]
+      }
+    },
+    "walk": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-south.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "f86034fe-18c1-499d-a1d2-02ef4c2738a8",
+        "source_anchor": [
+          69,
+          111
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "57b47bc4-143a-4ac1-900f-203ec3061214",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-north-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "9f53c808-11b2-4bdc-b57c-1768002dd7f7",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "fc8ef956-df35-45b7-b667-603e2e732b45",
+        "source_anchor": [
+          70,
+          113
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-south-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "819d2a88-6509-4eb7-be90-b9210b6a644b",
+        "source_anchor": [
+          74,
+          112
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-north-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "ac0a301d-52da-43ac-8d67-e13f6669b836",
+        "source_anchor": [
+          62,
+          112
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-north.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "db6d064e-25a4-4079-8745-d5572d28a676",
+        "source_anchor": [
+          63,
+          112
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/cult/walk-south-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "38a918b2-6c0f-459a-be6d-d752dfdfe5e0",
+        "source_anchor": [
+          68,
+          112
         ]
       }
     }

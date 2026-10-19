@@ -1,0 +1,93 @@
+--- main.gd.before
++++ main.gd
+@@ -39,8 +39,9 @@
+ var send_timer := 0.0
+ var save_timer := 0.0
+ var previous_buttons: Dictionary = {}
+-# 0.19: preserva a mira do controle ao soltar o analógico.
+-var joy_aim: Dictionary = {}
++# Mouse motion briefly expresses aim; camera movement does not refresh it.
++const MOUSE_AIM_GRACE_USEC := 180000
++var last_mouse_aim_usec: int = -MOUSE_AIM_GRACE_USEC
+ var last_save := ""
+ var network_status := "OFFLINE"
+ var map_open := false
+@@ -448,7 +449,7 @@
+ 
+ func _input(event: InputEvent) -> void:
+ 	if event is InputEventMouseMotion and event.relative.length_squared() > 0.0:
+-		joy_aim.clear()
++		last_mouse_aim_usec = Time.get_ticks_usec()
+ 
+ # 0.19: um controle no coop pertence ao P2; dois controles atendem os dois pilotos.
+ func connected_gamepads() -> Array:
+@@ -463,11 +464,14 @@
+ func player_input(index: int, use_primary: bool = true) -> Dictionary:
+ 	var a: Dictionary = sim.actors[index]
+ 	var cmd := {"move": Vector2.ZERO, "aim": a.aim, "fire": false, "melee": false, "melee_m": false, "melee_h": false, "jump": false, "dodge": false, "interact": false, "armor": false, "weapon": false, "summon": false, "fusion": false, "robot_switch": false, "special": false}
++	var deliberate_aim := Vector2.ZERO
+ 	if use_primary:
+ 		cmd.move = Vector2(float(Input.is_physical_key_pressed(key_binds.right)) - float(Input.is_physical_key_pressed(key_binds.left)), float(Input.is_physical_key_pressed(key_binds.down)) - float(Input.is_physical_key_pressed(key_binds.up))).normalized()
+-		if not joy_aim.get(index, false): cmd.aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
+ 		cmd.fire = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not map_open and not minimap_rect().has_point(get_viewport().get_mouse_position())
+ 		cmd.melee = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) or Input.is_physical_key_pressed(key_binds.melee)
++		var mouse_attack: bool = ui_input_block <= 0 and (cmd.fire or (Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) and not map_open))
++		if not map_open and (mouse_attack or Time.get_ticks_usec() - last_mouse_aim_usec < MOUSE_AIM_GRACE_USEC):
++			deliberate_aim = (get_global_mouse_position() - a.p + Vector2(0, 28)).normalized()
+ 		cmd.melee_m = Input.is_physical_key_pressed(key_binds.melee_m)
+ 		cmd.melee_h = Input.is_physical_key_pressed(key_binds.melee_h)
+ 		cmd.jump = Input.is_physical_key_pressed(key_binds.jump)
+@@ -481,7 +485,7 @@
+ 	else:
+ 		cmd.move = Vector2(float(Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_UP))).normalized()
+ 		var dir := Vector2(float(Input.is_physical_key_pressed(KEY_L)) - float(Input.is_physical_key_pressed(KEY_J)), float(Input.is_physical_key_pressed(KEY_K)) - float(Input.is_physical_key_pressed(KEY_I)))
+-		if dir.length() > 0.1: cmd.aim = dir.normalized()
++		if dir.length() > 0.1: deliberate_aim = dir.normalized()
+ 		cmd.fire = Input.is_physical_key_pressed(KEY_ENTER); cmd.melee = Input.is_physical_key_pressed(KEY_PERIOD)
+ 		cmd.melee_m = Input.is_physical_key_pressed(KEY_SEMICOLON); cmd.melee_h = Input.is_physical_key_pressed(KEY_APOSTROPHE)
+ 		cmd.jump = Input.is_physical_key_pressed(KEY_SLASH); cmd.dodge = Input.is_physical_key_pressed(KEY_COMMA); cmd.boost = cmd.dodge
+@@ -496,7 +500,7 @@
+ 		if stick.length() > 0.2: cmd.move = stick.limit_length()
+ 		stick = Vector2(Input.get_joy_axis(device, JOY_AXIS_RIGHT_X), Input.get_joy_axis(device, JOY_AXIS_RIGHT_Y))
+ 		if stick.length() > 0.25:
+-			cmd.aim = stick.normalized(); joy_aim[index] = true
++			deliberate_aim = stick.normalized()
+ 		cmd.fire = cmd.fire or Input.get_joy_axis(device, JOY_AXIS_TRIGGER_RIGHT) > 0.3
+ 		var combat_buttons := controller_combat_buttons(Input.is_joy_button_pressed(device, JOY_BUTTON_X), Input.is_joy_button_pressed(device, JOY_BUTTON_Y), Input.is_joy_button_pressed(device, JOY_BUTTON_RIGHT_SHOULDER), Input.get_joy_axis(device, JOY_AXIS_TRIGGER_LEFT) > 0.3)
+ 		for action in combat_buttons: cmd[action] = cmd[action] or combat_buttons[action]
+@@ -507,10 +511,17 @@
+ 		cmd.summon = cmd.summon or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_UP)
+ 		cmd.fusion = cmd.fusion or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_DOWN)
+ 		cmd.robot_switch = cmd.robot_switch or Input.is_joy_button_pressed(device, JOY_BUTTON_DPAD_LEFT)
++	cmd.aim = resolve_player_aim(cmd.move, a.aim, deliberate_aim)
+ 	for key in ["interact", "armor", "weapon", "dodge", "jump", "summon", "fusion", "robot_switch"]: cmd[key] = edge(str(index) + key, cmd[key])
+ 	if ui_input_block > 0:
+ 		for action in ["fire", "melee", "melee_m", "melee_h"]: cmd[action] = false
+ 	return cmd
++
++# Explicit aim is sampled each frame; releasing it never latches a device mode.
++static func resolve_player_aim(movement: Vector2, last_aim: Vector2, deliberate_aim: Vector2) -> Vector2:
++	if deliberate_aim.length() > 0.1: return deliberate_aim.normalized()
++	if movement.length() > 0.1: return movement.normalized()
++	return last_aim
+ 
+ # L2 modifica os golpes; Triângulo/Y e R1/RB ficam exclusivos de interação/arma.
+ static func controller_combat_buttons(square: bool, triangle: bool, r1: bool, l2: bool) -> Dictionary:
+@@ -815,7 +826,7 @@
+ 	if playing and not online and not save_game(): return false
+ 	disconnect_network()
+ 	playing = false; paused = false; map_open = false
+-	previous_buttons.clear(); joy_aim.clear(); ui_input_block = 0.2
++	previous_buttons.clear(); last_mouse_aim_usec = -MOUSE_AIM_GRACE_USEC; ui_input_block = 0.2
+ 	menu.open("main")
+ 	return true
+ 
+@@ -844,7 +855,7 @@
+ 	sim.jump_gap = data.get("jump_gap", Rect2())
+ 	sim.coop = data.get("coop", "solo") if data.get("coop", "solo") in ["solo", "ai", "local"] else "solo"
+ 	sim.ob_grid_count = -1; sim.build_navigation()
+-	playing = true; paused = false; map_open = false; previous_buttons.clear(); joy_aim.clear()
++	playing = true; paused = false; map_open = false; previous_buttons.clear(); last_mouse_aim_usec = -MOUSE_AIM_GRACE_USEC
+ 	ui_input_block = 0.2; menu.hide()
+ 	return true
+ 

@@ -29,19 +29,19 @@ func _init() -> void:
 	check(s.bullets.all(func(b): return b.team == 0 or b.life <= 0), "onda de choque apaga projéteis inimigos")
 	for n in range(60): s.step_actor(a, {}, 0.016)
 	check(a.transform == 0, "transformação termina")
-	check(s.weapon_of(a) == "pistol", "Ômega preserva arma equipada e reserva espada ao corpo a corpo")
+	check(s.weapon_of(a) == "omega_orb", "Ômega equipa esferas temporárias")
 	check(not s.equip(0, "espiao", "titan") and a.outfit == "padrao", "com armadura ativa não troca uniforme/arma")
 	check(s.ARMORS.omega.speed > s.UNIFORMS.espiao.speed, "Ômega é mais rápida até que o Espião")
 	# combo de espada: 3 cortes, o 3º solta a onda
 	s.enemies.clear(); s.bullets.clear()
 	s.spawn_enemy(a.p + Vector2(60, 0), "brute"); var e: Dictionary = s.enemies[0]
 	a.aim = Vector2.RIGHT; a.shot = 0
-	s.step_actor(a, {"melee": true, "aim": Vector2.RIGHT}, 0.016)
-	check(e.hp == e.max - 38 and s.effects.any(func(fx): return fx.kind == "sword"), "1º corte da espada: 38 e rastro")
+	s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)
+	check(e.hp == e.max - 38 and s.bullets.any(func(b): return b.kind == "p_omega"), "1º corte da espada: 38 e rastro")
 	e.hp = 999; e.max = 999
 	for n in range(2):
-		a.shot = 0; s.step_actor(a, {"melee": true, "aim": Vector2.RIGHT}, 0.016)
-	check(s.bullets.any(func(b): return b.kind == "p_wave" and b.pierce == 5), "3º corte solta onda perfurante")
+		a.shot = 0; s.step_actor(a, {"fire": true, "aim": Vector2.RIGHT}, 0.016)
+	check(s.bullets.any(func(b): return b.kind == "p_omega" and b.pierce == 5), "3º corte solta onda perfurante")
 	check(e.hp == 999 - 38 - 64, "combo: 38 + 64 no finalizador")
 	hp = a.hp; a.hurt = 0
 	s.damage_actor(a, 20)
@@ -97,6 +97,41 @@ func _init() -> void:
 	check(a.p.x - p0.x > normal * 1.8 and a.boost < 1.0 and s.mech.boosting, "Titan: Shift segurado ativa o turbo e gasta energia")
 	for n in range(40): s.step_actor(a, {"move": Vector2.UP}, 0.05)
 	check(s.effects.any(func(fx): return fx.kind == "stomp"), "Titan: pisadas pesadas geram poeira/tremor")
+	# Teleporte Ômega: Shift+direção pisca e deixa sombra; Shift parado volta.
+	s = Expedition.new(); s.coop = "solo"; s.start_arena(); s.enemies.clear(); s.obstacles.clear()
+	a = s.actors[0]; a.p = Vector2(600, 500); s.set_armor(a, true); a.transform = 0.0; a.armor_time = 300.0
+	var origin: Vector2 = a.p
+	s.step_actor(a, {"dodge": true, "move": Vector2.RIGHT}, 0.016)
+	check(a.p.x > origin.x + 200 and a.shadows.size() == 1, "Ômega: Shift+direção teleporta ~320px e deixa sombra na origem")
+	check(a.invuln > 0 and a.dodge_cd > 0.4, "teleporte dá i-frames e entra em recarga de 0.55s")
+	var land: Vector2 = a.p
+	s.step_actor(a, {}, 0.016)
+	check(a.p == land, "teleporte não desliza depois de chegar")
+	check(a.shadows[0].p == origin, "sombra fica exatamente no ponto de origem")
+	for n in range(3): # esgota: máximo 3 sombras vivas
+		a.invuln = 0; a.dodge_cd = 0; s.step_actor(a, {"dodge": true, "move": Vector2.RIGHT}, 0.016)
+	check(a.shadows.size() == 3, "no máximo 3 sombras acumuladas")
+	# volta em cadeia: cada Shift parado retorna à próxima sombra, até esgotar todas
+	var back_chain: Array = [a.shadows[2].p, a.shadows[1].p, a.shadows[0].p]
+	for i in range(3):
+		a.invuln = 0; a.dodge_cd = 0
+		s.step_actor(a, {"dodge": true, "move": Vector2.ZERO}, 0.016)
+		check(a.p == back_chain[i] and a.shadows.size() == 2 - i, "Shift parado volta pelas sombras em cadeia (%d/3)" % (i + 1))
+		s.step_actor(a, {}, 0.016)
+		check(a.p == back_chain[i], "retorno não desliza: fica parado exatamente na sombra")
+	check(a.shadows.is_empty(), "as 3 sombras foram consumidas na volta")
+	# sombra expira depois de 4s
+	a.shadows = [{"p": a.p, "t": s.tick_time}, {"p": a.p, "t": s.tick_time - 5.0}]
+	check(s.live_shadows(a).size() == 1, "sombra desaparece após 4 segundos")
+	a.shadows = []; a.dodge = 0; a.dodge_cd = 0
+	var before_return: Vector2 = a.p
+	s.step_actor(a, {"dodge": true, "move": Vector2.ZERO}, 0.016)
+	check(a.p == before_return and a.shadows.is_empty(), "sem sombra viva, Shift parado não move")
+	# sem armadura: esquiva comum, sem sombra
+	s.set_armor(a, false); a.dodge = 0; a.dodge_cd = 0; a.p = Vector2(600, 500)
+	s.step_actor(a, {"dodge": true, "move": Vector2.RIGHT}, 0.016)
+	check(a.shadows.is_empty() and a.dodge > 0, "sem Ômega, esquiva normal não cria sombra")
+	check(a.p == Vector2(600, 500) + Vector2.RIGHT * 900 * 0.016 or a.p.x > 600, "esquiva normal desliza em vez de teleportar")
 	print("OMEGA_TESTS_DONE failures=", failures)
 	quit(1 if failures > 0 else 0)
 

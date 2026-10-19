@@ -1,6 +1,8 @@
 class_name CombatHUD
 extends Control
 const DocksMap = preload("res://scripts/docks_map.gd")
+const WeaponVisuals := preload("res://scripts/weapon_visuals.gd")
+const MissionMarkers := preload("res://scripts/mission_markers.gd")
 
 var app: Node
 var art: Dictionary = {}
@@ -10,6 +12,19 @@ const GOLD := Color("d6b36c")
 
 static func show_story_marker(story_quest: int) -> bool:
 	return story_quest < 2
+
+static func dialogue_rect(viewport: Vector2) -> Rect2:
+	var width := minf(780.0, viewport.x - 32.0)
+	return Rect2((viewport.x - width) * 0.5, viewport.y - 144, width, 124)
+
+static func resources_rect(viewport: Vector2) -> Rect2:
+	return Rect2(viewport.x - 374, viewport.y - 76, 360, 60)
+
+static func titan_rect(_viewport: Vector2) -> Rect2:
+	return Rect2(18, 276, 260, 54)
+
+func dialogue_active() -> bool:
+	return app.banner_frame != null and app.banner_frame.visible
 
 func _ready() -> void:
 	var form_material := ShaderMaterial.new()
@@ -26,16 +41,28 @@ func _ready() -> void:
 	art["key_clean"] = load("res://assets/environment/docks/key.png")
 	art["coin_clean"] = load("res://assets/environment/docks/coin.png")
 	art["titan"] = load("res://assets/mech/titan_v2.png")
-	art["portraits"] = load("res://assets/ui/hud/marty_omega_portraits_v1.png")
+	art["portraits"] = load("res://assets/ui/hud/marty_omega_portraits_v2.png")
 	art["azul_icon"] = load("res://assets/characters/marty/azul/front.tres")
+	art["supernova_icon"] = load("res://assets/characters/marty/supernova/v1/front.tres")
+	art["w_supernova"] = art.supernova_icon
 	art["omega_icon"] = load("res://assets/ui/equipamento/icones/icon_armadura_omega.png")
 	art["robot_titan"] = load("res://assets/ui/equipamento/icones/icon_robo_titan.png")
 	art["robot_spectre"] = load("res://assets/ui/equipamento/icones/icon_robo_spectre.png")
 	art["boss"] = load("res://assets/boss/almirante_idle.png")
 	# 0.16: ícones do mapa (tools/prepare_map_icons.py) — 48x48, mostrados em 1/2 (24) no mapa e 1/3 (16) no minimapa
 	for key in ["boss", "shop", "challenge", "chest", "locked", "exit"]: art["map_" + key] = load("res://assets/ui/map_icons/map_icon_" + key + ".png")
-	for key in ["pistol", "shotgun", "smg", "bazooka", "omega_sword"]:
-		art["w_" + key] = load("res://assets/weapons/" + ("bazooka_v2" if key == "bazooka" else key) + ".png")
+	for key in WeaponVisuals.PATHS:
+		art["w_" + key] = weapon_texture(key)
+	art["w_omega_sword"] = weapon_texture("omega_sword")
+	art["w_omega_orb"] = load("res://assets/weapons/omega_orb_hd.png")
+
+static func weapon_texture(weapon: String) -> Texture2D:
+	if weapon == "omega_sword": return load("res://assets/weapons/omega_sword.png")
+	return WeaponVisuals.texture(weapon)
+
+static func weapon_ammo_caption(actor: Dictionary, weapon: String) -> String:
+	var owned: Dictionary = actor.get("run_weapons", {})
+	return str(owned[weapon]) if owned.has(weapon) else "∞"
 
 func _process(_dt: float) -> void:
 	visible = app.playing and not app.menu.visible
@@ -147,7 +174,9 @@ func draw_omega_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
 	var center := Vector2(55, 140)
 	var icon_tint := Color.WHITE if a.armor or a.armor_cd <= 0.0 else Color(0.55, 0.58, 0.62)
 	draw_rect(Rect2(17, 102, 76, 76), Color("081724"))
-	if a.armor_type == "azul":
+	if a.armor_type == "supernova":
+		draw_texture_rect(art.supernova_icon,Rect2(29,106,52,68),false,icon_tint)
+	elif a.armor_type == "azul":
 		draw_texture_rect(art.azul_icon, Rect2(37, 114, 35, 52), false, Color(0.125, 0.25, 0.875, icon_tint.r))
 	else:
 		draw_texture_rect(art.omega_icon, Rect2(29, 114, 52, 52), false, icon_tint)
@@ -159,11 +188,14 @@ func draw_omega_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
 	if ratio >= 1.0 and not a.armor:
 		var pulse := 0.65 + 0.35 * sin(Time.get_ticks_msec() * 0.008)
 		draw_arc(center, 39.0, -PI * 0.5, PI * 1.5, 36, Color(CYAN, pulse), 2.0, true)
-	text(Vector2(103, 125), "FORMA AZUL" if a.armor_type == "azul" else "ARMADURA ÔMEGA", 13, GOLD)
+	text(Vector2(103, 125), armor_info.name, 13, GOLD)
 	text(Vector2(103, 146), state, 14, color)
 	text(Vector2(103, 165), detail, 11, Color("b6c8cd"))
 	if a.armor:
 		var special_key := "→" if ps else ("T" if id == 0 else "P")
+		if a.armor_type=="supernova":
+			text(Vector2(103,182),"PULSO • %.1fs" % a.get("nova_cd",0.0) if a.get("nova_cd",0.0)>0 else special_key+" • PULSO SOLAR",11,GOLD)
+			return
 		if s.is_blue_form(a):
 			var claw_cooldown: float = a.get("claw_cd", 0.0)
 			var claw_label := "GARRA • %.1fs" % claw_cooldown if claw_cooldown > 0 else "%s • GARRA DO CHÃO" % special_key
@@ -189,7 +221,7 @@ func draw_robot_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
 		state = "PILOTANDO" if a.mech else ("EM CAMPO" if s.mech.deployed else "GUARDADO")
 		if s.mech.hp <= 0.0: state = "SEM INTEGRIDADE"
 		detail = "INTEGRIDADE %d%%  •  GAS %d%%" % [int(roundf(ratio * 100.0)), int(roundf(clampf(float(s.mech.fuel) / s.FUEL_MAX, 0.0, 1.0) * 100.0))]
-		controls = "↑ INVOCAR  •  △ PILOTAR" if ps else "C INVOCAR  •  E PILOTAR"
+		controls = "CIMA INVOCAR  •  TRIANGULO PILOTAR" if ps else "C INVOCAR  •  E PILOTAR"
 	elif robot_id == "spectre":
 		robot_icon = art.robot_spectre
 		color = Color("c68cff")
@@ -201,24 +233,12 @@ func draw_robot_indicator(s, a: Dictionary, ps: bool, id: int) -> void:
 	if robot_id != "" and a.summon_cd > 0.0:
 		state += "  •  RECARGA %.1fs" % a.summon_cd
 
-	draw_rect(Rect2(17, 203, 76, 76), Color("081724"))
+	# Compact robot status keeps the world visible; full controls remain in equipment.
+	draw_rect(Rect2(18, 204, 280, 58), Color("081724"))
 	if robot_icon != null:
-		draw_texture_rect(robot_icon, Rect2(29, 215, 52, 52), false, Color.WHITE if ratio > 0.0 else Color(0.45, 0.48, 0.52))
-	else:
-		text(Vector2(47, 252), "–", 26, color)
-	for segment in range(12):
-		var start: float = -PI * 0.5 + TAU * float(segment) / 12.0
-		var end: float = start + TAU * 0.075
-		var segment_color: Color = color if float(segment) < ratio * 12.0 else Color("34404a")
-		draw_arc(center, 35.0, start, end, 3, segment_color, 4.0, true)
-	if ratio >= 1.0 and a.summon_cd <= 0.0:
-		var pulse := 0.65 + 0.35 * sin(Time.get_ticks_msec() * 0.008)
-		draw_arc(center, 39.0, -PI * 0.5, PI * 1.5, 36, Color(color, pulse), 2.0, true)
-	text(Vector2(103, 226), "ROBÔ • " + (robot_id.to_upper() if robot_id != "" else "NENHUM"), 13, GOLD)
-	text(Vector2(103, 247), state, 13, color)
-	text(Vector2(103, 265), detail, 11, Color("b6c8cd"))
-	if controls != "": text(Vector2(103, 283), controls, 11)
-	text(Vector2(103, 301), switch_hint, 11, GOLD)
+		draw_texture_rect(robot_icon, Rect2(24, 211, 40, 40), false)
+	text(Vector2(74, 223), (robot_id.to_upper() if robot_id != "" else "SEM ROBÔ") + " • " + state, 12, color)
+	text(Vector2(74, 244), detail if robot_id != "" else "B • EQUIPAMENTO", 11, Color("b6c8cd"))
 
 func _draw() -> void:
 	if app == null or app.sim == null: return
@@ -226,11 +246,23 @@ func _draw() -> void:
 	var ps: bool = app.playstation_controller_connected()
 	var id: int = 1 if app.online and not app.hosting else 0
 	var a: Dictionary = s.actors[id]
+	if a.get("bike",false):
+		var box := Rect2(get_viewport_rect().size.x*0.5-170,112,340,50)
+		frame(box)
+		text(box.position+Vector2(10,19),"TURBO • ESQUIVA SEGURADA   %d%%" % int(a.get("bike_turbo",1.0)*100),13,CYAN)
+		draw_rect(Rect2(box.position+Vector2(10,29),Vector2(320*a.get("bike_turbo",1.0),8)),CYAN)
 	var portrait_sheet: Texture2D = art.portraits
-	var portrait_cell := Vector2(portrait_sheet.get_width() * 0.5, portrait_sheet.get_height())
-	var portrait_index := 1 if a.armor else 0
-	if s.is_blue_form(a):
-		draw_texture_rect_region(portrait_sheet, Rect2(14, 14, 82, 82), Rect2(Vector2.ZERO, portrait_cell), Color(0.125, 0.25, 0.875, 1))
+	var portrait_cell := Vector2(portrait_sheet.get_width() / 6.0, portrait_sheet.get_height())
+	# Estilo DOOM: o rosto apanha conforme a vida cai — corte, roxo, olho fechado.
+	var damage_tier := 0
+	if a.hp <= s.HEART * 0.5: damage_tier = 3
+	elif a.hp <= s.HEART: damage_tier = 2
+	elif a.hp <= s.HEART * 2: damage_tier = 1
+	var portrait_index := 4 + (1 if damage_tier >= 2 else 0) if a.armor else damage_tier
+	if s.Supernova.active(a):
+		draw_texture_rect_region(art.supernova_icon,Rect2(14,14,82,82),Rect2(64,12,128,128))
+	elif s.is_blue_form(a):
+		draw_texture_rect_region(portrait_sheet, Rect2(14, 14, 82, 82), Rect2(damage_tier * portrait_cell.x, 0, portrait_cell.x, portrait_cell.y), Color(0.125, 0.25, 0.875, 1))
 	else:
 		draw_texture_rect_region(portrait_sheet, Rect2(14, 14, 82, 82), Rect2(portrait_index * portrait_cell.x, 0, portrait_cell.x, portrait_cell.y))
 	# 0.12: vida em corações (1 coração = 10) + corações de escudo Ômega em ciano
@@ -255,7 +287,7 @@ func _draw() -> void:
 	var vp: Vector2 = get_viewport_rect().size
 	var dx := vp.x - 1280.0; var dy := vp.y - 800.0   # HUD ancorado nas bordas reais (qualquer proporção)
 	if a.mech:
-		var box := Rect2(660 + dx * 0.5, 14, 260, 54)
+		var box := titan_rect(vp)
 		frame(box)
 		var bcd: float = a.get("bomb_cd", 0.0)
 		var bomb_ratio: float = clampf(1.0 - bcd / s.MECH_BOMB.cooldown, 0.0, 1.0)
@@ -266,10 +298,11 @@ func _draw() -> void:
 	weapon_frame()
 	var weapon: String = s.weapon_of(a)
 	if weapon == "mech": weapon = "shotgun"
-	var wtex: Texture2D = art["w_" + weapon]
-	var wsize: Vector2 = wtex.get_size() * minf(1.8, minf(78.0 / wtex.get_size().x, 35.0 / wtex.get_size().y))
-	draw_texture_rect(wtex, Rect2(Vector2(351, 43) - wsize * 0.5, wsize), false)
-	text(Vector2(405, 49), str(a.get("run_weapons", {}).get(weapon, 0)) if weapon == "bazooka" else "∞", 23, GOLD)
+	var wtex: Texture2D = art.get("w_" + weapon)
+	if wtex != null:
+		var wsize: Vector2 = wtex.get_size() * minf(1.8, minf(78.0 / wtex.get_size().x, 35.0 / wtex.get_size().y))
+		draw_texture_rect(wtex, Rect2(Vector2(351, 43) - wsize * 0.5, wsize), false)
+	text(Vector2(405, 49), weapon_ammo_caption(a, weapon), 23, GOLD)
 	text(Vector2(311, 82), s.weapon_name(a), 12, CYAN if a.armor else Color("e8dfba"))
 	if s.coop != "solo":
 		var partner: Dictionary = s.actors[1-id]
@@ -285,17 +318,38 @@ func _draw() -> void:
 		draw_set_transform(Vector2(dx, 0))
 	else: draw_set_transform(Vector2(dx, 0))
 	draw_minimap(s, a)
-	draw_set_transform(Vector2(dx, dy))
-	frame(Rect2(978,721,288,60))
-	for n in range(3):
-		var key: String = ["key", "coin", "crystal"][n]
-		draw_texture_rect(art[key],Rect2(992+n*87,733,25,32),false)
-		text(Vector2(1024+n*87,757), str([s.keys,s.money,s.materials][n]),22)
-	draw_set_transform(Vector2(dx * 0.5, dy))
-	text(Vector2(468,779), "OPTIONS • MENU / INVENTÁRIO" if ps else "B • EQUIPAMENTO     ESC • MENU", 13, GOLD)
+	if not dialogue_active():
+		var resource_box := resources_rect(vp)
+		draw_set_transform(resource_box.position)
+		frame(Rect2(Vector2.ZERO, resource_box.size))
+		for n in range(3):
+			var key: String = ["key", "coin", "crystal"][n]
+			draw_texture_rect(art[key], Rect2(12 + n * 86, 13, 25, 32), false)
+			text(Vector2(44 + n * 86, 38), str([s.keys, s.money, s.materials][n]), 20)
+		var bp := Vector2(283, 29)
+		draw_circle(bp, 11, Color("d92c40")); draw_circle(bp + Vector2(0, 4), 9, Color("edf1e9"))
+		draw_rect(Rect2(bp.x - 11, bp.y - 2, 22, 4), Color("232b32")); draw_circle(bp, 4, Color.WHITE)
+		text(Vector2(310, 38), str(s.robobolas), 20)
+		draw_set_transform(Vector2.ZERO)
+		text(Vector2(18, vp.y - 23), "OPTIONS • MENU / DIÁRIO" if ps else ("B • EQUIPAMENTO   ESC • MENU / DIÁRIO" if s.coop == "local" else "B • EQUIPAMENTO   N • DIÁRIO   ESC • MENU"), 12, GOLD)
+	draw_set_transform(Vector2.ZERO)
+	draw_objective(s, vp)
 	draw_set_transform(Vector2.ZERO)
 	draw_boss_health(s)
 	if app.map_open: draw_full_map(s, a)
+
+func draw_objective(s, viewport: Vector2) -> void:
+	if s.mode != "run" or app.map_open: return
+	var objective := "RECUPERAR O NÚCLEO"
+	var detail := "Siga as pistas até o Almirante"
+	if s.boss_dead:
+		objective = "VOLTAR AO REFÚGIO"; detail = "Use a extração com o núcleo"
+	var r := Rect2(viewport.x - 292, 140, 278, 66)
+	draw_rect(r, Color(0.025, 0.065, 0.09, 0.88))
+	draw_rect(Rect2(r.position, Vector2(3, r.size.y)), CYAN)
+	text(r.position + Vector2(12, 23), objective, 13, GOLD)
+	text(r.position + Vector2(12, 44), detail, 12, Color("c6dccd"))
+	text(r.position + Vector2(12, 59), "MISSÕES E PISTAS • MENU" if s.coop == "local" else "MISSÕES E PISTAS • MENU / N", 10, Color("87a5af"))
 
 # ───────── Minimapa e mapa completo (estilo Enter the Gungeon) ─────────
 const MAP_ROOM := Color("2f3566")
@@ -349,6 +403,12 @@ func map_icon(s, pos: Vector2, kind: String, size: float, done: bool = false) ->
 
 func draw_map_icons(s, to_screen: Callable, size: float, clip: Rect2) -> void:
 	if s.mode != "run": return
+	for marker in MissionMarkers.targets(s):
+		var mp: Vector2=to_screen.call(marker.p)
+		if not clip.grow(-12).has_point(mp): continue
+		draw_circle(mp,8,Color("152130")); draw_arc(mp,8,0,TAU,20,GOLD,2)
+		text(mp+Vector2(-3,5),"!",14,GOLD)
+		if size>=24: text(mp+Vector2(12,4),marker.label,11,GOLD)
 	var P: Dictionary = s.run_points
 	var icons: Array = []
 	for chest in s.chests:
@@ -373,6 +433,22 @@ func draw_map_icons(s, to_screen: Callable, size: float, clip: Rect2) -> void:
 		var sp: Vector2 = to_screen.call(icon[0])
 		if clip.has_point(sp): map_icon(s, sp, icon[1], size, icon[2])
 
+func minimap_enemy_positions(s, to_screen: Callable, clip: Rect2) -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	var known_corridors: Dictionary = s.visible_corridor_rects() if s.mode == "run" else {}
+	for enemy in s.enemies:
+		if enemy.hp <= 0: continue
+		if s.mode == "run":
+			var room: Dictionary = s.room_at(enemy.p)
+			if not room.is_empty():
+				if not room_visible(s, room): continue
+				if room.get("kind", "") == "secret" and not s.secret_open: continue
+			elif not known_corridors.keys().any(func(r): return r.has_point(enemy.p)):
+				continue
+		var position: Vector2 = to_screen.call(enemy.p)
+		if clip.grow(-4).has_point(position): positions.append(position)
+	return positions
+
 func draw_minimap(s, a: Dictionary) -> void:
 	frame(Rect2(1086, 14, 180, 112))
 	var clip := Rect2(1098, 26, 156, 76)
@@ -382,8 +458,11 @@ func draw_minimap(s, a: Dictionary) -> void:
 	draw_rect(clip, Color("0b0d18"))
 	draw_map_geometry(s, to_screen, scale_factor, clip, a)
 	draw_map_icons(s, to_screen, 16.0, clip)
+	for position in minimap_enemy_positions(s, to_screen, clip):
+		draw_circle(position, 3.5, Color("0b0d18"))
+		draw_circle(position, 2.5, Color("ff5267"))
 	draw_circle(to_screen.call(a.p), 3, CYAN)
-	text(Vector2(1100, 118), "TAB / M • MAPA", 11)
+	text(Vector2(1100, 118), "TAB • MAPA" if s.coop == "local" else "TAB / M • MAPA", 11)
 
 func draw_full_map(s, a: Dictionary) -> void:
 	var screen := get_viewport_rect()
@@ -407,5 +486,5 @@ func draw_full_map(s, a: Dictionary) -> void:
 	draw_texture_rect(art.portrait, Rect2(me - Vector2(14, 14), Vector2(28, 28)), false)
 	draw_arc(me, 17, 0, TAU, 20, CYAN, 2)
 	text(Vector2(90, 50), "DOCAS DE 1941 • MAPA", 22, GOLD)
-	text(Vector2(90, screen.size.y - 40), "TAB / M / clique no minimapa para fechar     •  caveira = chefe   saco = oficina   cronômetro = desafio   baú   cadeado = sala trancada   seta = extração", 14, Color("c6c9e0"))
+	text(Vector2(90, screen.size.y - 40), ("TAB / clique" if s.coop == "local" else "TAB / M / clique") + " para fechar   •   ! = missão   caveira = chefe   saco = oficina   cronômetro = desafio   seta = extração", 14, Color("c6c9e0"))
 

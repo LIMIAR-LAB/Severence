@@ -87,7 +87,7 @@ func run() -> void:
 	for row in range(directions.size()):
 		a.aim = directions[row]
 		check(view.weapon_hand_anchor(a) == omega_anchors[row], "ancora da espada Omega %d" % row)
-	check(view.marty_omega_action(a, true) == "run", "Omega se desloca flutuando com animacao propria")
+	check(view.marty_omega_action(a, true) == "flight", "Omega se desloca com pose de voo dedicada")
 	a.roll_visual = 0.18
 	check(view.marty_omega_action(a, true) == "evade" and view.omega_teleport_opacity(a) > 0.35, "dash Omega exibe rastro de teleporte no meio do movimento")
 	a.roll_visual = 0.0

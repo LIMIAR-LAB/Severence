@@ -8,7 +8,9 @@ class TestApp extends "res://scripts/main.gd":
 	func connected_gamepads() -> Array: return [12]
 	func playstation_controller_connected() -> bool: return force_ps
 
-func _initialize() -> void: run.call_deferred()
+func _initialize() -> void:
+	preload("res://tests/support/isolated_user_data.gd").activate()
+	run.call_deferred()
 func check(ok: bool, label: String) -> void:
 	if ok: print("PASS CONTROLE: ", label)
 	else: failures += 1; push_error(label)
@@ -22,7 +24,7 @@ func frames(n: int) -> void:
 	for i in range(n): await physics_frame
 
 func run() -> void:
-	app = TestApp.new(); root.add_child(app)
+	app = TestApp.new(); root.add_child(app); app.auto_aim = false
 	await frames(2)
 	check(app.is_playstation_controller("DualSense Wireless Controller") and app.is_playstation_controller("DUALSHOCK 4 Wireless Controller"), "DualSense e DualShock usam símbolos PlayStation")
 	check(not app.is_playstation_controller("Xbox Wireless Controller"), "outro controle não recebe símbolos PlayStation")
@@ -64,8 +66,23 @@ func run() -> void:
 	app.menu.close()
 	var mouse := InputEventMouseMotion.new(); mouse.relative = Vector2(5, 0); Input.parse_input_event(mouse)
 	Input.flush_buffered_events()
-	check(app.joy_aim.is_empty(), "mover mouse devolve mira ao mouse")
+	var expected_aim: Vector2 = (app.get_global_mouse_position() - app.sim.actors[0].p + Vector2(0, 28)).normalized()
+	check(app.player_input(0).aim.dot(expected_aim) > 0.99, "mover mouse devolve mira ao mouse")
 	check(app.gameplay_joypad(true, []) == -1, "sem controle mantém teclado")
+	app.sim.coop = "local"; app.menu.close(); app.map_open = false
+	for binding in [KEY_N, KEY_M]:
+		var key := InputEventKey.new(); key.physical_keycode = binding; key.pressed = true
+		Input.parse_input_event(key); Input.flush_buffered_events()
+		var command: Dictionary = app.player_input(1, false)
+		check(command.summon if binding == KEY_N else command.fusion, "P2 keyboard robot action remains available")
+		await frames(2)
+		check(not app.menu.visible and not app.map_open, "P2 N/M does not open journal or map")
+		key.pressed = false; Input.parse_input_event(key); Input.flush_buffered_events(); await frames(2)
+	app.sim.coop = "solo"
+	var journal_key := InputEventKey.new(); journal_key.physical_keycode = KEY_N; journal_key.pressed = true
+	Input.parse_input_event(journal_key); Input.flush_buffered_events(); await frames(2)
+	check(app.menu.visible and app.menu.screen == "missions", "N opens journal directly in solo")
+	journal_key.pressed = false; Input.parse_input_event(journal_key); Input.flush_buffered_events()
 	print("CONTROLLER INPUT TEST failures=", failures)
 	app.queue_free(); await process_frame; await process_frame
 	await preload("res://tests/support/scene_cleanup.gd").finish(self)

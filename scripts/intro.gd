@@ -5,6 +5,7 @@ const DisplaySettings = preload("res://scripts/display_settings.gd")
 @export_file("*.tscn") var menu_path := "res://scenes/main.tscn"
 var player: VideoStreamPlayer
 var leaving := false
+var pause_button: Button
 
 func _ready() -> void:
 	var settings = JSON.parse_string(FileAccess.get_file_as_string("user://settings.json")) if FileAccess.file_exists("user://settings.json") else {}
@@ -31,7 +32,7 @@ func _ready() -> void:
 	_fit_video()
 	var skip := Button.new()
 	skip.name = "SkipIntro"
-	skip.text = "PULAR  ·  QUALQUER TECLA / BOTÃO"
+	skip.text = "PULAR  ·  ENTER / BOTÃO A"
 	skip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
 	skip.offset_left = -380
 	skip.offset_top = -64
@@ -39,6 +40,11 @@ func _ready() -> void:
 	skip.offset_bottom = -20
 	skip.pressed.connect(finish)
 	add_child(skip)
+	pause_button = Button.new(); pause_button.name = "PauseIntro"
+	pause_button.text = "PAUSAR  ·  ESPAÇO / START"
+	pause_button.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	pause_button.offset_left = 24; pause_button.offset_right = 400; pause_button.offset_top = -64; pause_button.offset_bottom = -20
+	pause_button.pressed.connect(toggle_pause); add_child(pause_button)
 	if not ResourceLoader.exists(video_path):
 		finish()
 		return
@@ -56,8 +62,15 @@ func _fit_video() -> void:
 	player.size = fitted
 	player.position = (size - fitted) * 0.5
 
+func toggle_pause() -> void:
+	if leaving or player == null: return
+	player.paused = not player.paused
+	pause_button.text = "RETOMAR  ·  ESPAÇO / START" if player.paused else "PAUSAR  ·  ESPAÇO / START"
+
 func _input(event: InputEvent) -> void:
-	var skip: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	if (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START):
+		toggle_pause(); get_viewport().set_input_as_handled(); return
+	var skip: bool = (event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_ENTER, KEY_KP_ENTER]) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_A)
 	if skip and not leaving:
 		get_viewport().set_input_as_handled()
 		finish()

@@ -1,3 +1,11 @@
+# Estado atual — 03/10/2026
+
+A consolidação atual está em [Revisão implementada](REVISAO_IMPLEMENTADA_2026-10-03.md) e no [README](../README.md). Há geração modular, música, diário, persistência com revisão de checkpoint e proteção do perfil do convidado. O preset Windows existe, mas a distribuição exportada ainda precisa de validação. Outras eras e amigos jogáveis seguem planejados.
+
+**Registro histórico:** todo o conteúdo abaixo descreve o estado de 25/09/2026. Os números de testes, pendências e regras abaixo não são o estado atual do código.
+
+---
+
 # Estado — 25/09/2026 (revisado na versão 0.11)
 
 ## Decisões incorporadas

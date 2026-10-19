@@ -19,7 +19,19 @@ func run() -> void:
 	await frames(3)
 	app.start_single()
 	app.sim.start_run(1941)
-	app.sim.actors[0].p = Vector2(3010, 1200)
+	var rider: Dictionary = app.sim.actors[0]
+	rider.p = app.sim.run_points.bike_checkpoint
+	app.sim.bike_npc.talked = true
+	app.sim.set_armor(rider, true); app.sim.interact(rider)
+	rider.invuln = 100.0
+	var elapsed := 0.0
+	var intro_early := false
+	while elapsed < 23.0 and not app.sim.bridge_done:
+		if app.boss_room_entered(): intro_early = true
+		app.sim.step(1.0 / 60.0, [{"move": Vector2.RIGHT, "aim": Vector2.RIGHT}])
+		elapsed += 1.0 / 60.0
+	check(not intro_early and not app.sim.boss_intro_seen, "vinheta não é elegível antes da chegada física")
+	check(app.sim.bridge_done and elapsed >= 20.0, "moto percorre rota real antes da arena")
 	await frames(2)
 	check(app.boss_intro.visible and app.sim.boss_intro_seen, "entrada da arena inicia a vinheta uma vez")
 	var frozen_time: float = app.sim.tick_time

@@ -15,12 +15,12 @@ func _init() -> void:
 	var bazooka: Dictionary = sim.pickups.filter(func(p): return p.kind == "weapon" and p.weapon == "bazooka")[0]
 	check(sim.clear_at(bazooka.p, 11), "bazuca está em piso acessível na chegada")
 	marty.p = bazooka.p; sim.collect_pickups()
-	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 6, "encontra bazuca com seis foguetes")
+	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 30, "encontra bazuca com trinta foguetes")
 	sim.toggle_run_weapon(marty)
-	check(sim.weapon_of(marty) == "pistol" and marty.run_weapons.bazooka == 6, "troca preserva munição")
+	check(sim.weapon_of(marty) == "pistol" and marty.run_weapons.bazooka == 30, "troca preserva munição")
 	for _i in range(sim.available_weapons(marty).size() - 1): sim.toggle_run_weapon(marty)
 	check(sim.weapon_of(marty) == "bazooka", "troca reequipa arma da RUN")
-	for _i in range(6):
+	for _i in range(30):
 		marty.shot = 0; sim.fire_actor(marty)
 	check(sim.weapon_of(marty) == "bazooka" and marty.run_weapons.bazooka == 0, "arma vazia permanece equipada")
 	var shots: int = sim.bullets.size()

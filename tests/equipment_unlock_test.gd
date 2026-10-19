@@ -9,20 +9,20 @@ func check(ok: bool, label: String) -> void:
 
 func _init() -> void:
 	# dados
-	check(EquipmentData.items().size() == 6 and EquipmentData.stats().size() == 6, "6 itens e 6 atributos no JSON")
+	check(EquipmentData.items().size() == 7 and EquipmentData.stats().size() == 6, "7 itens incluindo Forma Azul e 6 atributos no JSON")
 	for it in EquipmentData.items():
 		for key in ["id", "nome", "descricao", "atributos", "raridade", "icone", "card", "desbloqueio", "desbloqueado_no_inicio"]:
 			if not it.has(key): check(false, "%s sem %s" % [it.get("id", "?"), key])
 		for path in [it.icone, it.card, it.get("icone_bloqueado", "")]:
 			if path != "" and not ResourceLoader.exists(path): check(false, "arquivo faltando: " + path)
-	check(EquipmentData.starting_unlocks() == ["padrao", "omega", "titan", "spectre"], "Padrão, Ômega, Titan e Spectre liberados desde o início")
+	check(EquipmentData.starting_unlocks() == ["padrao", "omega", "azul"], "Padrão, Ômega e Azul liberados desde o início")
 	var testing = Expedition.new()
 	testing.set_unlocks(EquipmentData.starting_unlocks())
 	testing.make_hub()
 	check(testing.is_unlocked("omega"), "Armadura Ômega disponível desde o início")
-	check(testing.is_unlocked("titan") and testing.is_unlocked("spectre"), "robôs disponíveis no Refúgio")
-	check(testing.equip(0, "padrao", "titan"), "Titan pode ser equipado desde o início")
-	check(testing.equip(0, "padrao", "spectre"), "Spectre pode ser equipado desde o início")
+	check(not testing.is_unlocked("titan") and not testing.is_unlocked("spectre"), "robôs aguardam recuperação na campanha nova")
+	check(not testing.equip(0, "padrao", "titan"), "Titan bloqueado não equipa")
+	check(not testing.equip(0, "padrao", "spectre"), "Spectre bloqueado não equipa")
 	var s = Expedition.new()
 	for id in s.OUTFITS:
 		var u: Dictionary = s.UNIFORMS[id]
@@ -44,15 +44,16 @@ func _init() -> void:
 	s.set_armor(a, false)
 	check(not s.summon_robot(a), "C não invoca robô bloqueado")
 	check(not s.equip(0, "mecanico", ""), "uniforme bloqueado não equipa")
-	# Titan: encontrado na Oficina
+	# A Oficina não substitui a peça recuperada do Almirante.
 	a.p = s.room_by_id("shop").r.get_center(); s.step(0.016, [{}, {}])
-	check(s.is_unlocked("titan") and s.mech.deployed and a.selected_robot == "titan", "entrar na Oficina libera o Titan")
-	check(s.new_unlocks.has("titan"), "desbloqueio marcado para salvar")
+	check(not s.is_unlocked("titan") and not s.mech.deployed, "Oficina não libera Titan sem a peça")
 	# Spectre: desafio do gerador
 	s.side_active = true; s.side_time = 30; s.enemies.clear(); s.step(0.016, [{}, {}])
 	check(s.is_unlocked("spectre"), "desafio do gerador libera o Spectre")
 	# chefe + expedições
 	s.boss_dead = true; a.p = s.DOCKS.POINTS.extraction; s.interact(a)
+	check(s.is_unlocked("titan") and s.owned_robot_ids(0).has("titan"), "primeira vitória restaura Titan e seu módulo")
+	check(s.new_unlocks.has("titan"), "desbloqueio marcado para salvar")
 	check(s.is_unlocked("omega") and s.is_unlocked("mecanico") and not s.is_unlocked("espiao"), "extração mantém Ômega e libera Mecânico (1 expedição)")
 	s.clears = 2; s.check_unlocks()
 	check(s.is_unlocked("espiao"), "2 expedições liberam o Espião")

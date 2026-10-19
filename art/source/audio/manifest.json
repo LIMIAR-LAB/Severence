@@ -218,6 +218,15 @@
       "boundary_sample_delta": 0.0,
       "sha256": "f9d716d426f8421b0d7de2d9526e7fd14b3c536c88c0185f55cb4da84e61262b"
     },
+    "whisper": {
+      "file": "assets/audio/generated/whisper.wav",
+      "format": "WAV PCM16 mono",
+      "duration_seconds": 1.9,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -20.82,
+      "boundary_sample_delta": 0.0,
+      "sha256": "8fd30fb8ad41a69a726892449aed2e5d0b7bee29ee15b4fd650ed6ce4536e6f1"
+    },
     "music_refuge": {
       "file": "assets/audio/generated/music_refuge.ogg",
       "format": "Ogg Vorbis stereo",
@@ -226,17 +235,17 @@
       "peak_dbfs": -3.48,
       "rms_dbfs": -17.05,
       "boundary_sample_delta": 0.0030956,
-      "sha256": "8ab02792a15562b045e91a09dcd79f414dcba8dfb4083c58778852ff199e9502"
+      "sha256": "82bf516bfdf96f3bd500f5016372cc6ca4077fc53be4c2213d4eeab7202a7731"
     },
     "music_expedition": {
       "file": "assets/audio/generated/music_expedition.ogg",
       "format": "Ogg Vorbis stereo",
       "loop": true,
       "duration_seconds": 51.2,
-      "peak_dbfs": -3.61,
-      "rms_dbfs": -18.43,
-      "boundary_sample_delta": 0.0035377,
-      "sha256": "7d626446c840d2f64c7aefbf07e9fd8b7caf7512e8b609075d5168a3e44df701"
+      "peak_dbfs": -3.47,
+      "rms_dbfs": -18.3,
+      "boundary_sample_delta": 0.0104916,
+      "sha256": "12c917bf1839f3b05a225d7a0df54e49dac9a3d9a38328473500c8f8cabfc781"
     },
     "music_boss": {
       "file": "assets/audio/generated/music_boss.ogg",

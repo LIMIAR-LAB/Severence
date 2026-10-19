@@ -1,0 +1,256 @@
+{
+  "cell": 128,
+  "pivot": [
+    64,
+    112
+  ],
+  "world_scale": 1.5625,
+  "clips": {
+    "walk": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-south.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "487ba280-2ce9-4374-aaaf-8bf19bee8e4f",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-south-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "5a537b93-4391-4ffd-a42a-bb1a4a863152",
+        "source_anchor": [
+          74,
+          116
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "24cbc601-b29d-42e8-b065-61af88d75339",
+        "source_anchor": [
+          76,
+          116
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-north-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "addc5613-b000-4fd1-9aef-d9b3d6c695cb",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-north.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "726101d7-9d6c-41ac-9405-6dbdfd036717",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-north-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "fcc283de-a616-4f1d-be23-0735b490725a",
+        "source_anchor": [
+          61,
+          115
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "dd7a2aa2-ba03-4128-9958-313ba531343e",
+        "source_anchor": [
+          57,
+          116
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/golem/walk-south-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "604c6288-3cd8-409d-b890-5c875e51f60f",
+        "source_anchor": [
+          66,
+          116
+        ]
+      }
+    },
+    "attack": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-south.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "86665fa7-f5f7-434e-9b8c-da03b481f303",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-south-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "717fbd3b-f6ea-45f1-91f3-501d4d17b890",
+        "source_anchor": [
+          74,
+          116
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "a2acce66-ff35-4413-9343-d7e990c91667",
+        "source_anchor": [
+          76,
+          116
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-north-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "10166a45-7f19-4775-a37d-30e228424c87",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-north.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "70d65e75-12b5-40e7-9f4b-f7b5009f6749",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-west.png",
+        "frames": 14,
+        "duration": 1.0,
+        "job_id": "a524f733-4f2a-490a-8931-a52269511784",
+        "source_anchor": [
+          57,
+          116
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-north-west.png",
+        "frames": 14,
+        "duration": 1.0,
+        "job_id": "mirror:10166a45-7f19-4775-a37d-30e228424c87",
+        "source_anchor": [
+          61,
+          115
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/golem/attack-south-west.png",
+        "frames": 14,
+        "duration": 1.0,
+        "job_id": "mirror:717fbd3b-f6ea-45f1-91f3-501d4d17b890",
+        "source_anchor": [
+          66,
+          116
+        ]
+      }
+    },
+    "death": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/golem/death-south.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "96bd47b0-e921-436c-9adf-7729e2b718c5",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/golem/death-west.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "b2075beb-fab7-4900-ba14-e3089715aec0",
+        "source_anchor": [
+          57,
+          116
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/golem/death-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "2e65b75a-2443-4da1-a22d-3d83448918ec",
+        "source_anchor": [
+          76,
+          116
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/golem/death-north.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "6845fd1d-cb96-4f22-b88d-c7d573187358",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/golem/death-south-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "bed07fe8-d111-4276-a722-aa23ccbab1d9",
+        "source_anchor": [
+          74,
+          116
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/golem/death-north-east.png",
+        "frames": 13,
+        "duration": 1.0,
+        "job_id": "f630c9ce-81e4-44b5-bbef-a834b20c2a2a",
+        "source_anchor": [
+          66,
+          113
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/golem/death-south-west.png",
+        "frames": 14,
+        "duration": 1.0,
+        "job_id": "mirror:bed07fe8-d111-4276-a722-aa23ccbab1d9",
+        "source_anchor": [
+          66,
+          116
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/golem/death-north-west.png",
+        "frames": 14,
+        "duration": 1.0,
+        "job_id": "mirror:f630c9ce-81e4-44b5-bbef-a834b20c2a2a",
+        "source_anchor": [
+          61,
+          115
+        ]
+      }
+    }
+  }
+}

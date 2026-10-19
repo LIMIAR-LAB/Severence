@@ -23,13 +23,13 @@ func _init() -> void:
 	var boss_rooms := DOCKS.ROOMS.filter(func(room): return room.id == "boss")
 	check(boss_rooms.size() == 1, "existe exatamente uma sala do Almirante")
 	var room: Dictionary = boss_rooms[0]
-	check(room.r == Rect2(3000, 400, 2400, 1800), "geometria física da sala permanece 2400x1800")
-	check(room.extra == [Rect2(2600, 700, 400, 500), Rect2(5400, 800, 300, 600)], "as duas alas de entrada permanecem intactas")
-	check(DOCKS.POINTS.boss == Vector2(4200, 1200), "spawn do chefe permanece intacto")
-	check(DOCKS.POINTS.extraction == Vector2(4200, 720), "extração permanece intacta")
+	check(room.r == Rect2(20200, -1800, 2400, 1800), "arena mantém dimensões no destino das rotas")
+	check(room.extra == [Rect2(22600, -1400, 300, 600)], "ala leste preservada sem atalho oeste")
+	check(DOCKS.POINTS.boss == Vector2(21400, -1000), "spawn acompanha arena")
+	check(DOCKS.POINTS.extraction == Vector2(21400, -1480), "extração acompanha arena")
 	var boss_water := DOCKS.WATER.filter(func(area): return area.room == "boss")
 	check(boss_water.size() == 4, "moldura aquática cobre os quatro lados sem alterar o piso")
-	for edge_point in [Vector2(1000, -200), Vector2(1000, 3000), Vector2(7400, 1000), Vector2(7400, 3000)]:
+	for edge_point in [Vector2(21000, -2000), Vector2(21000, 200), Vector2(19900, -1000), Vector2(23200, -1000)]:
 		check(boss_water.any(func(area): return area.r.has_point(edge_point)), "água cobre câmera ampla em %s" % edge_point)
 
 	var expected_obstacles := [
@@ -43,17 +43,21 @@ func _init() -> void:
 		[5227, 1276, 42, 30, "barrel_oil"], [5197, 1308, 42, 30, "barrel_explosive"],
 		[3589, 982, 22, 18, "lamp_post"], [4789, 982, 22, 18, "lamp_post"]]
 	var boss_obstacles := DOCKS.OBSTACLES.filter(func(item): return room.r.has_point(Vector2(item[0], item[1])))
+	for item in expected_obstacles:
+		item[0] += 17200; item[1] -= 2200
 	check(boss_obstacles == expected_obstacles, "obstáculos físicos do chefe permanecem idênticos")
 	var boss_hazards := DOCKS.HAZARDS.filter(func(item): return room.r.has_point(item.p))
 	check(boss_hazards == [
-		{"p": Vector2(3350, 1300), "r": 64, "damage": 12},
-		{"p": Vector2(5050, 1300), "r": 64, "damage": 12}], "perigos do chefe permanecem idênticos")
+		{"p": Vector2(20550, -900), "r": 64, "damage": 12},
+		{"p": Vector2(22250, -900), "r": 64, "damage": 12}], "perigos acompanham arena")
 
 	var sim := Sim.new()
 	sim.coop = "solo"
 	sim.start_run(1941)
-	check(sim.clear_at(Vector2(2800, 950), 15), "entrada oeste continua livre")
-	check(sim.clear_at(Vector2(5550, 1100), 15), "entrada leste continua livre")
+	var west := Vector2(20150, -1400)
+	var east := Vector2(22750, -1100)
+	check(sim.clear_at(west, 15), "chegada pela ponte está livre")
+	check(sim.clear_at(east, 15), "ala leste continua livre")
 	check(sim.clear_at(DOCKS.POINTS.extraction, 15), "ponto de extração continua navegável")
 
 	var safe := true
@@ -63,11 +67,11 @@ func _init() -> void:
 			if not sim.clear_at(p, 15): safe = false
 	check(safe, "disco central de esquiva de 360 px permanece livre")
 
-	var west_id := sim.nav.get_closest_point(Vector2(2800, 950))
-	var east_id := sim.nav.get_closest_point(Vector2(5550, 1100))
+	var west_id := sim.nav.get_closest_point(west)
+	var east_id := sim.nav.get_closest_point(east)
 	var boss_id := sim.nav.get_closest_point(DOCKS.POINTS.boss)
-	check(sim.nav.get_point_position(west_id).distance_to(Vector2(2800, 950)) <= 36.0, "entrada oeste tem nó de navegação local")
-	check(sim.nav.get_point_position(east_id).distance_to(Vector2(5550, 1100)) <= 36.0, "entrada leste tem nó de navegação local")
+	check(sim.nav.get_point_position(west_id).distance_to(west) <= 36.0, "entrada oeste tem nó de navegação local")
+	check(sim.nav.get_point_position(east_id).distance_to(east) <= 36.0, "entrada leste tem nó de navegação local")
 	check(sim.nav.get_point_path(west_id, boss_id).size() > 1, "navegação liga entrada oeste ao centro")
 	check(sim.nav.get_point_path(east_id, boss_id).size() > 1, "navegação liga entrada leste ao centro")
 	check(sim.nav.get_point_path(boss_id, sim.nav.get_closest_point(DOCKS.POINTS.extraction)).size() > 1, "navegação liga centro à extração")

@@ -1,0 +1,22 @@
+{
+  "attack-east.png": "29db9c3878683d8c78f2e498506658b4c07904b672b2a114f209fa39b7074932",
+  "attack-north-east.png": "aa82d5a54b837462e55c378c1bf38327fdc3720fbcd26c9e020776a307dbd205",
+  "attack-north-west.png": "eebb601528f3507e9330e2dc02d8369901ff5a533e75c865eb2eda505684a7a3",
+  "attack-north.png": "290c1a3db3a635955898e572036f9658f98dec925c0e6e0a62aeebb0c53cb881",
+  "attack-south-east.png": "c4ce77b3fd3eb957b3cff37ce0e0c4b66692c3e1cca15763a1028f632b94546b",
+  "attack-south-west.png": "5d3b5bbb4d53c9e622e8e0656345d2c091e5bc9670097114256caa00fdf00070",
+  "attack-south.png": "b96e8293cf9a9b542476c87366164ce07571aa458a351b3aa09f3cfeb97bf7d2",
+  "attack-west.png": "c5c1f92f96c3e0840c2c6bc50228b583aba2da8733e1d53bf517a26060763efb",
+  "enemy_motion.gd.before": "6cf41d8fcf9f4f821c7f99d86b117f43620ef6e0d2a5036dce802b2bfc15ec60",
+  "jobs.json.before": "2f6bb3dc24f42600025c5dca4c09ae4043b5d93f8e7b1d6b9d7fadc21ec2c59c",
+  "manifest.json": "c83cea62afb6df2b009a246f3670414ea619a3e11295b2977412c5076ec5eb4a",
+  "simulation.gd.before": "5c9f006d81e8472c49eacdff3a9a0f4fcf96c05451a39b2704bdf301a836e050",
+  "walk-east.png": "e516456aa63e52bc5cf0b0658862e4b9483e75258f07bf7892e48ace8c1ba5dd",
+  "walk-north-east.png": "98361227856af69926a11ce9e280f1b563247f3b65995714204160efff4e2633",
+  "walk-north-west.png": "98361227856af69926a11ce9e280f1b563247f3b65995714204160efff4e2633",
+  "walk-north.png": "98361227856af69926a11ce9e280f1b563247f3b65995714204160efff4e2633",
+  "walk-south-east.png": "54879f72f399ca2c6a2048b1d2239f22f6d2640cc67f4ca94e6ab3eb34b0a70a",
+  "walk-south-west.png": "b325caaa2e5c27454eb96c130772a1a36e994434abff7966f999e4d1adc4d823",
+  "walk-south.png": "6b9df57cab74e8562818e319e47dd6a28e91e2f6f3eaf779a15393d6baae7113",
+  "walk-west.png": "8a1adcf8a6c5ebec1cb46d795257996afdd488e11e876a083c76dce7810847ff"
+}

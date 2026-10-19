@@ -60,10 +60,15 @@ func _init() -> void:
 	check(s.bullets.is_empty(), "Espião: cultista a 450px não percebe")
 	a.outfit = "padrao"; s.enemies[0].cd = 0; s.enemies[0]["los_t"] = 0.0; s.step_enemies(0.016)
 	check(s.enemies[0].combat == "warning", "roupa Padrão: cultista a 450px anuncia ataque")
-	# Mecânico bate mais forte
+	# Mecânico bate mais forte — jab do combo (0.5× de 46 = 23)
 	s = arena(); a = s.actors[0]; a.outfit = "mecanico"; a.aim = Vector2.RIGHT
 	s.spawn_enemy(a.p + Vector2(40, 0), "brute"); s.melee(a)
-	check(s.enemies[0].hp == s.enemies[0].max - 46, "Mecânico: golpe corpo a corpo mais forte")
+	check(s.enemies[0].hp == s.enemies[0].max - 23, "Mecânico: jab corpo a corpo mais forte")
+	# Encadeando: direto cheio (46) e uppercut dobrado (92)
+	s.enemies[0].hp = s.enemies[0].max; a.slash = 0.0; a.punch_t = 1.0; s.melee(a)
+	check(s.enemies[0].hp == s.enemies[0].max - 46, "Mecânico: direto do combo em cheio")
+	s.enemies[0].hp = s.enemies[0].max; a.slash = 0.0; a.punch_t = 1.0; s.melee(a)
+	check(s.enemies[0].hp == s.enemies[0].max - 92, "Mecânico: uppercut final dobra o dano")
 	# O Almirante das Profundezas
 	s = arena(); s.actors[0].p = Vector2(600, 600)
 	s.spawn_enemy(Vector2(600, 300), "boss"); var boss: Dictionary = s.enemies[0]

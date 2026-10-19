@@ -66,7 +66,7 @@
       "id": "monstro_vigia",
       "categoria": "monstros",
       "ordem": 70,
-      "nome": "VIGIA",
+      "nome": "GUARDIÃO DA MARÉ",
       "subtitulo": "Minichefe das docas",
       "imagem": "res://assets/enemies/encyclopedia/vigia_card.png",
       "descricao": "Sentinela enorme que protege as passagens centrais. Alterna pressão direta, disparos e golpes de grande alcance.",
@@ -116,11 +116,11 @@
       "id": "item_lamina_omega",
       "categoria": "itens",
       "ordem": 40,
-      "nome": "LÂMINA ÔMEGA",
+      "nome": "ENERGIA ÔMEGA",
       "subtitulo": "Arma lendária temporária",
-      "imagem": "res://assets/items/encyclopedia/lamina_omega_card.png",
-      "descricao": "Manifestada pela Armadura Ômega, executa um combo de três cortes. O golpe final lança uma onda que atravessa inimigos.",
-      "tracos": ["Combo de três golpes", "Reflete projéteis", "Exige Armadura Ômega ativa"]
+      "imagem": "res://assets/weapons/omega_orb_hd.png",
+      "descricao": "A Armadura Ômega lança grandes esferas de energia azul pela mão. A terceira esfera é maior e atravessa inimigos; a emissão próxima conserva seu poder de impacto e reflexão.",
+      "tracos": ["Combo de três esferas", "Reflete projéteis", "Exige Armadura Ômega ativa"]
     },
     {
       "id": "item_bazuca",

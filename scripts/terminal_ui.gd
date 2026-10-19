@@ -161,7 +161,8 @@ func show_screen(next: String) -> void:
 		"seed": build_seed()
 		"options": build_options()
 		"encyclopedia": build_encyclopedia()
-	focus_first.call_deferred()   # navegação pelo controle
+		"missions": build_missions()
+	if next != "missions": focus_first.call_deferred()   # journal owns its focus chain
 
 func open(page: String = "main") -> void:
 	if app.playing and page == "equipment": page = "pause"
@@ -279,12 +280,35 @@ func concept_button(parent: Control, button_name: String, rect: Rect2, callback:
 
 func continue_title() -> void:
 	if app.playing: close()
-	elif app.has_saved_game(): app.load_game()
+	elif app.has_saved_game() and not app.load_game():
+		show_operation_error(app.load_error if not app.load_error.is_empty() else "Não foi possível continuar esta expedição. Seu progresso permanece preservado.")
+
+func show_operation_error(message: String) -> void:
+	var notice := AcceptDialog.new()
+	notice.name = "OperationError"
+	notice.title = "PARTIDA PRESERVADA"
+	notice.dialog_text = message
+	notice.ok_button_text = "ENTENDI"
+	notice.min_size = Vector2i(460, 160)
+	notice.exclusive = true
+	add_child(notice)
+	notice.confirmed.connect(notice.queue_free)
+	notice.canceled.connect(notice.queue_free)
+	notice.popup_centered()
+	notice.get_ok_button().grab_focus()
 
 func build_main() -> void:
 	var art := concept_art(TITLE_CONCEPT, "TitleConceptArt")
 	var ink := ShaderMaterial.new(); ink.shader = TITLE_CONCEPT_SHADER; art.material = ink
 	content.add_child(art)
+	# P8 — o golden mutante mora no Refúgio e aparece na tela inicial.
+	if ResourceLoader.exists("res://assets/ui/title/golden_dog.png"):
+		var dog := TextureRect.new(); dog.name = "TitleGoldenDog"
+		dog.texture = load("res://assets/ui/title/golden_dog.png")
+		dog.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; dog.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		dog.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		dog.position = Vector2(1098, 522); dog.size = Vector2(200, 200)
+		dog.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(dog)
 	var lockup := Control.new(); lockup.name = "TitleLockup"; lockup.position = Vector2(25, 85)
 	lockup.size = Vector2(485, 230); lockup.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(lockup)
 	var title_top := label(lockup, Rect2(0, 0, 470, 58), "SEVERENCE", 42, Color.TRANSPARENT); title_top.name = "TitlePrimary"
@@ -294,8 +318,8 @@ func build_main() -> void:
 	deck.mouse_filter = Control.MOUSE_FILTER_IGNORE; content.add_child(deck)
 	var callbacks: Dictionary = {
 		"new": func(): show_screen("characters"), "online": func(): show_screen("online"),
-		"options": func(): show_screen("options"),
-		"exit": func(): app.save_progress(); app.get_tree().quit(),
+		"options": func(): open_options("main"),
+		"exit": app.request_quit,
 	}
 	var has_continue: bool = app.playing or app.has_saved_game()
 	if app.playing:
@@ -397,7 +421,7 @@ func choose_adventure(mode: String) -> void:
 	else: read_equipment(); show_screen("equipment")
 
 func build_pause() -> void:
-	var p := panel(content, Rect2(222, 110, 900, 532), Color("11272b"), Color("1c2829"))
+	var p := panel(content, Rect2(222, 66, 900, 620), Color("11272b"), Color("1c2829"))
 	p.name = "PausePanel"
 	if ResourceLoader.exists(PAUSE_FRAME):
 		var frame := TextureRect.new(); frame.name = "PauseFrame"; frame.texture = load(PAUSE_FRAME)
@@ -406,9 +430,9 @@ func build_pause() -> void:
 		frame.stretch_mode = TextureRect.STRETCH_SCALE
 		frame.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; p.add_child(frame)
-	label(p, Rect2(110, 86, 680, 40), "PAUSA", 31, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label(p, Rect2(110, 125, 680, 28), "Expedição em andamento", 20, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var mission_inventory := button(p, Rect2(160, 158, 580, 42), "INVENTÁRIO DA MISSÃO   [B]", func(): read_equipment(); show_screen("mission_inventory"))
+	label(p, Rect2(110, 91, 680, 40), "PAUSA", 31, GOLD).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label(p, Rect2(110, 131, 680, 28), "Expedição em andamento", 20, Color("c6dccd")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var mission_inventory := button(p, Rect2(160, 176, 580, 38), "INVENTÁRIO DA MISSÃO   [B]", func(): read_equipment(); show_screen("mission_inventory"))
 	mission_inventory.name = "MissionInventory"
 	mission_inventory.tooltip_text = "Consultar itens levados e recursos obtidos nesta missão"
 	mission_inventory.add_theme_font_size_override("font_size", 21)
@@ -416,35 +440,85 @@ func build_pause() -> void:
 	var inventory_normal := mission_inventory.get_theme_stylebox("normal").duplicate() as StyleBoxFlat
 	inventory_normal.bg_color = Color("16444a"); inventory_normal.border_color = CYAN; inventory_normal.set_border_width_all(3)
 	mission_inventory.add_theme_stylebox_override("normal", inventory_normal)
-	var resume := button(p, Rect2(160, 208, 580, 42), "CONTINUAR", close)
+	var resume := button(p, Rect2(160, 219, 580, 38), "CONTINUAR", close)
 	resume.name = "ResumeGame"
-	var save := button(p, Rect2(160, 258, 580, 42), "SALVAR JOGO", func():
+	var save := button(p, Rect2(160, 305, 580, 38), "SALVAR JOGO", func():
 		if app.save_game(): telemetry.text = "Expedição salva."
 		else: telemetry.text = "Não foi possível salvar esta partida.")
 	save.name = "SaveGame"; save.disabled = app.online
-	var leave := button(p, Rect2(160, 308, 580, 42), "VOLTAR AO MENU", func():
+	var leave := button(p, Rect2(160, 348, 580, 38), "VOLTAR AO MENU", func():
 		if not app.return_to_title():
 			telemetry.text = "Não foi possível salvar. A partida continua em pausa."
 			telemetry.add_theme_color_override("font_color", Color("ffad99")))
 	leave.name = "ReturnToMenu"
-	var encyclopedia_button := button(p, Rect2(160, 358, 580, 42), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
+	var encyclopedia_button := button(p, Rect2(160, 391, 580, 38), "ARQUIVO DO REFÚGIO", func(): open_encyclopedia("pause"))
 	encyclopedia_button.name = "PauseEncyclopedia"
-	mission_inventory.focus_neighbor_bottom = mission_inventory.get_path_to(resume); mission_inventory.focus_next = mission_inventory.get_path_to(resume)
-	resume.focus_neighbor_top = resume.get_path_to(mission_inventory); resume.focus_previous = resume.get_path_to(mission_inventory)
-	resume.focus_neighbor_bottom = resume.get_path_to(save); resume.focus_next = resume.get_path_to(save)
-	save.focus_neighbor_top = save.get_path_to(resume); save.focus_neighbor_bottom = save.get_path_to(leave)
-	save.focus_previous = save.get_path_to(resume); save.focus_next = save.get_path_to(leave)
-	leave.focus_neighbor_top = leave.get_path_to(save); leave.focus_previous = leave.get_path_to(save)
-	leave.focus_neighbor_bottom = leave.get_path_to(encyclopedia_button); leave.focus_next = leave.get_path_to(encyclopedia_button)
-	encyclopedia_button.focus_neighbor_top = encyclopedia_button.get_path_to(leave)
-	encyclopedia_button.focus_previous = encyclopedia_button.get_path_to(leave)
-	encyclopedia_button.focus_neighbor_bottom = encyclopedia_button.get_path_to(mission_inventory)
-	encyclopedia_button.focus_next = encyclopedia_button.get_path_to(mission_inventory)
-	mission_inventory.focus_neighbor_top = mission_inventory.get_path_to(encyclopedia_button)
-	mission_inventory.focus_previous = mission_inventory.get_path_to(encyclopedia_button)
-	telemetry = label(p, Rect2(110, 406, 680, 42), "Esc ou Start também continua a partida.", 15, GOLD)
+	var missions := button(p, Rect2(160, 434, 580, 38), "MISSÕES / DIÁRIO" if app.sim.coop == "local" else "MISSÕES   [N]", func(): show_screen("missions"))
+	missions.name = "PauseMissions"
+	var settings := button(p, Rect2(160, 262, 580, 38), "CONFIGURAÇÕES • VÍDEO / SOM", func(): open_options("pause"))
+	settings.name = "PauseSettings"
+	var navigation: Array = [mission_inventory,resume,settings,save,leave,encyclopedia_button,missions]
+	navigation = navigation.filter(func(control):return not control.disabled)
+	for i in navigation.size():
+		var current: Button = navigation[i]
+		var previous: Button = navigation[posmod(i-1,navigation.size())]
+		var next: Button = navigation[(i+1)%navigation.size()]
+		current.focus_neighbor_top=current.get_path_to(previous); current.focus_previous=current.get_path_to(previous)
+		current.focus_neighbor_bottom=current.get_path_to(next); current.focus_next=current.get_path_to(next)
+	telemetry = label(p, Rect2(110, 487, 680, 26), "Esc ou Start também continua a partida.", 15, GOLD)
 	telemetry.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	telemetry.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+# P7 — diário de missões: objetivo, progresso e recompensa de cada frente.
+func build_missions() -> void:
+	var p := panel(content, Rect2(182, 46, 980, 660), Color("11272b"), Color("75b5a2"))
+	p.name = "MissionsPanel"
+	label(p, Rect2(35, 20, 900, 42), "MISSÕES E DIÁRIO DA TRIPULAÇÃO", 27, GOLD)
+	label(p, Rect2(35, 66, 900, 26), "Pistas preservadas no Refúgio • direcional / setas para percorrer", 14, CYAN)
+	var scroll := ScrollContainer.new(); scroll.name = "JournalScroll"
+	scroll.position = Vector2(30, 105); scroll.size = Vector2(920, 460)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true; scroll.focus_mode = Control.FOCUS_ALL; p.add_child(scroll)
+	var list := VBoxContainer.new(); list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 12); scroll.add_child(list)
+	var cards: Array[Control] = []
+	for m in app.sim.missions_list():
+		cards.append(journal_card(list, ("CONCLUÍDA • " if m.get("done", false) else "MISSÃO • ") + m.title, m.objective + "\n" + m.progress + " • Recompensa: " + m.reward, m.get("done", false)))
+	for entry in app.sim.journal_entries():
+		cards.append(journal_card(list, entry.title, entry.text, false))
+	var back := button(p, Rect2(220, 592, 540, 44), "VOLTAR   [B / Esc]", func(): show_screen("pause"))
+	back.name = "MissionsBack"
+	if not cards.is_empty():
+		for i in cards.size():
+			var previous: Control = cards[i - 1] if i > 0 else back
+			var next: Control = cards[i + 1] if i + 1 < cards.size() else back
+			cards[i].focus_neighbor_top = cards[i].get_path_to(previous)
+			cards[i].focus_previous = cards[i].get_path_to(previous)
+			cards[i].focus_neighbor_bottom = cards[i].get_path_to(next)
+			cards[i].focus_next = cards[i].get_path_to(next)
+		back.focus_neighbor_top = back.get_path_to(cards.back()); back.focus_previous = back.get_path_to(cards.back())
+		back.focus_neighbor_bottom = back.get_path_to(cards.front()); back.focus_next = back.get_path_to(cards.front())
+		focus_first.call_deferred()
+
+func journal_card(parent: Control, heading: String, body: String, complete: bool) -> Control:
+	var card := PanelContainer.new(); card.name = "JournalEntry%d" % parent.get_child_count()
+	card.focus_mode = Control.FOCUS_ALL; card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.custom_minimum_size.y = 104
+	var style := StyleBoxFlat.new(); style.bg_color = Color("17333a" if complete else "122328")
+	style.border_color = Color("3f8f5a") if complete else Color("38565c")
+	style.set_border_width_all(2); style.set_corner_radius_all(4)
+	style.content_margin_left = 16; style.content_margin_right = 16; style.content_margin_top = 12; style.content_margin_bottom = 12
+	card.add_theme_stylebox_override("panel", style)
+	var focused := style.duplicate() as StyleBoxFlat; focused.border_color = CYAN; focused.set_border_width_all(3)
+	card.focus_entered.connect(func(): card.add_theme_stylebox_override("panel", focused))
+	card.focus_exited.connect(func(): card.add_theme_stylebox_override("panel", style))
+	var lines := VBoxContainer.new(); card.add_child(lines)
+	for item in [[heading, 18, GOLD], [body, 15, Color("c6dccd")]]:
+		var line := Label.new(); line.text = item[0]; line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.add_theme_font_size_override("font_size", item[1]); line.add_theme_color_override("font_color", item[2]); lines.add_child(line)
+	parent.add_child(card)
+	return card
 
 func summary_time(seconds: float) -> String:
 	var total := maxi(0, int(seconds))
@@ -713,6 +787,15 @@ func launch_seed(kind: String) -> void:
 	app.start_solo(); app.sim.coop = kind; app.sim.start_run(value.to_int()); app.apply_preferences(0)
 
 var options_tab := "video"
+var options_return_screen := "main"
+
+func open_options(return_screen: String) -> void:
+	options_return_screen = return_screen
+	show_screen("options")
+
+func leave_options() -> void:
+	app.save_settings()
+	show_screen(options_return_screen)
 var awaiting_bind := ""   # 0.18: nome da ação esperando a próxima tecla, ou "" se nenhuma
 var bind_buttons: Dictionary = {}
 
@@ -727,24 +810,33 @@ func build_options() -> void:
 	match options_tab:
 		"video": build_video_options(p)
 		"audio":
-			label(p, Rect2(30, 100, 600, 35), "VOLUME GERAL • MÚSICA E EFEITOS", 18)
-			var volume := HSlider.new(); volume.position = Vector2(30, 145); volume.size = Vector2(760, 40); volume.min_value = 0; volume.max_value = 100; volume.value = app.volume_percent
-			volume.value_changed.connect(func(value): app.set_volume(value)); p.add_child(volume)
+			volume_slider(p, 110, "VOLUME GERAL", app.volume_percent, func(value): app.set_volume(value))
+			volume_slider(p, 245, "MÚSICA", app.music_percent, func(value): app.music_percent = value; app.set_volume(app.volume_percent))
+			volume_slider(p, 380, "EFEITOS", app.effects_percent, func(value): app.effects_percent = value; app.set_volume(app.volume_percent))
 		"controls": build_controls_options(p)
-	button(p, Rect2(30, 585, 200, 48), "VOLTAR", func(): app.save_settings(); show_screen("main"))
+	var back_y := 606 if options_tab == "controls" and app.playstation_controller_connected() else 585
+	button(p, Rect2(30, back_y, 200, 40), "VOLTAR À PAUSA" if options_return_screen == "pause" else "VOLTAR", leave_options).name = "OptionsBack"
 	var encyclopedia_button := button(p, Rect2(550, 585, 240, 48), "ARQUIVO DO REFÚGIO", func(): app.save_settings(); open_encyclopedia("options"))
 	encyclopedia_button.name = "EncyclopediaButton"
+
+func volume_slider(parent: Control, y: float, caption: String, value: float, callback: Callable) -> void:
+	var title := label(parent, Rect2(30, y, 760, 30), "%s • %d%%" % [caption, value], 18)
+	var slider := HSlider.new(); slider.name = caption.to_pascal_case()
+	slider.position = Vector2(30, y + 40); slider.size = Vector2(760, 40)
+	slider.min_value = 0; slider.max_value = 100; slider.step = 5; slider.value = value
+	slider.value_changed.connect(func(next): title.text = "%s • %d%%" % [caption, next]; callback.call(next))
+	parent.add_child(slider)
 
 # 0.18: remapeamento do P1 (teclado/mouse). P2 local e joypad continuam fixos.
 func build_controls_options(p: Control) -> void:
 	awaiting_bind = ""; bind_buttons.clear()
-	label(p, Rect2(30, 90, 760, 26), "MARTY / P1 — clique numa tecla e pressione a nova", 16, Color("9fc3bb"))
+	option_row(p, 90, "AUTO-MIRA", ["DESLIGADA", "INIMIGO MAIS PRÓXIMO"], int(app.auto_aim), func(i): app.auto_aim = i == 1; app.save_settings()).name = "AutoAimOption"
 	var actions: Array = app.KEY_BIND_DEFAULTS.keys()
-	var col_h := 38
+	var col_h := 30
 	for i in actions.size():
 		var action: String = actions[i]
-		var col := i / 7; var row := i % 7
-		var rect := Rect2(30 + col * 390, 125 + row * col_h, 370, 34)
+		var col := i / 8; var row := i % 8
+		var rect := Rect2(30 + col * 390, 145 + row * col_h, 370, 28)
 		var b := button(p, rect, bind_caption(action), func(): start_rebind(action))
 		b.add_theme_font_size_override("font_size", 15)
 		bind_buttons[action] = b
@@ -752,10 +844,11 @@ func build_controls_options(p: Control) -> void:
 	if app.playstation_controller_connected():
 		var ps_legend := label(p, Rect2(30, 428, 760, 26), "CONTROLE PLAYSTATION DETECTADO", 16, GOLD)
 		ps_legend.name = "PlayStationControlsLegend"
-		label(p, Rect2(30, 453, 760, 25), "Analógico esquerdo mover • direito mirar • R2 atirar", 14)
-		label(p, Rect2(30, 478, 760, 25), "□ golpe • ✕ salto • ○ dash • △ interagir • L1 armadura • R1 arma", 14)
-		label(p, Rect2(30, 503, 760, 25), "↑ invocar • ↓ fundir • ← trocar robô • → raio Ômega • OPTIONS pausa", 14)
-	button(p, Rect2(30, 530 if app.playstation_controller_connected() else 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
+		label(p, Rect2(30, 453, 760, 25), "Analógico esquerdo mover • direito mirar • R2 atirar / esferas Ômega", 14)
+		label(p, Rect2(30, 478, 760, 25), "QUADRADO soco • L2+QUADRADO médio • L2+R1 forte • X salto • CIRCULO dash", 14)
+		label(p, Rect2(30, 503, 760, 25), "TRIANGULO interagir • L1 armadura • R1 arma • OPTIONS pausa", 14)
+		label(p, Rect2(30, 528, 760, 25), "Direcional: CIMA invocar • BAIXO fundir • ESQUERDA trocar robô • DIREITA raio", 14)
+	button(p, Rect2(30, 558 if app.playstation_controller_connected() else 440, 400, 44), "RESTAURAR PADRÃO", func(): reset_binds())
 
 func bind_caption(action: String) -> String:
 	var label_text: String = app.KEY_BIND_LABELS.get(action, action)
@@ -800,7 +893,9 @@ func build_video_options(p: Control) -> void:
 	vs.add_theme_font_size_override("font_size", 17); vs.toggled.connect(func(on): d.vsync = on; apply_video()); p.add_child(vs)
 	var pp := CheckButton.new(); pp.position = Vector2(420, 365); pp.size = Vector2(380, 44); pp.text = "PIXEL PERFEITO (escala inteira)"; pp.button_pressed = d.pixel_perfect
 	pp.add_theme_font_size_override("font_size", 17); pp.toggled.connect(func(on): d.pixel_perfect = on; apply_video()); p.add_child(pp)
-	label(p, Rect2(30, 420, 760, 150), d.summary() + "\n\nTelas 16:9, 16:10, 21:9 e 4:3: a interface se ajusta às bordas e a sobra da tela mostra mais mapa.\nEm tela cheia o jogo usa a resolução do monitor. \"Longe\" mostra mais da sala; \"Pixel perfeito\" evita\nborrões em monitores com resolução múltipla de 1280×800 (pode deixar faixas pretas).", 14, Color("9fc3bb"))
+	option_row(p, 420, "TREMER A CÂMERA", ["DESLIGADO", "SUAVE", "COMPLETO"], roundi(d.camera_shake * 2), func(i): d.camera_shake = i * 0.5; app.save_settings())
+	option_row(p, 475, "FLASH DE TRANSFORMAÇÃO", ["DESLIGADO", "SUAVE", "COMPLETO"], roundi(d.screen_flash * 2), func(i): d.screen_flash = i * 0.5; app.save_settings())
+	label(p, Rect2(30, 532, 760, 30), d.summary(), 14, Color("9fc3bb"))
 
 func apply_video() -> void:
 	app.display.apply(get_tree()); app.save_settings()
@@ -854,6 +949,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == JOY_BUTTON_B and screen == "pause": close(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "equipment": show_screen("play"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "mission_inventory": show_screen("pause"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "missions": show_screen("pause"); accept_event()
+		elif event.button_index == JOY_BUTTON_B and screen == "options": leave_options(); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "encyclopedia": show_screen(encyclopedia_return_screen); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "play": show_screen("characters"); accept_event()
 		elif event.button_index == JOY_BUTTON_B and screen == "characters_coop": show_screen("play"); accept_event()
@@ -864,6 +961,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		focus_first(); accept_event()
 
 func focus_first() -> void:
+	if screen == "missions":
+		var entry := content.find_child("JournalEntry0", true, false) as Control
+		if entry != null:
+			entry.grab_focus()
+			var scroll := content.find_child("JournalScroll", true, false) as ScrollContainer
+			if scroll != null: scroll.set_deferred("scroll_vertical", 0)
+			return
 	# primeiro botão visível da tela recebe o foco (para jogar só com o controle)
 	if screen == "main" and app.playing and main_resume != null and main_resume.visible and not main_resume.disabled:
 		main_resume.grab_focus(); return

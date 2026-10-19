@@ -47,18 +47,30 @@ const PROP_NAMES := ["crate", "crate_2", "crate_3", "crate_broken", "crate_net",
 	"brazier_f1", "brazier_f2", "brazier_f3", "container", "container_open", "rowboat", "crane", "hook", "phone_booth", "poster",
 	"radio", "jerrycans", "medkit", "iron_door", "tentacle_pool_1", "tentacle_pool_2", "ritual_circle", "tentacle_planks",
 	"debris_crate", "debris_barrel", "debris_sandbags", "container_red", "container_olive", "container_open_red", "container_open_olive",
-	"tentacle_gate_active", "tentacle_gate_sealed", "npc_fisherman"]   # 0.16: tools/prepare_tentacle_gate.py • 0.17: NPC da sala de história
+	"tentacle_gate_active", "tentacle_gate_sealed", "npc_fisherman", "chest", "chest_open"]   # 0.16: tools/prepare_tentacle_gate.py • 0.17: NPC da sala de história
 # 0.16: microbiomas — props e pisos por sala (tools/prepare_workshop.py, prepare_market.py, prepare_chapel.py)
 # 0.17: +depot, lighthouse, drydock, cellar, boss (tools/make_scenery_017.py)
 const SET_PROPS := {
 	"workshop": ["workshop_bench", "workshop_tool_rack", "workshop_hoist", "workshop_oil_puddle", "workshop_welder", "workshop_parts"],
 	"market": ["market_stall", "market_net", "market_baskets", "market_ice_barrel", "market_rowboat", "market_lanterns"],
 	"chapel": ["chapel_stained_glass", "chapel_candles", "chapel_banner", "chapel_offering_bowl"],
-	"depot": ["depot_shells", "depot_sign"],
+	"depot": ["depot_shells", "depot_sign", "rail_wagon", "rail_buffer", "rail_signal", "rail_sleepers"],
 	"drydock": ["dock_scaffold", "dock_chain"],
 	"cellar": ["cellar_float"],
 	"boss": ["boss_skull_pile"],
-	"lighthouse": ["light_gear"]}
+	"lighthouse": ["light_gear"],
+	# P13: microbioma da Antessala — sala de guerra do Almirante (PixelLab).
+	"antessala": ["adm_map_table", "adm_cannonballs", "adm_banner", "adm_candelabra"],
+	# P13: microbioma do Mangue Negro — pântano apodrecido (PixelLab).
+	"mangue": ["mng_tree", "mng_roots", "mng_stump", "mng_planks"],
+	# P13: microbioma do Armazém 7 — estantes, paletes, carrinho, balança (PixelLab).
+	"warehouse": ["wh_shelf", "wh_pallet", "wh_handcart", "wh_scale"],
+	# P13: microbioma do Pátio dos Guindastes — base de guindaste, sucata, gancho (PixelLab).
+	"cranes": ["crane_base", "crane_scrap", "crane_hook"],
+	# P13: microbioma do Contrabando — caixas sob lona, fundo falso (PixelLab).
+	"secret": ["sec_crate_tarp", "sec_tarp_stack", "sec_crate_open"],
+	# P13: microbioma do Último Gerador — turbina, bobina Tesla, tubulação (PixelLab).
+	"generator": ["gen_turbine", "gen_coil", "gen_pipes"]}
 # piso de cada conjunto: [nome, peso] (64x64, 1 px da arte = 1 px de mundo)
 const FLOOR_SETS := {
 	"workshop": [["workshop_floor_riveted", 14], ["workshop_floor_worn", 5], ["workshop_floor_oil", 2], ["workshop_floor_grate", 1]],
@@ -68,7 +80,22 @@ const FLOOR_SETS := {
 	"lighthouse": [["light_floor_a", 10], ["light_floor_rail", 2], ["light_floor_gear", 1]],
 	"drydock": [["dock_floor_steel", 8], ["dock_floor_rust", 4], ["dock_floor_rib", 1]],
 	"cellar": [["cellar_floor_wet", 10], ["cellar_floor_moss", 4], ["cellar_floor_broken", 1]],
-	"boss": [["boss_floor_stone", 10], ["boss_floor_glyph", 2], ["boss_floor_crack", 2]]}
+	# 0.22: removido o glifo roxo do piso da arena do Almirante (pedido do jogador).
+	"boss": [["boss_floor_stone", 10], ["boss_floor_crack", 2]],
+	# P13: basalto com rebites de latão + faixas de carpete carmesim (PixelLab tiles_pro).
+	"antessala": [["antessala_floor_stone", 12], ["antessala_floor_worn", 4], ["antessala_floor_carpet", 2], ["antessala_floor_drain", 1]],
+	# P13: lama negra com poças + trechos de tabuado podre (PixelLab tiles_pro).
+	"mangue": [["mng_floor_mud", 12], ["mng_floor_mud2", 6], ["mng_floor_planks", 4], ["mng_floor_puddle", 3]],
+	# P13: concreto rachado com faixas de corredor e manchas de óleo (PixelLab tiles_pro).
+	"warehouse": [["wh_floor_concrete", 12], ["wh_floor_concrete2", 6], ["wh_floor_stripe", 3], ["wh_floor_stain", 2]],
+	# P13: brita escura com dormentes e trilhos embutidos, ervas e óleo (PixelLab tiles_pro).
+	"railyard": [["rail_floor_gravel", 12], ["rail_floor_gravel2", 6], ["rail_floor_sleepers", 3], ["rail_floor_weeds", 3], ["rail_floor_track", 2]],
+	# P13: placas de ferro rebitadas com trilho de guindaste embutido (PixelLab tiles_pro).
+	"cranes": [["crane_floor_plate", 12], ["crane_floor_plate2", 6], ["crane_floor_rivets", 4], ["crane_floor_rail", 2], ["crane_floor_rust", 2]],
+	# P13: tábuas empoeiradas de esconderijo — giz de contrabandista e palha (PixelLab tiles_pro).
+	"secret": [["sec_floor_planks", 12], ["sec_floor_boards", 6], ["sec_floor_worn", 4], ["sec_floor_straw", 3], ["sec_floor_chalk", 2]],
+	# P13: deck de ferro rebitado com faixas de perigo e stencil "41" (PixelLab tiles_pro).
+	"generator": [["gen_floor_plate", 12], ["gen_floor_plate2", 6], ["gen_floor_drain", 3], ["gen_floor_hazard", 3], ["gen_floor_oil", 2], ["gen_floor_stencil", 1]]}
 # 0.17: peles de fachada por ambiente (tools/make_scenery_017.py → docks12/walls/<set>/)
 const WALL_SETS := ["cult", "abyssal", "rail"]
 const WALL_TILE_NAMES := ["wall_cap_0", "wall_cap_1", "wall_cap_2", "wall_cap_3", "wall_cap_4",
@@ -83,8 +110,16 @@ const DECAL_POOL := {
 	"cobble": ["crack_a", "stain_water", "algae", "rust_stain", "crack_b"]}
 const DECAL_POOL_SET := {   # reforços por microbioma (somam no pool do piso)
 	"depot": ["stain_oil", "rust_stain", "scorch"], "cellar": ["stain_water", "algae", "algae", "fishbones"],
-	"boss": ["glyph_chalk", "scorch", "crack_b"], "chapel": ["glyph_chalk", "stain_water"],
-	"lighthouse": ["rust_stain", "stain_oil"], "drydock": ["rust_stain", "stain_water", "algae"]}
+	# 0.22: sem glifo do culto na arena do chefe — mantido só na capela, onde faz sentido.
+	"boss": ["scorch", "crack_b"], "chapel": ["glyph_chalk", "stain_water"],
+	"lighthouse": ["rust_stain", "stain_oil"], "drydock": ["rust_stain", "stain_water", "algae"],
+	"antessala": ["rust_stain", "scorch", "stain_oil"],
+	"mangue": ["algae", "stain_water", "algae", "fishbones"],
+	"warehouse": ["stain_oil", "crack_a", "rust_stain"],
+	"railyard": ["stain_oil", "rust_stain", "crack_b", "algae"],
+	"cranes": ["rust_stain", "stain_oil", "scorch"],
+	"secret": ["planks_loose", "stain_water", "crack_a"],
+	"generator": ["stain_oil", "scorch", "rust_stain", "crack_b"]}
 # tinte ambiente por pele de parede / tipo de sala (bem sutil, por cima do piso)
 const AMBIENT := {"cult": Color(0.55, 0.3, 0.8, 0.07), "abyssal": Color(0.2, 0.5, 0.65, 0.09), "rail": Color(0.75, 0.72, 0.6, 0.05)}
 
@@ -93,7 +128,14 @@ const PROP_SCALE := {"crate": 0.8, "crate_2": 0.8, "crate_3": 0.8, "crate_broken
 	"barrel": 0.75, "barrel_oil": 0.75, "barrel_toxic": 0.75, "barrel_explosive": 0.75, "barrel_tipped": 0.75,
 	"bollard": 0.6, "bollard_rope": 0.6, "fish_basket": 0.75, "lobster_trap": 0.8, "wheelbarrow": 0.8, "bench": 0.9,
 	"brazier": 0.75, "container": 1.15, "container_open": 1.15, "container_red": 1.15, "container_olive": 1.15, "container_open_red": 1.15, "container_open_olive": 1.15, "crane": 1.3, "phone_booth": 0.95, "radio": 0.8,
-	"jerrycans": 0.75, "medkit": 0.75, "rope": 0.8, "anchor": 0.9}
+	"jerrycans": 0.75, "medkit": 0.75, "rope": 0.8, "anchor": 0.9,
+	"adm_map_table": 1.15, "adm_cannonballs": 0.9, "adm_banner": 1.1, "adm_candelabra": 1.1,
+	"mng_tree": 1.15, "mng_roots": 1.0, "mng_stump": 1.0, "mng_planks": 1.0,
+	"wh_shelf": 1.15, "wh_pallet": 1.0, "wh_handcart": 1.0, "wh_scale": 0.9,
+	"rail_wagon": 1.2, "rail_buffer": 1.0, "rail_signal": 1.0, "rail_sleepers": 1.0,
+	"crane_base": 1.3, "crane_scrap": 1.1, "crane_hook": 1.0,
+	"sec_crate_tarp": 1.0, "sec_tarp_stack": 1.0, "sec_crate_open": 1.0,
+	"gen_turbine": 1.2, "gen_coil": 1.1, "gen_pipes": 1.1}
 # Tipos antigos de obstáculo que passam a usar a arte nova.
 const LEGACY := {"fishbox": "fish_basket", "container_blue": "container"}
 const PLANK_VARIANTS := ["planks_knot", "planks_nails", "planks_crack", "planks_light", "planks_wet", "planks_oil", "planks_hole"]
@@ -124,6 +166,7 @@ var chapel_room_active := false
 var sanctuary_texture: Texture2D
 var sanctuary_bounds := Rect2()
 var reveal_at := {}     # id da sala -> tick_time em que apareceu
+var discovery_mist := preload("res://scripts/discovery_mist.gd").new()
 var lights: Array = []  # poças de luz do quadro atual (desenhadas no LightLayer, modo aditivo)
 
 func _init() -> void:
@@ -133,6 +176,8 @@ func _init() -> void:
 	pixel_wall_side = load(PIXEL_WALL_SIDE_PATH)
 	for n in TILE_NAMES: tiles[n] = load(BASE + "tiles/" + n + ".png")
 	for n in PROP_NAMES: props[n] = load(BASE + "props/" + n + ".png")
+	var empty_path := BASE + "props/chest_empty.png"
+	props["chest_empty"] = load(empty_path) if ResourceLoader.exists(empty_path) else ImageTexture.create_from_image(Image.load_from_file(empty_path))
 	for set_name in SET_PROPS:
 		for n in SET_PROPS[set_name]: props[n] = load(BASE + set_name + "/" + n + ".png")
 	for set_name in FLOOR_SETS:
@@ -188,19 +233,29 @@ func discovered_rooms(sim) -> Array:
 	return out
 
 func visible_floors(sim, rooms: Array) -> Array:
-	# Pisos cuja área toca uma sala descoberta (corredores e alas aparecem junto com a sala).
+	# A geometria autoral recorta os corredores antigos. Revelar o caminho real,
+	# inclusive seus fragmentos, sem desenhar o retângulo antigo sobre água/paredes.
 	var out: Array = []
+	var corridors: Array = sim.visible_corridor_rects().keys()
+	for corridor: Rect2 in CorridorArt.routes(sim):
+		var discovered := false
+		for room in rooms:
+			if ([room.r] + room.get("extra", [])).any(func(r): return corridor.grow(6).intersects(r)):
+				discovered = true; break
+		if discovered and corridor not in corridors: corridors.append(corridor)
 	for f in sim.floors:
 		var seen := false
 		for room in rooms:
+			if room.get("id", "") == "chapel" and SanctuaryFixed.bounds(sim).encloses(f): seen = true
+			if room.get("id", "") == "cranes" and sim.CranesFixed.active(sim) and sim.CranesFixed.bounds(sim).encloses(f): seen = true
+			if room.get("id", "") == "warehouse" and sim.WarehouseFixed.active(sim) and sim.WarehouseFixed.bounds(sim).encloses(f): seen = true
 			for rr: Rect2 in [room.r] + room.get("extra", []):
 				if f.grow(6).intersects(rr): seen = true; break
 			if seen: break
+		if not seen and corridors.any(func(r): return r.intersects(f)): seen = true
 		for a in sim.actors:
 			if a.active and f.has_point(a.p): seen = true
 		if seen: out.append(f)
-	for rect in sim.visible_corridor_rects():
-		if rect not in out: out.append(rect)
 	return out
 
 static func chapel_frame_index(tick_time: float) -> int:
@@ -224,7 +279,7 @@ func chapel_is_visible(rooms: Array, view: Rect2) -> bool:
 	return false
 
 func chapel_hides_legacy(kind: String, position: Vector2) -> bool:
-	return kind in ["cranes_baked","warehouse_baked"] or (sanctuary_texture!=null and sanctuary_bounds.has_point(position))
+	return kind in ["cranes_baked","warehouse_baked","remaining_baked"] or (sanctuary_texture!=null and sanctuary_bounds.has_point(position))
 
 func chapel_hides_gate(room_id: String, gate_rect: Rect2 = Rect2()) -> bool:
 	# A placa já contém soleiras, pilares e iluminação próprios nas três saídas.
@@ -250,6 +305,9 @@ func draw_chapel_plate(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
 		if sanctuary_texture!=null:
 			chapel_room_active=true
 			ci.draw_texture_rect(sanctuary_texture,sanctuary_bounds,false)
+			# The baked east wall must open wherever the physical exit is walkable.
+			var opening:=SanctuaryFixed.rect(sim,Rect2(1180,738,181,202))
+			CorridorArt.sanctuary_floor(ci,opening,view)
 			continue
 		# A supported stone nave and a restrained carpet lead to the physical altar.
 		# No baked architecture or imaginary floor is sampled into the corridors.
@@ -267,13 +325,8 @@ static func inside(rects: Array, p: Vector2, margin: float = 0.0) -> bool:
 	return false
 
 func draw_reveal(ci: CanvasItem, sim, rooms: Array) -> void:
-	# A sala recém-descoberta "acende" em 0,5s.
-	for room in rooms:
-		if not room.has("id"): continue
-		var age: float = sim.tick_time - float(reveal_at.get(room.id, -9.0))
-		if age >= 0.0 and age < 0.5:
-			for rr in [room.r] + room.get("extra", []):
-				ci.draw_rect(rr.grow(40), Color(VOID, 1.0 - age / 0.5))
+	# The mist stays in the ground pass, below actors and the interface.
+	discovery_mist.draw(ci,sim,ci.vis_floors,reveal_at,ci.view_rect())
 
 # ------------------------------------------------------------------ piso
 func style_of(room: Dictionary) -> Dictionary:
@@ -343,10 +396,9 @@ func style_of_rect(sim, rect: Rect2) -> Dictionary:
 
 # 0.16: piso de um microbioma — azulejos 64x64 sorteados pelos pesos de FLOOR_SETS (fixo por célula).
 func set_area(ci: CanvasItem, rect: Rect2, view: Rect2, set_name: String) -> void:
-	if pixel_floors.size() == 16 and set_name != "chapel":
-		var material := "wood" if set_name == "cellar" else ("metal" if set_name in ["depot", "workshop", "drydock"] else "stone")
-		draw_pixel_floor(ci, rect, view, material)
-		return
+	# P13: o pack genérico pixel_floors NÃO substitui mais os microbiomas — cada sala
+	# com floor_set desenha os azulejos autorais dela (PixelLab). pixel_floors segue
+	# só como fallback de corredores e pisos sem set (tile_area).
 	var area := rect.intersection(view)
 	if area.size.x <= 0 or area.size.y <= 0: return
 	var entries: Array = FLOOR_SETS[set_name]
@@ -381,8 +433,9 @@ func draw_boss_arena(ci: CanvasItem, rect: Rect2, view: Rect2) -> void:
 	# O viewport já recorta a placa; desenhá-la inteira evita costuras entre recortes da câmera.
 	ci.draw_texture_rect(boss_arena, rect, false)
 	# O emblema continua aparente, mas o miolo recebe um véu discreto para projéteis e telegraphs.
-	if view.grow(BOSS_SAFE_RADIUS).has_point(BOSS_SAFE_CENTER):
-		ci.draw_circle(BOSS_SAFE_CENTER, BOSS_SAFE_RADIUS, Color(0.015, 0.035, 0.065, 0.16))
+	var safe_center := rect.position + (BOSS_SAFE_CENTER - BOSS_ARENA_RECT.position)
+	if view.grow(BOSS_SAFE_RADIUS).has_point(safe_center):
+		ci.draw_circle(safe_center, BOSS_SAFE_RADIUS, Color(0.015, 0.035, 0.065, 0.16))
 
 func room_plate_for_rect(sim, rect: Rect2) -> Dictionary:
 	# Placas pequenas ampliadas várias vezes borram o cenário. Salas grandes usam
@@ -409,15 +462,16 @@ func draw_room_plate(ci: CanvasItem, room: Dictionary, rect: Rect2, view: Rect2)
 func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -> void:
 	for rect in floors:
 		if not rect.intersects(view): continue
+		if not discovery_mist.floor_is_discovered(sim,rect): continue
+		if sim.RemainingFixed.owns_rect(sim,rect): continue
 		if corridor_deck != null and is_corridor(rect, sim):
-			draw_corridor_surface(ci, rect, rect, view)
 			continue
 		var plate_room := room_plate_for_rect(sim, rect)
 		if not plate_room.is_empty():
 			draw_room_plate(ci, plate_room, rect, view)
 			continue
 		# A placa 4:3 substitui apenas o retângulo principal; alas/entradas seguem o piso navegável normal.
-		if rect == BOSS_ARENA_RECT and boss_arena != null:
+		if rect == sim.room_by_id("boss").get("r", Rect2()) and boss_arena != null:
 			draw_boss_arena(ci, rect, view)
 			continue
 		if style_of_rect(sim, rect).get("painted", false): continue
@@ -429,7 +483,7 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 			var tint := Color(1.0, 0.93, 0.86) if kind == "cobble" else Color.WHITE
 			tile_area(ci, rect, view, "planks" if kind == "planks" else "granite", Vector2.ZERO, tint)
 			if st.has("floor_patch"): set_area(ci, st.floor_patch, view, st.floor_set)
-		if pixel_floors.is_empty(): scatter_decals(ci, rect, view, kind, st.get("floor_set", ""))
+		scatter_decals(ci, rect, view, kind, st.get("floor_set", ""))
 		var amb: Color = AMBIENT.get(st.get("wall_set", ""), Color(0, 0, 0, 0))
 		if amb.a > 0: ci.draw_rect(rect.intersection(view), amb)       # 0.17: tinte ambiente da sala
 	for room in rooms:
@@ -443,59 +497,41 @@ func draw_floors(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) 
 		tile_area(ci, quay, view, "granite", Vector2(r.position.x, r.end.y - rows * th), Color.WHITE, rows - 1)
 		ci.draw_rect(Rect2(quay.position.x, quay.position.y - 3, quay.size.x, 6), Color("2a1b12"))
 		ci.draw_rect(Rect2(quay.position.x, quay.position.y + 3, quay.size.x, 2), Color(0, 0, 0, 0.35))
-	if corridor_deck != null:
-		for rect: Rect2 in floors:
-			if is_corridor(rect, sim): draw_corridor_joins(ci, rect, rooms, view)
+	# Corridor joins are drawn once by WorldView, after the room wall layer.
 
 static func is_corridor(rect: Rect2, sim = null) -> bool:
 	if sim != null:
-		if sim.run_corridors.any(func(r):return r.encloses(rect)): return true
-		if sim.run_secret_floors.any(func(r):return r.encloses(rect)): return true
-		if sim.CranesFixed.active(sim) and sim.CranesFixed.apron(sim).encloses(rect): return true
-		if sim.WarehouseFixed.active(sim) and sim.WarehouseFixed.apron().encloses(rect): return true
-	if sim != null and (rect in sim.run_corridors or rect in sim.run_secret_floors): return true
+		return CorridorArt.is_corridor(sim,rect)
 	if rect in DOCKS.CORRIDORS or rect == DOCKS.SECRET_CORRIDOR: return true
 	for shortcut in DOCKS.SHORTCUTS:
 		if rect == shortcut.r: return true
 	return false
 
-func draw_corridor_surface(ci: CanvasItem, rect: Rect2, area: Rect2, view: Rect2, alpha: float = 1.0) -> void:
-	if CorridorArt.STONE!=null:
-		CorridorArt.floor_surface(ci,area,view,alpha)
-		return
-	var horizontal := rect.size.x > rect.size.y
-	var texture := corridor_deck if horizontal else corridor_deck_vertical
-	var scale_factor := rect.size.y / texture.get_height() if horizontal else rect.size.x / texture.get_width()
-	var size := texture.get_size() * scale_factor
-	var step := size.x if horizontal else size.y
-	var origin := rect.position.x if horizontal else rect.position.y
-	var clip := area.intersection(view)
-	if not clip.has_area(): return
-	var start := clip.position.x if horizontal else clip.position.y
-	var finish := clip.end.x if horizontal else clip.end.y
-	for i in range(int(floor((start - origin) / step)), int(ceil((finish - origin) / step))):
-		var position := rect.position + (Vector2(i * step, 0) if horizontal else Vector2(0, i * step))
-		var part := Rect2(position, size).intersection(clip)
-		if part.has_area():
-			ci.draw_texture_rect_region(texture, part, Rect2((part.position - position) / scale_factor, part.size / scale_factor), Color(1, 1, 1, alpha))
+func draw_corridor_surface(ci: CanvasItem, rect: Rect2, area: Rect2, view: Rect2, _alpha: float = 1.0) -> void:
+	CorridorArt.transition_surface(ci,rect,area,view)
 
 func draw_corridor_joins(ci: CanvasItem, rect: Rect2, rooms: Array, view: Rect2) -> void:
-	# O piso entra 80 px na sala e desaparece em faixas; nunca revela sala não descoberta.
+	if CorridorArt.altar_transition(ci.sim,rect): return
+	# Short solid landings meet the room; no translucent strips over its painting.
 	var horizontal := rect.size.x > rect.size.y
+	var sim = ci.sim
 	for direction in [-1.0, 1.0]:
 		var end := Vector2(rect.position.x if direction < 0 else rect.end.x, rect.get_center().y) if horizontal else Vector2(rect.get_center().x, rect.position.y if direction < 0 else rect.end.y)
+		if not view.grow(64).has_point(end): continue
 		var axis := Vector2(direction, 0) if horizontal else Vector2(0, direction)
-		for room in rooms:
-			if room.get("id", "") not in ROOM_PLATE_IDS: continue
-			for floor_rect: Rect2 in [room.r] + room.get("extra", []):
-				if not floor_rect.has_point(end + axis * 2): continue
-				for i in range(10):
-					var distance := float(i * 8)
-					var position := end + axis * (distance + (8.0 if direction < 0 else 0.0))
-					var band := Rect2(Vector2(position.x, rect.position.y), Vector2(8, rect.size.y)) if horizontal else Rect2(Vector2(rect.position.x, position.y), Vector2(rect.size.x, 8))
-					draw_corridor_surface(ci, rect, band.intersection(floor_rect), view, 1.0 - float(i) / 10.0)
-
+		for floor_rect: Rect2 in sim.floors:
+			if is_corridor(floor_rect,sim) or not floor_rect.has_point(end+axis*2): continue
+			if not rooms.any(func(room): return room.r.grow(160).intersects(floor_rect) or room.get("extra",[]).any(func(wing):return wing.intersects(floor_rect))): continue
+			var landing := Rect2(Vector2(end.x-48 if direction<0 else end.x,rect.position.y),Vector2(48,rect.size.y)) if horizontal else Rect2(Vector2(rect.position.x,end.y-48 if direction<0 else end.y),Vector2(rect.size.x,48))
+			for piece in CorridorArt.pieces_outside(landing.intersection(floor_rect),sim.obstacles+sim.gaps):
+				if not piece.has_area(): continue
+				CorridorArt.transition_surface(ci,rect,piece,view)
+				var threshold := Rect2(piece.end.x-4 if direction>0 else piece.position.x,piece.position.y,4,piece.size.y) if horizontal else Rect2(piece.position.x,piece.end.y-4 if direction>0 else piece.position.y,piece.size.x,4)
+				ci.draw_rect(threshold,Color("8c816b"))
 func draw_corridor_edges(ci: CanvasItem, sim, rect: Rect2, view: Rect2) -> void:
+	if CorridorArt.altar_transition(sim,rect):
+		rect=CorridorArt.altar_exterior(sim,rect)
+		if not rect.has_area(): return
 	# Mureta baixa: mantém os vazios legíveis sem erguer uma fachada sobre o caminho.
 	var corners := [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]
 	var normals := [Vector2.UP, Vector2.RIGHT, Vector2.DOWN, Vector2.LEFT]
@@ -508,7 +544,10 @@ func draw_corridor_edges(ci: CanvasItem, sim, rect: Rect2, view: Rect2) -> void:
 			var p: Vector2 = a + tangent * run.x
 			var q: Vector2 = a + tangent * run.y
 			if not Rect2(p, q - p).abs().grow(40).intersects(view): continue
-			CorridorArt.boundary(ci,p,q,normal,view)
+			if CorridorArt.altar_transition(sim,rect):
+				CorridorArt.boundary(ci,p,q,normal,view)
+				continue
+			CorridorArt.transition_edge(ci,p,q,normal)
 			var length: float = run.y - run.x
 			for offset in range(48, int(length), 640):
 				var lamp := p + tangent * offset + normal * 8
@@ -674,9 +713,10 @@ func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -
 	var all_floors: Array = sim.floors
 	for rect in floors:
 		if not rect.grow(WALL_H + 60).intersects(view): continue
+		if not discovery_mist.floor_is_discovered(sim,rect): continue
 		if CorridorArt.is_authored(sim,rect): continue
+		if sim.RemainingFixed.owns_rect(sim,rect): continue
 		if corridor_deck != null and is_corridor(rect, sim):
-			draw_corridor_edges(ci, sim, rect, view)
 			continue
 		if style_of_rect(sim, rect).get("painted", false): continue
 		var style: Dictionary = style_of_rect(sim, rect)   # 0.18: também cobre as alas (ROOM_EXTRA)
@@ -699,7 +739,7 @@ func draw_walls(ci: CanvasItem, sim, floors: Array, rooms: Array, view: Rect2) -
 				for b in bricks:
 					if b[1] == "brick_window": lights.append({"p": Vector2(b[0], y_brick + 60), "kind": "window"})
 				ci.draw_rect(Rect2(x0, tl.y - 4, x1 - x0, 4), Color(0, 0, 0, 0.45))
-				wall_wear(ci, x0, x1, tl.y, wset)   # 0.17: infiltração, fuligem e pichações na fachada
+				wall_wear(ci, x0, x1, tl.y, wset, style.get("floor_set", ""))   # 0.17: infiltração, fuligem e pichações na fachada
 				# pilares emolduram as aberturas (portas de corredor)
 				for end in [x0, x1]:
 					if end > tl.x + 2 and end < br.x - 2:
@@ -761,7 +801,7 @@ func scatter_decals(ci: CanvasItem, rect: Rect2, view: Rect2, kind: String, set_
 			ci.draw_texture(tex, -tex.get_size() * 0.5, Color(1, 1, 1, 0.75 + 0.2 * hash01(gx, gy, 27)))
 			ci.draw_set_transform(Vector2.ZERO)
 
-func wall_wear(ci: CanvasItem, x0: float, x1: float, y_base: float, wset: String) -> void:
+func wall_wear(ci: CanvasItem, x0: float, x1: float, y_base: float, wset: String, floor_set: String = "") -> void:
 	# Desgaste seedado na fachada: infiltração desce do tijolo, fuligem, pichação do culto.
 	var y_brick := y_base - 107.0
 	var x := x0 + 24.0
@@ -777,7 +817,7 @@ func wall_wear(ci: CanvasItem, x0: float, x1: float, y_base: float, wset: String
 			ci.draw_set_transform(Vector2(x, y_base - 8), 0, Vector2(1, 0.45))
 			ci.draw_circle(Vector2.ZERO, 16 + hash01(i, 4, 34) * 10, Color(0.05, 0.08, 0.06, 0.3))
 			ci.draw_set_transform(Vector2.ZERO)
-		elif roll < 0.52 and wset in ["cult", "abyssal"]:   # runa de giz na parede
+		elif roll < 0.52 and wset in ["cult", "abyssal"] and floor_set != "boss":   # runa de giz na parede (sem culto na arena do chefe)
 			var tex: Texture2D = decals.glyph_chalk
 			var k := 0.4 + 0.25 * sin(float(y_base) * 0.01)
 			ci.draw_set_transform(Vector2(x, y_brick + 46), 0, Vector2.ONE * 0.45)
@@ -997,6 +1037,10 @@ func handles(kind: String) -> bool: return is_flat(kind) or props.has(kind)
 func draw_decor(ci: CanvasItem, d: Dictionary, t: float) -> void:
 	var p: Vector2 = d.p
 	match d.kind:
+		"debris_crate", "debris_barrel", "debris_sandbags":
+			var size := debris_size(d)
+			# Os destroços ficam deitados no chão, abaixo das entidades e portões.
+			ci.draw_texture_rect(props[d.kind], Rect2(p - Vector2(size.x * 0.5, size.y * 0.65), size), false, Color(0.82, 0.82, 0.82))
 		"grate", "manhole":
 			ci.draw_texture_rect(tiles[d.kind], Rect2(p - Vector2(28, 28), Vector2(56, 56)), false, Color(0.9, 0.9, 0.95, 0.95))
 		"symbol_0", "symbol_1", "symbol_2":
@@ -1043,6 +1087,9 @@ func draw_decor(ci: CanvasItem, d: Dictionary, t: float) -> void:
 			for k in 4: lights.append({"p": p + Vector2(-33 + k * 22, -8), "kind": "bulb"})
 		_:
 			if props.has(d.kind): draw_prop(ci, d.kind, p, t)
+
+func debris_size(d: Dictionary) -> Vector2:
+	return prop_size(d.kind) * (0.30 if d.get("small", false) else 1.0)
 
 func draw_rails(ci: CanvasItem, a: Vector2, b: Vector2) -> void:
 	var dir := (b - a).normalized(); var n := Vector2(-dir.y, dir.x)
@@ -1109,7 +1156,7 @@ func draw_chapel_wall(ci: CanvasItem, box: Rect2) -> void:
 
 func draw_gate(ci: CanvasItem, d: Dictionary, locked: bool, t: float, room_rect: Rect2) -> void:
 	var r: Rect2 = d.r
-	var compact: bool = d.room in ROOM_PLATE_IDS
+	var compact := true  # Batentes pequenos em todas as salas; sem torres sobre o caminho.
 	var horizontal: bool = d.side == "top" or d.side == "bottom"   # a abertura corre no eixo x
 	var tower: Texture2D = tiles.wall_corner_0
 	var ends: Array = [Vector2(r.position.x, r.end.y), Vector2(r.end.x, r.end.y)] if horizontal else [Vector2(r.get_center().x, r.position.y), Vector2(r.get_center().x, r.end.y)]

@@ -2,14 +2,6 @@
   "chapel_origin": "(200.0, 3600.0)",
   "checks": [
     {
-      "label": "chapel bottom radius11 direction-1",
-      "ok": true
-    },
-    {
-      "label": "chapel bottom radius11 direction1",
-      "ok": true
-    },
-    {
       "label": "stairs right radius11 direction-1",
       "ok": true
     },
@@ -23,6 +15,22 @@
     },
     {
       "label": "stairs left radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius11 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius11 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius11 direction1",
       "ok": true
     },
     {
@@ -42,35 +50,11 @@
       "ok": true
     },
     {
-      "label": "stairs top radius11 direction-1",
-      "ok": true
-    },
-    {
-      "label": "stairs top radius11 direction1",
-      "ok": true
-    },
-    {
-      "label": "stairs bottom radius11 direction-1",
-      "ok": true
-    },
-    {
-      "label": "stairs bottom radius11 direction1",
-      "ok": true
-    },
-    {
       "label": "outside chapel has no invisible floor radius11",
       "ok": true
     },
     {
       "label": "altar blocks physical approach radius11",
-      "ok": true
-    },
-    {
-      "label": "chapel bottom radius23 direction-1",
-      "ok": true
-    },
-    {
-      "label": "chapel bottom radius23 direction1",
       "ok": true
     },
     {
@@ -90,6 +74,22 @@
       "ok": true
     },
     {
+      "label": "stairs top radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "stairs top radius23 direction1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius23 direction-1",
+      "ok": true
+    },
+    {
+      "label": "chapel bottom radius23 direction1",
+      "ok": true
+    },
+    {
       "label": "chapel right radius23 direction-1",
       "ok": true
     },
@@ -103,22 +103,6 @@
     },
     {
       "label": "chapel top radius23 direction1",
-      "ok": true
-    },
-    {
-      "label": "stairs top radius23 direction-1",
-      "ok": true
-    },
-    {
-      "label": "stairs top radius23 direction1",
-      "ok": true
-    },
-    {
-      "label": "stairs bottom radius23 direction-1",
-      "ok": true
-    },
-    {
-      "label": "stairs bottom radius23 direction1",
       "ok": true
     },
     {
@@ -647,7 +631,7 @@
     }
   ],
   "failures": 0,
-  "farol_origin": "(1900.0, 3500.0)",
-  "save_sha256": "2ca681ce3e127d167af9c7df114ad8c731c100277326cac25237358dc904020e",
-  "seed": 72044
+  "farol_origin": "(1800.0, 3700.0)",
+  "save_sha256": "01264a00cde44b29fa1d833e5fcdbca2054867c3e8ea829ab5cf1e47804f1878",
+  "seed": 1964600499
 }

@@ -13,6 +13,58 @@ static func bounds(sim) -> Rect2:
 static func rect(sim, source: Rect2) -> Rect2:
 	return Rect2(bounds(sim).position+source.position*SCALE,source.size*SCALE)
 
+static func align_south_passage(sim) -> void:
+	# The traced landing starts 27px to the right of the connecting deck.
+	# Fill only missing slivers of the real connector, keeping one straight edge.
+	var landing:=rect(sim,Rect2(704,1480,194,344))
+	for route: Rect2 in sim.run_corridors:
+		if route.size.x>=route.size.y or not route.intersects(landing) or route.end.y<=landing.end.y: continue
+		var missing: Array=[route.intersection(bounds(sim))]
+		for floor_rect: Rect2 in sim.floors:
+			var next: Array=[]
+			for part: Rect2 in missing: next.append_array(subtract(part,floor_rect))
+			missing=next
+		for part: Rect2 in missing:
+			if part.has_area(): sim.floors.append(part)
+		for door in sim.doors:
+			if door.room!="chapel" or door.side!="bottom" or not route.intersects(door.r): continue
+			var left:=minf(door.r.position.x,route.position.x)
+			door.r=Rect2(left,door.r.position.y,maxf(door.r.end.x,route.end.x)-left,door.r.size.y)
+	sim.ob_grid_count=-1
+	sim.refresh_gate_blocks()
+
+static func align_east_passage(sim) -> void:
+	var opening:=rect(sim,Rect2(1200,738,161,202))
+	var chapel: Dictionary=sim.room_by_id("chapel")
+	if chapel.is_empty(): return
+	for i in sim.run_corridors.size():
+		var old: Rect2=sim.run_corridors[i]
+		if old.size.x<=old.size.y or absf(old.position.x-chapel.r.end.x)>2: continue
+		if not old.grow(120).intersects(opening): continue
+		var aligned:=Rect2(old.position.x,opening.position.y,old.size.x,opening.size.y)
+		if old==aligned: continue
+		var floors: Array=[]
+		for floor_rect: Rect2 in sim.floors:
+			# Preserve both rooms; replace only the exposed connector fragment.
+			if old.encloses(floor_rect) and not bounds(sim).encloses(floor_rect): continue
+			floors.append(floor_rect)
+		floors.append(Rect2(bounds(sim).end.x,aligned.position.y,aligned.end.x-bounds(sim).end.x,aligned.size.y))
+		sim.floors=floors
+		sim.run_corridors[i]=aligned
+		for actor in sim.actors:
+			if old.has_point(actor.p) and actor.p.x>=bounds(sim).end.x and not aligned.grow(-24).has_point(actor.p):
+				actor.p.y=clampf(actor.p.y,aligned.position.y+24,aligned.end.y-24)
+		if not sim.mech.is_empty() and old.has_point(sim.mech.p) and sim.mech.p.x>=bounds(sim).end.x:
+			sim.mech.p.y=clampf(sim.mech.p.y,aligned.position.y+48,aligned.end.y-48)
+		for group in sim.run_corridor_groups:
+			for j in group.rects.size():
+				if group.rects[j]==old: group.rects[j]=aligned
+		for door in sim.doors:
+			if door.room=="stairs" and door.side=="left" and door.r.grow(120).intersects(old):
+				door.r=Rect2(door.r.position.x,aligned.position.y,door.r.size.x,aligned.size.y)
+		sim.ob_grid_count=-1
+		sim.refresh_gate_blocks()
+
 static func subtract(area: Rect2, cut: Rect2) -> Array:
 	var hit := area.intersection(cut)
 	if not hit.has_area(): return [area]

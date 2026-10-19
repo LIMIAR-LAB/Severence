@@ -34,8 +34,12 @@ ROOMS = [
     # Adega em L: ala oeste alagada.
     ("cellar", "13 • ADEGA INUNDADA", "chest", "planks", (7600, 1200, 1500, 1100), [(7000, 1400, 600, 600)]),
     # Arena do Almirante: alcovas laterais no meio — a silhueta deixa de ser um retângulo.
-    ("boss", "12 • O ALMIRANTE DAS PROFUNDEZAS", "boss", "stone", (3000, 400, 2400, 1800), [(2600, 700, 400, 500), (5400, 800, 300, 600)]),
+    ("boss", "12 • O ALMIRANTE DAS PROFUNDEZAS", "boss", "stone", (20200, -1800, 2400, 1800), [(22600, -1400, 300, 600)]),
     ("secret", "? • CONTRABANDO", "secret", "planks", (5900, 900, 900, 700), []),
+    # Antessala obrigatória: duas rotas horizontais paralelas convergem na arena.
+    # Ao norte: ponte de moto; ao sul: mangue fechado, a pé, com miniboss.
+    ("antessala", "14 • ANTESSALA DO ALMIRANTE", "fight", "stone", (3200, -1800, 1400, 1800), []),
+    ("forest", "15 • MANGUE NEGRO", "fight", "planks", (4600, -900, 15600, 600), []),
 ]
 R = {r[0]: r[4] for r in ROOMS}
 
@@ -60,12 +64,17 @@ CORRIDORS = [
     (3500, 4200, 400, 200),   # 09 → 08
     (1500, 4200, 300, 200),   # 10 → 09
     (700, 2700, 200, 900),    # 10 ↑ 11
-    (1700, 1500, 1300, 200),  # 11 → 12 (entrada lateral da arena)
-    (3300, 2200, 200, 1500),  # 09 ↑ 12 (entrada principal da arena)
     (8800, 2300, 200, 1600),  # 06 ↑ 13
+    # P12: a rota 09→12 passa pela Antessala — a escolha fica no caminho do chefe.
+    (3300, 0, 200, 3700),   # Farol → partida das duas rotas, sem cruzar outros pisos
 ]
 SECRET_CORRIDOR = (6450, 1600, 180, 2100)   # 07 ↑ ? (parede rachada no topo do Depósito)
+# Ponte Temporal: 20 segundos para leste, com segmentos de um segundo.
+BRIDGE_ZONE = (4600, -1600, 15600, 400)
+BRIDGE_SEGS = [(4600 + i * 780, -1600, 780, 400) for i in range(20)]
 EXTRA_FLOORS = []
+ROOMS.append(("bridge", "16 • PONTE TEMPORAL", "route", "planks", BRIDGE_ZONE, []))
+R["bridge"] = BRIDGE_ZONE
 
 # Balcão elevado no 09 com duas rampas laterais.
 RAISED = [(2250, 4000, 800, 360)]
@@ -76,8 +85,9 @@ GAPS = [(5480, 5900, 80, 780), (7950, 1200, 80, 700), (650, 1650, 600, 520)]
 POINTS = {
     "spawn": (820, 6480), "spawn2": (880, 6540), "key": (1450, 6560),
     "shop": (8950, 6170), "side": (8950, 4450), "secret_wall": (6540, 3740),
-    "boss": (4200, 1200), "extraction": (4200, 720), "mech": (9250, 6700),
+    "boss": (21400, -1000), "extraction": (21400, -1480), "mech": (9250, 6700),
     "ammo_center": (7050, 4350), "warden": (4850, 4350),
+    "bike": (4420, -1400), "bike_checkpoint": (4420, -1400),
 }
 CHESTS = [(700, 4470, False), (8850, 1400, False), (6350, 1150, True)]
 
@@ -85,19 +95,23 @@ CHESTS = [(700, 4470, False), (8850, 1400, False), (6350, 1150, True)]
 # wall_set (0.17): pele da fachada por ambiente — default = tijolo de armazém.
 ROOM_STYLE = {
     "entry": {"top": "facade", "bottom": "quay", "left": "pier", "quay_band": 180},
-    "cranes": {"top": "facade", "bottom": "quay", "quay_band": 150},
-    "warehouse": {"top": "facade", "bottom": "wall"},
+    "cranes": {"top": "facade", "bottom": "quay", "quay_band": 150, "floor_set": "cranes"},
+    "warehouse": {"top": "facade", "bottom": "wall", "floor_set": "warehouse"},
     "market": {"top": "facade", "bottom": "quay", "quay_band": 140, "floor_set": "market"},
     "shop": {"top": "facade", "bottom": "quay", "right": "pier", "quay_band": 130, "floor_set": "workshop"},
-    "generator": {"top": "facade", "bottom": "wall", "wall_set": "rail"},
+    "generator": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "generator"},
     "ammo": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "depot"},
-    "rails": {"top": "facade", "bottom": "wall", "wall_set": "rail"},
+    "rails": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "railyard"},
     "stairs": {"top": "facade", "bottom": "wall", "wall_set": "rail", "floor_set": "lighthouse"},
     "chapel": {"top": "facade", "bottom": "wall", "left": "pier", "wall_set": "cult", "floor_set": "chapel", "floor_patch": (640, 3700, 420, 1300)},
     "drydock": {"top": "facade", "bottom": "wall", "left": "pier", "wall_set": "rail", "floor_set": "drydock"},
     "cellar": {"top": "facade", "bottom": "wall", "right": "pier", "wall_set": "abyssal", "floor_set": "cellar"},
     "boss": {"top": "facade", "bottom": "wall", "wall_set": "abyssal", "floor_set": "boss"},
-    "secret": {"top": "facade", "bottom": "wall", "wall_set": "abyssal"},
+    "secret": {"top": "facade", "bottom": "wall", "wall_set": "abyssal", "floor_set": "secret"},
+    # P12: bordas "pier" onde a sala toca água aberta, ponte ou a sala vizinha (sem parede).
+    "antessala": {"top": "facade", "bottom": "wall", "right": "pier", "wall_set": "rail", "floor_set": "antessala"},
+    "forest": {"top": "none", "bottom": "quay", "left": "pier", "right": "pier", "quay_band": 120, "wall_set": "abyssal", "floor_set": "mangue"},
+    # P12: a ala norte do Mangue invade a arena por baixo — sem portão na emenda.
 }
 # Mar visível (aparece junto com a sala dona).
 WATER = [
@@ -109,6 +123,8 @@ WATER = [
     # Moldura aquática visual da arena; o piso da arena é desenhado por cima.
     ("boss", (500, -1000, 7400, 1500)), ("boss", (500, 400, 2500, 3200)),
     ("boss", (5400, 400, 2500, 3200)), ("boss", (500, 2200, 7400, 1400)),
+    # P12: a baía entre Antessala, ponte e Mangue — cobre a faixa nova ao leste da arena.
+    ("antessala", (4300, 1200, 3600, 2400)),
 ]
 
 # 0.16: ATALHOS — corredor fechado por uma fachada rachada. Explosão (barril, bomba, canhão) perto da
@@ -123,6 +139,8 @@ extra("cranes", 4400, 5800, 300, 300)      # 02 Guindastes: baia à direita
 extra("rails", 5800, 3700, 300, 320)       # 08 Ferroviário: baia à direita
 extra("market", 6320, 5900, 280, 260)      # 04 Mercado: reentrância à esquerda
 extra("warehouse", 4700, 7000, 320, 300)   # 03 Armazém: baia embaixo
+# P12: galeria norte do Mangue — sobe pela lateral leste e desemboca DENTRO da arena.
+# Mangrove and bridge meet the arena only at their far eastern ends.
 # 0.19: "entry" agora é a composição pintada do Desembarque (arrival_art.gd) — não usa ala/props
 # procedurais. Revertido para não conflitar com os pisos mapeados na imagem (docs/DESEMBARQUE_ARTISTICO_0_19.md).
 
@@ -154,6 +172,22 @@ FOOT = {  # caixa de colisão por prop (largura, altura) — pés do sprite
     "workshop_bench": (88, 26), "workshop_tool_rack": (56, 20), "workshop_welder": (58, 22), "workshop_parts": (60, 22),
     "market_stall": (120, 30), "market_net": (92, 14), "market_baskets": (60, 24), "market_ice_barrel": (44, 26),
     "market_rowboat": (90, 20), "chapel_stained_glass": (50, 20), "chapel_offering_bowl": (44, 20),
+    # P12: árvore retorcida do mangue — desenho procedural em world_view.
+    "mangrove": (70, 60),
+    # P13: microbioma da Antessala (PixelLab) — sala de guerra do Almirante.
+    "adm_map_table": (80, 30), "adm_cannonballs": (54, 30), "adm_banner": (26, 20), "adm_candelabra": (26, 20),
+    # P13: microbioma do Mangue Negro (PixelLab) — árvore, raízes, toco, tabuado.
+    "mng_tree": (70, 50), "mng_roots": (80, 24), "mng_stump": (44, 30), "mng_planks": (90, 16),
+    # P13: microbioma do Armazém 7 (PixelLab).
+    "wh_shelf": (80, 30), "wh_pallet": (56, 34), "wh_handcart": (48, 30), "wh_scale": (40, 28),
+    # P13: microbioma do Pátio Ferroviário (PixelLab).
+    "rail_wagon": (130, 50), "rail_buffer": (54, 30), "rail_signal": (24, 20), "rail_sleepers": (80, 22),
+    # P13: microbioma dos Guindastes (PixelLab).
+    "crane_base": (110, 70), "crane_scrap": (90, 30), "crane_hook": (56, 30),
+    # P13: microbioma do Contrabando (PixelLab).
+    "sec_crate_tarp": (56, 34), "sec_tarp_stack": (84, 34), "sec_crate_open": (54, 34),
+    # P13: microbioma do Gerador (PixelLab).
+    "gen_turbine": (100, 60), "gen_coil": (44, 30), "gen_pipes": (90, 24),
 }
 
 def ob(kind, x, y):
@@ -220,6 +254,9 @@ barrels(2960, 5930, True)   # 0.16: abrem o atalho da parede rachada (↑ Farol)
 ob("lamp_post", 3080, 6460); ob("lamp_post", 3760, 6700); ob("brazier", 2620, 6700)
 dec("rails", 3400, 6250); dec("rails", 3400, 6560)
 dec("grate", 3000, 6620); dec("manhole", 3800, 6300); dec("symbol_2", 3400, 6780)
+# P13: microbioma dos guindastes (PixelLab) — bases novas nos pedestais, sucata e ganchos
+for cx, cy in [(2850, 6150), (3950, 6150), (2850, 6800), (3950, 6800)]: ob("crane_base", cx, cy)
+ob("crane_scrap", 3050, 6350); ob("crane_scrap", 3650, 6900); ob("crane_hook", 3400, 6100); ob("crane_hook", 4150, 6600)
 row("bollard", 2700, 7040, 6, 330)
 spawns("mix", [(2750, 6300), (3100, 6200), (3650, 6250), (4150, 6300), (2750, 6900), (3300, 6850), (3750, 6600), (4150, 6700)])
 
@@ -278,6 +315,10 @@ for cx, cy in [(8550, 4150), (9350, 4150), (8550, 4800), (9350, 4800)]: ob("pill
 barrels(8420, 4450, True); barrels(9420, 4550, True)
 ob("brazier", 8700, 4600); ob("brazier", 9200, 4600)
 dec("symbol_0", 8950, 4650); dec("grate", 8650, 4350); dec("grate", 9250, 4350)
+# P13: microbioma do gerador (PixelLab) — turbinas laterais, bobina Tesla, tubulações
+ob("gen_turbine", 8650, 4880); ob("gen_turbine", 9250, 4880)
+ob("gen_coil", 8400, 4700); ob("gen_coil", 9500, 4700)
+ob("gen_pipes", 9200, 3980); ob("gen_pipes", 8400, 4150); ob("gen_pipes", 9500, 4150)
 
 # ── 07 Depósito de Munição (muitos barris explosivos) ──
 facade_decor("ammo", [("poster", 700), ("iron_door", 1200)])   # 340: parede rachada (sala secreta)
@@ -300,6 +341,10 @@ sandbag_wall(4100, 4450, 1); sandbag_wall(5000, 4000, 1); ob("sandbags_damaged",
 barrels(4900, 4600, True); ob("wheelbarrow", 4250, 4900)
 ob("lamp_post", 4300, 4300); ob("lamp_post", 5100, 4800); ob("brazier", 4850, 3950)
 dec("grate", 4700, 4400); dec("symbol_2", 5300, 4700); dec("debris_crate", 4350, 4700)
+# P13: microbioma ferroviário (PixelLab) — vagão e dormentes sobre os trilhos diagonais
+ob("rail_wagon", 4250, 3910); ob("rail_wagon", 5150, 4180)
+ob("rail_buffer", 5700, 4500); ob("rail_signal", 3980, 4780)
+ob("rail_sleepers", 5550, 4830); ob("rail_sleepers", 4080, 4600)
 spawns("mix", [(4100, 4100), (4500, 3900), (5000, 4250), (5600, 4150), (4400, 4550), (4900, 4850), (5500, 4650), (5250, 3900)])
 
 crate_pile(5900, 3780, 0); ob("lamp_post", 6000, 3950)   # 0.18: baía extra (ROOM_EXTRA)
@@ -366,7 +411,7 @@ spawns("dock", [(8100, 1500), (8600, 1400), (8900, 1600), (8300, 2150), (8800, 2
 facade_decor("boss", [("iron_door", 1200)])
 for cx, cy in [(3400, 800), (5000, 800), (3400, 1800), (5000, 1800)]: ob("pillar", cx, cy)
 for p in [(3250, 600), (5150, 600), (3250, 2050), (5150, 2050), (3800, 1150), (4600, 1150)]: ob("brazier", *p)
-dec("ritual_circle", 4200, 1250); dec("symbol_0", 3600, 1500); dec("symbol_1", 4800, 1500); dec("symbol_2", 4200, 1900)
+dec("symbol_0", 3600, 1500); dec("symbol_1", 4800, 1500); dec("symbol_2", 4200, 1900)
 barrels(3150, 1300, True); barrels(5200, 1300, True)
 hazard(3350, 1300, 64); hazard(5050, 1300, 64)
 for p in [(3200, 480), (5200, 480), (3150, 2150), (5250, 2150)]: dec("debris_crate" if p[1] < 1000 else "debris_barrel", *p)
@@ -377,9 +422,65 @@ for x in (3600, 4800): ob("lamp_post", x, 1000)
 # ── ? Contrabando ──
 crate_pile(5980, 980, 0); crate_pile(6600, 980, 1); barrels(6000, 1400); ob("medkit", 6650, 1450)
 dec("rope", 6200, 1450)
+# P13: microbioma do esconderijo (PixelLab) — mercadoria sob lona, fundo falso
+ob("sec_tarp_stack", 6050, 1080); ob("sec_tarp_stack", 6520, 1250)
+ob("sec_crate_tarp", 6230, 1030); ob("sec_crate_tarp", 5980, 1320); ob("sec_crate_open", 6560, 1420)
+
+# ── 14 Antessala do Almirante (P12: ponto de escolha — corredor / moto / mangue) ──
+# Microbioma PixelLab: mesa de mapas, estandartes, candelabros, balas — sala de guerra.
+facade_decor("antessala", [("iron_door", 400), ("poster", 900)])
+ob("adm_map_table", 3850, 2900); ob("adm_cannonballs", 3550, 2620)
+ob("adm_banner", 3700, 2460); ob("adm_banner", 4300, 2460)
+ob("adm_candelabra", 3400, 2750); ob("adm_candelabra", 4450, 2500)
+ob("pillar", 3350, 2600); ob("pillar", 4150, 2600); ob("pillar", 3650, 3050)
+crate_pile(3350, 3060, 0); barrels(4150, 3100, True)
+ob("lamp_post", 3600, 2980); ob("lamp_post", 4000, 2980)
+dec("symbol_1", 3900, 2800); dec("rope", 4050, 2500); dec("anchor", 4150, 3050)
+spawns("mix", [(3400, 2750), (3800, 2660), (4200, 2750), (3500, 2950), (4100, 3000)])
+
+# ── Ponte Temporal: 780 px/s × 20 s, west → east. Clear centre lane.
+for i in range(1, 19):
+    x = 4600 + i * 780
+    ob("crate" if i % 2 else "barrel_oil", x, -1530 if i % 2 else -1220)
+    dec("rope", x, -1580)
+    dec("rope", x, -1220)
+
+# ── Mangue: enclosed walking alternative, same destination, miniboss at centre.
+for i, x in enumerate(range(4900, 20000, 600)):
+    ob("mng_tree", x, -810)
+    ob("mng_tree", x + 250, -330)
+    ob("mng_roots", x + 120, -740 if i % 2 else -390)
+    dec("algae", x + 300, -550)
+    if i % 3 == 0:
+        spawns("forest", [(x + 300, -600)])
+    if i % 5 == 0:
+        hazard(min(x + 400, 20000), -790, 50)
 
 GROUPS = {"dock": ["crawler", "fish"], "mix": ["cult", "fish", "brute", "crawler"],
           "heavy": ["brute", "fish", "cult", "brute"], "cult": ["cult", "cult", "crawler"]}
+
+# Keep the arena's hand-authored composition after relocating it.
+for o in OB:
+    if 3000 <= o[0] < 5400 and 400 <= o[1] < 2200:
+        o[0] += 17200; o[1] -= 2200
+    elif 3200 <= o[0] < 4600 and 2400 <= o[1] < 3200:
+        o[1] -= 4200
+for d in DEC:
+    if 3000 <= d[0] <= 5400 and 300 <= d[1] < 2200:
+        d[0] += 17200; d[1] -= 2200
+    elif 3200 <= d[0] < 4600 and 2320 <= d[1] < 3200:
+        d[1] -= 4200
+for h in HAZ:
+    if 3000 <= h["p"][0] < 5400 and 400 <= h["p"][1] < 2200:
+        h["p"] = (h["p"][0] + 17200, h["p"][1] - 2200)
+for sp in SPAWNS:
+    if 3200 <= sp[0] < 4600 and 2400 <= sp[1] < 3200:
+        sp[1] -= 4200
+ROOM_STYLE["bridge"] = {"top": "none", "bottom": "quay", "left": "none", "right": "none", "quay_band": 20}
+WATER[:] = [(rid, rr) for rid, rr in WATER if rid not in ("boss", "antessala")]
+WATER.extend([("bridge", (4600, -1900, 15600, 300)), ("bridge", (4600, -1200, 15600, 300)),
+              ("boss", (20200, -2300, 3000, 500)), ("boss", (20200, 0, 3000, 500)),
+              ("boss", (19600, -1800, 600, 1800)), ("boss", (22900, -1800, 600, 1800))])
 
 # ─────────────────────────────────────────────────────────────── validação
 def rect_has(r, x, y): return r[0] <= x < r[0] + r[2] and r[1] <= y < r[1] + r[3]
@@ -475,6 +576,11 @@ GAPS[:] = [g for g in GAPS if not inside_room(g,"warehouse")]
 SPAWNS[:] = [p for p in SPAWNS if not any(inside_room(p,r) for r in ["warehouse","chapel"])]
 HAZ[:] = [h for h in HAZ if not any(inside_room(h["p"],r) for r in ["warehouse","chapel"])]
 OB.extend([(5100,6000,90,650,"maze_wall"),(5680,6370,90,530,"maze_wall")])
+# P13: microbioma PixelLab do Armazém — entra DEPOIS do strip (sala "maze" limpa ob()).
+for px, py, pk in [(4900, 5980, "wh_shelf"), (5450, 5980, "wh_shelf"), (6000, 5980, "wh_shelf"),
+                  (5300, 6150, "wh_pallet"), (6200, 6800, "wh_pallet"), (4900, 6650, "wh_pallet"),
+                  (5600, 6200, "wh_handcart"), (5050, 6850, "wh_handcart"), (6150, 6150, "wh_scale")]:
+    w, h = FOOT[pk]; OB.append([int(px - w / 2), int(py - h), w, h, pk])
 # 0.17 (Tarefa C): colunas interiores do Depósito — quebram o retângulo vazio.
 OB.extend([(6680,4280,90,470,"maze_wall"),(7420,3900,90,430,"maze_wall")])
 for pos,kind,phase in [((5300,6800),"spikes",0),((5470,6150),"darts",0.8),((6000,6510),"steam",1.6)]:
@@ -490,6 +596,9 @@ SQUADS = {
     "market": ["fish", "crawler", "guard", "bomber"],
     "cellar": ["crawler", "cult", "bomber"],
     "ammo": ["brute", "guard", "fish", "bomber"],
+    # P12: a Antessala é a ante-sala da escolha; o Mangue é a rota "difícil" a pé.
+    "antessala": ["cult", "guard", "crawler", "fish"],
+    "forest": ["brute", "guard", "bomber", "cult", "brute", "guard"],
 }
 counts = {}
 for point in SPAWNS:
@@ -545,6 +654,9 @@ def emit():
     L.append("const RAISED := [" + ", ".join(r2(r) for r in RAISED) + "]")
     L.append("const RAMPS := [\n\t" + ",\n\t".join(f'{{"r": {r2(r)}, "axis": "{a}", "low": {lo}, "high": {hi}}}' for r, a, lo, hi in RAMPS) + "]")
     L.append("const GAPS := [" + ", ".join(r2(r) for r in GAPS) + "]")
+    L.append("# P12: zona da ponte e segmentos que desabam durante a travessia de moto.")
+    L.append("const BRIDGE_ZONE := " + r2(BRIDGE_ZONE))
+    L.append("const BRIDGE_SEGS := " + val(BRIDGE_SEGS))
     L.append("")
     L.append("const POINTS := {\n\t" + ",\n\t".join(", ".join(f'"{k}": {v2(v)}' for k, v in ch) for ch in chunks(list(POINTS.items()), 4)) + "}")
     L.append("const CHESTS := [" + ", ".join(f"[{x}, {y}, {val(s)}]" for x, y, s in CHESTS) + "]")

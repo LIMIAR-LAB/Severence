@@ -1,0 +1,24 @@
+{
+  "character_id": "9d0d295a-e53c-4955-a33d-063031fd95f3",
+  "mode": "v3",
+  "animation_name": "harpoon-gun-fire-v2",
+  "action_description": "Standing fish-man aims and fires his HELD HARPOON GUN, not a throwing attack. Both hands grip the same wooden-stock metal harpoon gun throughout: rear hand on trigger, front hand under barrel. Raise stock against shoulder, point barrel forward in facing direction, fire once, short backward shoulder recoil, recover to ready. Feet planted. Compact motion, identical fish head clothing anatomy and weapon, fixed scale camera. Never throw an object or gun, never drop gun, no overhead windup, no open empty hand reaching forward, no projectile or muzzle flash baked into sprite. Poses: ready, raise gun, shoulder and aim, hold aim, fire/recoil, recoil settle, lower slightly, ready.",
+  "directions": [
+    "east",
+    "west"
+  ],
+  "frame_count": 8,
+  "keep_first_frame": true,
+  "animation_group_id": "3bb59f99-696f-4f70-976b-f9f9f681f16b",
+  "provider": "PixelLab v3; explicitly authorized",
+  "all_requested_directions": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ]
+}

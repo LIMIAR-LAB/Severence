@@ -4,6 +4,7 @@ extends Control
 const DATA := preload("res://scripts/equipment_data.gd")
 const InventoryData := preload("res://scripts/inventory_data.gd")
 const InventoryState := preload("res://scripts/inventory_state.gd")
+const WeaponVisuals := preload("res://scripts/weapon_visuals.gd")
 const DIR := "res://assets/ui/equipamento/"
 const INDUSTRIAL_DIR := DIR + "industrial/"
 const SIZE := Vector2(1344, 752)
@@ -27,7 +28,7 @@ var inventory: RefCounted
 var active_tab := 0
 var focus_id := ""
 var slots: Dictionary = {}
-var order: Array = ["padrao", "mecanico", "espiao", "omega", "azul", "titan", "spectre"]
+var order: Array = ["padrao", "mecanico", "espiao", "omega", "azul", "supernova", "titan", "spectre"]
 var card: TextureRect
 var card_lock: TextureRect
 var numbers: Array = []
@@ -100,7 +101,8 @@ func image(parent: Control, rect: Rect2, texture: Texture2D) -> TextureRect:
 	var node := TextureRect.new(); node.position = rect.position; node.size = rect.size; node.texture = texture
 	if texture != null and texture.resource_path == "res://assets/characters/marty/azul/front.tres": node.material = preload("res://assets/characters/marty/azul/palette.tres")
 	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; node.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(node); return node
+	node.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if texture != null and "items_hd_v1" in texture.resource_path else CanvasItem.TEXTURE_FILTER_NEAREST
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE; parent.add_child(node); return node
 
 func build() -> void:
 	size = SIZE; mouse_filter = Control.MOUSE_FILTER_PASS
@@ -108,7 +110,7 @@ func build() -> void:
 	backdrop.texture = tex("res://assets/environment/docks12/entry/desembarque_painted_v1.png" if mission_mode else "res://assets/environment/refuge/refuge_bg.png")
 	backdrop.size = SIZE; backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	backdrop.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST; backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(backdrop)
-	var veil := ColorRect.new(); veil.name = "ContextVeil"; veil.color = Color("061713b8"); veil.size = SIZE; veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(veil)
+	var veil := ColorRect.new(); veil.name = "ContextVeil"; veil.color = Color("061713e6"); veil.size = SIZE; veil.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(veil)
 	build_header()
 	status = label(self, Rect2(455, 707, 625, 25), "", 13, DIM); status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	host.live_status = status
@@ -327,8 +329,9 @@ func build_details_panel() -> void:
 	detail_rarity = label(page, Rect2(1022, 80, 268, 26), "", 13, TEAL)
 	detail_description_panel = panel(page, Rect2(1014, 104, 276, 120), Color("071b1d"), Color("316b69"))
 	detail_text = label(page, Rect2(1022, 112, 266, 110), "", 13, TEXT); detail_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	detail_stats = label(page, Rect2(838, 238, 452, 112), "", 13, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	detail_bars = Control.new(); detail_bars.name = "DetailStatBars"; detail_bars.position = Vector2(838, 354); detail_bars.size = Vector2(452, 112); page.add_child(detail_bars)
+	detail_stats = label(page, Rect2(838, 238, 452, 124), "", 13, TEXT); detail_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	detail_stats.clip_text = true
+	detail_bars = Control.new(); detail_bars.name = "DetailStatBars"; detail_bars.position = Vector2(838, 368); detail_bars.size = Vector2(452, 106); page.add_child(detail_bars)
 	comparison_panel = panel(page, Rect2(836, 18, 454, 448), Color("071b1d"), Color("316b69")); comparison_panel.visible = false
 	comparison_scroll = ScrollContainer.new(); comparison_scroll.name = "InventoryComparisonScroll"
 	comparison_scroll.position = Vector2(846, 28); comparison_scroll.size = Vector2(434, 428)
@@ -426,8 +429,8 @@ func refresh_stat_bars(rows: Array) -> void:
 		var raw := str(row[1])
 		var value := clampf(float(row[2]) * 100.0, 0.0, 100.0) if row.size() > 2 else raw.to_float()
 		if value <= 0.0: continue
-		var caption := label(detail_bars, Rect2(0, shown * 27, 118, 22), str(row[0]), 10, DIM)
-		var bar := ProgressBar.new(); bar.name = "StatBar_%d" % shown; bar.position = Vector2(122, shown * 27 + 3); bar.size = Vector2(326, 17)
+		var caption := label(detail_bars, Rect2(0, shown * 26, 118, 22), str(row[0]), 10, DIM)
+		var bar := ProgressBar.new(); bar.name = "StatBar_%d" % shown; bar.position = Vector2(122, shown * 26 + 3); bar.size = Vector2(326, 17)
 		bar.max_value = 100.0; bar.value = minf(value, 100.0); bar.show_percentage = false
 		bar.add_theme_stylebox_override("background", make_style(Color("071412"), Color("31504a"), 1, 2))
 		bar.add_theme_stylebox_override("fill", make_style(Color("2aa6a4"), TEAL, 1, 2)); detail_bars.add_child(bar)
@@ -441,7 +444,7 @@ func select_inventory(id: String) -> void:
 func refresh_inventory_details() -> void:
 	if detail_title == null: return
 	reset_comparison_view()
-	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 112)
+	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 124)
 	detail_stats.add_theme_font_size_override("font_size", 13)
 	var entry := InventoryData.item(inventory.selected_id)
 	if entry.is_empty():
@@ -450,6 +453,7 @@ func refresh_inventory_details() -> void:
 	var open: bool = transient or InventoryData.unlocked(entry, app.sim.unlocked)
 	var art_path := str(entry.get("arte", entry.get("icone", "")))
 	detail_art.texture = tex(art_path) if tex(art_path) != null else tex(str(entry.get("icone", "")))
+	detail_art.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR if detail_art.texture != null and "items_hd_v1" in detail_art.texture.resource_path else CanvasItem.TEXTURE_FILTER_NEAREST
 	detail_art.material = preload("res://assets/characters/marty/azul/palette.tres") if entry.get("loadout_id", "") == "azul" else null
 	detail_art.modulate = Color.WHITE if open else Color(0.28, 0.34, 0.33)
 	detail_title.text = entry.nome
@@ -535,7 +539,7 @@ func reset_comparison_view() -> void:
 	comparison_panel.visible = false; comparison_scroll.visible = false; comparison_rich.text = ""
 	detail_description_panel.visible = true; detail_text.visible = true; detail_stats.visible = true
 	detail_art.visible = true; detail_bars.visible = true
-	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 112)
+	detail_stats.position = Vector2(838, 238); detail_stats.size = Vector2(452, 124)
 	detail_stats.add_theme_font_size_override("font_size", 13)
 
 func comparison_tone(before: Dictionary, after: Dictionary) -> String:
@@ -656,7 +660,7 @@ func unequip_slot(slot: String) -> void:
 
 func reference_rows(kind: String, outfit: String = "padrao") -> Array:
 	var rows: Array = app.sim.loadout_stats(kind, outfit).duplicate(true)
-	if kind in ["omega", "azul"]:
+	if kind in ["omega", "azul", "supernova"]:
 		rows[0][0] = "ESCUDO TEMPORÁRIO"; rows[0][1] = "%d corações" % app.sim.OMEGA_SHIELD_HEARTS
 	if kind == "uniform":
 		var u: Dictionary = app.sim.UNIFORMS.get(outfit, app.sim.UNIFORMS.padrao)
@@ -689,7 +693,7 @@ func build_status() -> void:
 	var u: Dictionary = app.sim.UNIFORMS.get(host.outfit_choice, app.sim.UNIFORMS.padrao)
 	status_panel(20, "MARTY • " + str(u.name), "Referência do uniforme: " + str(u.weapon_name) + "\nA arma equipada é selecionada separadamente.", reference_rows("uniform", host.outfit_choice), "MartyReference")
 	var omega_ready := unlocked(host.armor_choice)
-	status_panel(449, DATA.item(host.armor_choice).get("nome", "TRANSFORMAÇÃO"), ("R transforma • F ou T: garra sob o alvo mais próximo." if host.armor_choice == "azul" else "R ativa a armadura e sua lâmina temporária.") if omega_ready else "Poder bloqueado.", reference_rows(host.armor_choice) if omega_ready else [], "OmegaReference")
+	status_panel(449, DATA.item(host.armor_choice).get("nome", "TRANSFORMAÇÃO"), DATA.item(host.armor_choice).get("descricao_curta","R ativa a transformação.") if omega_ready else "Poder bloqueado.", reference_rows(host.armor_choice) if omega_ready else [], "OmegaReference")
 	var robot: String = host.robot_choice if unlocked(host.robot_choice) else ""
 	status_panel(878, robot.to_upper() if robot != "" else "SEM ROBÔ", "C invoca • E pilota • consome combustível" if robot == "titan" else ("C invoca/recolhe • G funde/separa" if robot == "spectre" else "Selecione um robô na aba ROBÔS."), reference_rows(robot) if robot != "" else [], "RobotReference")
 	if not mission_mode:
@@ -699,11 +703,23 @@ func build_status() -> void:
 	update_status_condition()
 	var weapon_buttons: Array = []
 	var actor: Dictionary = app.sim.actors[host.gear_actor]
+	var weapon_scroll := ScrollContainer.new()
+	weapon_scroll.name = "WeaponSelector"
+	weapon_scroll.position = Vector2(30, 546); weapon_scroll.size = Vector2(1248, 44)
+	weapon_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	weapon_scroll.follow_focus = true
+	page.add_child(weapon_scroll)
+	var weapon_row := HBoxContainer.new(); weapon_row.add_theme_constant_override("separation", 12)
+	weapon_scroll.add_child(weapon_row)
 	for weapon in app.sim.available_weapons(actor):
 		var selected: String = weapon
-		var caption: String = {"pistol":"BLASTER", "shotgun":"ESCOPETA", "smg":"SUBMETRALHADORA", "bazooka":"BAZUCA"}[weapon]
-		var control := button(page, Rect2(30 + weapon_buttons.size()*305, 548, 290, 26), caption, func():
+		var caption: String = app.sim.WEAPON_NAMES.get(weapon, weapon.to_upper())
+		var control := button(weapon_row, Rect2(0, 0, 290, 28), caption, func():
 			if app.request_run_weapon(host.gear_actor, selected): update_status_condition(), "SelectWeapon_" + weapon)
+		control.custom_minimum_size = Vector2(290, 28)
+		control.icon = WeaponVisuals.texture(weapon)
+		control.expand_icon = true
+		control.add_theme_constant_override("icon_max_width", 44)
 		control.disabled = actor.mech or actor.dead
 		weapon_buttons.append(control)
 	update_status_condition()
@@ -714,14 +730,15 @@ func update_status_condition() -> void:
 	for weapon in app.sim.available_weapons(a):
 		var control := page.find_child("SelectWeapon_" + weapon, true, false) as Button
 		if control != null:
-			control.disabled = a.mech or a.dead
-			var caption: String = {"pistol":"BLASTER", "shotgun":"ESCOPETA", "smg":"SUBMETRALHADORA", "bazooka":"BAZUCA"}[weapon]
+			control.disabled = a.mech or a.dead or (a.armor and not app.sim.is_blue_form(a))
+			var caption: String = app.sim.WEAPON_NAMES.get(weapon, weapon.to_upper())
 			control.text = ("• " if app.sim.weapon_of(a) == weapon else "") + caption
 	var u: Dictionary = app.sim.UNIFORMS.get(host.outfit_choice, app.sim.UNIFORMS.padrao)
 	var omega_ready := unlocked(host.armor_choice)
 	var robot: String = host.robot_choice if unlocked(host.robot_choice) else ""
 	condition_label(Rect2(30, 438, 1200, 27), "CONDIÇÃO ATUAL • JOGADOR %d" % (host.gear_actor + 1), "MissionPlayer", GOLD)
 	var state := "CAÍDO" if a.get("dead", false) else ("PILOTANDO TITAN" if a.get("mech", false) else (("FORMA AZUL ATIVA" if a.get("armor_type", "omega") == "azul" else "ÔMEGA ATIVA") if a.get("armor", false) else ("EM FUSÃO" if a.get("fused", false) else "A PÉ")))
+	if app.sim.Supernova.active(a) and not a.dead: state="SUPERNOVA ATIVA"
 	var health := condition_label(Rect2(30, 476, 390, 65), "VIDA  %.1f / %d corações\n%s" % [float(a.hp) / app.sim.HEART, app.sim.BASE_HEARTS, state], "MissionHealth")
 	var omega_state := "ATIVA • %.0fs restantes" % ceilf(float(a.get("armor_time", 0))) if a.get("armor", false) else ("RECARREGANDO • %.0fs" % ceilf(float(a.get("armor_cd", 0))) if float(a.get("armor_cd", 0)) > 0 else ("INATIVA • pronta para ativar" if omega_ready else "BLOQUEADA"))
 	var shield := condition_label(Rect2(450, 476, 410, 65), "ESCUDO  %.1f / %d corações\n%s" % [float(a.get("shield", 0)) / app.sim.HEART, app.sim.OMEGA_SHIELD_HEARTS, omega_state], "MissionShield")
@@ -737,7 +754,8 @@ func update_status_condition() -> void:
 	var condition := condition_label(Rect2(880, 476, 400, 65), robot_text, "MissionRobot")
 	var ammo := condition_label(Rect2(30, 518, 1250, 24), "ARMA EQUIPADA • %s" % app.sim.weapon_name(a), "MissionAmmo", TEAL)
 	if a.get("mech", false): ammo.text = "CANHÃO TITAN EM USO • consome combustível"
-	elif a.get("armor", false): ammo.text += " • F / T: GARRA DO CHÃO" if a.get("armor_type", "omega") == "azul" else " • CORPO A CORPO: LÂMINA ÔMEGA"
+	elif a.get("armor", false): ammo.text += " • F / T: GARRA DO CHÃO" if a.get("armor_type", "omega") == "azul" else " • R2 / CLIQUE ESQUERDO: ESFERAS ÔMEGA"
+	if app.sim.Supernova.active(a): ammo.text="PLASMA SOLAR • CLIQUE ESQUERDO   |   F / T: PULSO SOLAR"
 	if a.get("run_weapons", {}).has("bazooka"):
 		ammo.text += "    |    BAZUCA %s • %d foguetes" % ["EM USO" if a.get("run_weapon", "") == "bazooka" and not a.get("mech", false) else "GUARDADA", a.run_weapons.bazooka]
 

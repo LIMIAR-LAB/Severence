@@ -1,0 +1,101 @@
+{
+  "south": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-south.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "8ef6c6c6-54b8-4e43-b0b8-30b043c09265",
+    "source_anchor": [
+      66,
+      112
+    ],
+    "fire_frame": 7,
+    "recover_frame": 8
+  },
+  "north": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-north.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "51061dfc-9409-46ac-bc1f-929953efdbbe",
+    "source_anchor": [
+      60,
+      112
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7
+  },
+  "south-east": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-south-east.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "source_anchor": [
+      69,
+      113
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7
+  },
+  "north-east": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-north-east.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "source_anchor": [
+      62,
+      112
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7
+  },
+  "east": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-east.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "93e47c8c-e113-4ecc-a490-b485a9433193",
+    "source_anchor": [
+      62,
+      113
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7
+  },
+  "south-west": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-south-west.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "mirror:9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "source_anchor": [
+      63,
+      113
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7,
+    "mirrored_from": "south-east"
+  },
+  "north-west": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-north-west.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "mirror:2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "source_anchor": [
+      60,
+      112
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7,
+    "mirrored_from": "north-east"
+  },
+  "west": {
+    "path": "res://assets/enemies/motion_v3/fish/attack-west.png",
+    "frames": 9,
+    "duration": 1.0,
+    "job_id": "mirror:93e47c8c-e113-4ecc-a490-b485a9433193",
+    "source_anchor": [
+      63,
+      113
+    ],
+    "fire_frame": 5,
+    "recover_frame": 7,
+    "mirrored_from": "east"
+  }
+}

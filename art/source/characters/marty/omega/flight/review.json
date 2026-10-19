@@ -1,0 +1,24 @@
+{
+  "source_character": "036c6e2f-d296-478d-acd5-c3597bdbc3e3",
+  "approved_flight_state": "465590a4-dc1f-474b-af69-7384493b2184",
+  "rejected_animation_group": "a23e37d5-be87-4eb9-a964-3cc62f3b77f9",
+  "rejection_reason": "Initial v3 sequence changed facing and raised hands in several profiles; replaced by dedicated native pose state.",
+  "cell": 112,
+  "native_rotation": 96,
+  "packing": "8px transparent padding; no resizing, repainting or repeated fake animation frames",
+  "flight_frames_per_direction": 1,
+  "directions": 8,
+  "effects": "Four continuous procedural nozzles; near palms in front of cape; far limbs occluded in profile; feet behind body",
+  "landing": "0.14s renderer-only release; no writes to simulation actors",
+  "tests": {
+    "omega_flight": {
+      "checks": 30,
+      "failures": 0
+    },
+    "omega_combat_failures": 0,
+    "marty_actions_failures": 0
+  },
+  "capture": "DockView + Expedition; no main/save lifecycle. Contact sheet, runtime eight views and jump/landing sequence.",
+  "manual_playtest": false,
+  "runtime_asset_sha256": "d49aea75bd48030db3c9c19e0b1bdb2bda48e0acb81258392b8802658e1eb4b0"
+}

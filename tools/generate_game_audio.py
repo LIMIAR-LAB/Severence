@@ -108,7 +108,15 @@ def make_sfx():
     sounds['pickup'] = sum(np.sin(2*np.pi*f*t)*env(t,.14,.003)*a for f,a in [(659.25,.45),(987.77,.3),(1318.51,.2)])
     t = timeline(.12)
     sounds['dry_fire'] = ring(t,1850,.015,4)*.3+noise(t,900,9000)*env(t,.006)
-    return {k:finish(v, .62 if k in ['pickup','dry_fire','jump'] else .78) for k,v in sounds.items()}
+    # Lore das Docas (Passo 1): sussurro da fissura — sílabas mudas em ruído filtrado,
+    # formação "consonantal" espectral e um deslize grave que resolve como água escura.
+    t = timeline(1.9)
+    breath = noise(t, 700, 3600)
+    syllables = (.28 + .72*np.sin(2*np.pi*2.7*t)**2) * (.55 + .45*np.sin(2*np.pi*4.6*t + 1.3)**2)
+    formant = noise(t, 1800, 2600) * np.sin(2*np.pi*6.1*t)**4
+    slide = sweep(t, 95, 62, .9) * env(t, 1.3, .5)
+    sounds['whisper'] = breath * syllables * env(t, 1.15, .4) + .35*formant*env(t, 1.0, .3) + .22*slide
+    return {k:finish(v, .5 if k == 'whisper' else (.62 if k in ['pickup','dry_fire','jump'] else .78)) for k,v in sounds.items()}
 
 
 def hz(midi):

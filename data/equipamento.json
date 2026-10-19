@@ -10,6 +10,7 @@
 		{"id": "dash", "nome": "DASH", "cor": "a57cff"}
 	],
 	"itens": [
+		{"id":"supernova","categoria":"armadura","nome":"ARMADURA SUPERNOVA","subtitulo":"reator solar","arma":"PLASMA SOLAR","raridade":"lendario","descricao_curta":"Plasma solar e pulso em área. R ativa.","descricao":"R ativa por 5 minutos: +3 corações de escudo, velocidade 430 e propulsores para atravessar vãos. Clique esquerdo: plasma solar, 32 de dano. F/T ou ataque corpo a corpo: pulso solar de 72 de dano, raio 210 e recarga de 6s. Ao terminar, a armadura recarrega em 60s.","icone":"res://assets/characters/marty/supernova/v1/front.tres","icone_bloqueado":"","card":"res://assets/characters/marty/supernova/v1/front.tres","desbloqueado_no_inicio":true,"desbloqueio":{"tipo":"inicio","texto":"Disponível no equipamento."},"atributos":{"vida":"+3","velocidade":"=430","golpe":"=72","dash":"=0.3"}},
 		{
 			"id": "padrao", "categoria": "uniforme", "nome": "PADRÃO", "subtitulo": "equilibrado", "cor": "5fd6d8", "arma": "BLASTER", "raridade": "comum",
 			"descricao_curta": "Blaster de energia, cadência média.",
@@ -44,9 +45,9 @@
 			"atributos": {"vida": 3, "velocidade": 385, "golpe": 20, "dano": 82, "defesa": -10, "dash": 0.35}
 		},
 		{
-			"id": "omega", "categoria": "armadura", "nome": "ARMADURA ÔMEGA", "subtitulo": "lendária", "arma": "LÂMINA ÔMEGA", "raridade": "lendario",
+			"id": "omega", "categoria": "armadura", "nome": "ARMADURA ÔMEGA", "subtitulo": "lendária", "arma": "ENERGIA ÔMEGA", "raridade": "lendario",
 			"descricao_curta": "R: 5 min de poder, começa carregada.",
-			"descricao": "LENDÁRIA. Começa cada expedição carregada e, ao vestir com R, permanece ativa por 5 minutos (recarga de 60s; baús recarregam na hora). +3 corações de escudo, velocidade 430 e a Lâmina Ômega: combo de 3 cortes (38/38/64); o 3º solta uma onda que atravessa inimigos e o corte reflete tiros.",
+			"descricao": "LENDÁRIA. Começa cada expedição carregada e, ao vestir com R, permanece ativa por 5 minutos (recarga de 60s; baús recarregam na hora). +3 corações de escudo, velocidade 430 e a Energia Ômega: combo de 3 esferas azuis (38/38/64); a terceira é maior, atravessa inimigos e a emissão próxima reflete tiros.",
 			"icone": "res://assets/ui/equipamento/icones/icon_armadura_omega.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_armadura_omega_bloqueada.png",
 			"card": "res://assets/ui/equipamento/cards/card_armadura_omega.png",
@@ -58,22 +59,22 @@
 		{
 			"id": "titan", "categoria": "robo", "nome": "TITAN", "subtitulo": "robô pilotável", "arma": "CANHÃO PESADO", "raridade": "raro",
 			"descricao_curta": "C invoca, E pilota. Canhão e bombas.",
-			"descricao": "Robô de combate pesado. C invoca perto de você, E entra e sai. Canhão pesado (70 + 34 em área), bomba em arco com R e turbo segurando Shift. Gasta gasolina: procure galões nos baús.",
+			"descricao": "O mesmo Titan protegido pelo culto nos Guindastes: neutralize-o, recupere o chassi, restaure a energia no Último Gerador e extraia o núcleo do Almirante. C invoca, E pilota, R lança bomba e Shift ativa o turbo. Gasta gasolina.",
 			"icone": "res://assets/ui/equipamento/icones/icon_robo_titan.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_titan_bloqueado.png",
 			"card": "res://assets/ui/equipamento/cards/card_titan.png",
-			"desbloqueado_no_inicio": true,
-			"desbloqueio": {"tipo": "sala", "sala": "shop", "texto": "Encontre o Titan na Oficina das docas (sala 05)."},
+			"desbloqueado_no_inicio": false,
+			"desbloqueio": {"tipo": "chefe", "texto": "Complete A Máquina do Culto: chassi nos Guindastes, energia do Gerador e núcleo extraído do Almirante."},
 			"atributos": {"vida": "+6", "velocidade": "=190", "golpe": "=55", "dano": "=82"}
 		},
 		{
 			"id": "spectre", "categoria": "robo", "nome": "SPECTRE", "subtitulo": "companheiro", "arma": "RAIO DE ENERGIA", "raridade": "raro",
 			"descricao_curta": "C invoca: acompanha e atira. G funde.",
-			"descricao": "Predador simbionte de apoio. C invoca: ele acompanha e atira sozinho (9 de dano). G funde com Marty: mais velocidade e dano, e a energia do Spectre absorve os golpes.",
+			"descricao": "Chassi de apoio recuperado no Último Gerador; o Spectre original continua desaparecido com Íris. C invoca: ele acompanha e atira sozinho (9 de dano). G funde com Marty: mais velocidade e dano, e a energia do Spectre absorve os golpes.",
 			"icone": "res://assets/ui/equipamento/icones/icon_robo_spectre.png",
 			"icone_bloqueado": "res://assets/ui/equipamento/icones/icon_robo_spectre_bloqueado.png",
 			"card": "res://assets/ui/equipamento/cards/card_spectre.png",
-			"desbloqueado_no_inicio": true,
+			"desbloqueado_no_inicio": false,
 			"desbloqueio": {"tipo": "desafio", "texto": "Conclua o desafio do Último Gerador (sala 06)."},
 			"atributos": {"velocidade": "=360", "dano": "x1.69", "defesa": "+20"}
 		}

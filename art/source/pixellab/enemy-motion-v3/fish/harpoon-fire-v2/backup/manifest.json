@@ -1,0 +1,174 @@
+{
+  "cell": 128,
+  "pivot": [
+    64,
+    112
+  ],
+  "world_scale": 0.8279569892473119,
+  "clips": {
+    "walk": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-south.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "a28cccdd-eb7c-42ec-a470-47f15b814b41",
+        "source_anchor": [
+          66,
+          112
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "694269b9-fb5a-4ec7-a73c-bdd24b9df013",
+        "source_anchor": [
+          62,
+          113
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-north.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "5b0345bd-233f-47e8-b72e-7106235e9275",
+        "source_anchor": [
+          60,
+          112
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "3be3e729-4318-4f9c-bf93-3f23e8d8fdd5",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-south-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "46e6dfce-cf57-4be2-a09f-0a3f8061f568",
+        "source_anchor": [
+          69,
+          113
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-south-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "mirror:46e6dfce-cf57-4be2-a09f-0a3f8061f568",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-north-east.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "reuse-north",
+        "source_anchor": [
+          60,
+          112
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/fish/walk-north-west.png",
+        "frames": 17,
+        "duration": 0.9,
+        "job_id": "reuse-north",
+        "source_anchor": [
+          60,
+          112
+        ]
+      }
+    },
+    "attack": {
+      "south": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-south.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "5d4ddb74-1a02-4269-a2dc-211806ac3815",
+        "source_anchor": [
+          66,
+          112
+        ]
+      },
+      "east": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-east.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "f0dd462b-a585-48d8-98e0-d6ce24f38155",
+        "source_anchor": [
+          62,
+          113
+        ]
+      },
+      "west": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-west.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "edd9dd63-1b67-4580-911a-9c85b7e38e24",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "north-east": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-north-east.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "9236bdf3-4390-4b73-ad6e-8493981277f0",
+        "source_anchor": [
+          60,
+          112
+        ]
+      },
+      "south-east": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-south-east.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "2bc89a0e-9786-41f9-8a52-952aec405907",
+        "source_anchor": [
+          69,
+          113
+        ]
+      },
+      "north": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-north.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "c1be29a5-a680-4161-9317-dd3dee3c1112",
+        "source_anchor": [
+          60,
+          112
+        ]
+      },
+      "south-west": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-south-west.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "24451e12-e25e-4969-8051-a235405d887b",
+        "source_anchor": [
+          63,
+          113
+        ]
+      },
+      "north-west": {
+        "path": "res://assets/enemies/motion_v3/fish/attack-north-west.png",
+        "frames": 8,
+        "duration": 1.0,
+        "job_id": "e2d4acb5-902a-48c4-99e8-6932baf99ac3",
+        "source_anchor": [
+          60,
+          112
+        ]
+      }
+    }
+  }
+}

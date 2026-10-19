@@ -22,10 +22,12 @@ var fps_limit := 0
 var view := "normal"
 var pixel_perfect := false
 var ui_scale := 1.0
+var camera_shake := 1.0
+var screen_flash := 1.0
 
 func to_dict() -> Dictionary:
 	return {"resolution": [resolution.x, resolution.y], "mode": mode, "vsync": vsync, "fps_limit": fps_limit,
-		"view": view, "pixel_perfect": pixel_perfect, "ui_scale": ui_scale}
+		"view": view, "pixel_perfect": pixel_perfect, "ui_scale": ui_scale, "camera_shake": camera_shake, "screen_flash": screen_flash}
 
 func from_dict(data: Dictionary) -> void:
 	var r = data.get("resolution", [])
@@ -37,6 +39,11 @@ func from_dict(data: Dictionary) -> void:
 	pixel_perfect = data.get("pixel_perfect", pixel_perfect) == true
 	var us := float(data.get("ui_scale", ui_scale))
 	ui_scale = us if us in UI_SCALES else 1.0
+	camera_shake = comfort_value(data.get("camera_shake", 1.0))
+	screen_flash = comfort_value(data.get("screen_flash", 1.0))
+
+static func comfort_value(value) -> float:
+	return clampf(float(value), 0.0, 1.0) if (value is float or value is int) and is_finite(float(value)) else 1.0
 
 func camera_zoom() -> float:
 	return VIEWS[view]

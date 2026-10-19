@@ -1,0 +1,629 @@
+{
+  "character": {
+    "id": "812c6637-c0c0-461a-bce5-22da22348ad7",
+    "name": "Se transformando em",
+    "prompt": "Cocky, irreverent young adult male mech pilot, chibi proportions about 2 heads tall, huge head, stubby limbs, cartoonish and caricatured, cute-grotesque style. Messy dark-brown spiky hair, defined jaw, light stubble, lopsided cocky grin, raised eyebrow, small scar on one cheek. Aviator goggles with cyan lenses pushed up on his forehead. Oversized worn brown leather bomber jacket with shearling collar, patched elbows, rolled-up sleeves, worn over a dark navy flight suit. White-and-steel futuristic armor fragments: one shoulder pauldron and a chest plate with thin glowing cyan lines. Right hand wears a chunky high-tech gauntlet with a glowing cyan palm core. Utility belt with pouches and a small holster. Dark cargo pants tucked into heavy boots with glowing cyan thruster soles. Tiny backpack thruster with a cyan vent. Confident, swaggering, relaxed posture with a playful smirk \u2014 casual and cocky, not a stiff hero pose. Thick 1-pixel dark outline, flat colors, simple 2-3 tone shading, no gradients, no smooth 3D, no painterly blur.\n",
+    "size": {
+      "width": 80,
+      "height": 80
+    },
+    "directions": 8,
+    "view": "low top-down"
+  },
+  "spritesheet": {
+    "path": "Cocky_irreverent_young_a-Se_transformando_em.png",
+    "cell_size": {
+      "width": 112,
+      "height": 112
+    },
+    "sheet_size": {
+      "width": 1008,
+      "height": 8288
+    },
+    "columns": 9,
+    "pivot": "cell-center",
+    "rows": [
+      {
+        "row": 0,
+        "type": "rotations",
+        "frame_count": 8,
+        "directions": [
+          "south",
+          "south-east",
+          "east",
+          "north-east",
+          "north",
+          "north-west",
+          "west",
+          "south-west"
+        ]
+      },
+      {
+        "row": 1,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "south"
+      },
+      {
+        "row": 2,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "south-east"
+      },
+      {
+        "row": 3,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "east"
+      },
+      {
+        "row": 4,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "north-east"
+      },
+      {
+        "row": 5,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "north"
+      },
+      {
+        "row": 6,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "north-west"
+      },
+      {
+        "row": 7,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "west"
+      },
+      {
+        "row": 8,
+        "type": "animation",
+        "frame_count": 9,
+        "animation": "animating",
+        "animation_group_id": "1a98492f-299c-4bb0-a67f-8efe178a78f5",
+        "direction": "south-west"
+      },
+      {
+        "row": 9,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "south"
+      },
+      {
+        "row": 10,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "south-east"
+      },
+      {
+        "row": 11,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "east"
+      },
+      {
+        "row": 12,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "north-east"
+      },
+      {
+        "row": 13,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "north"
+      },
+      {
+        "row": 14,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "north-west"
+      },
+      {
+        "row": 15,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "west"
+      },
+      {
+        "row": 16,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Melee Swing 8-dir",
+        "animation_group_id": "43c14ead-4467-4f93-b5a1-f69595c6a36c",
+        "direction": "south-west"
+      },
+      {
+        "row": 17,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "south"
+      },
+      {
+        "row": 18,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "south-east"
+      },
+      {
+        "row": 19,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "east"
+      },
+      {
+        "row": 20,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "north-east"
+      },
+      {
+        "row": 21,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "north"
+      },
+      {
+        "row": 22,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "north-west"
+      },
+      {
+        "row": 23,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "west"
+      },
+      {
+        "row": 24,
+        "type": "animation",
+        "frame_count": 3,
+        "animation": "Shoot Recoil 8-dir",
+        "animation_group_id": "6bd32bb7-3243-48b1-9abc-fc596a5f61a4",
+        "direction": "south-west"
+      },
+      {
+        "row": 25,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "south"
+      },
+      {
+        "row": 26,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "south-east"
+      },
+      {
+        "row": 27,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "east"
+      },
+      {
+        "row": 28,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "north-east"
+      },
+      {
+        "row": 29,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "north"
+      },
+      {
+        "row": 30,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "north-west"
+      },
+      {
+        "row": 31,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "west"
+      },
+      {
+        "row": 32,
+        "type": "animation",
+        "frame_count": 4,
+        "animation": "Idle Breathing 8-dir",
+        "animation_group_id": "78e8b29a-b922-46d3-b424-04a01f1f4573",
+        "direction": "south-west"
+      },
+      {
+        "row": 33,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "south"
+      },
+      {
+        "row": 34,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "south-east"
+      },
+      {
+        "row": 35,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "east"
+      },
+      {
+        "row": 36,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "north-east"
+      },
+      {
+        "row": 37,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "north"
+      },
+      {
+        "row": 38,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "north-west"
+      },
+      {
+        "row": 39,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "west"
+      },
+      {
+        "row": 40,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "falling backward",
+        "animation_group_id": "79b23070-927b-446e-8c26-bc62e5c86359",
+        "direction": "south-west"
+      },
+      {
+        "row": 41,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "south"
+      },
+      {
+        "row": 42,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "south-east"
+      },
+      {
+        "row": 43,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "east"
+      },
+      {
+        "row": 44,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "north-east"
+      },
+      {
+        "row": 45,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "north"
+      },
+      {
+        "row": 46,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "north-west"
+      },
+      {
+        "row": 47,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "west"
+      },
+      {
+        "row": 48,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Hurt 8-dir",
+        "animation_group_id": "a34503b9-58c4-4c1b-9616-4dd926454c3f",
+        "direction": "south-west"
+      },
+      {
+        "row": 49,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "south"
+      },
+      {
+        "row": 50,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "south-east"
+      },
+      {
+        "row": 51,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "east"
+      },
+      {
+        "row": 52,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "north-east"
+      },
+      {
+        "row": 53,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "north"
+      },
+      {
+        "row": 54,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "north-west"
+      },
+      {
+        "row": 55,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "west"
+      },
+      {
+        "row": 56,
+        "type": "animation",
+        "frame_count": 7,
+        "animation": "Surprise Uppercut",
+        "animation_group_id": "b1308135-c771-42a7-98c0-0ffed9b3d0a0",
+        "direction": "south-west"
+      },
+      {
+        "row": 57,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "south"
+      },
+      {
+        "row": 58,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "south-east"
+      },
+      {
+        "row": 59,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "east"
+      },
+      {
+        "row": 60,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "north-east"
+      },
+      {
+        "row": 61,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "north"
+      },
+      {
+        "row": 62,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "north-west"
+      },
+      {
+        "row": 63,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "west"
+      },
+      {
+        "row": 64,
+        "type": "animation",
+        "frame_count": 6,
+        "animation": "Dodge Roll 8-dir",
+        "animation_group_id": "cfad306f-c95f-466e-ad36-7fcb5b27c3bc",
+        "direction": "south-west"
+      },
+      {
+        "row": 65,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "south"
+      },
+      {
+        "row": 66,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "south-east"
+      },
+      {
+        "row": 67,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "east"
+      },
+      {
+        "row": 68,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "north-east"
+      },
+      {
+        "row": 69,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "north"
+      },
+      {
+        "row": 70,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "north-west"
+      },
+      {
+        "row": 71,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "west"
+      },
+      {
+        "row": 72,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running 8-dir",
+        "animation_group_id": "d7001378-e95a-463e-8f95-67c13a5f7257",
+        "direction": "south-west"
+      },
+      {
+        "row": 73,
+        "type": "animation",
+        "frame_count": 8,
+        "animation": "Running",
+        "animation_group_id": "fa702e0a-6294-4882-b4f2-61375eae63c3",
+        "direction": "south-west"
+      }
+    ]
+  },
+  "export_version": "1.0",
+  "export_date": "2026-10-01T13:22:01.684298+00:00"
+}

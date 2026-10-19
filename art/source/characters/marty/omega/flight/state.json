@@ -1,0 +1,15 @@
+{
+  "character_id": "465590a4-dc1f-474b-af69-7384493b2184",
+  "source_id": "036c6e2f-d296-478d-acd5-c3597bdbc3e3",
+  "pose": "Upright flight; straight parallel legs; both open palms below hips facing ground; exact original design and facings",
+  "rotations": {
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/south.png?t=1791071974",
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/east.png?t=1791071974",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/north.png?t=1791071974",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/west.png?t=1791071974",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/south-east.png?t=1791071974",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/north-east.png?t=1791071974",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/north-west.png?t=1791071974",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/465590a4-dc1f-474b-af69-7384493b2184/rotations/south-west.png?t=1791071974"
+  }
+}

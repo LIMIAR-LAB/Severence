@@ -39,7 +39,7 @@ func _init() -> void:
 	s.bullets.clear(); guard.face = Vector2.LEFT
 	s.add_bullet(Vector2(525, 500), Vector2.LEFT, 0, 100, 200, 4, 0, "p_pistol")
 	s.step_enemies(0.016); s.step_bullets(0.05)
-	check(guard.hp <= 0, "Guard morre com tiro pelas costas")
+	check(is_equal_approx(guard.hp, hp_before - 100), "Guard recebe todo o dano do tiro pelas costas")
 
 	# A primeira onda de elite (5) mostra portais e materializa um Warden após 0,8s.
 	s = arena(); s.arena_wave = 4; s.spawn_arena_wave()

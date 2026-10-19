@@ -1,0 +1,173 @@
+[
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "south",
+    "job_id": "8ef6c6c6-54b8-4e43-b0b8-30b043c09265",
+    "source_dir": "fish/harpoon-fire-v2/raw/south-8ef6c6c6-54b8-4e43-b0b8-30b043c09265",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/0.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/1.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/2.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/3.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/4.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/5.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/6.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/7.png?t=1791066428578",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/8ef6c6c6-54b8-4e43-b0b8-30b043c09265/south/8.png?t=1791066428578"
+    ],
+    "approved": true,
+    "fire_frame": 7,
+    "recover_frame": 8
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "south-west",
+    "job_id": "mirror:9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "source_dir": "fish/harpoon-fire-v2/raw/south-east-9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/0.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/1.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/2.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/3.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/4.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/5.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/6.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/7.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/8.png?t=1791066149094"
+    ],
+    "approved": true,
+    "mirrored_from": "south-east",
+    "reference_policy": "existing walk frame0; generated frames mirrored within each native cell"
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "north-west",
+    "job_id": "mirror:2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "source_dir": "fish/harpoon-fire-v2/raw/north-east-2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/0.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/1.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/2.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/3.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/4.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/5.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/6.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/7.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/8.png?t=1791065989843"
+    ],
+    "approved": true,
+    "mirrored_from": "north-east",
+    "reference_policy": "existing walk frame0; generated frames mirrored within each native cell"
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "north",
+    "job_id": "51061dfc-9409-46ac-bc1f-929953efdbbe",
+    "source_dir": "fish/harpoon-fire-v2/raw/north-51061dfc-9409-46ac-bc1f-929953efdbbe",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/0.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/1.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/2.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/3.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/4.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/5.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/6.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/7.png?t=1791066418764",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/51061dfc-9409-46ac-bc1f-929953efdbbe/north/8.png?t=1791066418764"
+    ],
+    "approved": true,
+    "frame_order": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      8
+    ]
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "south-east",
+    "job_id": "9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "source_dir": "fish/harpoon-fire-v2/raw/south-east-9892394e-1526-4b85-a2ff-48dc13226b4d",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/0.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/1.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/2.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/3.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/4.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/5.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/6.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/7.png?t=1791066149094",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/9892394e-1526-4b85-a2ff-48dc13226b4d/south-east/8.png?t=1791066149094"
+    ],
+    "approved": true
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "north-east",
+    "job_id": "2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "source_dir": "fish/harpoon-fire-v2/raw/north-east-2bc14dd7-5145-415c-a0b1-373a7270498b",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/0.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/1.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/2.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/3.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/4.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/5.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/6.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/7.png?t=1791065989843",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/2bc14dd7-5145-415c-a0b1-373a7270498b/north-east/8.png?t=1791065989843"
+    ],
+    "approved": true
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "west",
+    "job_id": "mirror:93e47c8c-e113-4ecc-a490-b485a9433193",
+    "source_dir": "fish/harpoon-fire-v2/raw/east-93e47c8c-e113-4ecc-a490-b485a9433193",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/0.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/1.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/2.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/3.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/4.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/5.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/6.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/7.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/8.png?t=1791065617781"
+    ],
+    "approved": true,
+    "mirrored_from": "east",
+    "reference_policy": "existing walk frame0; generated frames mirrored within each native cell"
+  },
+  {
+    "kind": "fish",
+    "action": "attack",
+    "direction": "east",
+    "job_id": "93e47c8c-e113-4ecc-a490-b485a9433193",
+    "source_dir": "fish/harpoon-fire-v2/raw/east-93e47c8c-e113-4ecc-a490-b485a9433193",
+    "frames": [
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/0.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/1.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/2.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/3.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/4.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/5.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/6.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/7.png?t=1791065617781",
+      "https://backblaze.pixellab.ai/file/pixellab-characters/acccde46-716d-43ee-8075-f974ba3eb5d4/9d0d295a-e53c-4955-a33d-063031fd95f3/animations/93e47c8c-e113-4ecc-a490-b485a9433193/east/8.png?t=1791065617781"
+    ],
+    "approved": true
+  }
+]

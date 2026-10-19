@@ -1,0 +1,84 @@
+{
+  "provider": "PixelLab v3",
+  "character_id": "9d0d295a-e53c-4955-a33d-063031fd95f3",
+  "group": "3bb59f99-696f-4f70-976b-f9f9f681f16b",
+  "rejected": [
+    "west original and west retry: gun points opposite facing",
+    "south-west: shoots right",
+    "north-west: flash at stock",
+    "north/south: transverse barrel"
+  ],
+  "muzzle_pixels_at_fire_pose5": {
+    "east": [
+      92,
+      60
+    ],
+    "west": [
+      35,
+      60
+    ],
+    "south-east": [
+      101,
+      58
+    ],
+    "south-west": [
+      26,
+      58
+    ],
+    "north-east": [
+      112,
+      49
+    ],
+    "north-west": [
+      15,
+      49
+    ],
+    "south": [
+      68,
+      66
+    ],
+    "north": [
+      64,
+      23
+    ]
+  },
+  "pivot": [
+    64,
+    112
+  ],
+  "scale": 0.8279569892473119,
+  "actor_visual_scale": 1.12,
+  "preserved": "walk and all unrelated enemies; existing combat timing damage speed",
+  "cost_generations": 33,
+  "approved": [
+    "south",
+    "north",
+    "south-east",
+    "north-east",
+    "east",
+    "south-west",
+    "north-west",
+    "west"
+  ],
+  "completed_groups": {
+    "south": "3ffa9f42-16d4-4d0d-baef-fe7ec24c7dee",
+    "north": "1a556312-78f1-44c9-8246-398b4ec22545"
+  },
+  "fire_frames": {
+    "south": 7,
+    "others": 5
+  },
+  "north_frame_order": [
+    0,
+    1,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    8
+  ],
+  "walk_byte_identical": true,
+  "reimport": "jobs.json packed_native_sheet retains reviewed native atlas and clip metadata"
+}

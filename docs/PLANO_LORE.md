@@ -5,6 +5,14 @@
 > (épicos de infra roguelike já aprovados). Este documento cobre o CONTEÚDO da lore;
 > os épicos 1-5 cobrem a espinha de run/meta/seed.
 
+## Consolidação implementada — 03/10/2026
+
+A primeira vitória nas Docas concede a peça TITAN-01, a ligação entre o selo da Ordem e o ataque à nave e o sinal de Letícia. O diário em Missões conserva essas pistas e apresenta os quatro tripulantes desaparecidos; sinal recuperado não é resgate nem desbloqueio jogável. A regra é garantida na primeira vitória, sem sorteio de personagem.
+
+Coral se apresenta como dissidente do ritual do Almirante. O acordo protege trabalhadores na Adega e não converte Marty à Ordem. O chassi Spectre obtido no Gerador é um apoio; Íris e o Spectre original continuam desaparecidos. Titan segue a primeira vitória; Spectre segue o desafio. Perfis existentes mantêm seus desbloqueios.
+
+O restante deste plano contém propostas e decisões históricas; esta atualização substitui abaixo as descrições de pista ausente, recompensa apenas de Ômega e Guardião ainda sem nome. Veja [entrega e validação](REVISAO_IMPLEMENTADA_2026-10-03.md).
+
 ## Divisão em duas partes (DECIDIDO)
 
 **Parte A — PRÉ-VENDA:** Passos 0, 1 e 2. Entrega um jogo completo em si:
@@ -72,10 +80,9 @@ personagens jogáveis. É o que vai para pré-venda/early access.
   Balcão do Farol, Capela do Culto (story), Doque Seco, Adega Inundada, arena do
   Almirante, Contrabando (secreta).
 - **O Almirante das Profundezas**: boss 3 estágios + enrage (600 HP), portal de
-  extração pós-vitória, recompensa atual = núcleo + armadura Ômega desbloqueada.
+  extração pós-vitória; primeira vitória concede peça TITAN-01, selo da Ordem e sinal de Letícia. Ômega já é inicial.
 - **Warden**: miniboss quadrúpede 420 HP, drop de baú dourado — corresponde ao
-  **Guardião da Maré** da lore (autômato corrompido). Falta batizar/amarrar na
-  narrativa.
+  **Guardião da Maré** da lore (autômato corrompido), já identificado no jogo.
 - Bestiário da Ordem: cult, fish, crawler (→crawler_small), brute, bomber, guard,
   elites com modificadores seedados (`mode == "run"` já existe com ~16% elite).
 - Refúgio hub (sala única), Desembarque com arte autoral + fenda animada.
@@ -95,8 +102,8 @@ personagens jogáveis. É o que vai para pré-venda/early access.
 | Eras: Japão (Vincent), Medieval (Elias), Laboratório (Íris), Região antiga (Letícia) | **Falta conteúdo** — mas o `biomes.json` + módulos já são o molde; hoje só `docks` + fixture de teste |
 | Portas do Refúgio para cada era | **Parcial** — portal "DOCAS / 1941" + "COORDENADA PERDIDA • BLOQUEADO" já existem no hub |
 | Resgate → personagem desbloqueável | **Framework pronto** — `unlocked`/`unlock()` persistem; tipos de desbloqueio data-driven (falta tipo "resgate"/era) |
-| Recompensa garantida de 1ª vitória | **Parcial** — vitória dá recompensa fixa; falta tabela de story beats garantidos por era |
-| Pista do ataque à nave por era | **Falta** — só ambientação (capela); sem sistema de pistas |
+| Recompensa garantida de 1ª vitória | **Docas implementada** — peça Titan, selo e sinal; outras eras seguem planejadas |
+| Pista do ataque à nave por era | **Docas implementada** — selo da Ordem, sinal de Letícia e diário persistente; demais eras planejadas |
 | Cinemática inicial | **Implementada como vídeo** — `intro.gd` toca `assets/video/opening.ogv` |
 | Arauto da Maré Negra + Cthulhu | **Falta** |
 | Horror cósmico sistêmico (vozes, sonhos, mutações) | **Parcial** — tentacle gates do Desembarque existem; falta sistema por era |
@@ -121,14 +128,19 @@ A lore e a arquitetura roguelike **se encaixam perfeitamente**:
 RunDirector, RunState/MetaState, seed, camada de variância. **Pré-requisito de
 tudo abaixo** — resgates e recompensas vivem no MetaState.
 
-### Passo 1 — Docas alinhadas à lore (polish narrativo)
-- Renomear/tematizar warden como **Guardião da Maré** (autômato corrompido pela
-  fissura — já é quadrúpede, 420 HP).
-- 1ª vitória sobre o Almirante → **peça do Titan + símbolo da Ordem** (recompensa
-  garantida, não sorteada) + retorno ao Refúgio.
-- Pista inicial: objeto/diálogo no final revelando que o ataque foi planejado.
-- Guardiões opcionais (7 em 55s) viram "pontos do ritual" das Docas.
-- Áudio/ambientação de horror: sussurros na água, sons perto da capela.
+### Passo 1 — Docas alinhadas à lore (polish narrativo) — IMPLEMENTADO
+- ~~Renomear/tematizar warden como **Guardião da Maré**~~ ✅ reveal ao se aproximar,
+  obituário e mensagem de abate nomeados (`simulation.gd`, `warden_intro_seen`).
+- ~~1ª vitória sobre o Almirante → **peça do Titan + símbolo da Ordem**~~ ✅
+  garantidos na primeira extração (`story_flags.peca_titan`/`simbolo_ordem`,
+  `first_victory_beat`); nota do relatório revela o ataque planejado e a baia do
+  Refúgio lista as relíquias. Saves antigos com `clears>=1` recebem as flags.
+- ~~Pista inicial~~ ✅ altar da capela interativo: primeira leitura entrega o selo
+  da Ordem da Maré Negra + 1 fragmento (`story_flags.ordem_pista`, persistente).
+- ~~Guardiões opcionais viram "pontos do ritual"~~ ✅ texto da missão renomeado.
+- ~~Áudio/ambientação de horror~~ ✅ `whisper.wav` procedural (generate_game_audio)
+  emitido na capela/adega e perto dos canais, sem consumir o RNG da expedição.
+- Cobertura: `tests/docks_lore_test.gd` (19 checks).
 
 ### Passo 2 — Sistema de personagens jogáveis
 - `CharacterDef` (dados): id, nome, atlas, cell_size, kit (armas/habilidades),

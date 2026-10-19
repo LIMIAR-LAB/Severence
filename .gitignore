@@ -9,6 +9,7 @@ __pycache__/
 *.import
 
 # Local tooling and temporary worktrees are not game source.
+/.devin/config.local.json
 /_dev-claude-wt/
 /addons/godot_mcp_toolkit/
 /addons/rmsmartshape/
@@ -17,3 +18,10 @@ __pycache__/
 # One-off local diagnostics.
 /tests/_dbg.gd
 /tests/_dbg.gd.uid
+
+# Local review snapshots and isolated test projects.
+/output/review-improvements/baseline/
+/output/isolated-tests/
+/output/export-staging/
+
+/output/weapon-energy/baseline/

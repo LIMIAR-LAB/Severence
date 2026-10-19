@@ -31,8 +31,8 @@ func _init() -> void:
 	a.hurt = 0; s.damage_actor(a, 8); check(a.hp == 15, "golpe comum tira meio coração")
 	a.hurt = 0; a.shield = 30.0
 	s.damage_actor(a, 20); check(a.hp == 15 and a.shield == 20.0, "escudo Ômega absorve o golpe antes da vida")
-	a.hurt = 0; a.jump = 0.4; s.damage_actor(a, 50)
-	check(a.hp == 15, "airborne damage rule is consistent")
+	a.hurt = 0; a.jump = 0.4; s.damage_actor(a, 50, "hazard", "acid")
+	check(a.hp == 15 and a.shield == 20.0, "normal jump clears ground acid without spending shield")
 	a.shield = 0.0
 	a.jump = 0
 	var old: Vector2 = a.p
@@ -69,17 +69,19 @@ func _init() -> void:
 	check(s.money == coins, "optional reward cannot repeat")
 	s.open_secret()
 	check(s.clear_at(DocksMap.SECRET_CORRIDOR.get_center(), 10) and s.clear_at(Vector2(6350, 1250), 10), "secret opens a traversable corridor")
-	check(s.height_at(Vector2(2060, 4100)) < s.height_at(Vector2(2240, 4100)), "ramp interpolates elevation")
+	check(s.height_at(Vector2(2060, 4100)) == 0 and s.height_at(Vector2(2240, 4100)) == 0, "published flat Farol has no legacy ramp elevation")
 	var blocked: Vector2 = s.move_body(Vector2(2650, 4400), Vector2(0, -150), 11)
-	check(blocked.y >= 4320, "raised balcony ledge cannot be walked through")
+	check(blocked.y <= 4251, "published flat Farol has no ghost balcony ledge")
 	var climbed: Vector2 = s.move_body(Vector2(2060, 4150), Vector2(300, 0), 11)
-	check(climbed.x > 2260 and s.height_at(climbed) == 44, "ramp allows walking onto raised balcony")
+	check(climbed.x > 2260 and s.height_at(climbed) == 0, "flat Farol remains traversable")
 	var route: PackedVector2Array = s.nav.get_point_path(s.nav.get_closest_point(DocksMap.POINTS.spawn), s.nav.get_closest_point(DocksMap.POINTS.boss))
 	check(route.size() > 2, "AI navigation connects arrival to boss")
 	a.dead = true; a.hp = 0; b.p = a.p + Vector2(30, 0); s.interact(b)
 	check(not a.dead and a.hp == s.HEART * 1.5, "partner can revive downed player")
 	a.p = DocksMap.POINTS.extraction; s.boss_dead = true; var before: int = s.materials
 	s.interact(a); wait_cockpit(s, a)
+	check(s.extract_state == "enter" and s.materials == before + 3, "extraction starts cinematic and grants reward once")
+	for i in range(80): s.step_extraction(0.05)
 	check(s.mode == "hub" and s.materials == before + 3 and s.armor_unlocked, "extraction awards permanent armor and returns to hub")
 	var copy = Sim.new(); copy.apply_snapshot(s.snapshot().duplicate(true))
 	check(copy.mode == s.mode and copy.actors[0].p == s.actors[0].p, "network state roundtrip")

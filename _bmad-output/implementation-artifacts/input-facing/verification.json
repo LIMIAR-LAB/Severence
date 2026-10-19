@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-03",
+  "engine": "Godot4.7.2",
+  "tests": {
+    "input_facing_test": {
+      "checks": 20,
+      "failures": 0
+    },
+    "dialogue_controller_regression_test": {
+      "checks": 21,
+      "failures": 0
+    }
+  },
+  "changed_runtime": [
+    "scripts/main.gd",
+    "scripts/world_view.gd"
+  ],
+  "simulation": "inspected, unchanged; consumes resolved cmd.aim",
+  "physical_controller_playtest": false,
+  "save_access": false,
+  "commit": false
+}

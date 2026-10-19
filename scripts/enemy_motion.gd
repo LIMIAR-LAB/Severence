@@ -6,7 +6,7 @@ var manifests: Dictionary = {}
 var textures: Dictionary = {}
 
 func load_assets() -> void:
-	for kind in ["crawler", "cult", "fish", "brute", "guard", "bomber"]:
+	for kind in ["crawler", "cult", "fish", "brute", "guard", "bomber", "golem"]:
 		var path := "res://assets/enemies/motion_v3/%s/manifest.json" % kind
 		if not FileAccess.file_exists(path): continue
 		var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -49,6 +49,17 @@ func sample(e: Dictionary, death_seconds: float = -1.0) -> Dictionary:
 	var count := int(clip.frames)
 	if action == "death": progress /= float(clip.duration)
 	var frame := clampi(int(progress * (count - 1)), 0, count - 1)
+	# Gun clips put the firing pose at the existing projectile emission instant.
+	# This changes visual sampling only, never warning/attack timers or damage.
+	if action == "attack" and clip.has("fire_frame"):
+		var fire_frame := int(clip.fire_frame)
+		var recover_frame := int(clip.get("recover_frame", count - 2))
+		if combat == "warning":
+			frame = clampi(int(progress / 0.25 * fire_frame), 0, fire_frame - 1)
+		elif combat == "attack":
+			frame = clampi(fire_frame + int((progress - 0.25) / 0.5 * (recover_frame - fire_frame)), fire_frame, recover_frame)
+		elif combat == "recover":
+			frame = clampi(recover_frame + int((progress - 0.75) / 0.25 * (count - 1 - recover_frame)), recover_frame, count - 1)
 	var scale: float = manifest.world_scale * (0.6 if e.kind == "crawler_small" else 1.0)
 	var cell := float(manifest.cell)
 	var pivot := Vector2(manifest.pivot[0], manifest.pivot[1])

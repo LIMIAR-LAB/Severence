@@ -1,0 +1,13 @@
+{
+  "character_id": "036c6e2f-d296-478d-acd5-c3597bdbc3e3",
+  "mode": "v3",
+  "animation_name": "upright-flight-palms-down",
+  "directions": [
+    "south",
+    "east"
+  ],
+  "frame_count": 8,
+  "keep_first_frame": true,
+  "action_description": "Upright vertical powered hovering flight, feet below hips, legs fully extended and parallel, NO crouching, NO jumping bent knees, NO walking strides. From starting pose lower BOTH arms alongside hips, slightly spread arms away from torso, straighten elbows and turn both palms toward ground. Both palms visible below hips, hands open flat facing DOWN to emit thrust. Keep this straight standing-in-air pose for middle frames with gentle cape flutter; finish still upright, never raised fists or forward punching. Keep original ivory gold cyan armor, closed helmet, short purple cape, exact same head size and proportions. Feet and palms unobscured. No weapons. Do NOT draw flames, jets, glows or smoke; thruster effects will be separate in game. Body stays fixed size and centered, no upward translation in canvas. Sequence lower arms, extend legs, hold stabilized upright hover. All thrust points face downward.",
+  "group": "a23e37d5-be87-4eb9-a964-3cc62f3b77f9"
+}

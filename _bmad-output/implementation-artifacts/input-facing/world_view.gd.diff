@@ -1,0 +1,25 @@
+--- world_view.gd.before
++++ world_view.gd
+@@ -1078,11 +1078,7 @@
+ 	return 3 if direction.y < 0 else 0
+ 
+ func fusion_visual_direction(a: Dictionary) -> Vector2:
+-	# Como no atlas básico do Marty: os pés comandam a vista durante a caminhada;
+-	# ao atacar, a silhueta volta a acompanhar a mira.
+-	if a.get("slash", 0.0) <= 0 and a.get("fire_flash", 0.0) <= 0:
+-		var movement: Vector2 = a.get("move", Vector2.ZERO)
+-		if movement.length() > 0.1: return movement.normalized()
++	# Input arbitration already resolves movement versus deliberate aim.
+ 	return a.get("aim", a.get("facing", Vector2.DOWN)).normalized()
+ 
+ func spectre_visual_direction(s: Dictionary) -> Vector2:
+@@ -1094,8 +1090,7 @@
+ 	var piloted: bool = m.get("occupant", -1) >= 0
+ 	if piloted:
+ 		var pilot: Dictionary = sim.actors[m.occupant]
+-		if pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0:
+-			return m.get("aim", Vector2.DOWN).normalized()
++		return pilot.get("aim", pilot.get("facing", Vector2.DOWN)).normalized()
+ 	if m.get("moving", false): return m.get("move_dir", m.get("facing", Vector2.DOWN)).normalized()
+ 	return m.get("aim", m.get("facing", Vector2.DOWN)).normalized()
+ 

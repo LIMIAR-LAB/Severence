@@ -6,7 +6,10 @@ const SIZE := Vector2(2500,1360.0*2500.0/2048.0)
 const SCALE := 2500.0/1927.0
 const Cut = preload("res://scripts/scenarios/sanctuary_fixed.gd")
 const FIXED_PILOT := true
-const WALK := [Rect2(145,210,1390,830),Rect2(1530,535,202,505),Rect2(0,521,250,166),Rect2(1700,537,227,137),Rect2(1255,0,130,220),Rect2(392,0,116,220),Rect2(1562,278,283,147),Rect2(1655,420,90,120)]
+# 0.22: o conector vertical 6→7→1 só sobrepunha ~5px nas duas pontas — margem
+# estreita o bastante para virar uma "parede invisível" (a arte pintada mostra
+# piso aberto, mas a colisão não conectava). Alarguei rect6/rect7/rect1 nesse trecho.
+const WALK := [Rect2(145,210,1390,830),Rect2(1530,515,202,525),Rect2(0,521,250,166),Rect2(1700,537,227,137),Rect2(1255,0,130,220),Rect2(392,0,116,220),Rect2(1562,278,283,187),Rect2(1655,420,90,120)]
 const BLOCKS := [Rect2(398,244,205,202),Rect2(879,272,231,140),Rect2(1018,169,151,92),Rect2(1202,542,208,134),Rect2(490,818,330,132),Rect2(1260,800,265,230),Rect2(1724,305,125,124),Rect2(1510,465,125,65),Rect2(170,184,119,54),Rect2(1490,175,44,127),Rect2(160,383,57,76),Rect2(160,927,55,104),Rect2(1668,899,60,135)]
 static func bounds(sim) -> Rect2:
 	return Rect2(ORIGIN+sim.room_offsets.get("cranes",Vector2.ZERO),SIZE)

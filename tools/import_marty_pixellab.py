@@ -13,7 +13,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = (
     ROOT
-    / "art/source/characters/marty/padrao/pixellab/export-v2"
+    / "art/source/characters/marty/padrao/pixellab/export-v3"
     / "Cocky_irreverent_young_a-Se_transformando_em.png"
 )
 OUTPUT = ROOT / "assets/characters/marty/padrao/pixellab"
@@ -28,11 +28,13 @@ ACTIONS = {
     "jump": (1, 9),
     "melee": (9, 6),
     "shoot": (17, 3),
+    "jab": (17, 3),      # lead-jab: primeiro golpe do combo de socos
     "idle": (25, 4),
     "defeat": (33, 7),
     "hurt": (41, 6),
-    "evade": (49, 6),
-    "run": (57, 8),
+    "uppercut": (49, 7), # surprise-uppercut: finalizador do combo de socos
+    "evade": (57, 6),
+    "run": (65, 8),
 }
 
 

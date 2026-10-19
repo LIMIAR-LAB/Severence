@@ -2,12 +2,18 @@ class_name DockView
 extends Node2D
 const DocksMap = preload("res://scripts/docks_map.gd")
 const SummonFX = preload("res://scripts/summon_fx.gd")
+const ExplosionVisuals = preload("res://scripts/explosion_visuals.gd")
 const BlueFormArt = preload("res://scripts/blue_form_art.gd")
 const ArrivalArt = preload("res://scripts/arrival_art.gd")
 var arrival_art := ArrivalArt.new()
 var cranes_painting = preload("res://scripts/scenarios/cranes_painting.gd").new()
 var warehouse_painting = preload("res://scripts/scenarios/warehouse_painting.gd").new()
+var remaining_painting = preload("res://scripts/scenarios/remaining_fixed.gd").new()
 const Scenery = preload("res://scripts/dock_scenery.gd")
+const WeaponVisuals = preload("res://scripts/weapon_visuals.gd")
+var bike_visuals := preload("res://scripts/bike_visuals.gd").new()
+var faisca_texture: Texture2D
+var faisca_region := Rect2()
 const FarolRuntime = preload("res://scripts/scenarios/farol_runtime.gd")
 var farol_renderer := FarolRuntime.new()
 
@@ -25,6 +31,11 @@ const NIGHT := Color(0.74, 0.78, 0.96)
 
 var sim: Expedition
 var marty_texture: Texture2D
+var dog_visuals := preload("res://scripts/dog_visuals.gd").new()
+var merchant_texture: Texture2D
+var merchant_visuals := preload("res://scripts/merchant_visuals.gd").new()
+var sanctuary_guardian_visuals := preload("res://scripts/sanctuary_guardian_visuals.gd").new()
+var world_detail_art := preload("res://scripts/world_detail_art.gd").new()
 var mech_texture: Texture2D
 var action_texture: Texture2D
 var floor_texture: Texture2D
@@ -39,6 +50,8 @@ var outfit_texture: Texture2D
 var marty_anim: Texture2D
 var marty_padrao_actions: Dictionary = {}
 var marty_omega_actions: Dictionary = {}
+const OmegaFlight = preload("res://scripts/omega_flight.gd")
+var omega_flight := OmegaFlight.new()
 var omega_assembly_texture: Texture2D
 var marty_roll: Dictionary = {}
 var marty_teleport: Dictionary = {}
@@ -48,6 +61,7 @@ var pixellab_enemy_art: Dictionary = {}
 const EnemyMotion = preload("res://scripts/enemy_motion.gd")
 var enemy_motion := EnemyMotion.new()
 var weapon_art: Dictionary = {}
+var omega_orb_art: Texture2D
 var cockpit_texture: Texture2D
 var marty_board_texture: Texture2D
 var titan_v2: Texture2D
@@ -56,19 +70,20 @@ var cobble_texture: Texture2D
 var enemy_texture: Texture2D
 var boss_art: Dictionary = {}
 var projectile_art: Dictionary = {}
+var screen_flash_strength := 1.0
 const OUTFIT_ROW := {"padrao": 0, "espiao": 1, "mecanico": 2, "omega": 3}
 const MARTY_ATLAS_PATH := "res://assets/marty/marty_anim_v3.png"
 const MARTY_PADRAO_ROOT := "res://assets/characters/marty/padrao/pixellab/"
 const MARTY_PADRAO_FRAMES := {
 	"idle": 4, "run": 8, "jump": 9, "evade": 6,
-	"shoot": 3, "melee": 6, "hurt": 6, "defeat": 7,
+	"shoot": 3, "melee": 6, "jab": 3, "uppercut": 7, "hurt": 6, "defeat": 7,
 }
 const MARTY_OMEGA_ROOT := "res://assets/characters/marty/omega/rounded_v4/"
 const MARTY_OMEGA_CELL := 112
 const MARTY_OMEGA_DRAW_SIZE := 124.0
 const MARTY_OMEGA_FRAMES := {
 	"idle": 4, "run": 8, "jump": 8, "evade": 7,
-	"melee": 6, "hurt": 6, "defeat": 8,
+	"melee": 6, "hurt": 6, "defeat": 8, "flight": 1,
 }
 const TITAN_ATLAS_PATH := "res://assets/mech/titan_mk2_walk.png"
 const SPECTRE_ATLAS_PATH := "res://assets/mech/spectre_octopus_v2.png"
@@ -79,7 +94,9 @@ const SPECTRE_ACTION_CELL := 128
 const FUSION_ACTION_CELL := 128
 const ENEMY_ROW := {"cult": 0, "fish": 1, "crawler": 2, "crawler_small": 2, "brute": 3}
 const PIXELLAB_ENEMY_VERSION := {"guard": "v1", "bomber": "v1", "cult": "v2", "fish": "v2", "crawler": "v2", "brute": "v2"}
-const PIXELLAB_ENEMY_SIZE := {"guard": 84.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
+# 0.22: guard (escudo, sala 02) desenhado maior — mesmo sprite, só em escala maior,
+# para combinar com o HP/dano mais altos (ver spawn_enemy em simulation.gd).
+const PIXELLAB_ENEMY_SIZE := {"guard": 118.0, "bomber": 72.0, "cult": 88.0, "fish": 88.0, "crawler": 96.0, "brute": 112.0}
 var refuge_bg: Texture2D
 var refuge_core: Texture2D
 const CORE_OFFSET := Vector2(548, 232)
@@ -123,6 +140,7 @@ func _ready() -> void:
 	for action in MARTY_OMEGA_FRAMES:
 		marty_omega_actions[action] = load(MARTY_OMEGA_ROOT + action + ".png")
 	omega_assembly_texture = load("res://assets/characters/marty/omega/assembly/omega_assembly_overlay_v1.png")
+	omega_flight.load_assets()
 	# 0.19: ações novas usam quadros e pivô idênticos, sem arma incorporada.
 	for direction in ["side", "front_diag", "back_diag"]:
 		marty_roll[direction] = load("res://assets/marty/marty_roll_%s_v1.png" % direction)
@@ -135,10 +153,18 @@ func _ready() -> void:
 	marty_board_texture = load("res://assets/mech/marty_board_titan.png")
 	for key in ["planks", "wall_side", "container_red", "container_blue", "container_olive", "pillar", "bollard", "generator", "altar", "pew", "ammo", "fishbox", "candles", "puddle", "anchor", "capsule", "crack", "key", "coin", "rug", "stairs"]:   # 0.15: props HD (tools/make_props_hd.py)
 		docks_art[key] = load("res://assets/environment/docks/" + key + ".png")
+	var capsule_path := "res://assets/environment/docks/capsule_naval_v2.png"
+	var merchant_path := "res://assets/npcs/merchant_hunchback_v1.png"
+	if ResourceLoader.exists(merchant_path): merchant_texture = load(merchant_path)
+	else: merchant_texture = ImageTexture.create_from_image(Image.load_from_file(merchant_path))
+	if ResourceLoader.exists(capsule_path): docks_art.capsule = load(capsule_path)
+	else: docks_art.capsule = ImageTexture.create_from_image(Image.load_from_file(capsule_path))
 	cobble_texture = load("res://assets/environment/cobble.png")
 	enemy_anim = load("res://assets/enemies/docas_anim.png")
 	for key in ["pistol", "shotgun", "smg", "bazooka", "omega", "omega_sword", "knife", "wrench", "sword_smear", "flash", "flash_cyan"]:
 		weapon_art[key] = load("res://assets/weapons/" + ("bazooka_v2" if key == "bazooka" else key) + ".png")
+	for key in WeaponVisuals.PATHS: weapon_art[key] = WeaponVisuals.texture(key)
+	omega_orb_art = load("res://assets/weapons/omega_orb_hd.png")
 	weapon_art["foguete"] = load("res://assets/ui/equipamento/icones/icon_foguete_v1.png")
 	for key in ["pistol", "smg", "pellet", "omega", "wave"]:
 		projectile_art["p_" + key] = load("res://assets/weapons/b_" + key + ".png")
@@ -159,6 +185,11 @@ func _ready() -> void:
 	light_layer.material = mat; light_layer.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	add_child(light_layer)
 
+static func projectile_size(texture_size: Vector2, team: int, kind: String, radius: float) -> Vector2:
+	if team == 0: return texture_size * 1.725 * 1.3
+	var length := clampf(radius * (4.8 if "harpoon" in kind else 3.2), 26.0, 72.0)
+	return texture_size * length / maxf(texture_size.x, texture_size.y)
+
 func text_at(p: Vector2, text: String, color: Color = GOLD, size: int = 14) -> void:
 	draw_string(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
 
@@ -171,6 +202,7 @@ func _draw() -> void:
 	if sim.mode == "hub": draw_refuge_back()
 	else: draw_expedition_ground()
 	draw_entities()
+	sim.Supernova.effects(self,sim)
 	if sim.mode == "hub": draw_refuge_front()
 	draw_screen_flash()
 
@@ -212,7 +244,9 @@ func draw_expedition_ground() -> void:
 	vis_floors = scenery.visible_floors(sim, vis_rooms)
 	var legacy_floors: Array = vis_floors.filter(func(area): return not FarolRuntime.owns(sim,area.get_center()))
 	scenery.draw_water(self, sim, vis_rooms, view)
+	# Water only: the backdrop never adds paving outside the real floors.
 	scenery.CorridorArt.backdrop(self,sim,vis_floors,view)
+	remaining_painting.backdrop(self,sim,vis_rooms,view)
 	arrival_art.draw_ground(self, sim, vis_rooms, view, scenery.lights)
 	scenery.draw_floors(self, sim, legacy_floors, vis_rooms, view)
 	scenery.draw_floor_grunge(self, sim, legacy_floors, view)
@@ -243,15 +277,33 @@ func draw_expedition_ground() -> void:
 		draw_rect(Rect2(r.end.x - 24 if high_left else r.position.x, r.position.y, 24, r.size.y), Color(0, 0, 0, 0.18))
 	for gap in sim.gaps:
 		if gap.intersects(view) and seen(gap.get_center(), gap.size.length()): scenery.draw_gap(self, sim, gap)
+	# P12: o próximo segmento da ponte pulsa em vermelho antes de cair.
+	if not sim.bike.is_empty() and sim.bridge_timer >= 0.0 and not sim.bridge_done:
+		var segs: Array = sim.bridge_segments()
+		if sim.bridge_broken.size() < segs.size():
+			var nseg: Rect2 = segs[sim.bridge_broken.size()]
+			if nseg.intersects(view):
+				draw_rect(nseg, Color(1, 0.3, 0.2, 0.18 + 0.18 * sin(sim.tick_time * 14)))
+				draw_rect(nseg, Color(1, 0.6, 0.3, 0.55), false, 2.0)
 	scenery.draw_walls(self, sim, legacy_floors, vis_rooms, view)
 	# Placa animada acima das paredes procedurais antigas e abaixo do gameplay.
-	farol_renderer.ground(self,sim,view)
-	for corridor_rect in vis_floors:
-		if scenery.is_corridor(corridor_rect,sim): scenery.draw_corridor_joins(self,corridor_rect,vis_rooms,view)
+	if not sim.RemainingFixed.owns(sim,"stairs"): farol_renderer.ground(self,sim,view)
 	scenery.draw_chapel_plate(self, sim, vis_rooms, view)
 	cranes_painting.ground(self,sim,vis_rooms,view)
 	warehouse_painting.ground(self,sim,vis_rooms,view)
+	remaining_painting.ground(self,sim,vis_rooms,view)
+	# Transition decks also cover connectors previously baked into room paintings.
+	var transition_parts: Array = scenery.CorridorArt.transition_surfaces(sim,vis_floors)
+	for route: Rect2 in scenery.CorridorArt.routes(sim):
+		var route_parts: Array = transition_parts.filter(func(part):return route.encloses(part))
+		if route_parts.is_empty(): continue
+		for part: Rect2 in route_parts:
+			scenery.draw_corridor_surface(self,route,part,view)
+		# One outline per route: fragments must not restart beams, bolts or lamps.
+		scenery.draw_corridor_edges(self,sim,route,view)
+		scenery.draw_corridor_joins(self,route,vis_rooms,view)
 	arrival_art.draw_rift(self, sim, scenery.lights)
+	if sim.mode=="run": sim.BikeHandling.draw(self,sim,view)
 	# decoração do chão (sob as entidades)
 	for h in sim.hazards:
 		if h.has("trap") and seen(h.p): scenery.draw_trap(self,sim,h,t)
@@ -260,6 +312,8 @@ func draw_expedition_ground() -> void:
 			if a.active and not a.dead and a.p.distance_to(h.p) < h.r + 90: alert = true
 		h["alert"] = alert
 	for d in sim.decor:
+		# Older saves may still contain the removed arena ritual prop.
+		if d.kind == "ritual_circle" and sim.room_at(d.p).get("id", "") == "boss": continue
 		if not view.has_point(d.p) or not seen(d.p, 120): continue
 		if scenery.chapel_hides_legacy(d.kind, d.p): continue
 		if scenery.is_flat(d.kind):
@@ -280,9 +334,7 @@ func draw_expedition_ground() -> void:
 		if room.is_empty() or not d.r.grow(200).intersects(view) or not seen(d.r.get_center(), 60): continue
 		if scenery.chapel_hides_gate(d.room, d.r): continue
 		if d.room=="entry" and d.side=="right" and sim.CranesFixed.active(sim): continue
-		if sim.CranesFixed.active(sim):
-			cranes_painting.gate(self,d,room.get("locked",false)); continue
-		if d.room=="cranes" and sim.CranesFixed.active(sim):
+		if (d.room in ["entry","cranes","warehouse"] and sim.CranesFixed.active(sim)) or sim.RemainingFixed.owns(sim,d.room):
 			cranes_painting.gate(self,d,room.get("locked",false)); continue
 		scenery.draw_gate(self, d, room.get("locked", false), t, room.r)
 	if sim.mode == "run":
@@ -344,6 +396,9 @@ func draw_obstacle(box: Rect2, kind: String) -> void:
 			var x := box.position.x
 			while x < box.end.x - 4:
 				crate(Rect2(x, box.position.y, minf(60, box.end.x - x), box.size.y)); x += 60
+		"mangrove":
+			var foot := Vector2(box.get_center().x, box.end.y)
+			scenery.draw_prop(self,"mng_tree",foot,sim.tick_time)
 		_: crate(box)
 
 func draw_entities() -> void:
@@ -358,22 +413,18 @@ func draw_entities() -> void:
 			draw_texture_rect(docks_art.key, Rect2(p - Vector2(12, 26), Vector2(24, 27)), false)
 		elif pickup.kind == "weapon":
 			draw_circle(p - Vector2(0, 13), 34, Color(0.35, 0.9, 1, 0.15))
-			draw_texture_rect(weapon_art.bazooka, Rect2(p - Vector2(42, 38), Vector2(84, 56)), false)
+			var pickup_weapon: String = pickup.get("weapon", "bazooka")
+			var pickup_size: Vector2 = WeaponVisuals.SIZES.get(pickup_weapon, Vector2(84, 56))
+			draw_texture_rect(weapon_art[pickup_weapon], Rect2(p - Vector2(pickup_size.x * 0.5, pickup_size.y + 6), pickup_size), false)
 		elif pickup.kind == "ammo":
 			draw_circle(p - Vector2(0, 9), 17, Color(1, 0.65, 0.3, 0.18))
 			draw_texture_rect(weapon_art.foguete, Rect2(p - Vector2(18, 29), Vector2(36, 36)), false)
 		elif pickup.kind == "fuel":
-			# Galão de gasolina (0.14): corpo vermelho com alça escura
 			draw_circle(p - Vector2(0, 10), 17, Color(1, 0.5, 0.25, 0.15))
-			draw_rect(Rect2(p - Vector2(7, 26), Vector2(14, 19)), Color(0.75, 0.16, 0.12))
-			draw_rect(Rect2(p - Vector2(7, 26), Vector2(14, 4)), Color(0.9, 0.3, 0.2))
-			draw_rect(Rect2(p - Vector2(4, 31), Vector2(8, 4)), Color(0.35, 0.2, 0.16))
+			draw_texture_rect(world_detail_art.textures.fuel,Rect2(p-Vector2(16,36),Vector2(32,38)),false)
 		elif pickup.kind == "battery":
-			# Bateria (0.14): célula ciano com polo positivo
 			draw_circle(p - Vector2(0, 10), 17, Color(0.4, 0.9, 1, 0.15))
-			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 18)), Color(0.15, 0.55, 0.65))
-			draw_rect(Rect2(p - Vector2(2, 28), Vector2(4, 4)), Color(0.7, 0.95, 1))
-			draw_rect(Rect2(p - Vector2(6, 24), Vector2(12, 3)), Color(0.85, 0.75, 0.3))
+			draw_texture_rect(world_detail_art.textures.battery,Rect2(p-Vector2(15,35),Vector2(30,37)),false)
 		else: draw_texture_rect(docks_art.coin, Rect2(p - Vector2(8, 18), Vector2(16, 18)), false)
 	var drawable: Array = []
 	if sim.mode == "run":
@@ -387,9 +438,25 @@ func draw_entities() -> void:
 			if scenery.handles(d.kind) and not scenery.is_flat(d.kind) and view.has_point(d.p) and seen(d.p, 60) and not scenery.chapel_hides_legacy(d.kind, d.p):
 				drawable.append({"type": "decor", "data": d, "y": d.p.y})
 		if seen(sim.run_points.extraction): drawable.append({"type": "capsule", "data": {}, "y": sim.run_points.extraction.y + 20})
-		if seen(sim.story_npc_position()): drawable.append({"type": "chapel_npc", "data": {"p": sim.story_npc_position()}, "y": sim.story_npc_position().y})
+		if seen(sim.run_points.shop): drawable.append({"type":"merchant","data":{},"y":sim.run_points.shop.y})
+		if seen(sim.story_npc_position()):
+			drawable.append({"type": "chapel_npc", "data": {"p": sim.story_npc_position()}, "y": sim.story_npc_position().y})
+			for i in 5:
+				var angle: float=-PI*0.85+i*(PI*0.7/4.0)
+				var foot:=sim.story_npc_position()+Vector2(cos(angle),sin(angle))*130+Vector2(0,46)
+				drawable.append({"type":"cult_follower","data":{"p":foot,"index":i},"y":foot.y})
+		for npc in sim.rescue_npcs:
+			if seen(npc.p): drawable.append({"type": "rescue_npc", "data": npc, "y": npc.p.y})
+		if not sim.dog.is_empty() and sim.dog.get("state", "") != "gone" and seen(sim.dog.p):
+			drawable.append({"type": "dog", "data": sim.dog, "y": sim.dog.p.y})
+		if not sim.bike.is_empty() and not sim.bike.get("riding", false) and seen(sim.bike.p):
+			drawable.append({"type": "bike", "data": sim.bike, "y": sim.bike.p.y})
+		if not sim.bike_npc.is_empty() and seen(sim.bike_npc.p):
+			drawable.append({"type": "bike_npc", "data": sim.bike_npc, "y": sim.bike_npc.p.y})
 	else:
 		for box in sim.obstacles: drawable.append({"type": "obstacle", "data": {"r": box, "k": "crate"}, "y": box.end.y})
+	if sim.mode == "hub" and not sim.hub_dog.is_empty():
+		drawable.append({"type": "dog", "data": sim.hub_dog, "y": sim.hub_dog.p.y})
 	for a in sim.actors:
 		if a.active and not a.mech and not (sim.mech.get("cockpit_t", 0.0) > 0 and sim.mech.get("cockpit_actor", -1) == a.id): drawable.append({"type": "actor", "data": a, "y": a.p.y})
 	for e in sim.enemies:
@@ -399,7 +466,7 @@ func draw_entities() -> void:
 	for s in sim.spectres:
 		if s.state == "following" and not SummonFX.robot_hidden(sim.effects, "spectre", s.owner): drawable.append({"type": "spectre", "data": s, "y": s.p.y})
 	if sim.mode == "hub": drawable.append({"type": "core", "data": {}, "y": 436.0})
-	farol_renderer.foreground(sim,drawable)
+	if not sim.RemainingFixed.owns(sim,"stairs"): farol_renderer.foreground(sim,drawable)
 	for thing in drawable:
 		if thing.type in ["actor","mech"]: thing.y -= sim.height_at(thing.data.p)
 	drawable.sort_custom(func(a, b): return a.y < b.y)
@@ -417,13 +484,24 @@ func draw_entities() -> void:
 			"obstacle": draw_obstacle(thing.data.r, thing.data.k)
 			"decor": scenery.draw_prop(self, thing.data.kind, thing.data.p, sim.tick_time)
 			"capsule": draw_capsule()
+			"merchant": draw_merchant()
 			"chapel_npc":
-				var npc_texture: Texture2D = scenery.chapel_fisherman_texture(sim.tick_time)
-				if npc_texture != null:
-					draw_texture_rect(npc_texture, Rect2(thing.data.p - Vector2(40, 112), Vector2(80, 112)), false)
+				if not sanctuary_guardian_visuals.draw(self,thing.data.p,sim.tick_time):
+					scenery.draw_prop(self, "npc_fisherman", thing.data.p, sim.tick_time)
+			"cult_follower": draw_cult_follower(thing.data.p,thing.data.index)
+			"rescue_npc":
+				var rtex: Texture2D = scenery.chapel_fisherman_texture(sim.tick_time)
+				if rtex != null:
+					draw_texture_rect(rtex, Rect2(thing.data.p - Vector2(36, 100), Vector2(72, 100)), false, Color("d8c4a8"))
 				else:
 					scenery.draw_prop(self, "npc_fisherman", thing.data.p, sim.tick_time)
+				draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+				var rtag: String = thing.data.name.to_upper() + (" • INTERAGIR" if not thing.data.get("thanked", false) else "")
+				text_at(thing.data.p + Vector2(-58, -100), rtag, GOLD, 13)
 			"spectre": draw_spectre(thing.data)
+			"dog": draw_dog(thing.data)
+			"bike": draw_bike_pickup(thing.data)
+			"bike_npc": draw_bike_npc(thing.data)
 			"core": draw_texture(refuge_core, CORE_OFFSET, Color(1, 1, 1, core_alpha()))
 	visual_scale = 1.0; visual_origin = Vector2.ZERO; visual_transform(Vector2.ZERO)
 	if sim.mode == "run" and seen(sim.story_npc_position()):
@@ -434,11 +512,28 @@ func draw_entities() -> void:
 			var npc_label := chapel_npc_label(sim.story_quest)
 			# O rótulo usa coordenadas mundiais, fora de qualquer transform de sprite.
 			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-			text_at(sim.story_npc_position() + Vector2(-82, -112), npc_label, GOLD if sim.story_quest < 2 else Color("c9b99c"), 14)
+			if nearest_actor < 145.0:
+				draw_arc(sim.story_npc_position(), 35, 0, TAU, 32, CYAN, 2.0)
+				npc_label = "FALAR • MESTRE CORAL"
+			text_at(sim.story_npc_position() + Vector2(-82, -184), npc_label, CYAN if nearest_actor < 145.0 else GOLD, 14)
 	for b in sim.bullets:
 		if not seen(b.p): continue
 		var bullet_pos: Vector2 = b.p - Vector2(0, b.get("height", 28.0))
 		var kind: String = b.get("kind", "")
+		if kind=="p_supernova":
+			draw_line(bullet_pos-b.v.normalized()*28,bullet_pos,Color("ff792e"),7)
+			draw_circle(bullet_pos,10,Color("ffbe55")); draw_circle(bullet_pos,5,Color("fff3d0"))
+			continue
+		if b.get("ray_missile",false):
+			var flight: float=clampf(b.age/b.flight,0.0,1.0)
+			var missile_pos: Vector2=b.p-Vector2(0,28+sin(flight*PI)*90)
+			var velocity: Vector2=(b.to-b.from)/b.flight-Vector2(0,cos(flight*PI)*90*PI/b.flight)
+			var tail:=velocity.normalized()
+			draw_line(missile_pos-tail*28,missile_pos-tail*12,Color("ff973f"),5)
+			visual_transform(missile_pos,tail.angle()+PI/4)
+			draw_texture_rect(weapon_art.foguete,Rect2(-24,-24,48,48),false)
+			visual_transform(Vector2.ZERO)
+			continue
 		if kind == "bomb":
 			# 0.15: telegraph da zona de impacto — anel vermelho no ponto de queda
 			var landing: Vector2 = b.get("to", b.p)
@@ -453,22 +548,29 @@ func draw_entities() -> void:
 			var tail: Vector2 = b.v.normalized()
 			draw_line(bullet_pos - tail * 29, bullet_pos - tail * 7, Color("ff883e"), 9)
 			draw_line(bullet_pos - tail * 21, bullet_pos - tail * 7, Color("ffe5a1"), 4)
-			draw_circle(bullet_pos, 10, Color("222b29")); draw_circle(bullet_pos + tail * 3, 5, Color("74dce5"))
+			visual_transform(bullet_pos,tail.angle()+PI*0.25)
+			draw_texture_rect(weapon_art.foguete,Rect2(Vector2(-16,-16),Vector2(32,32)),false)
+			visual_transform(Vector2.ZERO)
+			continue
+		if kind == "p_omega":
+			draw_omega_orb(bullet_pos, b.v.normalized(), maxf(24, b.get("visual_r", b.r)), sim.tick_time + b.get("age", 0.0))
 			continue
 		var visual_radius: float = b.get("visual_r",b.r) * 1.15
 		if b.get("arc", false):
 			draw_arc(b.to, 62, 0, TAU, 36, Color("ffe281"), 3)
 			bullet_pos -= Vector2(0, sin(clampf(b.get("age", 0.0) / b.flight, 0, 1) * PI) * 90)
+		if projectile_art.has(kind):
+			var tex: Texture2D = projectile_art[kind]
+			# 0.22: acompanha o aumento geral das balas (BULLET_SIZE_SCALE em simulation.gd).
+			var art_scale := projectile_size(tex.get_size(), int(b.team), kind, visual_radius)
+			visual_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
+			draw_texture_rect(tex, Rect2(-art_scale * 0.5, art_scale), false)
+			visual_transform(Vector2.ZERO)
+			continue
 		if b.team == 1:
 			draw_circle(bullet_pos,visual_radius+2,Color("11101c"))
 			draw_circle(bullet_pos,visual_radius,Color("f965ae"))
 			draw_circle(bullet_pos,visual_radius*0.45,Color("fff4db"))
-			continue
-		if projectile_art.has(kind):
-			var tex: Texture2D = projectile_art[kind]
-			visual_transform(bullet_pos, b.v.angle() if kind != "orb" and kind != "magenta" and kind != "violet" else 0.0)
-			draw_texture_rect(tex, Rect2(-tex.get_size()*0.8625,tex.get_size()*1.725),false)
-			visual_transform(Vector2.ZERO)
 			continue
 		var c := CYAN if b.team == 0 else Color("fa6dbc")
 		draw_line(bullet_pos - b.v.normalized() * 14, bullet_pos, Color(c, 0.55), b.r)
@@ -490,6 +592,10 @@ func draw_entities() -> void:
 			draw_line(fx.p, fx.p - Vector2(0, 140 * fx.life / 0.6), Color(0.3, 0.95, 1, fx.life), 12)
 		elif fx.kind == "dash":
 			draw_line(fx.p - fx.dir * 18 - Vector2(0, 20), fx.p - Vector2(0, 20), Color(0.3, 0.9, 1, fx.life * 1.5), 3)
+		elif fx.kind == "blink":
+			var bt: float = 1.0 - fx.life / fx.max
+			draw_arc(fx.p - Vector2(0, 20), 6 + bt * 34, 0, TAU, 24, Color(0.4, 0.95, 1, 1 - bt), 3)
+			draw_circle(fx.p - Vector2(0, 20), (1 - bt) * 9, Color(0.7, 1, 1, 0.5 * (1 - bt)))
 		elif fx.kind == "slash":
 			var t: float = clampf(1.0 - fx.life / 0.18, 0, 1)
 			var frame := 0 if t < 0.3 else (1 if t < 0.7 else 2)
@@ -562,6 +668,14 @@ func draw_entities() -> void:
 			visual_transform(fx.p + Vector2(k * 40, -40 + k * k * 120), k * 5.0)
 			draw_texture(tex, -tex.get_size() * 0.5, Color(1, 1, 1, fx.life / fx.max))
 			visual_transform(Vector2.ZERO)
+		elif fx.kind == "heart":
+			var ht: float = 1.0 - fx.life / fx.max
+			var hp_p: Vector2 = fx.p - Vector2(0, ht * 40)
+			var hcol := Color(1, 0.35, 0.55, 1.0 - ht * 0.7)
+			var hs := 10.0 + sin(ht * PI) * 4.0
+			draw_circle(hp_p + Vector2(-hs * 0.45, 0), hs * 0.55, hcol)
+			draw_circle(hp_p + Vector2(hs * 0.45, 0), hs * 0.55, hcol)
+			draw_polygon([hp_p + Vector2(-hs, hs * 0.15), hp_p + Vector2(hs, hs * 0.15), hp_p + Vector2(0, hs * 1.15)], [hcol])
 		elif fx.kind in ["explosion", "tentacle_strike", "gate_open", "gate_slam", "shield_hit", "spawn_portal", "prop_break", "splinter", "splash", "flash", "recoil"]: draw_fx_013(fx)
 		else: draw_circle(fx.p, 8, GOLD)
 	for a in sim.actors:
@@ -572,6 +686,15 @@ func draw_entities() -> void:
 		draw_line(origin, destination, Color(0.45, 0.95, 1.0, 0.8), 14)
 		draw_line(origin, destination, Color.WHITE, 5)
 		draw_circle(destination, 12, Color(0.8, 1.0, 1.0, 0.75))
+	# Sombras do teleporte do Ômega: fantasma ciano + anel que encolhe conforme os 4s acabam.
+	for a in sim.actors:
+		for s in a.get("shadows", []):
+			var age: float = sim.tick_time - float(s.t)
+			if age >= sim.OMEGA_SHADOW_LIFE: continue
+			var k: float = 1.0 - age / sim.OMEGA_SHADOW_LIFE
+			var ghost := Color(0.25, 0.85, 1.0, 0.15 + 0.3 * k)
+			draw_marty_omega_frame("idle", Vector2.DOWN, 0, s.p, ghost)
+			draw_arc(s.p - Vector2(0, 4), 16, -PI / 2, -PI / 2 + TAU * k, 24, Color(0.4, 0.95, 1.0, 0.55 * k + 0.15), 2.5)
 
 func lamp(p: Vector2) -> void:
 	for radius in [100, 75, 50, 30]: draw_circle(p, radius, Color(0.98, 0.57, 0.17, 0.025))
@@ -623,8 +746,9 @@ func draw_docks() -> void:
 	var P: Dictionary = sim.run_points
 	# Oficina: comerciante atrás do balcão
 	var shop: Vector2 = P.shop
-	draw_circle(shop - Vector2(0, 58), 12, Color("d2a077")); draw_rect(Rect2(shop - Vector2(16, 48), Vector2(32, 30)), Color("465860"))
-	draw_rect(Rect2(shop - Vector2(18, 72), Vector2(36, 8)), Color("3a2a22"))
+	visual_transform(shop,0,Vector2(1,0.28))
+	draw_circle(Vector2.ZERO,64,Color(0.01,0.015,0.02,0.45))
+	visual_transform(Vector2.ZERO)
 	text_at(shop + Vector2(-95, 44), "E • CHAVE + CURA / 15 moedas" if not sim.shop_bought else "ESTOQUE ESGOTADO", GOLD, 13)
 	# Gerador do desafio opcional
 	if not sim.side_complete: text_at(P.side + Vector2(-95, 46), "E • DESAFIO OPCIONAL / 55s" if not sim.side_active else "DEFENDA O GERADOR  %ds" % int(sim.side_time), GOLD, 14)
@@ -637,31 +761,54 @@ func draw_docks() -> void:
 	for ramp in sim.ramps:
 		if not FarolRuntime.owns(sim,ramp.r.get_center()): text_at(ramp.r.position + Vector2(10, ramp.r.size.y + 22), "RAMPA", Color("c9bfae"), 11)
 
+func draw_merchant() -> void:
+	if merchant_texture==null: return
+	var p: Vector2=sim.run_points.shop
+	if not merchant_visuals.draw(self,p,sim.tick_time):
+		var size := Vector2(200,245)
+		draw_texture_rect(merchant_texture,Rect2(p-Vector2(size.x*0.5,size.y-12),size),false)
+	var relic_position: Vector2=merchant_visuals.idle_transform(sim.tick_time)*Vector2(-43,-157)
+	scenery.lights.append({"p":p+relic_position,"kind":"bulb","s":0.4})
+
 func draw_capsule() -> void:
 	# Cápsula de extração no estilo das câmaras de upgrade: selada até o chefe cair; depois acende.
 	var P: Vector2 = sim.run_points.extraction
 	var t: float = sim.tick_time
-	var active: bool = sim.boss_dead
+	var state: String = sim.extract_state
+	var launch_k: float = clampf(sim.extract_t / 0.9, 0.0, 1.0) if state == "launch" else 0.0
+	var fade := 1.0 - launch_k
+	var active: bool = sim.boss_dead or state != ""
 	var tex: Texture2D = docks_art.capsule
-	var origin := P + Vector2(-75, 40 - 240)
+	var origin := P + Vector2(-120, -324) - Vector2(0, launch_k * 170)
 	if active:
-		for k in range(4): draw_circle(P - Vector2(0, 70), 90 + k * 26 + sin(t * 2 + k) * 6, Color(0.35, 0.9, 1, 0.05))
-		draw_rect(Rect2(P.x - 30, P.y - 1400, 60, 1260), Color(0.5, 1, 1, 0.08 + 0.04 * sin(t * 3)))
-	draw_texture(tex, origin, Color.WHITE if active else Color(0.62, 0.62, 0.7))
-	var glass := Rect2(origin + Vector2(32, 62), Vector2(86, 128))
+		visual_transform(P + Vector2(0, 25), 0, Vector2(1, 0.3))
+		draw_circle(Vector2.ZERO, 76, Color(0.2, 0.65, 0.8, 0.12 * fade))
+		visual_transform(Vector2.ZERO)
+		var beam_w := 60.0 + launch_k * 70.0
+		if state == "launch": draw_rect(Rect2(P.x - beam_w * 0.5, P.y - 1400, beam_w, 1260), Color(0.5, 1, 1, launch_k * 0.3 * fade))
+	var cap_tint := Color(1, 1, 1, fade) if state != "" else (Color.WHITE if active else Color(0.62, 0.62, 0.7))
+	draw_texture_rect(tex, Rect2(origin, Vector2(240,384)), false, cap_tint)
+	var glass := Rect2(origin + Vector2(87, 99), Vector2(66, 181))
 	if active:
 		var pulse := 0.5 + 0.5 * sin(t * 4)
-		draw_rect(glass, Color(0.45, 0.95, 1, 0.25 + 0.2 * pulse))
-		draw_rect(Rect2(glass.position.x + 30, glass.position.y, 18, glass.size.y), Color(1, 1, 1, 0.35 + 0.3 * pulse))
-		for n in range(10):
+		draw_rect(glass, Color(0.18, 0.65, 0.76, (0.04 + 0.03 * pulse) * fade))
+		for n in range(4):
 			var h := fposmod(t * 60 + n * 23, glass.size.y)
-			draw_rect(Rect2(glass.position.x + 8 + (n * 17) % 60, glass.end.y - h, 3, 3), Color(0.8, 1, 1, 1 - h / glass.size.y))
-		for k in range(3):
-			var ry := fposmod(t * 40 + k * 45, 150.0)
-			visual_transform(P - Vector2(0, 20 + ry), 0, Vector2(1, 0.3))
-			draw_arc(Vector2.ZERO, 58, 0, TAU, 32, Color(0.5, 1, 1, 0.8 - ry / 190.0), 3)
-			visual_transform(Vector2.ZERO)
-		text_at(P + Vector2(-68, 70), "E • EXTRAÇÃO", CYAN, 16)
+			draw_rect(Rect2(glass.position.x + 8 + (n * 17) % 48, glass.end.y - h, 2, 2), Color(0.8, 1, 1, (1 - h / glass.size.y) * 0.5 * fade))
+		# P10 — porta da cápsula: duas placas deslizam sobre o vidro e trancam o herói dentro.
+		if state in ["close", "launch"]:
+			var ck: float = 1.0 - pow(1.0 - (1.0 if state == "launch" else clampf(sim.extract_t / 0.55, 0.0, 1.0)), 2)
+			var half := glass.size.x * 0.5 * ck
+			var shutter := Color(0.1, 0.15, 0.22, fade)
+			draw_rect(Rect2(glass.position, Vector2(half, glass.size.y)), shutter)
+			draw_rect(Rect2(glass.end.x - half, glass.position.y, half, glass.size.y), shutter)
+			var seam := Color(0.55, 1, 1, 0.9 * fade)
+			draw_line(glass.position + Vector2(half, 0), glass.position + Vector2(half, glass.size.y), seam, 2)
+			draw_line(Vector2(glass.end.x - half, glass.position.y), Vector2(glass.end.x - half, glass.end.y), seam, 2)
+		match state:
+			"enter": text_at(P + Vector2(-62, 70), "EMBARCANDO...", CYAN, 14)
+			"close": text_at(P + Vector2(-70, 70), "VEDANDO...", Color("8fe8ff"), 14)
+			"": text_at(P + Vector2(-68, 70), "E • EXTRAÇÃO", CYAN, 16)
 	else:
 		draw_rect(glass, Color(0.05, 0.1, 0.15, 0.5))
 		text_at(P + Vector2(-80, 70), "CÁPSULA SELADA • DERROTE O CHEFE", Color("8a8a9a"), 12)
@@ -691,12 +838,73 @@ func draw_marty_dodge(a: Dictionary, pos: Vector2, outfit: String, tint: Color) 
 	draw_texture_rect_region(texture, Rect2(-48, -92, 96, 96), Rect2(frame * 96, row * 96, 96, 96), tint)
 	visual_transform(Vector2.ZERO)
 
+# Moto Temporal: sprite transparente estacionado ou sob o piloto.
+# O desenho antigo permanece como fallback caso a textura esteja ausente.
+func draw_bike_at(p: Vector2, facing: Vector2 = Vector2.RIGHT) -> void:
+	if bike_visuals.draw(self, p, facing):
+		scenery.lights.append({"p": p + Vector2(38 if facing.x >= 0 else -38, -25), "kind": "cyan"})
+		return
+	# A moto gira na direção do movimento — na ponte vertical ela aponta pra cima.
+	var rot: float = facing.angle() if facing.length() > 0.2 else 0.0
+	var R := func(v: Vector2) -> Vector2: return p + v.rotated(rot)
+	for wx in [-26.0, 26.0]:
+		visual_transform(R.call(Vector2(wx, 0)), rot, Vector2(1, 0.5))
+		draw_circle(Vector2.ZERO, 16, Color(0.05, 0.05, 0.08)); draw_circle(Vector2.ZERO, 8, Color("4a4a55"))
+		visual_transform(Vector2.ZERO)
+	draw_line(R.call(Vector2(-20, -10)), R.call(Vector2(8, -22)), Color("7a5232"), 6)
+	draw_line(R.call(Vector2(8, -22)), R.call(Vector2(24, -8)), Color("7a5232"), 6)
+	draw_line(R.call(Vector2(-16, -23)), R.call(Vector2(16, -23)), Color("8b2a2a"), 13)
+	draw_circle(R.call(Vector2(30, -24)), 7, Color(0.4, 0.9, 1, 0.85 + 0.15 * sin(sim.tick_time * 9)))
+	scenery.lights.append({"p": p + Vector2(0, -12), "kind": "cyan"})
+
+func draw_bike_pickup(b: Dictionary) -> void:
+	var p: Vector2 = b.p + Vector2(0, sin(sim.tick_time * 3) * 2)
+	draw_circle(p - Vector2(0, 14), 36, Color(0.4, 0.9, 1, 0.1 + 0.05 * sin(sim.tick_time * 5)))
+	draw_bike_at(p)
+	text_at(p + Vector2(-70, -108), "E • MOTO TEMPORAL", CYAN, 13)
+	text_at(p + Vector2(-54, -92), "requer ÔMEGA", Color("8fe8ff"), 11)
+
+# P12 — Faísca: motoqueiro do ano 2099 encostado na moto; jaqueta escura, aura ciano.
+func draw_bike_npc(npc: Dictionary) -> void:
+	var p: Vector2 = npc.p
+	if faisca_texture==null:
+		faisca_texture=load("res://assets/npcs/faisca_cyberpunk_v1.png")
+		faisca_region=Rect2(faisca_texture.get_image().get_used_rect())
+	var used := faisca_region
+	var size := Vector2(126*used.size.x/used.size.y,126)
+	draw_texture_rect_region(faisca_texture,Rect2(p-Vector2(size.x/2,size.y)+Vector2(0,sin(sim.tick_time*2)*1.1),size),used)
+	text_at(p+Vector2(-44,-140),"FAÍSCA • E",CYAN,13)
+
 func draw_actor(a: Dictionary) -> void:
+	var flight_visual := omega_flight.sample(a, sim.tick_time)
+	if a.get("hidden", false): return   # P10 — já embarcou na cápsula
+	# A pose do companheiro acompanha a caminhada sem alterar a mira de combate.
+	if sim.coop == "ai" and a.id == 1 and a.move.length() > 0.1:
+		a = a.duplicate()
+		a.aim = a.move.normalized(); a.facing = a.aim
 	var foot: Vector2 = a.p
 	var support: Vector2 = foot - Vector2(0, sim.height_at(foot))
+	if sim.Supernova.active(a):
+		sim.Supernova.draw(self,a,support,sim.tick_time)
+		return
 	var player_color := CYAN if a.id == 0 else GOLD
 	visual_transform(support, 0, Vector2(1, 0.42)); draw_circle(Vector2.ZERO, 17, Color(0, 0, 0, 0.4)); visual_transform(Vector2.ZERO)
 	draw_arc(support, 16, 0, TAU, 20, player_color, 2)
+	if a.get("bike", false) and not a.dead:
+		var bike_facing: Vector2 = a.move if a.move.length() > 0.1 else a.facing
+		if a.get("bike_boosting",false):
+			var rear := support+Vector2(-76 if bike_facing.x>=0 else 76,-22)
+			var trail := Vector2(-1 if bike_facing.x>=0 else 1,0)
+			for i in 5:
+				draw_circle(rear+trail*(i*16.0),12-i*1.7,Color(0.15,0.8,1.0,0.8-i*0.14))
+		var riding_tint := Color.WHITE
+		if a.hp <= sim.HEART * 2.0: riding_tint = Color(1.0, 0.78, 0.76)
+		if a.hurt > 0 and int(a.hurt * 20) % 2 == 0: riding_tint.a = 0.5
+		if bike_visuals.draw_riding(self, support, bike_facing, riding_tint):
+			scenery.lights.append({"p": support + Vector2(38 if bike_facing.x >= 0 else -38, -25), "kind": "cyan"})
+			text_at(support + Vector2(-25, -82), "MARTY" if a.id == 0 else "ECHO • P2", player_color, 11)
+			return # Mounted pose replaces standing, walking and floating armor poses.
+		draw_bike_at(support, bike_facing)
 	if sim.is_blue_form(a):
 		var blue_jump := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
 		var blue_pos := support - Vector2(0, blue_jump)
@@ -706,17 +914,20 @@ func draw_actor(a: Dictionary) -> void:
 		if carrying_blue and not sim.weapon_behind_body(a): draw_weapon(a, blue_pos)
 		return
 	if a.dead:
+		# P9 — a queda é animada: dead_t avança os frames até o último (corpo no chão).
+		var dead_frame := int(a.get("dead_t", 0.0) / 0.11)
 		if a.fused and fusion_actions.has("defeat"):
 			var defeat_texture: Texture2D = fusion_actions["defeat"]
-			draw_character_action(defeat_texture, FUSION_ACTION_CELL, 128.0, foot, a.facing, maxi(0, int(defeat_texture.get_width() / FUSION_ACTION_CELL) - 1))
+			draw_character_action(defeat_texture, FUSION_ACTION_CELL, 128.0, foot, a.facing, mini(maxi(0, int(defeat_texture.get_width() / FUSION_ACTION_CELL) - 1), dead_frame))
 		elif sim.outfit_of(a) == "padrao":
-			draw_marty_padrao_frame("defeat", a.facing, MARTY_PADRAO_FRAMES.defeat - 1, foot, Color.WHITE)
+			draw_marty_padrao_frame("defeat", a.facing, mini(MARTY_PADRAO_FRAMES.defeat - 1, dead_frame), foot, Color.WHITE)
 		elif sim.outfit_of(a) == "omega":
-			draw_marty_omega_frame("defeat", a.facing, MARTY_OMEGA_FRAMES.defeat - 1, foot, Color.WHITE)
+			draw_marty_omega_frame("defeat", a.facing, mini(MARTY_OMEGA_FRAMES.defeat - 1, dead_frame), foot, Color.WHITE)
 		else:
 			draw_line(foot - Vector2(9, 9), foot + Vector2(9, 9), Color("f77c89"), 5)
 			draw_line(foot + Vector2(9, -9), foot + Vector2(-9, 9), Color("f77c89"), 5)
-		text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12)
+		if sim.death_cine <= 0.0 and sim.actors.any(func(o): return o.active and not o.dead):
+			text_at(foot + Vector2(-35, -25), "E • REANIMAR", Color("f77c89"), 12)
 		return
 	var jump_height := sin((1.0 - a.jump / 0.65) * PI) * 68 if a.jump > 0 else 0.0
 	var elevation := sim.height_at(foot)
@@ -751,7 +962,7 @@ func draw_actor(a: Dictionary) -> void:
 	var walking: bool = a.move.length() > 0.1
 	var firing: bool = a.get("fire_flash", 0.0) > 0
 	var column := 0; var bob := 0.0
-	var slash_dur := 0.32 if a.armor else 0.45
+	var slash_dur: float = a.get("slash_max", 0.32 if a.armor else 0.45)
 	if a.slash > 0 and not a.mech:
 		var sp: float = 1.0 - a.slash / slash_dur
 		column = 7 if sp < 0.2 else (8 if sp < 0.6 else 9)
@@ -765,6 +976,8 @@ func draw_actor(a: Dictionary) -> void:
 	elif firing: column = 5
 	else: bob = -1.0 if fmod(sim.tick_time + a.id * 0.7, 1.6) < 0.8 else 0.0  # respiração
 	var tint := Color.WHITE
+	if a.hp <= sim.HEART: tint = Color(1.0, 0.58, 0.55)        # P9 — no limite: vermelho forte
+	elif a.hp <= sim.HEART * 2.0: tint = Color(1.0, 0.78, 0.76) # P9 — machucado
 	if a.get("roll_visual", a.dodge) <= 0 and a.hurt > 0 and int(a.hurt * 20) % 2 == 0: tint.a = 0.45
 	if a.slash > 0.24: tint = tint.lightened(0.25)
 	if transforming > 0:
@@ -777,12 +990,13 @@ func draw_actor(a: Dictionary) -> void:
 	# Locomotion advances the feet but the torso faces the independent aim.
 	if transforming <= 0: bob = 0.0
 	else: tint.a *= 1.0 - smoothstep(0.15, 0.65, charge_t / sim.TRANSFORM_TIME)
-	var carrying: bool = transforming <= 0 and a.slash <= 0 and a.get("roll_visual", a.dodge) <= 0
+	var carrying: bool = transforming <= 0 and a.slash <= 0 and a.get("roll_visual", a.dodge) <= 0 and not flight_visual.active and not OmegaFlight.requested(a)
 	if carrying and sim.weapon_behind_body(a): draw_weapon(a, draw_pos)
 	if outfit_key == "padrao":
 		var padrao_action := marty_padrao_action(a, walking, firing)
 		var padrao_direction: Vector2 = a.dash_dir if padrao_action == "evade" else a.aim
 		var padrao_frame := marty_padrao_frame(a, padrao_action, slash_dur)
+		if a.hp <= sim.HEART * 2.0 and padrao_action == "idle": padrao_action = "hurt"; padrao_frame = 0
 		if transforming > 0:
 			var progress := charge_t / sim.TRANSFORM_TIME
 			var remaining_height := lerpf(74.0, 12.0, smoothstep(0.0, 0.85, progress))
@@ -792,11 +1006,14 @@ func draw_actor(a: Dictionary) -> void:
 		else: draw_marty_padrao_frame(padrao_action, padrao_direction, padrao_frame, draw_pos + Vector2(0, bob), tint)
 	elif outfit_key == "omega":
 		var omega_action := marty_omega_action(a, walking)
+		if flight_visual.active: omega_action = "flight"
 		var omega_direction: Vector2 = a.dash_dir if omega_action == "evade" else a.aim
 		var omega_frame := marty_omega_frame(a, omega_action, slash_dur)
-		if walking and omega_action == "idle":
-			bob = -7.0 + sin(sim.tick_time * 7.0 + a.id) * 2.0
+		if a.hp <= sim.HEART * 2.0 and omega_action == "idle": omega_action = "hurt"; omega_frame = 0
+		if omega_action == "flight": bob = -float(flight_visual.lift)
 		var omega_pos := draw_pos + Vector2(0, bob)
+		if omega_action == "flight" and flight_visual.active:
+			omega_flight.draw_exhaust(self, omega_pos, marty_direction_row(omega_direction), omega_frame, sim.tick_time, flight_visual.blend, tint.a)
 		var sword_visible := omega_sword_should_draw(omega_action, omega_frame)
 		var sword_anchor := omega_melee_hand_anchor(omega_direction, omega_frame) if sword_visible else Vector2.ZERO
 		var omega_body_tint := tint
@@ -810,6 +1027,10 @@ func draw_actor(a: Dictionary) -> void:
 		if sword_visible and omega_sword_behind_body(omega_direction):
 			draw_blade(a, omega_pos, weapon_art.omega_sword, 0.32, true, sword_anchor)
 		draw_marty_omega_frame(omega_action, omega_direction, omega_frame, omega_pos, omega_body_tint)
+		if a.slash > 0 and a.get("omega_cast",false):
+			draw_omega_orb(omega_pos + sim.weapon_hand_anchor(a), a.aim, 13.0 + 8.0 * a.slash / 0.32, sim.tick_time)
+		if omega_action == "flight" and flight_visual.active:
+			omega_flight.draw_exhaust(self, omega_pos, marty_direction_row(omega_direction), omega_frame, sim.tick_time, flight_visual.blend, tint.a, true)
 		if sword_visible and not omega_sword_behind_body(omega_direction):
 			draw_blade(a, omega_pos, weapon_art.omega_sword, 0.32, true, sword_anchor)
 	elif a.get("roll_visual", a.dodge) > 0 and not a.mech:
@@ -819,7 +1040,8 @@ func draw_actor(a: Dictionary) -> void:
 		draw_texture_rect_region(marty_anim, Rect2(-48, -92, 96, 96), Rect2(column * 96, row * 96, 96, 96), tint)
 		visual_transform(Vector2.ZERO)
 	if carrying and not sim.weapon_behind_body(a): draw_weapon(a, draw_pos)
-	if a.slash > 0 and outfit_key != "omega": draw_weapon(a, draw_pos)
+	# Punches sao de mao vazia; a arma na mao so aparece no golpe das skins antigas.
+	if a.slash > 0 and outfit_key != "omega" and outfit_key != "padrao": draw_weapon(a, draw_pos)
 	if transforming > 0:
 		var assembly_progress := 1.0 - transforming / sim.TRANSFORM_TIME
 		draw_omega_assembly_overlay(draw_pos + Vector2(0, bob), assembly_progress)
@@ -890,7 +1112,10 @@ func draw_cockpit(m: Dictionary) -> void:
 	var position: Vector2 = (m.cockpit_outside - Vector2(0, sim.height_at(m.cockpit_outside))).lerp(base + Vector2(0,-48),inside)
 	var size := lerpf(96.0, 42.0, inside)
 	var sprite_rect := Rect2(position-Vector2(size*0.5,size*91.0/96.0),Vector2.ONE*size)
-	if actor.id == 0 and sim.outfit_of(actor) == "padrao" and not actor.armor and marty_board_texture:
+	if actor.armor and actor.armor_type=="supernova":
+		var texture: Texture2D=load("res://assets/characters/marty/supernova/v1/front.tres")
+		draw_texture_rect(texture,sprite_rect,false,Color(1,1,1,1-inside*0.8))
+	elif actor.id == 0 and sim.outfit_of(actor) == "padrao" and not actor.armor and marty_board_texture:
 		var board_frame := clampi(int(inside * 5.0), 0, 4)
 		draw_texture_rect_region(marty_board_texture,sprite_rect,Rect2(board_frame*96,0,96,96),Color(1,1,1,1.0-inside*0.8))
 	else:
@@ -899,7 +1124,18 @@ func draw_cockpit(m: Dictionary) -> void:
 
 func draw_spectre(s: Dictionary) -> void:
 	var p: Vector2 = s.p
-	draw_arc(p, 17, 0, TAU, 18, Color(0.3, 0.9, 1, 0.6), 2)
+	var ally_kind: String = s.get("kind", "spectre")
+	if ally_kind=="sentinela":
+		var body := {"kind":"sentinela","titan_copy":true,"face":spectre_visual_direction(s),"moving":s.get("moving",false),"step":s.get("step",0.0)}
+		draw_enemy_body(body,p,Color.WHITE)
+		draw_arc(p,26,0,TAU,20,CYAN,2)
+		text_at(p+Vector2(-50,-176),"SENTINELA-7",CYAN,12)
+		return
+	if enemy_motion.manifests.has(ally_kind):
+		draw_motion_ally(s, p, ally_kind); return
+	var is_sentinela: bool = ally_kind == "sentinela"
+	var team_col := Color(1.0, 0.62, 0.25) if is_sentinela else CYAN
+	draw_arc(p, 17, 0, TAU, 18, Color(team_col, 0.6), 2)
 	var col := 3 if s.shot > 0.38 else (1 + int(s.get("step", 0.0)) % 2 if s.get("moving", false) else 0)
 	var action := "shoot" if s.shot > 0.38 else ("run" if s.get("moving", false) else "idle")
 	var draw_pos := p - Vector2(0, sim.height_at(p))
@@ -907,27 +1143,44 @@ func draw_spectre(s: Dictionary) -> void:
 		var texture: Texture2D = spectre_actions[action]
 		var count := maxi(1, texture.get_width() / SPECTRE_ACTION_CELL)
 		var frame := int(s.get("step", 0.0)) % count if action == "run" else (int(sim.tick_time * 4.0) % count if action == "idle" else clampi(int((sim.SPECTRE_SHOT.cooldown - s.shot) / 0.17 * count), 0, count - 1))
-		draw_character_action(texture, SPECTRE_ACTION_CELL, 112.0, draw_pos, spectre_visual_direction(s), frame)
+		draw_character_action(texture, SPECTRE_ACTION_CELL, 112.0, draw_pos, spectre_visual_direction(s), frame, Color(1.15, 0.8, 0.55) if is_sentinela else Color.WHITE)
 	else:
 		draw_feral(spectre_texture, draw_pos, spectre_visual_direction(s), col, 128, 112)
 	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40, 3)), Color("1a3541"))
-	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40 * s.hp / 100, 3)), CYAN)
-	text_at(p + Vector2(-30, -112), "SPECTRE", CYAN, 10)
+	draw_rect(Rect2(p + Vector2(-20, 8), Vector2(40 * s.hp / (160.0 if is_sentinela else 100.0), 3)), team_col)
+	text_at(p + Vector2(-30, -112), "SENTINELA-7" if is_sentinela else "SPECTRE", team_col, 10)
+
+# Aliados capturados com clip articulado (ex.: Golem-9) — mesma malha de atlas
+# dos inimigos, só com tinta quente de aliado e a etiqueta por cima.
+func draw_motion_ally(s: Dictionary, p: Vector2, kind: String) -> void:
+	var team_col := Color(1.0, 0.72, 0.3)
+	draw_arc(p, 26, 0, TAU, 20, Color(team_col, 0.6), 3)
+	var fake := {"kind": kind, "face": spectre_visual_direction(s), "moving": s.get("moving", false), "step": s.get("step", 0.0), "combat": "ready", "combat_t": 0.0}
+	if s.get("shot", 0.0) > 0:
+		fake["combat"] = "attack"; fake["combat_t"] = clampf(s.shot / sim.GOLEM_SHOT.cooldown, 0.0, 1.0) * sim.GUARD_ATTACK_TIME
+	var animated := enemy_motion.sample(fake)
+	var draw_pos := p - Vector2(0, sim.height_at(p))
+	if not animated.is_empty():
+		visual_transform(draw_pos)
+		draw_texture_rect_region(animated.texture, animated.destination, animated.source, Color(1.25, 1.05, 0.85))
+		visual_transform(Vector2.ZERO)
+	var max_hp := sim.GOLEM_HP if kind == "golem" else 160.0
+	draw_rect(Rect2(p + Vector2(-24, 10), Vector2(48, 3)), Color("1a3541"))
+	draw_rect(Rect2(p + Vector2(-24, 10), Vector2(48 * clampf(s.hp / max_hp, 0.0, 1.0), 3)), team_col)
+	text_at(p + Vector2(-34, -150), sim.ROBOT_NAMES.get(kind, kind.to_upper()), team_col, 10)
 
 func feral_row(direction: Vector2) -> int:
 	if absf(direction.x) > absf(direction.y): return 1 if direction.x < 0 else 2
 	return 3 if direction.y < 0 else 0
 
 func fusion_visual_direction(a: Dictionary) -> Vector2:
-	# Como no atlas básico do Marty: os pés comandam a vista durante a caminhada;
-	# ao atacar, a silhueta volta a acompanhar a mira.
-	if a.get("slash", 0.0) <= 0 and a.get("fire_flash", 0.0) <= 0:
-		var movement: Vector2 = a.get("move", Vector2.ZERO)
-		if movement.length() > 0.1: return movement.normalized()
+	if sim.coop == "ai" and a.get("id", -1) == 1 and a.get("move", Vector2.ZERO).length() > 0.1:
+		return a.move.normalized()
+	# Input arbitration already resolves movement versus deliberate aim.
 	return a.get("aim", a.get("facing", Vector2.DOWN)).normalized()
 
 func spectre_visual_direction(s: Dictionary) -> Vector2:
-	if s.get("moving", false) and s.get("shot", 0.0) <= 0:
+	if s.get("moving", false):
 		return s.get("move_dir", s.get("aim", Vector2.DOWN)).normalized()
 	return s.get("aim", Vector2.DOWN).normalized()
 
@@ -935,8 +1188,7 @@ func titan_visual_direction(m: Dictionary) -> Vector2:
 	var piloted: bool = m.get("occupant", -1) >= 0
 	if piloted:
 		var pilot: Dictionary = sim.actors[m.occupant]
-		if pilot.get("fire_flash", 0.0) > 0 or pilot.get("slash", 0.0) > 0:
-			return m.get("aim", Vector2.DOWN).normalized()
+		return fusion_visual_direction(pilot)
 	if m.get("moving", false): return m.get("move_dir", m.get("facing", Vector2.DOWN)).normalized()
 	return m.get("aim", m.get("facing", Vector2.DOWN)).normalized()
 
@@ -995,11 +1247,16 @@ func draw_weapon_hand(a: Dictionary, wrist: Vector2, _grip: Vector2) -> void:
 	draw_texture_rect_region(marty_anim, Rect2(-4, -4, 8, 8), Rect2(patch.position + Vector2(0, row * 96), patch.size))
 	visual_transform(Vector2.ZERO)
 
+# 0.22: sprites de armas maiores (jogabilidade > fidelidade; pode ficar um pouco
+# caricato). Compartilhado por armas de fogo (draw_weapon) e corpo-a-corpo (draw_blade).
+const WEAPON_VISUAL_SCALE := 1.35
 func draw_weapon(a: Dictionary, base: Vector2, body_direction: Vector2 = Vector2.ZERO, hand_override: Variant = null) -> void:
 	# Arma e cano compartilham a mira (360°) e o espelhamento com a simulação,
 	# e o clarão passa por 3 estágios (estrela → brilho → fumaça).
 	var weapon: String = sim.weapon_of(a)
 	var aim: Vector2 = a.aim.normalized()
+	if weapon == "omega_orb":
+		draw_omega_orb(base + sim.weapon_hand_anchor(a), aim, 10.0, sim.tick_time); return
 	if weapon == "omega_sword": draw_blade(a, base, weapon_art.omega_sword, 0.32, true, hand_override); return
 	if a.slash > 0:
 		# golpe corpo a corpo do uniforme: chave inglesa (Mecânico), faca (Espião) ou coronhada (Padrão)
@@ -1013,16 +1270,17 @@ func draw_weapon(a: Dictionary, base: Vector2, body_direction: Vector2 = Vector2
 	var wrist: Vector2 = base + geometry.hand
 	var grip: Vector2 = wrist
 	var handle: Vector2 = geometry.handle
-	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
-	draw_texture(tex, -handle)
+	var display_scale := 1.0 if WeaponVisuals.SIZES.has(weapon) else WEAPON_VISUAL_SCALE
+	visual_transform(grip, angle, Vector2(display_scale, (-1.0 if mirrored else 1.0) * display_scale))
+	draw_texture_rect(tex, Rect2(-handle, geometry.size), false)
 	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
 	if k <= 0: return
 	var dir := Vector2.RIGHT.rotated(angle)
 	var muzzle: Vector2 = geometry.muzzle
-	var cyan: bool = weapon in ["pistol", "omega"]
+	var cyan: bool = weapon in ["pistol", "omega", "tesla"]
 	var fx: Texture2D = weapon_art.flash_cyan if cyan else weapon_art.flash
-	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "bazooka": 2.2, "omega": 2.2}[weapon]
+	var big: float = {"pistol": 1.1, "shotgun": 1.9, "smg": 1.0, "bazooka": 2.2, "omega": 2.2}.get(weapon, 1.7) * WEAPON_VISUAL_SCALE
 	if k > 0.55:
 		visual_transform(muzzle + dir * 6 * big, angle, Vector2(1.6, 1.0) * big)
 		draw_texture(fx, -fx.get_size() * 0.5)
@@ -1056,6 +1314,11 @@ func omega_samurai_swing_angle(a: Dictionary, duration: float) -> float:
 	if a.get("swing", 0) == 1: eased = 1.0 - eased
 	return base + lerpf(-0.55, 0.55, eased)
 
+func blade_render_size(a: Dictionary, tex: Texture2D) -> Vector2:
+	var weapon: String = sim.weapon_of(a)
+	if tex == weapon_art.get(weapon): return WeaponVisuals.SIZES.get(weapon, tex.get_size())
+	return tex.get_size()
+
 func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, energy: bool, hand_override: Variant = null) -> void:
 	var aim: Vector2 = a.aim.normalized()
 	var mirrored: bool = aim.x < 0
@@ -1066,13 +1329,13 @@ func draw_blade(a: Dictionary, base: Vector2, tex: Texture2D, duration: float, e
 	if hand_override != null: hand_anchor = hand_override
 	var wrist := base + hand_anchor
 	var grip: Vector2 = wrist
-	var size := tex.get_size()
+	var size := blade_render_size(a, tex)
 	if energy:
 		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 8)
-		var tip := grip + Vector2.RIGHT.rotated(angle) * size.x
+		var tip := grip + Vector2.RIGHT.rotated(angle) * size.x * WEAPON_VISUAL_SCALE
 		draw_line(grip, tip, Color(0.4, 0.95, 1, 0.18 + 0.1 * pulse), 12)
-	visual_transform(grip, angle, Vector2(1, -1 if mirrored else 1))
-	draw_texture(tex, Vector2(-6, -size.y * 0.5))
+	visual_transform(grip, angle, Vector2(WEAPON_VISUAL_SCALE, (-1.0 if mirrored else 1.0) * WEAPON_VISUAL_SCALE))
+	draw_texture_rect(tex, Rect2(Vector2(-6, -size.y * 0.5), size), false)
 	visual_transform(Vector2.ZERO)
 	draw_weapon_hand(a, wrist, grip)
 
@@ -1087,7 +1350,7 @@ func omega_sword_behind_body(direction: Vector2) -> bool:
 
 func omega_sword_should_draw(action: String, frame: int) -> bool:
 	# O início prepara o golpe; a lâmina aparece apenas na fase do corte.
-	return action == "melee" and frame >= 3
+	return false # Legacy helper retained; energy casts never display a sword.
 
 func omega_teleport_opacity(a: Dictionary) -> float:
 	var remaining: float = a.get("roll_visual", a.dodge)
@@ -1097,8 +1360,9 @@ func omega_teleport_opacity(a: Dictionary) -> float:
 
 func draw_chest(chest: Dictionary) -> void:
 	if chest.get("reward",false):
-		draw_circle(chest.p,44,Color(1,0.75,0.15,0.18))
-		draw_arc(chest.p,34,0,TAU,32,GOLD,3)
+		if not chest.open:
+			draw_circle(chest.p,44,Color(1,0.75,0.15,0.18))
+			draw_arc(chest.p,34,0,TAU,32,GOLD,3)
 		text_at(chest.p+Vector2(-65,-70),"ARSENAL • SEM CHAVE" if not chest.open else "RECUPERADO",GOLD,12)
 	# 0.15: baú da folha docks12 (fechado / aberto) com tremida e brilho ao abrir
 	if scenery and scenery.props.has("chest"):
@@ -1124,7 +1388,7 @@ func draw_chest(chest: Dictionary) -> void:
 	if open_k > 0:
 		var inner := Rect2(origin + Vector2(8, lid_h * scale.y - 4), Vector2(42, 10))
 		draw_rect(inner, Color("1a1020"))
-		var glow := (0.6 + 0.4 * sin(sim.tick_time * 5)) if t > 1.2 else 1.0
+		var glow := maxf(0.0, 1.0 - t / 0.8)
 		draw_rect(inner.grow(-2), Color(1, 0.8, 0.35, 0.8 * glow * open_k))
 	# tampa: sobe, inclina para trás e escurece
 	var lid_pos := origin + shake - Vector2(0, 16 * open_k)
@@ -1153,7 +1417,9 @@ func marty_direction_row(direction: Vector2) -> int:
 
 func marty_padrao_action(a: Dictionary, walking: bool, firing: bool) -> String:
 	if a.get("roll_visual", a.dodge) > 0: return "evade"
-	if a.slash > 0 and not a.mech: return "melee"
+	if a.slash > 0 and not a.mech:
+		# Combo de socos: a simulacao marca o estagio atual em a.punch.
+		return ["jab", "melee", "uppercut"][clampi(int(a.get("punch", 0)), 0, 2)]
 	if a.jump > 0: return "jump"
 	if a.hurt > 0: return "hurt"
 	if firing: return "shoot"
@@ -1169,7 +1435,7 @@ func marty_padrao_frame(a: Dictionary, action: String, slash_dur: float) -> int:
 	var count: int = MARTY_PADRAO_FRAMES[action]
 	match action:
 		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
-		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
+		"jab", "melee", "uppercut": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
 		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
 		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
 		"run": return int(a.step) % count
@@ -1203,7 +1469,7 @@ func character_action_frame(texture: Texture2D, cell: int, action: String, a: Di
 	var count := maxi(1, int(texture.get_width() / cell))
 	match action:
 		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
-		"melee": return clampi(int((1.0 - a.slash / 0.32) * count), 0, count - 1)
+		"melee": return clampi(int((1.0 - a.slash / a.get("slash_max", 0.32)) * count), 0, count - 1)
 		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
 		"shoot": return clampi(int((1.0 - a.get("fire_flash", 0.0) / 0.09) * count), 0, count - 1)
 		"run": return int(a.step) % count
@@ -1219,7 +1485,8 @@ func draw_character_action(texture: Texture2D, cell: int, size: float, foot: Vec
 
 func marty_omega_action(a: Dictionary, walking: bool) -> String:
 	if a.get("roll_visual", a.dodge) > 0: return "evade"
-	if a.slash > 0 and not a.mech: return "melee"
+	if a.slash > 0 and not a.mech: return "idle"
+	if OmegaFlight.eligible(a) and (walking or a.jump > 0): return "flight"
 	if a.jump > 0: return "jump"
 	if a.hurt > 0: return "hurt"
 	if walking: return "run"
@@ -1228,6 +1495,7 @@ func marty_omega_action(a: Dictionary, walking: bool) -> String:
 func marty_omega_frame(a: Dictionary, action: String, slash_dur: float) -> int:
 	var count: int = MARTY_OMEGA_FRAMES[action]
 	match action:
+		"flight": return posmod(int(sim.tick_time * 8.0), count)
 		"evade": return clampi(int((1.0 - a.get("roll_visual", a.dodge) / 0.36) * count), 0, count - 1)
 		"melee": return clampi(int((1.0 - a.slash / slash_dur) * count), 0, count - 1)
 		"jump": return clampi(int((1.0 - a.jump / 0.65) * count), 0, count - 1)
@@ -1260,10 +1528,16 @@ func draw_guard_shield_icon(p: Vector2, broken: bool) -> void:
 	visual_transform(Vector2.ZERO)
 
 func enemy_art_kind(kind: String) -> String:
-	return "crawler" if kind == "crawler_small" else kind
+	# P6: sem arte própria ainda — o lobo usa a passada quadrúpede do crawler,
+	# a sentinela usa o traje pesado do guard (restante da silhueta é tinta+escala).
+	var reuse := {"crawler_small": "crawler", "lobo": "crawler", "sentinela": "guard", "golem": "guard"}
+	return reuse.get(kind, kind)
 
 func enemy_art_scale(kind: String, _crouched: bool = false) -> Vector2:
 	var size_scale := 0.6 if kind == "crawler_small" else 1.0
+	if kind == "sentinela": size_scale = 1.5
+	elif kind == "golem": size_scale = 1.8
+	elif kind == "lobo": size_scale = 1.15
 	return Vector2.ONE * size_scale
 
 # One directional drawing is the model for every state. Generated action sheets
@@ -1273,8 +1547,12 @@ func enemy_body_pose(e: Dictionary, death_progress: float = -1.0) -> Transform2D
 	var angle := 0.0
 	var scale := enemy_art_scale(e.kind)
 	if death_progress >= 0.0:
+		# 0.22: o tombo ia até 90° em torno dos pés; para inimigos altos (brute, guard)
+		# isso projeta a silhueta quase na horizontal e dá a impressão de um monstro
+		# "gigante" deitado. Limitamos o giro e encolhemos levemente ao assentar no chão.
 		var fall := smoothstep(0.0, 1.0, death_progress / 0.24)
-		angle = fall * PI * 0.5 * (-1.0 if e.get("face", Vector2.DOWN).x < 0 else 1.0)
+		angle = fall * PI * 0.22 * (-1.0 if e.get("face", Vector2.DOWN).x < 0 else 1.0)
+		scale *= lerpf(1.0, 0.82, fall)
 	elif e.get("shot", 0.0) > 0.0:
 		offset = -e.get("face", Vector2.DOWN).normalized() * clampf(e.shot / 0.2, 0.0, 1.0) * 3.0
 	elif e.get("moving", false):
@@ -1284,6 +1562,13 @@ func enemy_body_pose(e: Dictionary, death_progress: float = -1.0) -> Transform2D
 	return Transform2D(angle, scale, 0.0, offset * scale)
 
 func draw_enemy_body(e: Dictionary, position: Vector2, tint: Color, death_progress: float = -1.0) -> void:
+	if sim.TitanRecovery.original(sim,e) or e.get("titan_copy",false):
+		var pose := titan_pose(e.get("face",Vector2.DOWN))
+		var column := 1+int(e.get("step",0.0))%4 if e.get("moving",false) else 0
+		visual_transform(position,0,Vector2(-1 if pose[1] else 1,1))
+		draw_texture_rect_region(titan_v2,Rect2(-88,-164,176,176),Rect2(column*176,pose[0]*176,176,176),tint)
+		visual_transform(Vector2.ZERO)
+		return
 	var animated: Dictionary = enemy_motion.sample(e, death_progress)
 	if animated.is_empty():
 		# An unfinished action keeps the authored directional anatomy visible.
@@ -1326,11 +1611,17 @@ func draw_enemy(e: Dictionary) -> void:
 		bob = -1.0 if phase % 2 == 0 else 0.0
 	elif face.y < -0.6: column = 1
 	var tint := Color(1.6, 1.6, 1.6) if e.hurt > 0 else Color.WHITE
+	if e.kind == "lobo": tint *= Color(1.05, 0.7, 0.65)      # metal enferrujado
+	elif e.kind == "sentinela": tint *= Color(0.7, 0.85, 1.15)  # aço frio
+	if e.get("dormant", false): tint = Color(0.38, 0.42, 0.5)   # desligado, escuro
+	if e.get("stunned", false): tint = Color(0.7, 0.75, 0.9)
+	# 0.22: aviso claro antes de qualquer golpe forte — pisca âmbar durante o "warning"
+	# (telegraph), não só o Bombardeiro. Dá tempo do jogador reagir ou contra-atacar.
+	if e.get("combat", "") == "warning" and int(sim.tick_time * 12) % 2 == 0:
+		tint = Color(1.6, 0.85, 0.5)
 	visual_transform(p + Vector2(0, bob), 0, Vector2(-scale if flip else scale, scale * (0.78 if e.get("crouched", false) else 1.0)))
 	var art_kind := enemy_art_kind(e.kind)
 	if pixellab_enemy_art.has(art_kind):
-		if e.combat == "warning" and e.kind == "bomber" and int(sim.tick_time * 12) % 2 == 0:
-			tint = Color(1.5, 0.8, 0.55)
 		draw_enemy_body(e, p, tint)
 	elif special_enemy_art.has(e.kind):
 		var special: Texture2D = special_enemy_art[e.kind]
@@ -1342,7 +1633,20 @@ func draw_enemy(e: Dictionary) -> void:
 		draw_texture_rect_region(enemy_anim, Rect2(-56, -92, 144, 96), Rect2(column * 144, ENEMY_ROW[e.kind] * 96, 144, 96), tint)
 	visual_transform(Vector2.ZERO)
 	if e.kind == "guard": draw_guard_shield_icon(p + Vector2(0, -101), e.combat == "attack")
-	if e.hp < e.max:
+	if e.get("dormant", false):
+		# Olho apagado que pulsa fraco — "ainda não acordou".
+		var glint := 0.25 + 0.35 * (0.5 + 0.5 * sin(sim.tick_time * 2.2))
+		draw_circle(p + Vector2(8, -95), 3.5, Color(1, 0.15, 0.1, glint))
+	if e.get("stunned", false):
+		# P6 — estado capturável: anel âmbar pulsante + robobola + etiqueta.
+		var pulse := 0.5 + 0.5 * sin(sim.tick_time * 6)
+		draw_arc(p - Vector2(0, 30), 34 + pulse * 10, 0, TAU, 28, Color(1, 0.75, 0.2, 0.25 + 0.45 * pulse), 3.5)
+		var bp := p + Vector2(0, -122 - pulse * 6)
+		draw_circle(bp, 11, Color(0.85, 0.12, 0.15)); draw_circle(bp + Vector2(0, 4), 11, Color(0.92, 0.92, 0.95))
+		draw_rect(Rect2(bp.x - 11, bp.y - 2, 22, 4), Color(0.15, 0.15, 0.2))
+		draw_circle(bp, 3.5, Color(0.95, 0.95, 1))
+		text_at(p + Vector2(-58, -180), "RECUPERAR TITAN • E" if sim.TitanRecovery.original(sim,e) else "CAPTURÁVEL • E", Color("ffd166"), 14)
+	if e.hp < e.max and not e.get("stunned", false):
 		var w := 30.0 * scale
 		draw_rect(Rect2(p + Vector2(-w * 0.5, 6), Vector2(w, 3)), Color("1c1522"))
 		draw_rect(Rect2(p + Vector2(-w * 0.5, 6), Vector2(w * e.hp / e.max, 3)), Color("df729f"))
@@ -1372,8 +1676,14 @@ func draw_boss(e: Dictionary) -> void:
 		draw_texture_rect(tex, Rect2(-size * 0.5, size), false)
 		visual_transform(Vector2.ZERO)
 	else:
-		var sway := sin(sim.tick_time * 1.6) * 2.0
-		draw_texture_rect(tex, Rect2(p + Vector2(-size.x * 0.5, 92 - size.y + sway), size), false)
+		var stride: float=e.get("step",0.0)
+		var active: bool=e.get("moving",false)
+		var sway := sin(sim.tick_time*1.6)*2.0 + (sin(stride*2.0)*3.0 if active else 0.0)
+		visual_transform(p,(sin(stride)*0.025 if active else sin(sim.tick_time*1.6)*0.006))
+		draw_texture_rect(tex, Rect2(Vector2(-size.x * 0.5, 92 - size.y + sway), size), false)
+		visual_transform(Vector2.ZERO)
+	if e.get("brood_flash",0.0)>0:
+		text_at(p+Vector2(-80,-size.y+65),"MINI POLVOS!",Color("c4a2ff"),16)
 	if pose == "charge":
 		var k: float = 1.0 - e.charge / 0.9
 		draw_circle(p - Vector2(0, 20), 10 + k * 26, Color(0.65, 0.3, 1, 0.12 + k * 0.2))
@@ -1629,7 +1939,7 @@ func draw_screen_flash() -> void:
 			if t > 0.44 and t < 0.66:
 				var a := 1.0 - absf(t - 0.47) / 0.19
 				var owner: Dictionary = sim.actors[fx.get("owner", 0)]
-				draw_rect(Rect2(owner.p - Vector2(3000, 3000), Vector2(6000, 6000)), Color(1, 1, 0.95, clampf(a, 0, 1) * 0.85))
+				draw_rect(Rect2(owner.p - Vector2(3000, 3000), Vector2(6000, 6000)), Color(1, 1, 0.95, clampf(a, 0, 1) * 0.85 * screen_flash_strength))
 
 # ── 0.13: Titan só usa vistas reais (lado nas diagonais), bomba, explosões e efeitos do cenário ──
 func titan_pose(f: Vector2) -> Array:
@@ -1655,7 +1965,7 @@ func draw_bomb(b: Dictionary) -> void:
 	var height := sin(k * PI) * 170.0
 	var p: Vector2 = b.p - Vector2(0, 30 + height)
 	visual_transform(b.p, 0, Vector2(1, 0.4)); draw_circle(Vector2.ZERO, 12 * (1.0 - height / 250.0), Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
-	draw_circle(p, 11, Color("1d1e24")); draw_circle(p - Vector2(3, 3), 4, Color("7d808c"))
+	draw_texture_rect(world_detail_art.textures.bomb,Rect2(p-Vector2(19,25),Vector2(38,42)),false)
 	var spark := p + Vector2(6, -12) + Vector2(sin(sim.tick_time * 40) * 2, 0)
 	draw_circle(spark, 4, Color(1, 0.8, 0.3)); scenery.lights.append({"p": spark, "kind": "bulb"})
 
@@ -1664,16 +1974,7 @@ func draw_fx_013(fx: Dictionary) -> void:
 	var p: Vector2 = fx.p
 	match fx.kind:
 		"explosion":
-			var r: float = fx.get("r", 100.0)
-			visual_transform(p, 0, Vector2(1, 0.62))
-			draw_circle(Vector2.ZERO, r * (0.3 + 0.8 * t), Color(1, 0.55, 0.15, 0.45 * (1 - t)))
-			draw_circle(Vector2.ZERO, r * (0.2 + 0.5 * t), Color(1, 0.9, 0.5, 0.7 * (1 - t)))
-			draw_arc(Vector2.ZERO, r * (0.5 + 0.7 * t), 0, TAU, 40, Color(1, 0.8, 0.5, 1 - t), 4)
-			visual_transform(Vector2.ZERO)
-			for n in range(12):
-				var d := Vector2.RIGHT.rotated(n * TAU / 12 + p.x)
-				draw_circle(p + d * r * t * Vector2(1, 0.6) - Vector2(0, sin(t * PI) * 40), 7 * (1 - t) + 2, Color(0.35, 0.3, 0.3, 0.6 * (1 - t)))
-			scenery.lights.append({"p": p, "kind": "blast", "r": r * 1.6 * (1 - t * 0.6)})
+			ExplosionVisuals.draw(self,fx,scenery.lights)
 		"tentacle_strike":
 			var dir: Vector2 = fx.get("dir", Vector2.RIGHT)
 			var tip: Vector2 = p + dir * 80 * sin(t * PI) - Vector2(0, 30 + 40 * sin(t * PI))
@@ -1719,26 +2020,59 @@ func draw_fx_013(fx: Dictionary) -> void:
 func draw_chest_hd(chest: Dictionary) -> void:
 	var p: Vector2 = chest.p
 	var closed: Texture2D = scenery.props.chest
-	var opened: Texture2D = scenery.props.chest_open
+	var opened: Texture2D = scenery.props.chest_empty
 	visual_transform(p + Vector2(0, 6), 0, Vector2(1, 0.35)); draw_circle(Vector2.ZERO, 34, Color(0, 0, 0, 0.35)); visual_transform(Vector2.ZERO)
 	var s := 0.66
+	var csz := closed.get_size() * s
+	var tint := Color(1.25, 1.1, 0.5) if chest.get("reward", false) else Color.WHITE
 	if not chest.open:
-		var bob := sin(sim.tick_time * 2.0 + p.x) * 1.0
-		var sz := closed.get_size() * s
-		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8 + bob), sz), false, Color(1.25,1.1,0.5) if chest.get("reward",false) else Color.WHITE)
+		# respiração sutil + faíscas subindo — o baú convida antes de ser tocado
+		var breathe := 1.0 + 0.02 * sin(sim.tick_time * 1.8 + p.x * 0.01)
+		var sz := Vector2(csz.x, csz.y * breathe)
+		draw_texture_rect(closed, Rect2(p - Vector2(sz.x * 0.5, sz.y - 8), sz), false, tint)
+		for k in range(3):
+			var ph := fposmod(sim.tick_time * 0.45 + k * 0.34 + p.x * 0.013, 1.0)
+			var mote := p + Vector2(sin(ph * 9.4 + k * 2.1) * csz.x * 0.45, -csz.y - 2 - ph * 24)
+			draw_circle(mote, 1.6, Color(1, 0.9, 0.5, sin(ph * PI) * 0.5))
 		var glint := fposmod(sim.tick_time * 0.7 + p.x * 0.01, 3.0)
-		if glint < 0.3: draw_circle(p + Vector2(-sz.x * 0.4 + glint * sz.x * 2.6, -sz.y + 18), 2.5, Color(1, 1, 0.85, 0.85))
+		if glint < 0.3:
+			var gp := p + Vector2(-csz.x * 0.4 + glint * csz.x * 2.6, -csz.y + 18)
+			draw_circle(gp, 2.5, Color(1, 1, 0.85, 0.85))
+			draw_line(gp - Vector2(5, 0), gp + Vector2(5, 0), Color(1, 1, 0.85, 0.4), 1.5)
+			draw_line(gp - Vector2(0, 5), gp + Vector2(0, 5), Color(1, 1, 0.85, 0.4), 1.5)
 		return
 	var t: float = sim.tick_time - chest.get("t", -99.0)
-	var shake := Vector2(sin(t * 90) * 2.5, 0) if t < 0.22 else Vector2.ZERO
-	var tex: Texture2D = closed if t < 0.22 else opened
-	var pop := 1.0 + 0.12 * maxf(0, 1.0 - absf(t - 0.3) / 0.15) if t < 0.5 else 1.0
-	var sz2 := tex.get_size() * s * pop
-	draw_texture_rect(tex, Rect2(p + shake - Vector2(sz2.x * 0.5, sz2.y - 8), sz2), false, Color(1, 1, 1).darkened(0.25 if t > 3.0 else 0.0))
-	if t > 0.22 and t < 3.0:
-		var glow := 0.6 + 0.4 * sin(sim.tick_time * 5)
-		scenery.lights.append({"p": p - Vector2(0, 30), "kind": "bulb"})
-		draw_circle(p - Vector2(0, 34), 14 * glow, Color(1, 0.85, 0.4, 0.25 * glow))
+	var c_origin := p - Vector2(csz.x * 0.5, csz.y - 8)
+	var lid_src_h := 40.0  # cúpula no sprite fechado (99×93 → tampa até ~y=40)
+	var lid_h := lid_src_h * s
+	if t < 0.26:
+		# antecipação: tremida crescente + squash antes do estalo
+		var w := t / 0.26
+		var shake := Vector2(sin(t * 95) * 2.6 * (0.4 + 0.6 * w), 0)
+		var sz2 := Vector2(csz.x * (1.0 + 0.06 * w), csz.y * (1.0 - 0.08 * w))
+		draw_texture_rect(closed, Rect2(p + shake - Vector2(sz2.x * 0.5, sz2.y - 8), sz2), false, tint)
+		return
+	var k := clampf((t - 0.26) / 0.45, 0, 1)
+	var ease := 1.0 - pow(1.0 - k, 3)
+	var osz: Vector2 = scenery.props.chest_open.get_size() * s
+	if k < 1.0:
+		# luz escapando pela fresta enquanto a tampa abre
+		var seam := c_origin + Vector2(csz.x * 0.5, lid_h)
+		var beam := sin(ease * PI)
+		for n in range(5):
+			var ang := -PI / 2 + (n - 2) * 0.3
+			draw_line(seam, seam + Vector2.RIGHT.rotated(ang) * (20 + 60 * ease), Color(1, 0.85, 0.4, 0.5 * beam), 3)
+		draw_circle(seam - Vector2(0, 6), 16 * beam, Color(1, 0.85, 0.4, 0.35 * beam))
+	# baú aberto assume com um estalo de escala
+	var pop := 1.0 + 0.12 * sin(min(ease * 1.3, 1.0) * PI)
+	var osz2 := osz * pop
+	draw_texture_rect(opened, Rect2(p - Vector2(osz2.x * 0.5, osz2.y - 8), osz2), false, Color(1, 1, 1, ease).darkened(0.25 if t > 3.0 else 0.0))
+	if k < 1.0:
+		# corpo fechado some em crossfade; a cúpula gira na dobradiça e evapora
+		draw_texture_rect_region(closed, Rect2(c_origin + Vector2(0, lid_h), Vector2(csz.x, csz.y - lid_h)), Rect2(0, lid_src_h, closed.get_size().x, closed.get_size().y - lid_src_h), Color(1, 1, 1, 1 - ease))
+		visual_transform(c_origin + Vector2(csz.x * 0.5, lid_h), -ease * 1.5, Vector2(1.0 - 0.25 * ease, 1.0 - 0.25 * ease))
+		draw_texture_rect_region(closed, Rect2(-csz.x * 0.5, -lid_h, csz.x, lid_h), Rect2(0, 0, closed.get_size().x, lid_src_h), Color(1, 1, 1, 1 - ease * ease))
+		visual_transform(Vector2.ZERO)
 
 # 0.18: transformação única ao redor dos pés; mantém mão, arma e corpo unidos.
 var visual_origin := Vector2.ZERO
@@ -1769,4 +2103,52 @@ func draw_combat_warnings() -> void:
 			draw_line(enemy.p - Vector2(0, 28), aim - Vector2(0, 28), Color(1, 0.75, 0.4, 0.65), 2)
 		text_at(enemy.p + Vector2(-5, -106), "!", Color("ffe281"), 20)
 static func chapel_npc_label(quest_state: int) -> String:
-	return "PESCADOR • INTERAGIR" if quest_state == 0 else ("PESCADOR • RETORNAR" if quest_state == 1 else "PESCADOR")
+	return "MESTRE CORAL • INTERAGIR" if quest_state == 0 else ("MESTRE CORAL • RETORNAR" if quest_state == 1 else "MESTRE CORAL")
+
+# P8 — golden retriever mutante: gordo, redondo, olhos grandes e bobos,
+# sempre faminto; a única mutação física é a LÍNGUA GIGANTE (e o teleporte).
+func draw_dog(d: Dictionary) -> void:
+	var p: Vector2=d.p
+	var t: float=d.get("t",sim.tick_time)
+	visual_transform(p+Vector2(0,2),0,Vector2(1,0.28))
+	draw_circle(Vector2.ZERO,35,Color(0.02,0.025,0.03,0.3))
+	visual_transform(Vector2.ZERO)
+	var target_id := int(d.get("target",-1))
+	if d.get("state","")=="licking" and target_id>=0 and target_id<sim.actors.size():
+		var direction: float = sim.actors[target_id].p.x-p.x
+		if absf(direction)>1: dog_visuals.facing=signf(direction)
+	dog_visuals.draw(self,d,t)
+	if d.get("state","")=="licking" and target_id>=0 and target_id<sim.actors.size():
+		var mouth: Vector2=dog_visuals.mouth(p,t,d.get("velocity",Vector2.ZERO).length()>1)
+		var target: Vector2=sim.actors[target_id].p-Vector2(0,44)
+		var progress := clampf(1.0-float(d.get("lick_t",0.0))/0.9,0.0,1.0)
+		var reach := minf(1.0,sin(progress*PI)*1.8)
+		var tip := mouth.lerp(target,reach)
+		var control := mouth.lerp(tip,0.5)+Vector2(0,12*sin(progress*TAU))
+		var curve := PackedVector2Array()
+		for i in 17:
+			var f := float(i)/16.0
+			curve.append(mouth.lerp(control,f).lerp(control.lerp(tip,f),f))
+		draw_polyline(curve,Color("9b3851"),10,true)
+		draw_polyline(curve,Color("ef8299"),7,true)
+		draw_circle(tip,4,Color("ef8299"))
+	if sim.mode=="run" and d.get("state")=="hiding": text_at(p+Vector2(-6,-94),"?",Color("ffd9f0"),22)
+func draw_cult_follower(p: Vector2, seed_i: int) -> void:
+	world_detail_art.follower(self,p,sim.tick_time,seed_i)
+
+# Animated plasma shell: short trail, layered blue body and a rotating energy ring.
+func draw_omega_orb(center: Vector2, direction: Vector2, radius: float, clock: float) -> void:
+	var pulse := 0.96 + sin(clock * 19.0) * 0.04
+	var r := radius * pulse
+	for index in range(4, 0, -1):
+		draw_circle(center - direction * index * r * 0.44, r * (1.0 - index * 0.15), Color(0.08, 0.42, 1.0, 0.18 - index * 0.025))
+	draw_circle(center, r * 1.2, Color(0.08, 0.38, 1.0, 0.16))
+	# Full-resolution plasma is bounded in world units, with its transparent corona.
+	visual_transform(center, clock * 0.7)
+	draw_texture_rect(omega_orb_art, Rect2(Vector2.ONE * -r * 1.15, Vector2.ONE * r * 2.3), false)
+	visual_transform(Vector2.ZERO)
+	for spark in range(3):
+		var angle := clock * 3.0 + spark * TAU / 3.0
+		var point := center + Vector2.RIGHT.rotated(angle) * r * 0.82
+		draw_arc(point, r * 0.16, angle, angle + PI * 1.25, 8, Color(0.7, 0.98, 1.0, 0.7), 1.4)
+	draw_arc(center, r * 1.03, clock * 6, clock * 6 + PI * 1.4, 28, Color("9bedff"), 2.5)

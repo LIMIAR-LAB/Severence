@@ -13,7 +13,7 @@ func _init() -> void:
 	var rewards: Array=s.chests.filter(func(c): return c.get("reward",false))
 	check(rewards.size()==1 and rewards[0].p==death,"miniboss deixa baú no local da morte")
 	s.keys=0; a.p=death; s.interact(a)
-	check(rewards[0].open and s.keys==0 and s.weapon_of(a)=="bazooka" and a.run_weapons.bazooka==3,"baú gratuito equipa bazuca temporária")
+	check(rewards[0].open and s.keys==0 and s.weapon_of(a)=="bazooka" and a.run_weapons.bazooka==15,"baú gratuito equipa bazuca temporária")
 	check(s.weapon_of(s.actors[1])!="bazooka","troca não altera arma do parceiro")
 	var top={"p":a.p,"open":false,"reward":true,"secret":false}
 	var before:int=s.materials

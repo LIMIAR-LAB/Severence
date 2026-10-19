@@ -10,6 +10,7 @@ func check(ok: bool, description: String) -> void:
 	else: failures += 1; push_error(description)
 
 func _initialize() -> void:
+	preload("res://tests/support/isolated_user_data.gd").activate()
 	run.call_deferred()
 
 func run() -> void:

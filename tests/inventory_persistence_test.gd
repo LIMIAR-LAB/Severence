@@ -7,6 +7,7 @@ func check(ok: bool, description: String) -> void:
 	else: failures += 1; push_error(description)
 
 func _initialize() -> void:
+	preload("res://tests/support/isolated_user_data.gd").activate()
 	run.call_deferred()
 
 func run() -> void:
@@ -41,8 +42,9 @@ func run() -> void:
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	file.store_var({"version": 1, "state": legacy_state, "rng_state": sim.rng.state, "coop": "solo"}); file.close()
 	var app = load("res://scenes/main.tscn").instantiate(); root.add_child(app); await process_frame
-	check(app.load_game() and app.sim.spectres.size() == 2, "arquivo v1 real migra sem apagar Spectres")
-	check(app.sim.inventory_state.has("stacks") and app.sim.inventory_state.stacks.has("arma_blaster"), "arquivo v1 recebe inventário padrão")
+	var original_profile: Dictionary = app.profile_data().duplicate(true)
+	check(not app.load_game() and not app.load_error.is_empty(), "checkpoint v1 sem revisão é recusado com explicação")
+	check(app.profile_data() == original_profile and app.sim.spectres.size() == 2, "recusa do checkpoint antigo preserva perfil e robôs locais")
 	var invalid_state := legacy_state.duplicate(true); invalid_state.actors = [{}, {}]
 	file = FileAccess.open(path, FileAccess.WRITE); file.store_var({"version": 2, "state": invalid_state}); file.close()
 	check(not app.load_game(), "save com atores malformados é rejeitado antes de aplicar")

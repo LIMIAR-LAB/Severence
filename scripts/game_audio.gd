@@ -3,7 +3,8 @@ extends Node
 const ROOT := "res://assets/audio/generated/"
 const SFX_KEYS := ["pistol", "shotgun", "smg", "bazooka", "mech", "sword", "melee", "spectre",
 	"enemy_cult", "enemy_fish", "enemy_crawler", "enemy_brute", "enemy_guard", "enemy_bomber",
-	"enemy_warden", "enemy_boss", "enemy_die", "explosion", "hit", "jump", "dash", "pickup", "dry_fire"]
+	"enemy_warden", "enemy_boss", "enemy_die", "explosion", "hit", "jump", "dash", "pickup", "dry_fire",
+	"whisper"]
 const VOICES := 20
 const MAX_DISTANCE := 1300.0
 var samples: Dictionary = {}
@@ -73,6 +74,14 @@ func set_volume(percent: float) -> void:
 	if index >= 0:
 		AudioServer.set_bus_mute(index, master <= 0.0)
 		AudioServer.set_bus_volume_db(index, linear_to_db(master) if master > 0 else -80.0)
+
+func set_channel_volumes(music_percent: float, effects_percent: float) -> void:
+	for channel in [["Severence Music", music_percent], ["Severence SFX", effects_percent]]:
+		var index := AudioServer.get_bus_index(channel[0])
+		var gain := clampf(float(channel[1]) / 100.0, 0.0, 1.0)
+		if index >= 0:
+			AudioServer.set_bus_mute(index, gain <= 0.0)
+			AudioServer.set_bus_volume_db(index, linear_to_db(gain) if gain > 0 else -80.0)
 
 func discard_history(sequence: int) -> void:
 	last_sequence = sequence

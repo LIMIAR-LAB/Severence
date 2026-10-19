@@ -1,3 +1,19 @@
+# Dez salas restantes integradas — 03/10/2026
+
+Mercado, Oficina, Gerador, Munição, Ferrovia, Farol, Doque, Adega, Contrabando e Antessala receberam pinturas próprias. Uma geração por sala, dez imagens 2048², estimativa27,5créditos; manifestos/prompts/IDs em art/scenarios/scn-production/remaining-fixed-v01. Objetos com escala uniforme, colisões traçadas, entradas preservadas e elenco/interações reposicionados quando necessário. Mangue e Ponte receberam acabamento reaproveitando material existente. Adega respeita CellarPlatforms e seus canais80px.
+
+188 verificações das salas passaram, além de15 da Adega, cobertura das18ligações e route_p12. Capturas reais em test-output/remaining-fixed-v01. Novas expedições usam revisão6/remaining_fixed_version1; saves antigos não são migrados nem repintados. Nenhum commit, push ou nova rodada de geração. Detalhes em _bmad-output/implementation-artifacts/spec-restantes-pinturas-fixas.md.
+
+---
+# Acabamento dos corredores — 03/10/2026
+
+Revisão ampliada após usuário apontar cobertura incompleta: 35 capturas das 18 ligações (15 normais, secreta e dois atalhos). Corrigido fundo ausente da secreta e piso/paredes antigos nos fragmentos dos atalhos; descoberta também usa lista completa. `all_corridors_finish_test` passou com 16 fragmentos externos, travessias Marty/Titan ida/volta e save preservado; regressões de visibilidade/travessia passaram. Evidência atual: test-output/corridors-all-after. As quatro capturas abaixo eram cobertura parcial, agora substituída pela revisão completa das ligações.
+
+Atendido pedido direto de ajustar corredores antes da próxima sala. Capturas atuais reproduziram entorno preto: a chamada do fundo havia sido removida. Restaurado fundo usando amostra somente de água, com recorte fora das salas; bordas inferiores ganharam face de cais. Retirados pilares/setas genéricos sobre entradas pintadas da Doca e do Armazém, mantendo barreiras dinâmicas trancadas. Transições deixam de ser desenhadas em duplicidade. Geometria, imagens aprovadas, mudanças externas e save preservados.
+
+Passaram corridor_finish_test e corridor_visibility_test, zero falhas. Quatro capturas reais antes/depois em test-output/corridors-review-before e test-output/corridors-review-after. Nenhuma geração ou commit; Mercado não iniciado nesta rodada. Especificação: _bmad-output/implementation-artifacts/spec-acabamento-corredores.md.
+
+---
 # Piloto vigente — Armazém7 v01 integrado, 30/09/2026
 
 Após correção dos corredores, usuário autorizou explicitamente seguir. Armazém7/warehouse gerado e integrado, aguardando revisão visual. Uma geração Higgsfield GPT Image2.5 (job572ccb09-951e-4748-a7df-70ec7a100714, estimativa2,75créditos), referência Pátio aprovado. Fonte, prompt, gabarito e verificação em art/scenarios/scn-production/warehouse-fixed-v01. Capturas reais em implementation-artifacts/cenarios-base/captures/warehouse-fixed-v01.

@@ -1,0 +1,9 @@
+{
+  "provider": "GameLab MCP",
+  "project_id": 30458,
+  "asset_id": 64197,
+  "image_job_id": "9aa34fb4-0d66-4b0f-bf11-38979560dcce",
+  "cutout_job_id": "6e0ae397-3131-4378-b9fe-caec0c095669",
+  "credits_debited": 1,
+  "prompt": "SUPERNOVA armor for Marty, new solar reactor battle suit for a 2D top-down action RPG. Reference image ONLY establishes small stylized hero proportions and pixel-art craftsmanship, NOT the armor design. New design: dark obsidian segmented underarmor, burnished copper and pale gold plates, compact rounded pauldrons, white-hot circular star reactor in the chest, amber visor inside a sealed angular helmet, orange glowing seams, thick armored boots, two compact back thrusters. No cape, no weapon held, no text. Production directional sprite atlas: EXACTLY eight full-body figures in a regular 4-column by 2-row grid, each cell exactly 256x256 in a 1024x512 image. All figures identical height 210 pixels, feet centered at local y=238, bodies centered x=128, ample empty margins. Same identical armor in every cell. Row 1 left to right: FRONT facing south, SOUTH-EAST three-quarter front, EAST right profile, NORTH-EAST three-quarter back. Row 2: BACK north, NORTH-WEST three-quarter back, WEST left profile, SOUTH-WEST three-quarter front. Neutral hovering combat stance with arms slightly away from torso, feet close together. Crisp handcrafted pixel art, readable silhouette, consistent orthographic slightly elevated camera and scale, no perspective size change. No cast shadows or extra objects."
+}

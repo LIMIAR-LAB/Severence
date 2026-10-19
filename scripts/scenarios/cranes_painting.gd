@@ -1,6 +1,7 @@
 extends RefCounted
 const Geometry = preload("res://scripts/scenarios/cranes_fixed.gd")
 var texture: Texture2D
+var iron_gate:=preload("res://scripts/scenarios/iron_gate_art.gd").new()
 func ground(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
 	if not Geometry.active(sim): return
 	if texture==null and ResourceLoader.exists(Geometry.TEXTURE): texture=load(Geometry.TEXTURE)
@@ -14,13 +15,7 @@ func ground(ci: CanvasItem, sim, rooms: Array, view: Rect2) -> void:
 		return
 	if area.intersects(view): ci.draw_texture_rect(texture,area,false)
 func gate(ci: CanvasItem, door: Dictionary, locked: bool) -> void:
-	if not locked: return
-	ci.draw_rect(door.r,Color("382d28"))
-	ci.draw_rect(door.r,Color("e3773e"),false,3)
-	var horizontal: bool=door.r.size.x>door.r.size.y
-	for i in range(0,int(door.r.size.x if horizontal else door.r.size.y),18):
-		var start: Vector2=door.r.position+(Vector2(i,0) if horizontal else Vector2(0,i))
-		ci.draw_line(start,start+(Vector2(0,door.r.size.y) if horizontal else Vector2(door.r.size.x,0)),Color("ab8060"),3)
+	iron_gate.draw(ci,door,locked)
 
 func overhead(ci: CanvasItem, sim, rooms: Array) -> void:
 	if texture==null or not Geometry.active(sim) or not rooms.any(func(r):return r.id=="cranes"): return

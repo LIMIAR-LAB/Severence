@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-03",
+  "asset": "timber.png",
+  "generator": "image_gen",
+  "purpose": "Continuous timber transition decks between rooms, replacing sampled masonry corridor surfaces",
+  "source": "exec-4a025194-c648-4f0f-b47e-610ee7d95f26.png",
+  "integration": "Full texture repeated at 640 world units, rotated for horizontal routes; low iron edges and 48-unit entrance landings",
+  "verification": "18 routes, 35 rendered views, traversal checks passed; saved expedition unchanged"
+}

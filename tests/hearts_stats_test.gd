@@ -21,6 +21,18 @@ func _init() -> void:
 	check(s.materials == mats and s.max_hp() == 3 * s.HEART, "bancada não compra corações por enquanto")
 	s.heal(a, 5)
 	check(a.hp <= 3 * s.HEART, "cura nunca passa de 3 corações")
+	s.start_arena(); a = s.actors[0]
+	s.damage_actor(a, 0.1)
+	check(a.hp == 2 * s.HEART, "golpe pequeno tira um coração inteiro")
+	s.damage_actor(a, 8)
+	check(a.hp == 2 * s.HEART, "invulnerabilidade ainda impede golpes consecutivos")
+	a.hurt = 0; s.damage_actor(a, 0)
+	check(a.hp == 2 * s.HEART and a.hurt == 0, "dano zero não tira vida nem ativa invulnerabilidade")
+	a.shield = 3 * s.HEART; s.damage_actor(a, 1)
+	check(a.shield == 2 * s.HEART and a.hp == 2 * s.HEART, "escudo absorve um coração inteiro por golpe")
+	a.shield = 0; a.hurt = 0; s.damage_actor(a, 8)
+	a.hurt = 0; s.damage_actor(a, 8)
+	check(a.hp == 0 and a.dead, "três golpes confirmados derrubam personagem com três corações")
 	# armas: o tiro real usa os mesmos números mostrados na tela
 	s.start_arena()
 	for outfit in ["padrao", "mecanico", "espiao"]:
@@ -37,7 +49,7 @@ func _init() -> void:
 	var titan: Array = s.loadout_stats("titan")
 	check(find(titan, "INTEGRIDADE")[1] == str(int(s.new_mech(Vector2.ZERO).hp)) and find(titan, "CANHÃO")[1].begins_with(str(int(s.MECH_SHELL.damage))), "Titan: integridade e canhão reais")
 	var omega: Array = s.loadout_stats("omega")
-	check(find(omega, "VELOCIDADE")[1] == str(int(s.ARMORS.omega.speed)) and find(omega, "LÂMINA")[1].ends_with(str(int(s.SWORD.finisher))), "Ômega: velocidade e lâmina reais")
+	check(find(omega, "VELOCIDADE")[1] == str(int(s.ARMORS.omega.speed)) and find(omega, "ENERGIA")[1].ends_with(str(int(s.SWORD.finisher))), "Ômega: velocidade e lâmina reais")
 	var sp: Array = s.loadout_stats("spectre")
 	check(find(sp, "ENERGIA")[1] == str(int(s.SPECTRE_HP)), "Spectre: energia real")
 	print("HEARTS_STATS_TESTS_DONE failures=%d" % failures)

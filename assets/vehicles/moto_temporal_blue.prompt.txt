@@ -1,0 +1,5 @@
+Created with built-in image_gen, transparent background, 2026-10-03.
+
+Blue motorcycle edit: Change only the red body panels of moto_temporal.png to cobalt/royal blue, preserving geometry, black tires, bronze hardware, cyan lights and transparent background.
+
+Mounted pose edit: Use moto_temporal_blue.png as edit target and assets/characters/marty/omega/rounded_v4/idle.png as character identity reference. Add one Omega rider seated astride the saddle, hips on the seat, torso leaning forward, knees bent, boots on foot pegs and both hands gripping the handlebar. Preserve blue motorcycle identity and east-facing three-quarter camera. Gold/white rounded armor, cyan visor/joints, purple cape. No standing, hovering, straight legs, scene or background. Preserve whole vehicle width and wheel ground alignment. Truly transparent game sprite.

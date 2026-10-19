@@ -1,0 +1,3 @@
+Generated with the built-in image_gen tool on 2026-10-04.
+
+Use case: stylized-concept. Asset: game NPC sprite Faisca, full body single male cyberpunk biker, purple leather jacket and trousers, black heavy boots, cyan futuristic narrow visor sunglasses, short swept-back silver hair with shaved sides, visible leather seams and chrome buckles, cocky relaxed standing pose hands near belt, three-quarter front facing slightly right. Hand-painted detailed pixel-art aesthetic for a top-down 2D action RPG, slightly elevated camera, readable bold silhouette, small proportionally stylized head, no motorcycle no props no text no border no ground shadow. Single figure centered with generous transparent margins. True transparent background.
